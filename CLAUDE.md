@@ -1,6 +1,6 @@
 # CLAUDE.md — Claude Code / Claude Project
 
-> Mirror of AGENTS.md tuned for Claude. Upload `docs/*` + this file to a Claude Project.
+> Agent-nav entry is thin [`AGENTS.md`](./AGENTS.md) (load FEATURE-MAP, then one feature doc). This file is the Claude Project engineering mirror — not a second copy of the whole repo. Upload `docs/*` + this file to a Claude Project.
 
 ## Role
 
