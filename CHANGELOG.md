@@ -8,11 +8,12 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
-## 2026-09-15 — Docs sync
+## 2026-09-15 — Agent-nav docs + status snapshot
 
-- Add this changelog (honest recap from git; no app-code claims beyond what landed).
-- Add [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md): Done / Pending / Needs from Ashish / Next.
-- Record current product identity and open gaps without shipping code.
+- Slim [`AGENTS.md`](./AGENTS.md) to a thin entry (pointer tables + working loop). Do not load all of `docs/`.
+- Add [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md), [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md), and [`docs/features/`](./docs/features/) (capture→prove, MCP plugin, design dogfood, training-data/MCP sink, showcase/Tiller).
+- Add this changelog and [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md) (Done / Pending / Stuck / Needs from Ashish / Next).
+- Registry lists only in-repo skills, the `tell` MCP server, and no Cursor plugin package. No app code.
 
 ---
 

@@ -1,6 +1,6 @@
 # Tell Proof — project status
 
-Snapshot: **2026-09-15**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). This file is the honest Done / Pending / Needs / Next cut.
+Snapshot: **2026-09-15**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). Agent-nav: [`AGENTS.md`](../AGENTS.md) → [`FEATURE-MAP.md`](./FEATURE-MAP.md) → one [`features/`](./features/) file. This page is the honest Done / Pending / Stuck / Needs / Next cut.
 
 **What this product is:** a Cursor / Grok Build **plugin** for world-class site and app design across many sessions — observe, name, direct, repair, prove. Agents write code; Tell proves the UI.
 
@@ -37,6 +37,14 @@ These are open even where partial code exists:
 
 3. **Tiller missing from showcase / GitHub**  
    Still open. In-repo page and a README still exist; the public surface still does not present Tiller as a first-class offering. Do not treat `#74` / `#75` as closing this.
+
+---
+
+## Stuck
+
+- **Eng attention parked** on DeepHarness honesty. Tell Proof work (including the pending items above) waits until Ashish unblocks.
+- **Tiller public gap** is stuck on a definition: in-repo specimen exists; “missing from showcase/GitHub” is not a code path we can close without Ashish naming the miss.
+- **Training sink** is stuck on a real `tell-design-data` sibling to prove curated SFT/DPO — not on more writer code in this repo.
 
 ---
 

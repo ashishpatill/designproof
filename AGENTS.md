@@ -1,176 +1,65 @@
-# AGENTS.md — Cursor Agent instructions
+# AGENTS.md — entry only
 
-You are building **Tell**: an AI taste critic for rendered UI. Read [USER_STORY.md](./USER_STORY.md) first — every feature serves Ashish's journey (solo founder, shipped with Cursor, UI looks generic, demo tomorrow).
+Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app design across many sessions. Agents write code; Tell observes the **rendered** UI, names genericness tells and drift, takes plain-English art-direction, drafts patches, and proves them in a disposable checkout. Humans approve — `tell_apply` never writes files.
 
-## Mission
+`/studio` and `/showcase` are dogfood and specimens. They are not the product.
 
-Capture rendered UI → deterministic fingerprint → detect tells + drift → taste verdict → voice art-direction → redesign diff → apply in Cursor (human approves).
+**Do not load entire `docs/`. Open only the FEATURE-MAP rows that match this task.**
 
-## Non-negotiables
+Status: [`CHANGELOG.md`](./CHANGELOG.md) · [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md)  
+Registry: [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md) · [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md)
 
-1. **Deterministic core** — `packages/core` has zero LLM calls. Taste/redesign only.
-2. **Never auto-apply** — MCP `tell_apply` returns patches; human applies.
-3. **Schemas** — all boundaries use `@tell/schema` zod types.
-4. **Tokens only** in `apps/web` — no raw hex in classNames (dogfood).
-5. **User-first copy** — critic voice, problem-oriented, see USER_STORY copy bank.
-6. **Measured reconciliation** — any after-state must preserve readable contrast and explain the measured improvement.
-7. **Build order** — follow BUILD.md §8 milestones M1→M10; protect cut line.
+---
 
-## Where things live
+## Standing rules
 
-| Path | Purpose |
-|---|---|
-| `packages/schema` | Zod contracts — edit first |
-| `packages/core` | Capture, fingerprint, detectors |
-| `packages/taste` | Gemini taste + deterministic/Gemini voice direction parsing |
-| `packages/redesign` | Contrast-grounded reconciliation + diff generation |
-| `packages/mcp` | Cursor MCP server |
-| `packages/cli` | `tell` CLI — diagnose, voice, mcp install, doctor, install-info |
-| `apps/web` | Ashish-facing UI + `/api/diagnose`, `/api/setup/*`, `/api/voice`, `/api/redesign`, `/api/install-info` |
-| `apps/web/src/lib/cursor-redesign.ts` | Cursor-SDK-backed patch drafting with deterministic fallback |
-| `apps/web/src/lib/repo-runner.ts` | GitHub clone → install → reachable dev server (local only) |
-| `apps/web/src/lib/discover-routes.ts` | Multi-page route discovery from snapshot HTML |
-| `packages/redesign/src/reconcile.ts` | Deterministic token reconciliation for live seam |
-| `fixtures/generic-app` | Demo "before" (labeled input, not our work) |
-| `fixtures/reports/` | Offline demo artifacts |
+- **Ship bar:** stacked images, motion, artistic, unique. Not one-shot AI generate.
+- **Park:** secondary to DeepHarness honesty — do not pull eng attention here while that is open.
+- **Local CI only:** never wait on or re-run GitHub Actions. Gate on `pnpm test` / `pnpm typecheck`.
+- **Deterministic core** (`packages/core`): zero LLM. Zod at every boundary (`@tell/schema`).
+- **Never auto-apply.** Tokens only in `apps/web` (no raw hex in classNames).
+- **No invented connectors.** Skills/MCP/plugins: only what [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md) lists as in-repo.
 
-## Parallel workstreams (multitask)
+Persona / copy: [`USER_STORY.md`](./USER_STORY.md). Engineering contracts: [`BUILD.md`](./BUILD.md). Checklists: [`PLAN.md`](./PLAN.md). Visuals: [`docs/01_DESIGN_SYSTEM.md`](./docs/01_DESIGN_SYSTEM.md). Model pins: [`ORCHESTRATION.md`](./ORCHESTRATION.md).
 
-When using Task/subagents, split by package boundary — never split a zod schema across agents:
+---
 
-| Agent | Scope | DoD |
+## Working loop
+
+1. Read **this file only**.
+2. Match the task to [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md) row(s).
+3. Open **those** feature doc(s) + the listed skills / MCP.
+4. Skip unrelated features.
+5. When done: prepend [`CHANGELOG.md`](./CHANGELOG.md); refresh the matching row in [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md).
+
+---
+
+## Feature → doc
+
+| Feature | Open | When |
 |---|---|---|
-| A | `packages/schema` + `packages/core` detectors | vitest green on fixture JSON |
-| B | `packages/taste` + `packages/redesign` | mock taste returns valid verdicts |
-| C | `apps/web` components | matches docs/01_DESIGN_SYSTEM.md |
-| D | `fixtures/generic-app` | triggers all planted tells |
+| Capture → diagnose → prove | [`docs/features/capture-diagnose-prove.md`](./docs/features/capture-diagnose-prove.md) | Detectors, Report, seam, proof, fixture |
+| MCP plugin (Cursor / Grok) | [`docs/features/mcp-plugin.md`](./docs/features/mcp-plugin.md) | `tell_*` tools, install-info, catalog honesty |
+| Design dogfood loop | [`docs/features/design-dogfood-loop.md`](./docs/features/design-dogfood-loop.md) | Tell’s own UI, Studio bar, multi-session craft |
+| Training-data / MCP sink | [`docs/features/training-data-mcp-sink.md`](./docs/features/training-data-mcp-sink.md) | `tell-design-data`, SFT/DPO, episode writes |
+| Showcase / Tiller | [`docs/features/showcase-tiller.md`](./docs/features/showcase-tiller.md) | Specimens, GitHub README stills, Tiller gap |
 
-Merge only after schema is frozen.
+Full table (status, code paths, skills): [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md).
 
-## MCP tools (use in Agent chat)
+---
 
-Local stdio only — `.cursor/mcp.json` → `pnpm -F @tell/mcp start`, or `tell mcp install cursor --project`. Catalog must match `@tell/schema` `MCP_TOOL_NAMES` / `REGISTERED_MCP_TOOLS` (eleven tools). `tell_apply` returns patch text only — never writes files.
+## Skill / MCP / plugin → load
 
-```
-tell_capture({ url })
-tell_diagnose({ url?, reportPath? })          # no args → committed fixture report (not live)
-tell_redesign({ direction, findingId?, reportId? })
-tell_apply({ proposalId?, projectRoot? })     # patch text + instructions; never writes
-tell_capture_matrix({ url, routes?, compare? })
-tell_proof_verify({ url, patch, projectRoot?, … })   # Report prove
-tell_proof_revert({ projectRoot?, patch? })
-tell_design_from_features({ …brief })         # Studio author
-tell_voice({ transcript })
-tell_install_info({ launch? })
-tell_resolve_intent({ text, fixtureUrl? })
-```
+| Load | How | When required |
+|---|---|---|
+| Feature skill | Read `.cursor/skills/<name>/SKILL.md` | Row in FEATURE-MAP lists it |
+| Tell MCP | `.cursor/mcp.json` → `pnpm -F @tell/mcp start` | Diagnose / redesign / prove / design-from-features in Agent chat |
+| Site research graph | `@website-domain-research` (auto on new sites) | Any new or redesigned website |
+| Always-on media | `@responsive-performance` | After photography lands under `apps/web/public/**` |
+| In-repo plugins | **None** | Do not invent grok-kit or other plugin packages |
 
-## Testing before claiming done
+Names, paths, and “when”: [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md).
 
 ```bash
-pnpm test
-pnpm -F @tell/schema build
-pnpm -F @tell/web typecheck
+pnpm test && pnpm -F @tell/schema build && pnpm -F @tell/web typecheck
 ```
-
-## Demo narrative (do not lead with architecture)
-
-1. Paste a live URL **or** `github.com/owner/repo` → Set up & run / Capture with clear loading and failure states
-2. Named tells with evidence on the real rendered page
-3. Pages strip — scan `/pricing` or other routes for drift
-4. Seam drag — live reconciliation of the captured page with contrast floor called out
-5. Voice: "warmer, editorial, less shadow" → action items + reconciliation table update
-6. Draft fix → copy patch → Apply in Cursor
-7. Dogfood: zero tells on Tell itself
-
-## Project skills
-
-Feature workflows live in `.cursor/skills/`:
-
-- `tell-schema-contracts` — zod contracts first
-- `tell-detector-authoring` — detectors in `packages/core`
-- `tell-capture-fingerprint` — Playwright capture + fingerprint
-- `tell-taste-verdicts` — taste + voice direction
-- `tell-redesign-diff` — reconciliation + diffs
-- `tell-mcp-tools` — MCP integration
-- `tell-report-ui` — web app + API routes
-- `tell-github-setup` — clone/install/run localhost
-- `tell-demo-fixture` — fixtures + offline demo
-- `tell-template-craft` — peer plumbing → measured designer corridors for templates
-- `premium-content-custom-web` — skill graph + Taste Controls for feature-true sites
-- `product-proof-stage` — SaaS product-as-proof workflow (sample path + human approve + HTMX swaps)
-- `conversion-landing-craft` — single-offer landing FAQ/CTA craft
-- `pricing-decision-craft` — cadence toggle + honest plan lanes
-- `scroll-reveal-once` / `motion-stack-craft` / `paper-technical-frame` / `gates-until-verified` — motion (incl. Three/D3/OSS stack craft), atmosphere, verify loop
-- `tell-dogfood-audit` — zero-tells self audit
-- `tell-deploy` — Vercel/Docker public URL
-- `tell-demo-script` — demo + compliance
-- `tell-template-craft` — peer plumbing first, then top-designer craft iteration + screenshot proof
-- `agency-quality-site` — phased agency marketing-site pipeline (Goal/Loop + `agency:run`)
-- `agency-run-learn` — **developer-only** automatic learn after `agency:run` (corpus/engine memory)
-- `website-domain-research` — **auto-triggered** general research graph before any new website (engine `routeSkills` + always-applied rule)
-- `sport-matchday-web` — **auto-triggered** when sportId / sport language; extends website-domain-research
-- `sport-site-research` — **mandatory** sport research gate before cricket/football/hockey/tennis sites
-- `sport-vernacular-craft` — score-spine + format-lens craft from sport packs
-- `responsive-performance` — **always-on** WebP display budgets + lazy/LCP (`pnpm media:site`, `SiteImg`)
-- `tell-user-session-learn` — **end-user** localStorage learning (directions, priorities, tools)
-- `tell-recursive-improve` — champion/challenger loop + `research/LEARNINGS.md` (no nav-only showcase shots)
-- `ship-loop` — analyze PR → fix → semantic commits → push → re-check → merge
-
-**Site builds:** always-applied `tell-site-build-autoload` + `tell-domain-research` require executing the full research/craft graph and media optimize without waiting for the user to wire skills.
-
-## Subagents
-
-Role agents live in `.cursor/agents/`:
-
-- `orchestrator` — milestones and parallel Tasks
-- `core-engineer` — schema + capture + detectors
-- `taste-engineer` — verdicts + direction parsing
-- `redesign-engineer` — reconciliation + diffs
-- `mcp-engineer` — MCP server + Cursor tools
-- `ui-builder` — Tell Report UI
-- `ux-copywriter` — Ashish-facing copy
-- `fixture-smith` — bland demo app
-- `deploy-engineer` — public demo URL
-- `demo-director` — rehearsal + compliance
-- `dogfood-auditor` — M10 self audit
-
-See `ORCHESTRATION.md` for model routing and when to invoke each.
-
-## Docs authority
-
-- Visuals: `docs/01_DESIGN_SYSTEM.md`
-- Engineering: `BUILD.md`
-- Remaining work / goal+loop prompts: `PLAN.md`
-- Screens: `docs/03_CLAUDE_DESIGN_BRIEF.md`
-- Vision/scope: `docs/04_CLAUDE_PROJECT.md`
-- Educational / interactive visualization plan: `docs/07_VISUALIZATION_PLAN.md` (principles only — no third-party author or site names)
-- AI design methods + how to add styles: `docs/08_AI_DESIGN_METHODS.md` (principle-only)
-- Premium content-custom skill graph: `docs/09_PREMIUM_DESIGN_SKILLS.md`, `agent-skills/web-design/premium-content-custom-web/`, `/studio`
-- Agent/platform integration: `docs/11_AGENT_PLATFORM_INTEGRATION_PLAN.md`
-- Auth/security envelopes: `docs/12_AUTH_SECURITY_BOUNDARIES_PLAN.md`
-- Design capability flows: `docs/13_DESIGN_CAPABILITY_FLOWS_PLAN.md`
-- Design training-data curation (research only; collector is separate `tell-design-data` repo): `docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md`
-- Design training-data literature survey (cited): `research/DESIGN_LLM_TRAINING_DATA_SURVEY.md`
-- Sport matchday vernacular (cricket/football/hockey/tennis): `research/SPORT_SITE_VERNACULAR.md`
-- Motion/animation capability plan: `docs/15_MOTION_ANIMATION_PLAN.md`
-- Motion/animation experts + 2026 stacks survey (named; research-only): `research/MOTION_ANIMATION_SURVEY.md`
-- Peer plumbing identity: gitignored `research/plumbing-reference.local.json` (never name the peer in commits)
-
-## Cursor Cloud specific instructions
-
-Node 20+ and pnpm 9 are required (see root `package.json` `engines`/`packageManager`). Dependencies (`pnpm install`) and Playwright Chromium are refreshed by the startup update script — no manual install needed.
-
-Services (both Next.js 14, standard commands in root `package.json`):
-
-| Service | Command | Port | Notes |
-|---|---|---|---|
-| `@tell/web` (the product) | `pnpm dev` | 3000 | Tell Report UI + API routes |
-| `@tell/generic-app` (fixture "before" app) | `pnpm dev:fixture` | 3001 | Local capture target for the demo loop |
-
-Non-obvious caveats:
-
-- **Live capture needs Playwright Chromium.** The update script runs `playwright install chromium`. Verify readiness with `GET /api/health/capture` (expects `{"ok":true}`). If capture can't run, `/api/diagnose` silently falls back to the committed offline report (`fixtures/reports/tell-report.json`) with `meta.live=false` — so a passing UI does not by itself prove live capture works; check `meta.live` or the health route.
-- **End-to-end smoke test:** with both servers up, POST `http://localhost:3000/api/diagnose` with `{"url":"http://localhost:3001"}` (or paste `http://localhost:3001` into the URL field and click Capture). A live run returns `meta.live=true` and 14 findings.
-- **`pnpm lint`** aliases to `pnpm typecheck` (no eslint config in-repo). Use `pnpm typecheck` and `pnpm test`; the `next build` step also performs its own lint/type validation.
-- **No secrets required.** Every AI/remote feature (`GEMINI_API_KEY`, `CURSOR_API_KEY`, `TELL_CAPTURE_API_URL`) has a deterministic/offline fallback; the deterministic core (capture → fingerprint → detect → reconcile) makes zero LLM calls.
