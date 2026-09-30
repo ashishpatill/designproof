@@ -504,8 +504,12 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
     "control-plane-oss": `
 @keyframes ds-keel-in{from{opacity:0;transform:translateY(0.6rem)}to{opacity:1;transform:none}}
 @keyframes ds-keel-cursor{0%,49%{opacity:1}50%,100%{opacity:0}}
-@keyframes ds-keel-permit{0%{box-shadow:0 0 0 0 var(--keel-permit)}100%{box-shadow:none}}
-[data-sitekind="control-plane-oss"]{--m-stagger:100ms;--m-entrance:280ms;--m-reveal:240ms;--keel-permit:#3d9a6a;--keel-deny:#c44b3c}
+@keyframes ds-keel-permit{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c-accent) 0%,transparent)}
+  40%{box-shadow:0 0 0 3px color-mix(in srgb,var(--c-accent) 60%,transparent),0 0 16px color-mix(in srgb,var(--keel-permit) 45%,transparent)}
+  100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c-accent) 0%,transparent)}
+}
+[data-sitekind="control-plane-oss"]{--m-stagger:100ms;--m-entrance:280ms;--m-reveal:240ms;--keel-permit:#3d9a6a;--keel-deny:#c44b3c;--keel-tape-last:5;--keel-permit-i:2}
 @media (prefers-reduced-motion: no-preference){
   [data-sitekind="control-plane-oss"] .ds-enter{
     animation:ds-keel-in var(--m-entrance,280ms) var(--m-ease-out,cubic-bezier(0.22,1,0.36,1)) forwards;
@@ -514,15 +518,16 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="control-plane-oss"] .ds-reveal,
   [data-sitekind="control-plane-oss"] .ds-reveal .ds-stagger > *{animation-name:ds-keel-in}
   [data-sitekind="control-plane-oss"] .ds-keel-cursor{animation:ds-keel-cursor 1000ms steps(1) infinite}
-  [data-sitekind="control-plane-oss"] .ds-keel-turn{animation:ds-keel-in 120ms var(--m-ease-out) both;animation-delay:calc(var(--i,0) * 100ms)}
-  [data-sitekind="control-plane-oss"] .ds-keel-permit{animation:ds-keel-permit 150ms var(--m-ease-out) both;animation-delay:600ms}
-  [data-sitekind="control-plane-oss"] .ds-keel-pin{animation:ds-keel-in 200ms var(--m-ease-out) both}
+  [data-sitekind="control-plane-oss"] .ds-keel-turn{animation:ds-keel-in 100ms var(--m-ease-out) both;animation-delay:calc(var(--i,0) * 100ms)}
+  [data-sitekind="control-plane-oss"] .ds-keel-permit{animation:ds-keel-permit 150ms var(--m-ease-out) both;animation-delay:calc(var(--keel-permit-i) * 100ms + 100ms)}
+  /* Pin after last tape index (T06 = --i 5) plus 200ms so done-when fades once lines have landed. */
+  [data-sitekind="control-plane-oss"] .ds-keel-pin{animation:ds-keel-in 200ms var(--m-ease-out) both;animation-delay:calc(var(--keel-tape-last) * 100ms + 200ms)}
 }
 @media (prefers-reduced-motion: reduce){
-  [data-sitekind="control-plane-oss"] .ds-keel-cursor,
+  [data-sitekind="control-plane-oss"] .ds-keel-cursor{animation:none;opacity:1}
   [data-sitekind="control-plane-oss"] .ds-keel-turn,
   [data-sitekind="control-plane-oss"] .ds-keel-permit,
-  [data-sitekind="control-plane-oss"] .ds-keel-pin{animation:none}
+  [data-sitekind="control-plane-oss"] .ds-keel-pin{animation:none;opacity:1;transform:none;box-shadow:none}
 }
 `,
   };

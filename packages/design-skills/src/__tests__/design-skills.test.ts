@@ -1077,6 +1077,38 @@ describe("research-backed offerings + implementation basics", () => {
     expect(locked.previewHtml).not.toMatch(/<body[^>]*data-sitekind="saas-marketing"/);
   });
 
+  it("polishes Keel motion: permit flash, pin after tape, reduced-motion end state", () => {
+    const { previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.keel!);
+    expect(previewHtml).toMatch(/animation:ds-keel-cursor 1000ms steps\(1\) infinite/);
+    expect(previewHtml).toMatch(/--m-stagger:100ms/);
+    expect(previewHtml).toMatch(
+      /\.ds-keel-turn\{animation:ds-keel-in 100ms[^;]*;animation-delay:calc\(var\(--i,0\) \* 100ms\)\}/,
+    );
+    expect(previewHtml).toMatch(/@keyframes ds-keel-permit\{/);
+    expect(previewHtml).toMatch(
+      /@keyframes ds-keel-permit\{[\s\S]*?40%\{box-shadow:0 0 0 3px color-mix\(in srgb,var\(--c-accent\)/,
+    );
+    expect(previewHtml).not.toMatch(
+      /@keyframes ds-keel-permit\{0%\{box-shadow:0 0 0 0 var\(--keel-permit\)\}100%\{box-shadow:none\}/,
+    );
+    expect(previewHtml).toMatch(/animation:ds-keel-permit 150ms/);
+    expect(previewHtml).toMatch(
+      /\.ds-keel-permit\{animation:ds-keel-permit 150ms[^;]*;animation-delay:calc\(var\(--keel-permit-i\) \* 100ms \+ 100ms\)\}/,
+    );
+    expect(previewHtml).toMatch(/--keel-tape-last:5/);
+    expect(previewHtml).toMatch(
+      /\.ds-keel-pin\{animation:ds-keel-in 200ms[^;]*;animation-delay:calc\(var\(--keel-tape-last\) \* 100ms \+ 200ms\)\}/,
+    );
+    expect(previewHtml).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)\{[\s\S]*?\.ds-keel-cursor\{animation:none;opacity:1\}/,
+    );
+    expect(previewHtml).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)\{[\s\S]*?\.ds-keel-turn,[\s\S]*?\.ds-keel-pin\{animation:none;opacity:1;transform:none;box-shadow:none\}/,
+    );
+    expect(previewHtml).not.toMatch(/#D4714A/i);
+    expect(previewHtml).not.toMatch(/parallax|particle/i);
+  });
+
   it("exposes reusable densify helpers for cell-grid figures", async () => {
     const { miniPageMatter, densitometerStrip, FIG_MONO_PX } = await import("../figures");
     expect(FIG_MONO_PX).toBe(11);
