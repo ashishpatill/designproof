@@ -8,6 +8,16 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-09-30 — Keel control-plane specimen
+
+- New engine offering `keel` (`siteKind: control-plane-oss`) — marketing claim + terminal specimen fold, not a helm-only clone of Tiller.
+- Showcase route `/showcase/keel`; filmstrip label **Control plane**; product name Keel.
+- Locked cool void `#0e1114`, accent `#3ecfbf`, IBM Plex Sans + Mono. Honest get-started placeholder; no invented install URL.
+- Motion polish: 150ms accent permit flash, pin fade after last tape index, reduced-motion static end state (no blink, no fill-mode opacity-0).
+- Does **not** close the Tiller public showcase/GitHub gap.
+
+---
+
 ## 2026-09-15 — Agent-nav docs + status snapshot
 
 - Slim [`AGENTS.md`](./AGENTS.md) to a thin entry (pointer tables + working loop). Do not load all of `docs/`.

@@ -222,7 +222,21 @@ export default function StudioPage() {
         businessGoal: "trust",
       };
     }
-    if (/agent.?harness|turn tape|tool permit|steer pin|tiller|coding agent|harness engineer|local session/.test(text)) {
+    if (/control.?plane|steer-to-finish|keel\b|terminal-first/.test(text)) {
+      next = {
+        ...next,
+        siteKind: "control-plane-oss",
+        aestheticLean: "system-crafted",
+        density: "information-rich",
+        colorMood: "dark-premium",
+        roundingDepth: "sharp",
+        businessGoal: "trust",
+      };
+    }
+    if (
+      next.siteKind !== "control-plane-oss" &&
+      /agent.?harness|turn tape|tool permit|steer pin|tiller|coding agent|harness engineer|local session/.test(text)
+    ) {
       next = {
         ...next,
         siteKind: "agent-harness",
@@ -600,4 +614,5 @@ const SURFACE_OPTIONS_FULL_VALUES: SiteKind[] = [
   "lantern-path",
   "care-pathway",
   "agent-harness",
+  "control-plane-oss",
 ];

@@ -157,6 +157,12 @@ export const SiteKind = z.enum([
    * Not SaaS pipeline boards, not queue consoles, not workflow-proof approve stamps, not care plates.
    */
   "agent-harness",
+  /**
+   * Control-plane OSS marketing — claim + honest terminal specimen fold (session tape, one
+   * Allow/Deny, done-when pin). Distinct from agent-harness (Tiller helm-only session UI).
+   * Cool void canvas, no waitlist, no invented live product URLs, zero inverse metric theatre.
+   */
+  "control-plane-oss",
 ]);
 export type SiteKind = z.infer<typeof SiteKind>;
 
@@ -505,6 +511,21 @@ export const LayoutVariant = z.enum([
    * Agent-harness signature; not pipeline board, queue console, care plate, or workflow-proof.
    */
   "hero-helm",
+  /**
+   * Keel fold — marketing claim + terminal specimen (session tape, one permit, done-when).
+   * Control-plane-oss signature; not a helm-only clone, not a pipeline board.
+   */
+  "hero-keel",
+  /**
+   * Keel how-loop — Ask → permit tools → check → ship.
+   * Control-plane-oss craft; not helm turn-ledger, not care rounds.
+   */
+  "story-keel-loop",
+  /**
+   * Larger static terminal replay with specimen-honesty caption.
+   * Control-plane-oss demo; not a live API, not Tiller permit-plate.
+   */
+  "specimen-terminal",
   /**
    * Rounds ladder — vertical stage beads + encounter panels — care-pathway craft.
    * Not ember zigzag, gather signatures, range beads, or essay+aside.
