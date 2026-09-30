@@ -719,7 +719,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       id: "what",
       kind: "figure",
       layout: "figure-explainer",
-      surface: "paper",
+      surface: "raised",
       columns: split.wide,
     });
     plans.push({

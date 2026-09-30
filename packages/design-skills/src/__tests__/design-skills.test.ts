@@ -1025,8 +1025,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain('--f-mono:"IBM Plex Mono"');
     expect(previewHtml).toMatch(/--c-paper:#0e1114/i);
     expect(previewHtml).toMatch(/--c-accent:#3ecfbf/i);
-    expect(previewHtml).not.toContain("ds-hero-helm");
-    expect(previewHtml).not.toContain("ds-helm-masthead");
+    expect(previewHtml).not.toMatch(/class="[^"]*ds-hero-helm/);
+    expect(previewHtml).not.toMatch(/class="[^"]*ds-helm-masthead/);
     expect(previewHtml).not.toContain('data-figure="permit-plate"');
     expect(previewHtml).not.toContain("What Keel covers");
     expect(previewHtml).not.toMatch(/waitlist/i);

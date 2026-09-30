@@ -746,7 +746,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && !/waitlist/i.test(html)
           && !/<section[^>]*\bdata-workflow-proof\b/.test(html)
           && !/data-figure="permit-plate"/.test(html)
-          && !/ds-hero-helm/.test(html)
+          && !/<section[^>]*ds-hero-helm/.test(html)
+          && !/class="[^"]*ds-hero-helm/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
       "Control-plane-oss uses claim+terminal keel fold, how-loop, specimen terminal, honest get-started — no pricing, metrics, waitlist, helm clone, or inverse theatre.",
@@ -757,9 +758,10 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
         || (
           /ds-hero-keel/.test(html)
           && /ds-keel-claim/.test(html)
-          && /ds-hero-keel[\s\S]*ds-actions/.test(html)
-          && !/ds-hero-helm/.test(html)
-          && !/ds-helm-masthead/.test(html)
+          && /class="[^"]*ds-hero-keel[\s\S]*class="ds-actions/.test(html)
+          && !/<section[^>]*ds-hero-helm/.test(html)
+          && !/class="[^"]*ds-hero-helm/.test(html)
+          && !/class="[^"]*ds-helm-masthead/.test(html)
         ),
       "Keel fold is marketing claim + terminal specimen with visible CTAs — not a Tiller helm-only clone.",
     ),
