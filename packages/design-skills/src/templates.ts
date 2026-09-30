@@ -34,7 +34,8 @@ export type TemplateKey =
   | "press"
   | "lantern"
   | "clinic"
-  | "harness";
+  | "harness"
+  | "keel";
 
 export interface DesignTemplate {
   /** Stable key used by /showcase/*, /studio presets, and GET /api/design?showcase= */
@@ -1101,6 +1102,84 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
         density: "information-rich",
         motion: "subtle-micro",
         colorMood: "light-airy",
+        typographyWeight: "medium-modern",
+        roundingDepth: "sharp",
+      },
+    }),
+  },
+  {
+    key: "keel",
+    label: "Control plane",
+    marketJob:
+      "Open coding-agent control-plane marketing — claim + terminal specimen fold, honest permits, scale 5→20→100 without UI collapse.",
+    siteKind: "control-plane-oss",
+    researchBasis:
+      "Measured demand gap: agent-harness (Tiller) is a local session helm (turn tape + permit plate + steer pin as the fold). Control-plane OSS marketing needs a product story first: claim + honest terminal specimen (session tape ≥5 real-work turns, one Allow/Deny, sticky done-when), then What / How / Demo / Principles / Get started. Not a helm-only clone, not a waitlist, not invented live product URLs, not a recolored SaaS pipeline. Cool void canvas, IBM Plex Sans + Mono, accent as a keel line — never Tell terracotta as brand.",
+    brief: DesignBrief.parse({
+      productName: "Keel",
+      tagline: "Keep every agent on course.",
+      audience: "Harness engineers and teams running many coding agents",
+      businessGoal: "trust",
+      siteKind: "control-plane-oss",
+      lockSiteKind: true,
+      primaryCta: "See the session",
+      brandAccent: "#3ecfbf",
+      banList: [
+        "waitlist / Product Hunt theatre",
+        "fake star counts or millions of developers",
+        "invented live product URLs or public MCP endpoints",
+        "naming other harness products",
+        "violet gradient hero",
+        "Inter-only stack",
+        "recolored SaaS pipeline",
+        "helm-only fold clone",
+        "Tell terracotta as brand",
+      ],
+      features: [
+        {
+          id: "k1",
+          name: "Steer-to-finish",
+          description:
+            "Done-when is written before the first tool and stays visible while the session tape grows",
+          priority: "p0",
+        },
+        {
+          id: "k2",
+          name: "Adaptive terminal",
+          description:
+            "Terminal and graphical views share one session — switching chrome does not drop the run",
+          priority: "p0",
+        },
+        {
+          id: "k3",
+          name: "Local-first data",
+          description: "Run data stays on the operator machine. This page does not invent a live host",
+          priority: "p0",
+        },
+        {
+          id: "k4",
+          name: "Scale without collapse",
+          description: "Five agents, then twenty, then a hundred — the control plane does not become a card grid",
+          priority: "p0",
+        },
+        {
+          id: "k5",
+          name: "Honest permits",
+          description: "One pending tool. Allow once or Deny. Scope sits on the plate before anything runs",
+          priority: "p1",
+        },
+        {
+          id: "k6",
+          name: "Open when real",
+          description: "Open source when the install path exists. Until then this page is the specimen, not a storefront",
+          priority: "p2",
+        },
+      ],
+      taste: {
+        aestheticLean: "system-crafted",
+        density: "information-rich",
+        motion: "light-scroll-reveals",
+        colorMood: "dark-premium",
         typographyWeight: "medium-modern",
         roundingDepth: "sharp",
       },

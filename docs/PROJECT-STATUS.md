@@ -1,6 +1,6 @@
 # Tell Proof — project status
 
-Snapshot: **2026-09-15**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). Agent-nav: [`AGENTS.md`](../AGENTS.md) → [`FEATURE-MAP.md`](./FEATURE-MAP.md) → one [`features/`](./features/) file. This page is the honest Done / Pending / Stuck / Needs / Next cut.
+Snapshot: **2026-09-30**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). Agent-nav: [`AGENTS.md`](../AGENTS.md) → [`FEATURE-MAP.md`](./FEATURE-MAP.md) → one [`features/`](./features/) file. This page is the honest Done / Pending / Stuck / Needs / Next cut.
 
 **What this product is:** a Cursor / Grok Build **plugin** for world-class site and app design across many sessions — observe, name, direct, repair, prove. Agents write code; Tell proves the UI.
 
@@ -19,7 +19,7 @@ Closed in git (see [`CHANGELOG.md`](../CHANGELOG.md)):
 - Sprint MVP M1–M10 and Phases 1–6: deterministic capture → fingerprint → 14 detectors → taste → Report/seam → voice → redesign diffs → MCP → disposable proof → scenario matrix + auth harness.
 - Eleven `tell_*` MCP tools; catalog honesty (docs ≡ code); `tell mcp install` for Cursor, Grok Build, and other hosts. `tell_apply` still returns patch text only.
 - Design-skills engine + skill graph (research auto-trigger, craft nodes, media budgets). Agency pipeline + learn split (developer corpus vs end-user session).
-- Specimens: 17 engine offerings plus Crease / Baseline matchday; Tiller hero-helm in-repo (`/showcase/harness`); Roundspool care pathway; Ember Gate path atlas; Lattice without the Z-stroke.
+- Specimens: 18 engine offerings plus Crease / Baseline matchday; Tiller hero-helm in-repo (`/showcase/harness`); Keel control-plane in-repo (`/showcase/keel`); Roundspool care pathway; Ember Gate path atlas; Lattice without the Z-stroke.
 - Captioned 5-beat README demo (2026-08-26). Ink-on-paper product shell.
 - Thin local training sink: Studio routes and (as of 2026-08-25) MCP writes into sibling `tell-design-data` when that checkout exists. Missing sibling ⇒ no-op.
 

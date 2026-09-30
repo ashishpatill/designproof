@@ -717,6 +717,53 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       "Agent-harness fold is never a pipeline board, queue console, or ds-dash-grid.",
     ),
     check(
+      "kind-keel",
+      spec.brief.siteKind !== "control-plane-oss"
+        || (
+          !spec.sections.some((s) => s.kind === "pricing")
+          && !spec.sections.some((s) => s.kind === "metrics")
+          && spec.sections.some((s) => s.layout === "hero-keel")
+          && spec.sections.some((s) => s.layout === "story-keel-loop")
+          && spec.sections.some((s) => s.layout === "specimen-terminal")
+          && /ds-hero-keel/.test(html)
+          && /data-keel-terminal/.test(html)
+          && /data-figure="keel-terminal"/.test(html)
+          && /T01/.test(html)
+          && /data-turn-tag="tool"/.test(html)
+          && /data-keel-permit/.test(html)
+          && /Allow/.test(html)
+          && /Deny/.test(html)
+          && /data-steer-pin/.test(html)
+          && /DONE WHEN/.test(html)
+          && /typecheck/.test(html)
+          && /Specimen — not a live API/.test(html)
+          && /id="what"/.test(html)
+          && /id="how"/.test(html)
+          && /id="demo"/.test(html)
+          && /id="principles"/.test(html)
+          && /id="get-started"/.test(html)
+          && /Repository and install path coming/.test(html)
+          && !/waitlist/i.test(html)
+          && !/<section[^>]*\bdata-workflow-proof\b/.test(html)
+          && !/data-figure="permit-plate"/.test(html)
+          && !/ds-hero-helm/.test(html)
+          && spec.sections.filter((s) => s.surface === "inverse").length === 0
+        ),
+      "Control-plane-oss uses claim+terminal keel fold, how-loop, specimen terminal, honest get-started — no pricing, metrics, waitlist, helm clone, or inverse theatre.",
+    ),
+    check(
+      "keel-not-helm-clone",
+      spec.brief.siteKind !== "control-plane-oss"
+        || (
+          /ds-hero-keel/.test(html)
+          && /ds-keel-claim/.test(html)
+          && /ds-hero-keel[\s\S]*ds-actions/.test(html)
+          && !/ds-hero-helm/.test(html)
+          && !/ds-helm-masthead/.test(html)
+        ),
+      "Keel fold is marketing claim + terminal specimen with visible CTAs — not a Tiller helm-only clone.",
+    ),
+    check(
       "fig-mono-floor",
       !Array.from(html.matchAll(/font-size="(\d+(?:\.\d+)?)"/g)).some((m) => Number(m[1]) > 0 && Number(m[1]) < 11),
       "SVG figure labels stay at ≥11px — smaller mono invents a type-step the probe counts but the eye cannot use.",
@@ -726,7 +773,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       (!/data-figure="press-sheet"/.test(html) || /data-figure="press-sheet"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="press-sheet"/.test(html))
         && (!/data-figure="path-plate"/.test(html) || /data-figure="path-plate"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="path-plate"/.test(html))
           && (!/data-figure="care-plate"/.test(html) || /data-figure="care-plate"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="care-plate"/.test(html))
-          && (!/data-figure="permit-plate"/.test(html) || /data-figure="permit-plate"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="permit-plate"/.test(html)),
+          && (!/data-figure="permit-plate"/.test(html) || /data-figure="permit-plate"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="permit-plate"/.test(html))
+          && (!/data-figure="keel-terminal"/.test(html) || /data-figure="keel-terminal"[^>]*data-dense="ink"|data-dense="ink"[^>]*data-figure="keel-terminal"/.test(html)),
       "Cell-grid craft figures must carry drawn page matter (data-dense=ink) — empty stroked voids fail the eye.",
     ),
     check(
@@ -766,6 +814,14 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
             /ds-hero-helm/.test(html) &&
             /data-steer-pin/.test(html) &&
             /ds-turn-rail/.test(html)
+          );
+        }
+        if (kind === "control-plane-oss") {
+          return (
+            /ds-hero-keel/.test(html) &&
+            /ds-keel-claim/.test(html) &&
+            /ds-keel-terminal/.test(html) &&
+            /data-steer-pin/.test(html)
           );
         }
         if (kind === "archive-index") {
@@ -859,6 +915,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           "lantern-path",
           "care-pathway",
           "agent-harness",
+          "control-plane-oss",
         ].includes(kind);
         if (craftProof) return !hasBoard;
         if (kind === "saas-marketing") {

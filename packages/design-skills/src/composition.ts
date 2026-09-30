@@ -708,6 +708,41 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
+   * Control-plane OSS — marketing claim + terminal specimen, not a session helm.
+   *
+   * IA: nav → hero → what → how → demo → principles → get-started → footer.
+   * No pricing, no metrics theatre, no waitlist, no inverse bands.
+   */
+  if (siteKind === "control-plane-oss") {
+    plans.push({ id: "hero", kind: "hero", layout: "hero-keel", surface: "paper", columns: split.hero });
+    plans.push({
+      id: "what",
+      kind: "figure",
+      layout: "figure-explainer",
+      surface: "paper",
+      columns: split.wide,
+    });
+    plans.push({
+      id: "how",
+      kind: "story",
+      layout: "story-keel-loop",
+      surface: "paper",
+      bond: true,
+    });
+    plans.push({ id: "demo", kind: "specimen", layout: "specimen-terminal", surface: "sunken" });
+    plans.push({
+      id: "principles",
+      kind: "features",
+      layout: "feature-index",
+      surface: "paper",
+      columns: split.wide,
+    });
+    plans.push({ id: "get-started", kind: "cta", layout: "cta-band", surface: "paper" });
+    plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
+    return plans;
+  }
+
+  /*
    * Field guide — herbarium / voucher craft.
    *
    * Personal-craft + brand-agency corridors favour figure-dense paper surfaces and quiet display.
@@ -859,6 +894,7 @@ export function displaySizeFor(siteKind: SiteKind, lean: AestheticLean, density:
   // Care pathway: quiet-but-in-band display (~3.3vw) so care-plate still owns the fold.
   if (siteKind === "care-pathway") px = 48;
   if (siteKind === "agent-harness") px = 48;
+  if (siteKind === "control-plane-oss") px = 52;
   if (lean === "refined-story") px += 6;
   if (lean === "minimal-clean") px -= 6;
   if (lean === "conversion-sharp") px += 2;
@@ -875,6 +911,7 @@ export function displaySizeFor(siteKind: SiteKind, lean: AestheticLean, density:
   if (siteKind === "lantern-path") return Math.max(46, Math.min(56, px));
   if (siteKind === "care-pathway") return Math.max(44, Math.min(52, px));
   if (siteKind === "agent-harness") return Math.max(44, Math.min(52, px));
+  if (siteKind === "control-plane-oss") return Math.max(46, Math.min(58, px));
   const ceiling = siteKind === "art-directed-studio" ? 88 : 86;
   return Math.max(48, Math.min(ceiling, px));
 }

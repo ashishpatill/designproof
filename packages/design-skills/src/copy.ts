@@ -184,6 +184,13 @@ export function ctaFor(
         note: "Runs on your machine — no invented host, no waitlist.",
       };
     }
+    if (siteKind === "control-plane-oss") {
+      return {
+        primary: "See the session",
+        secondary: "Get started",
+        note: "Specimen — not a live API. Repository and install path coming.",
+      };
+    }
     return GOAL_CTA[goal];
   })();
   // Agency brief "one CTA" wins when set — every page repeats the same verb.
@@ -229,6 +236,8 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                                   ? "Why the chart holds"
                                   : brief.siteKind === "agent-harness"
                                     ? "Why the finish holds"
+                                  : brief.siteKind === "control-plane-oss"
+                                    ? "Why the course holds"
                                   : "Why the argument holds";
   return {
     metrics: "What changes",
@@ -259,6 +268,8 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                           ? "The rounds"
                           : brief.siteKind === "agent-harness"
                             ? "The turns"
+                          : brief.siteKind === "control-plane-oss"
+                            ? "The loop"
                           : brief.siteKind === "editorial-foundry"
                             ? "The marginalia"
                             : brief.siteKind === "research-dossier"
@@ -566,6 +577,10 @@ export function pullQuote(brief: DesignBrief, features: FeatureSpec[]): { quote:
       quote: `${brief.productName} names its finish before the first tool runs — turn tape, tool permit, and steer pin on one local session.`,
       attribution: `Permit plate · ${n} turns · local session`,
     },
+    "control-plane-oss": {
+      quote: `${brief.productName} keeps many coding agents on course — honest permits, local run data, and a finish you can see at 5, 20, or 100.`,
+      attribution: `Terminal specimen · ${n} capabilities · not a live API`,
+    },
   };
   return (
     byKind[brief.siteKind] ?? {
@@ -597,6 +612,53 @@ export function helmSessionTurns(): Array<{
 }
 
 /**
+ * Control-plane session tape: ≥5 real-work turns on one run.
+ *
+ * Distinct from helmSessionTurns — this is a specimen of steering many agents,
+ * not a helm-only catalog reprint. The tool beat is the single Allow/Deny permit.
+ */
+export function keelSessionTurns(): Array<{
+  id: string;
+  tag: "user" | "agent" | "tool";
+  label: string;
+}> {
+  return [
+    { id: "T01", tag: "user", label: "Pin done-when: typecheck, tests, no public host." },
+    { id: "T02", tag: "agent", label: "Open the failing typecheck. Stay on this session." },
+    { id: "T03", tag: "tool", label: "git status — one pending permit." },
+    { id: "T04", tag: "agent", label: "Patch the assertion without leaving the run." },
+    { id: "T05", tag: "user", label: "Hold twenty agents on this tape. Do not start a second UI." },
+    { id: "T06", tag: "agent", label: "Same finish pin. Scale does not reset the session." },
+  ];
+}
+
+/** How-loop beats for control-plane-oss — Ask → permit → check → ship. */
+export function keelLoopBeats(): Array<{ title: string; body: string; meta: string }> {
+  return [
+    {
+      title: "Ask",
+      meta: "01",
+      body: "Name the finish before the first tool. Done-when stays pinned while the tape grows.",
+    },
+    {
+      title: "Permit",
+      meta: "02",
+      body: "One pending tool. Allow once or Deny. Scope sits on the plate before anything runs.",
+    },
+    {
+      title: "Check",
+      meta: "03",
+      body: "Typecheck and tests run on the same session. The pin does not reset when chrome changes.",
+    },
+    {
+      title: "Ship",
+      meta: "04",
+      body: "Finished means the named checks passed — not that a button said done.",
+    },
+  ];
+}
+
+/**
  * Navigation derived from the sections that will actually exist.
  *
  * Deduplicated by label: a page with two capability sections used to render "Capabilities" twice
@@ -611,6 +673,15 @@ export function navFor(
       { label: "Session", href: "#top" },
       { label: "Permit", href: "#features" },
       { label: "Finish", href: "#cta" },
+    ];
+  }
+  if (siteKind === "control-plane-oss") {
+    return [
+      { label: "What", href: "#what" },
+      { label: "How", href: "#how" },
+      { label: "Demo", href: "#demo" },
+      { label: "Principles", href: "#principles" },
+      { label: "Get started", href: "#get-started" },
     ];
   }
   const proofLabel =

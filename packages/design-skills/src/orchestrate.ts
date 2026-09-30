@@ -21,7 +21,7 @@ import {
 export function resolveTaste(brief: DesignBrief): TasteControls {
   const siteKind = inferSiteKind(brief);
   const leanDefault =
-    siteKind === "dashboard-webapp"
+    siteKind === "dashboard-webapp" || siteKind === "control-plane-oss"
       ? "system-crafted"
       : siteKind === "corporate-story" ||
           siteKind === "docs-educational" ||
@@ -44,7 +44,7 @@ export function resolveTaste(brief: DesignBrief): TasteControls {
         ? "sparse"
         : siteKind === "signal-observatory"
           ? "balanced"
-        : siteKind === "dashboard-webapp"
+        : siteKind === "dashboard-webapp" || siteKind === "control-plane-oss"
           ? "information-rich"
           : "balanced"),
     motion:
@@ -66,7 +66,8 @@ export function resolveTaste(brief: DesignBrief): TasteControls {
               siteKind === "archive-index" ||
               siteKind === "commerce-loom" ||
               siteKind === "field-guide" ||
-              siteKind === "care-pathway"
+              siteKind === "care-pathway" ||
+              siteKind === "control-plane-oss"
             ? "light-scroll-reveals"
             : "subtle-micro"),
     aestheticLean: brief.taste?.aestheticLean ?? leanDefault,
@@ -74,6 +75,8 @@ export function resolveTaste(brief: DesignBrief): TasteControls {
       brief.taste?.colorMood ??
       (siteKind === "editorial-foundry" || siteKind === "research-dossier" || siteKind === "signal-observatory" || siteKind === "archive-index" || siteKind === "commerce-loom" || siteKind === "field-guide" || siteKind === "press-atelier" || siteKind === "lantern-path" || siteKind === "care-pathway"
         ? "light-airy"
+        : siteKind === "control-plane-oss"
+          ? "dark-premium"
         : "neutral-professional"),
     typographyWeight:
       brief.taste?.typographyWeight ??
@@ -91,7 +94,8 @@ export function resolveTaste(brief: DesignBrief): TasteControls {
         siteKind === "field-guide" ||
         siteKind === "press-atelier" ||
         siteKind === "lantern-path" ||
-        siteKind === "care-pathway"
+        siteKind === "care-pathway" ||
+        siteKind === "control-plane-oss"
         ? "sharp"
         : "soft"),
   });

@@ -9,6 +9,7 @@ export type SpecimenPrefer = "hero" | "figure" | "auto";
 
 /** How far into a craft figure the still/cinema should land past claim chrome. */
 export function craftFigureFloor(doc: Pick<Document, "querySelector">): number {
+  if (doc.querySelector(".ds-keel-terminal, [data-sitekind='control-plane-oss']")) return 280;
   if (doc.querySelector(".ds-path-plate, [data-sitekind='lantern-path']")) return 360;
   if (doc.querySelector(".ds-press-sheet, [data-sitekind='press-atelier']")) return 360;
   if (doc.querySelector(".ds-register-ledger, [data-sitekind='archive-index']")) return 300;
@@ -42,6 +43,7 @@ export function discoverBeats(doc: Document): SpecimenBeat[] {
   if (hero) beats.push(hero);
 
   const figureRaw =
+    pick(".ds-hero .ds-keel-terminal, .ds-keel-terminal, .ds-hero-keel", "figure", "Tape") ||
     pick(".ds-hero .ds-path-plate .ds-fig, .ds-path-plate", "figure", "Atlas") ||
     pick(".ds-hero .ds-press-sheet .ds-fig, .ds-press-sheet", "figure", "Forme") ||
     pick(".ds-hero .ds-press-plate .ds-fig, .ds-press-plate, .ds-voucher-plate, .ds-tray-well", "figure", "Specimen") ||

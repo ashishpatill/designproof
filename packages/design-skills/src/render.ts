@@ -5,7 +5,7 @@
  * what keeps the emitted page consistent with the design system it declares, and it is what makes
  * the generated markup safe to hand to a developer as a starting point.
  */
-import { helmSessionTurns } from "./copy";
+import { helmSessionTurns, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
 import { horizonPlot, isReading, miniPageMatter, planFigures, type FigurePlan } from "./figures";
 import {
@@ -236,15 +236,103 @@ function cardMarkup(b: Block, i: number, opts: { lead?: boolean; wide?: boolean;
 /* ------------------------------------------------------------------ */
 
 function renderNav(section: SectionSpec): string {
+  const ctaHref = section.navItems.some((n) => n.href === "#demo") ? "#demo" : "#cta";
   return `<header class="ds-nav" data-surface="paper" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide ds-nav-inner">
       <a class="ds-wordmark" href="#top">${esc(section.brandLabel ?? section.title)}</a>
       <nav class="ds-nav-links" aria-label="Primary">
         ${section.navItems.map((n) => `<a href="${esc(n.href)}">${esc(n.label)}</a>`).join("")}
       </nav>
-      ${section.ctaLabel ? `<a class="ds-btn ds-btn-primary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
+      ${section.ctaLabel ? `<a class="ds-btn ds-btn-primary" href="${ctaHref}">${esc(section.ctaLabel)}</a>` : ""}
     </div>
   </header>`;
+}
+
+function renderKeelTerminal(role: "hero" | "demo"): string {
+  const turns = keelSessionTurns();
+  const currentIdx = turns.findIndex((t) => t.tag === "tool");
+  const lines = turns
+    .map((t, i) => {
+      const live = i === currentIdx;
+      const permit =
+        live
+          ? `<div class="ds-keel-permit" data-keel-permit>
+              <p class="ds-keel-permit-kicker">ONE PENDING TOOL · git status</p>
+              <div class="ds-keel-permit-actions">
+                <span class="ds-keel-allow">Allow</span>
+                <span class="ds-keel-deny">Deny</span>
+              </div>
+            </div>`
+          : "";
+      return `<li class="ds-keel-turn${live ? " is-current" : ""}" data-turn-tag="${t.tag}" style="--i:${i}">
+        <span class="ds-keel-turn-id">${t.id}</span>
+        <span class="ds-keel-turn-tag">${t.tag}</span>
+        <span class="ds-keel-turn-label">${esc(t.label)}</span>
+        ${permit}
+      </li>`;
+    })
+    .join("");
+  const pin = `<aside class="ds-keel-pin" data-steer-pin aria-label="Done-when">
+    <p class="ds-keel-pin-kicker">DONE WHEN</p>
+    <ul class="ds-keel-pin-checks">
+      <li>typecheck</li>
+      <li>tests</li>
+      <li>no public host</li>
+    </ul>
+  </aside>`;
+  const caption = "Specimen — not a live API";
+  return `<figure class="ds-keel-terminal" data-keel-terminal data-figure="keel-terminal" data-dense="ink" data-role="${role}" aria-label="${esc(caption)}">
+    <div class="ds-keel-term-chrome">
+      <span class="ds-keel-term-dots" aria-hidden="true"></span>
+      <span class="ds-keel-term-title">session tape · local</span>
+      <span class="ds-keel-cursor" aria-hidden="true"></span>
+    </div>
+    <div class="ds-keel-term-body">
+      ${pin}
+      <ol class="ds-keel-tape" aria-label="Session tape">${lines}</ol>
+    </div>
+    <figcaption class="ds-keel-caption">${esc(caption)}</figcaption>
+  </figure>`;
+}
+
+function renderKeelWhat(section: SectionSpec): string {
+  return `<section class="ds-section ds-keel-what" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+    <div class="ds-wrap-wide">
+      ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
+      <h2 class="ds-heading">${esc(section.title)}</h2>
+      ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
+    </div>
+  </section>`;
+}
+
+function renderKeelLoop(section: SectionSpec): string {
+  const beats = section.blocks
+    .map(
+      (b, i) => `<li class="ds-keel-beat" style="--i:${i}">
+        <p class="ds-keel-beat-meta">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
+        <h3>${esc(b.title)}</h3>
+        ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
+      </li>`,
+    )
+    .join("");
+  return `<section class="ds-section ds-keel-loop" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+    <div class="ds-wrap-wide">
+      ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
+      <h2 class="ds-heading">${esc(section.title)}</h2>
+      ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
+      <ol class="ds-keel-beats" aria-label="Ask, permit, check, ship">${beats}</ol>
+    </div>
+  </section>`;
+}
+
+function renderKeelSpecimen(section: SectionSpec): string {
+  return `<section class="ds-section ds-keel-demo" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+    <div class="ds-wrap-wide ds-keel-demo-head">
+      <h2 class="ds-heading">${esc(section.title)}</h2>
+      ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
+    </div>
+    <div class="ds-wrap-wide">${renderKeelTerminal("demo")}</div>
+  </section>`;
 }
 
 function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan): string {
@@ -289,6 +377,32 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
   const spanning = figures.hero
     ? `<div class="ds-bleed">${plate(figures.hero, caption, "ds-plate-hang ds-plate-bleed ds-plate-lit")}</div>`
     : "";
+
+  /*
+   * Keel fold — control-plane-oss signature.
+   *
+   * Marketing claim left; terminal specimen right with ≥5 session turns, one Allow/Deny, sticky
+   * done-when. Caption honesty: specimen, not a live API. Not a helm-only clone.
+   */
+  if (section.layout === "hero-keel") {
+    const keelActions = `<div class="ds-actions ds-hero-actions">
+      <a class="ds-btn ds-btn-primary" href="#demo">${esc(section.ctaLabel ?? "See the session")}</a>
+      ${section.secondaryLabel ? `<a class="ds-btn ds-btn-secondary" href="#get-started">${esc(section.secondaryLabel)}</a>` : ""}
+      ${section.ctaNote ? `<span class="ds-cta-note">${esc(section.ctaNote)}</span>` : ""}
+    </div>`;
+    const keelCopy = `<div class="ds-hero-copy">
+      <p ${enterAttr(spec, 0, "ds-brand-mark")}>${esc(spec.brief.productName)}</p>
+      <h1 ${enterAttr(spec, 1, "ds-display")}>${esc(section.title)}</h1>
+      <p ${enterAttr(spec, 2, "ds-lede")}>${esc(section.body)}</p>
+      ${withEnter(spec, 3, keelActions)}
+    </div>`;
+    return `<section id="top" class="ds-section ds-hero ds-hero-keel" data-surface="${section.surface}" data-section="${esc(section.id)}">
+      <div class="ds-keel-fold">
+        <div class="ds-keel-claim">${keelCopy}</div>
+        ${renderKeelTerminal("hero")}
+      </div>
+    </section>`;
+  }
 
   if (section.layout === "hero-statement") {
     /*
@@ -1116,7 +1230,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "fintech-marketing" ||
         spec.brief.siteKind === "saas-marketing" ||
         spec.brief.siteKind === "dashboard-webapp" ||
-        spec.brief.siteKind === "agent-harness";
+        spec.brief.siteKind === "agent-harness" ||
+        spec.brief.siteKind === "control-plane-oss";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row" data-feature="${esc(b.title)}">
@@ -1232,7 +1347,10 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
  * axis, hairline gridlines, and a stage marker per step. The slider still drives it, so the only
  * motion on the page is motion a reader asked for.
  */
-function renderFigure(section: SectionSpec): string {
+function renderFigure(section: SectionSpec, spec?: DesignSpec): string {
+  if (spec?.brief.siteKind === "control-plane-oss") {
+    return renderKeelWhat(section);
+  }
   const steps = section.blocks.slice(0, 4);
   const mid = Math.max(0, Math.floor((steps.length - 1) / 2));
   const max = Math.max(steps.length - 1, 0);
@@ -1335,7 +1453,8 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
     spec?.brief.siteKind === "care-pathway" ||
-    spec?.brief.siteKind === "agent-harness";
+    spec?.brief.siteKind === "agent-harness" ||
+    spec?.brief.siteKind === "control-plane-oss";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${secMeta("Chapters", `${count} beats · editorial order`)}
@@ -2127,7 +2246,7 @@ function renderCtaBand(section: SectionSpec, figures: FigurePlan, spec?: DesignS
           )
           .join("")}</ol>`
       : "";
-  return `<section class="ds-section ds-closing${colophonClass}" data-surface="${section.surface}" data-section="${esc(section.id)}" id="cta">
+  return `<section class="ds-section ds-closing${colophonClass}" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id === "get-started" ? "get-started" : "cta")}">
     <div class="ds-wrap-wide ds-closing-grid">
       <div class="ds-cta">
         ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
@@ -2201,6 +2320,8 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   // Closing band always exposes id="cta" even when section.id differs.
   knownIds.add("cta");
   knownIds.add("top");
+  knownIds.add("demo");
+  knownIds.add("get-started");
   return `<footer class="ds-footer" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       <div class="ds-footer-grid">
@@ -2359,6 +2480,7 @@ function renderSection(
     case "hero-path":
     case "hero-rounds":
     case "hero-helm":
+    case "hero-keel":
     case "hero-pipeline":
     case "hero-queue":
     case "hero-diligence":
@@ -2369,13 +2491,15 @@ function renderSection(
       return wrapped(renderMetricBand(section, figures, spec));
     case "specimen-band":
       return wrapped(renderSpecimen(section, figures, spec));
+    case "specimen-terminal":
+      return wrapped(renderKeelSpecimen(section));
     case "feature-bento":
     case "feature-index":
     case "feature-rows":
     case "feature-alternating":
       return wrapped(renderFeatures(section, spec, figures));
     case "figure-explainer":
-      return wrapped(renderFigure(section));
+      return wrapped(renderFigure(section, spec));
     case "story-chapters":
       return wrapped(renderChapters(section, figures, spec));
     case "story-marginalia":
@@ -2396,6 +2520,8 @@ function renderSection(
       return wrapped(renderEmber(section, figures));
     case "story-rounds":
       return wrapped(renderRounds(section, figures));
+    case "story-keel-loop":
+      return wrapped(renderKeelLoop(section));
     case "pullquote":
     case "marquee-proof":
       return wrapped(renderProofBoard(section, figures, spec));

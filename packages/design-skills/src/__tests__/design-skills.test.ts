@@ -488,7 +488,7 @@ describe("measured craft floors", () => {
 describe("research-backed offerings + implementation basics", () => {
   it("keeps a depth-first offering catalog with measured gap kinds filled", () => {
     const templates = listTemplates();
-    expect(templates).toHaveLength(17);
+    expect(templates).toHaveLength(18);
     expect(templates.map((t) => t.key).sort()).toEqual([
       "archive",
       "clinic",
@@ -501,6 +501,7 @@ describe("research-backed offerings + implementation basics", () => {
       "foundry",
       "harness",
       "herbarium",
+      "keel",
       "lantern",
       "loom",
       "observatory",
@@ -538,6 +539,10 @@ describe("research-backed offerings + implementation basics", () => {
     expect(clinic.siteKind).toBe("care-pathway");
     const harness = templates.find((t) => t.key === "harness")!;
     expect(harness.siteKind).toBe("agent-harness");
+    const keel = templates.find((t) => t.key === "keel")!;
+    expect(keel.siteKind).toBe("control-plane-oss");
+    expect(keel.label).toBe("Control plane");
+    expect(keel.brief.productName).toBe("Keel");
   });
 
   it("gives fintech an inverse-heavy plan distinct from SaaS conversion", () => {
@@ -960,6 +965,115 @@ describe("research-backed offerings + implementation basics", () => {
     const locked = designFromFeatures(SHOWCASE_BRIEFS.harness!);
     expect(locked.spec.brief.siteKind).toBe("agent-harness");
     expect(locked.previewHtml).toMatch(/<body[^>]*data-sitekind="agent-harness"/);
+    expect(locked.previewHtml).not.toMatch(/<body[^>]*data-sitekind="saas-marketing"/);
+  });
+
+  it("gives Keel a claim + terminal specimen fold distinct from Tiller helm", () => {
+    const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.keel!);
+    expect(spec.brief.siteKind).toBe("control-plane-oss");
+    expect(spec.brief.productName).toBe("Keel");
+    expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
+    expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
+    expect(spec.sections.some((s) => s.layout === "hero-keel")).toBe(true);
+    expect(spec.sections.some((s) => s.layout === "story-keel-loop")).toBe(true);
+    expect(spec.sections.some((s) => s.layout === "specimen-terminal")).toBe(true);
+    expect(spec.sections.some((s) => s.layout === "hero-helm")).toBe(false);
+    expect(spec.sections.filter((s) => s.surface === "inverse")).toHaveLength(0);
+    expect(previewHtml).toContain('data-sitekind="control-plane-oss"');
+    expect(previewHtml).toContain("ds-hero-keel");
+    expect(previewHtml).toContain("ds-keel-claim");
+    expect(previewHtml).toContain("ds-keel-terminal");
+    expect(previewHtml).toContain("Keep every agent on course.");
+    expect(previewHtml).toContain("See the session");
+    expect(previewHtml).toContain("Get started");
+    expect(previewHtml).toContain('href="#demo"');
+    expect(previewHtml).toContain('href="#get-started"');
+    expect(previewHtml).toContain(">What</");
+    expect(previewHtml).toContain(">How</");
+    expect(previewHtml).toContain(">Demo</");
+    expect(previewHtml).toContain(">Principles</");
+    expect(previewHtml).toContain(">Get started</");
+    expect(previewHtml).toContain("Ask");
+    expect(previewHtml).toContain("Permit");
+    expect(previewHtml).toContain("Check");
+    expect(previewHtml).toContain("Ship");
+    expect(previewHtml).toContain("id=\"what\"");
+    expect(previewHtml).toContain("id=\"how\"");
+    expect(previewHtml).toContain("id=\"demo\"");
+    expect(previewHtml).toContain("id=\"principles\"");
+    expect(previewHtml).toContain("id=\"get-started\"");
+    expect(previewHtml).toContain("Repository and install path coming");
+    expect(previewHtml).toContain("Specimen — not a live API");
+    expect(previewHtml).toContain("DONE WHEN");
+    expect(previewHtml).toContain("typecheck");
+    expect(previewHtml).toContain("no public host");
+    expect(previewHtml).toContain("T01");
+    expect(previewHtml).toContain("T05");
+    expect(previewHtml).toContain("T06");
+    expect((previewHtml.match(/class="ds-keel-turn/g) ?? []).length).toBeGreaterThanOrEqual(10);
+    expect((previewHtml.match(/data-keel-permit/g) ?? []).length).toBe(2);
+    expect((previewHtml.match(/class="ds-keel-allow"/g) ?? []).length).toBe(2);
+    expect((previewHtml.match(/class="ds-keel-deny"/g) ?? []).length).toBe(2);
+    const heroChunk = previewHtml.match(/ds-hero-keel[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(heroChunk).toMatch(/ds-actions/);
+    expect((heroChunk.match(/data-keel-permit/g) ?? []).length).toBe(1);
+    expect((heroChunk.match(/class="ds-keel-turn/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    expect(previewHtml).toMatch(/IBM\+Plex\+Sans/);
+    expect(previewHtml).toMatch(/IBM\+Plex\+Mono/);
+    expect(previewHtml).toContain('--f-display:"IBM Plex Sans"');
+    expect(previewHtml).toContain('--f-body:"IBM Plex Sans"');
+    expect(previewHtml).toContain('--f-mono:"IBM Plex Mono"');
+    expect(previewHtml).toMatch(/--c-paper:#0e1114/i);
+    expect(previewHtml).toMatch(/--c-accent:#3ecfbf/i);
+    expect(previewHtml).not.toContain("ds-hero-helm");
+    expect(previewHtml).not.toContain("ds-helm-masthead");
+    expect(previewHtml).not.toContain('data-figure="permit-plate"');
+    expect(previewHtml).not.toContain("What Keel covers");
+    expect(previewHtml).not.toMatch(/waitlist/i);
+    expect(previewHtml).not.toMatch(/<section[^>]*\bdata-workflow-proof\b/);
+    expect(previewHtml).not.toMatch(/class="[^"]*ds-pipeline-board/);
+    expect(previewHtml).not.toMatch(/tiller\.(app|io|dev|com)/i);
+    expect(previewHtml).not.toMatch(/https?:\/\/[^\s"']*(keel|mcp)/i);
+    const report = assertBasics(spec, previewHtml);
+    const failed = report.findings.filter((f) => !f.ok).map((f) => f.id);
+    expect(failed, failed.join(", ")).toEqual([]);
+  });
+
+  it("makes the Keel tape a session of work, not a feature-name reprint", () => {
+    const { previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.keel!);
+    const labels = [...previewHtml.matchAll(/class="ds-keel-turn-label">([^<]*)</g)].map((m) => m[1]!);
+    expect(labels.length).toBeGreaterThanOrEqual(5);
+    for (const banned of [
+      "Steer-to-finish",
+      "Adaptive terminal",
+      "Local-first data",
+      "Scale without collapse",
+      "Honest permits",
+      "Open when real",
+    ]) {
+      expect(labels, `turn label must not be feature name "${banned}"`).not.toContain(banned);
+    }
+    expect(previewHtml).toContain("Pin done-when: typecheck, tests, no public host.");
+    expect(previewHtml).toContain("git status — one pending permit.");
+    expect(previewHtml).toContain("Hold twenty agents on this tape. Do not start a second UI.");
+    expect(previewHtml).toMatch(
+      /class="ds-keel-turn is-current"[^>]*data-turn-tag="tool"[\s\S]*?class="ds-keel-turn-label">git status/,
+    );
+  });
+
+  it("keeps Keel-like briefs on control-plane-oss and never routes them to agent-harness or saas-marketing", () => {
+    const unlocked = {
+      ...SHOWCASE_BRIEFS.keel!,
+      lockSiteKind: false,
+      siteKind: "saas-marketing" as const,
+    };
+    const analysis = analyzeFeatures(unlocked);
+    expect(analysis.siteKind).toBe("control-plane-oss");
+    expect(analysis.hasApprovalWorkflow).toBe(false);
+    const locked = designFromFeatures(SHOWCASE_BRIEFS.keel!);
+    expect(locked.spec.brief.siteKind).toBe("control-plane-oss");
+    expect(locked.previewHtml).toMatch(/<body[^>]*data-sitekind="control-plane-oss"/);
+    expect(locked.previewHtml).not.toMatch(/<body[^>]*data-sitekind="agent-harness"/);
     expect(locked.previewHtml).not.toMatch(/<body[^>]*data-sitekind="saas-marketing"/);
   });
 
