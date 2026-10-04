@@ -5,7 +5,7 @@
  * what keeps the emitted page consistent with the design system it declares, and it is what makes
  * the generated markup safe to hand to a developer as a starting point.
  */
-import { helmSessionTurns } from "./copy";
+import { count, helmSessionTurns } from "./copy";
 import { renderCss } from "./css";
 import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
@@ -1933,7 +1933,7 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         ? `${cells.length} controls · audit-ready`
         : kind === "corporate-story"
           ? `${cells.length} pillars · verifiable`
-          : `${cells.length} capabilities · declared scope`;
+          : `${count(cells.length)} capabilities · declared scope`;
   return `<section class="ds-section ds-proof" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${secMeta(metaLabel, metaDetail)}

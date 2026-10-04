@@ -463,12 +463,43 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
     for (const line of ["Named pieces", "Attendance counts", "A parent can check"]) {
       expect(scaleProof.match(new RegExp(`>${line}<`, "g")) ?? [], line).toHaveLength(1);
     }
+    const shownLines = ["Named pieces", "Attendance counts", "A parent can check"].filter((line) =>
+      scaleProof.includes(`>${line}<`),
+    );
+    const countWord: Record<string, number> = {
+      one: 1,
+      two: 2,
+      three: 3,
+      four: 4,
+      five: 5,
+      six: 6,
+      seven: 7,
+      eight: 8,
+      nine: 9,
+      ten: 10,
+    };
+    const countClaims = [
+      ...scaleProof.matchAll(/\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+capabilities\b/gi),
+    ];
+    expect(countClaims.length, "Scalehouse proof states how many lines are shown").toBeGreaterThan(0);
+    for (const claim of countClaims) {
+      const raw = claim[1]!.toLowerCase();
+      const stated = countWord[raw] ?? Number(raw);
+      expect(stated, `says ${claim[0]} over ${shownLines.length} lines`).toBe(shownLines.length);
+    }
+    expect(scaleProof.toLowerCase(), "Scalehouse proof still says five").not.toMatch(/\bfive\b/);
     const freightProof = sectionChunk(pages[0]!.html, "proof");
     const load = "A load moves in order: tender, then dock, then release";
     expect(freightProof.split(load).length - 1).toBe(1);
     for (const name of ["Tender steps", "Exception queue", "Carrier roster", "Yard notes", "Rate sheet"]) {
       expect(freightProof, name).not.toContain(name);
     }
+    const sideNav = freightProof.match(/data-app-views[\s\S]*?<\/ul>/)?.[0] ?? "";
+    const sideNums = [...sideNav.matchAll(/>(\d{2})</g)].map((match) => match[1]!);
+    const sideValues = sideNums.map((n) => Number(n));
+    expect(sideValues, `side list skips: ${sideNums.join(", ")}`).toEqual(sideValues.map((_, i) => i + 1));
+    // 01, 02, 03, 05 is a skip. A fifth step stays only when its line is not the load sentence again.
+    expect(sideNums).not.toEqual(["01", "02", "03", "05"]);
     for (const page of pages) {
       expect(page.html).not.toMatch(/class="ds-bento"/);
     }

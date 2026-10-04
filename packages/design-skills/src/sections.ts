@@ -1015,7 +1015,16 @@ export function buildSections(
               });
             })
           : [];
-        const consoleRows = features.slice(0, 6).map((f, i) =>
+        // One row per line. A repeated sentence is not a new step, and the side numbers
+        // follow the rows that remain so the list cannot skip (01, 02, 03, 05).
+        const consoleSource = features.slice(0, 6).filter((feature, index, all) => {
+          const title = normTitle(titleNotUsed(feature.name, feature.description, usedOnFold));
+          const first = all.findIndex(
+            (other) => normTitle(titleNotUsed(other.name, other.description, usedOnFold)) === title,
+          );
+          return first === index;
+        });
+        const consoleRows = consoleSource.map((f, i) =>
           block({
             title: titleNotUsed(f.name, f.description, usedOnFold),
             meta: `${(i + 3) * 7}`,
@@ -1083,7 +1092,13 @@ export function buildSections(
           sentence(
             `Five named states. Every panel traces to a declared capability — nothing invented for theatre`,
           );
-        const marqueeClaim = authored?.proof.claim ?? q.quote;
+        // A plate can show fewer lines than the brief listed. The count written over that
+        // list has to match the lines on it, not the longer catalogue.
+        const shownOnPlate = fromBrief.length >= 2 ? fromBrief.length : features.length;
+        const plateQuote =
+          shownOnPlate === features.length ? q : pullQuote(brief, features.slice(0, shownOnPlate));
+        const marqueeClaim =
+          shownOnPlate === features.length ? (authored?.proof.claim ?? q.quote) : plateQuote.quote;
         const gateCopy =
           analysis.hasApprovalWorkflow && authored?.proof.gateCopy
             ? authored.proof.gateCopy
@@ -1139,11 +1154,11 @@ export function buildSections(
                 ? gateCopy
                 : undefined
               : isMarquee
-                ? q.attribution
+                ? plateQuote.attribution
                 : undefined,
             blocks: proofBlocks,
             aside: isConsole
-              ? features.slice(0, 6).map((_f, i) => block({ title: String(i + 1).padStart(2, "0") }))
+              ? consoleSource.map((_f, i) => block({ title: String(i + 1).padStart(2, "0") }))
               : [],
             metrics: isConsole
               ? features.slice(0, 3).map((_f, i) => ({
