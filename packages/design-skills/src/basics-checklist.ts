@@ -109,7 +109,11 @@ function saasProofMatches(
 ): boolean {
   const layout = proofLayoutOf(spec);
   if (layout === "workflow-proof") return /data-workflow-proof/.test(html);
-  if (layout === "marquee-proof" || layout === "pullquote") return hasBoard;
+  if (layout === "marquee-proof" || layout === "pullquote") {
+    if (hasBoard) return true;
+    // Evidence drawn once on the plate. A card row would tell those lines again.
+    return layout === "marquee-proof" && /data-figure="stack"/.test(html);
+  }
   if (layout === "app-shell") return /data-app-shell/.test(html);
   if (layout === "compare-matrix") return /ds-matrix/.test(html);
   if (layout === "figure-explainer") return /data-scrub/.test(html);

@@ -213,16 +213,10 @@ function scrubClaim(name: string, description: string): string {
       return (hits?.length ?? 0) > 1;
     });
   if (repeated) {
-    const clause = description.replace(/\s+/g, " ").trim();
-    return sentence(clause || "Scrub the mechanism");
+    // The description is already a scrub step. Repeating it as the claim tells the line twice.
+    return sentence("Scrub the mechanism");
   }
   return sentence(template);
-}
-
-function listClaim(name: string, description: string, used: Set<string>): string {
-  if (name && !used.has(normTitle(name))) return sentence(`Open ${name} and work the list`);
-  const clause = description.replace(/\s+/g, " ").trim();
-  return sentence(clause || "Work the list");
 }
 
 function titleNotUsed(name: string, description: string, used: Set<string>): string {
@@ -1026,7 +1020,8 @@ export function buildSections(
             title: titleNotUsed(f.name, f.description, usedOnFold),
             meta: `${(i + 3) * 7}`,
             kicker: i === 0 ? "Now" : i < 3 ? "Today" : "Queued",
-            points: [f.description || f.name],
+            // Not the title again. The row already tells that line.
+            points: [f.priority === "p0" ? "Primary" : "In product"],
           }),
         );
         const matrixRows = features.map((f) =>
@@ -1101,7 +1096,7 @@ export function buildSections(
             ? workflowClaim
             : sequenceClaim
           : isConsole
-            ? listClaim(proofFeature?.name ?? "", proofFeature?.description ?? "", usedOnFold)
+            ? sentence(`${brief.productName} keeps the list open`)
             : isMatrix
               ? sentence(`The options side by side, as a table`)
               : isScrub
@@ -1148,12 +1143,12 @@ export function buildSections(
                 : undefined,
             blocks: proofBlocks,
             aside: isConsole
-              ? features.slice(0, 6).map((f) => block({ title: titleNotUsed(f.name, f.description, usedOnFold) }))
+              ? features.slice(0, 6).map((_f, i) => block({ title: String(i + 1).padStart(2, "0") }))
               : [],
             metrics: isConsole
-              ? features.slice(0, 3).map((f, i) => ({
+              ? features.slice(0, 3).map((_f, i) => ({
                   value: String(i + 1).padStart(2, "0"),
-                  label: titleNotUsed(f.name, f.description, usedOnFold),
+                  label: ["Now", "Today", "Queued"][i] ?? "Queued",
                   note: "",
                 }))
               : isMetricProof

@@ -1329,7 +1329,13 @@ function renderFigure(section: SectionSpec): string {
             <input type="range" min="0" max="${max}" value="${mid}" data-scrub aria-label="Step through the mechanism" />
           </label>
         </div>
-        <figcaption data-scrub-caption>${esc(section.figureCaption ?? section.title)}</figcaption>
+        ${
+          section.figureCaption &&
+          section.figureCaption.replace(/\s+/g, " ").trim().toLowerCase() !==
+            section.title.replace(/\s+/g, " ").trim().toLowerCase()
+            ? `<figcaption data-scrub-caption>${esc(section.figureCaption)}</figcaption>`
+            : `<figcaption class="ds-sr" data-scrub-caption></figcaption>`
+        }
       </figure>
     </div>
   </section>`;
@@ -1865,7 +1871,7 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         : kind === "corporate-story"
           ? "ds-proof-board ds-proof-board-spine"
           : "ds-proof-board";
-  const board = cells.length
+  const boardMarkup = cells.length
     ? `<ul class="${boardClass}" data-proof-board>${cells
         .map((b, i) => {
           const mark = figures.marks[i] ?? "";
@@ -1886,20 +1892,27 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
     Boolean(spec) &&
     cells.length >= 2 &&
     cells.every((b) => !featureNames.has(b.title.replace(/\s+/g, " ").trim().toLowerCase()));
-  const plateDrawing = evidencePlate && spec
-    ? stackDiagram(cells, spec.brief.productName, "plate")
-    : figures.body;
+  // SaaS evidence is already the plate. Cards under it would tell those lines again.
+  // Other kinds keep the board the showcase proofs are built on.
+  const tellOnce = evidencePlate && kind === "saas-marketing";
+  const board = tellOnce ? "" : boardMarkup;
+  const drawn = evidencePlate && spec ? stackDiagram(cells, spec.brief.productName, "plate") : figures.body;
+  const plateDrawing = tellOnce
+    ? drawn.replace(/aria-label="[^"]*"/, 'aria-label="Evidence"')
+    : drawn;
   const figure = plateDrawing
     ? plate(
         plateDrawing,
-        section.quoteAttribution ??
-          (kind === "dashboard-webapp"
-            ? "Live desk"
-            : kind === "fintech-marketing"
-              ? "Treasury controls"
-              : kind === "corporate-story"
-                ? "Diligence pack"
-                : "Declared scope"),
+        tellOnce
+          ? ""
+          : section.quoteAttribution ??
+            (kind === "dashboard-webapp"
+              ? "Live desk"
+              : kind === "fintech-marketing"
+                ? "Treasury controls"
+                : kind === "corporate-story"
+                  ? "Diligence pack"
+                  : "Declared scope"),
         "ds-proof-figure ds-plate-lit",
       )
     : figures.field
@@ -2284,9 +2297,7 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
     : sectionHead(section);
   const lede = isDash
     ? ""
-    : section.body
-      ? `<p class="ds-lede">${esc(section.body)} Each row is a live decision for ${esc(spec.brief.audience)} — state, detail, and age — so this surface stays the source of truth rather than a report you refresh.</p>`
-      : "";
+    : `<p class="ds-lede">Each row is a live decision for ${esc(spec.brief.audience)} — state, detail, and age — so this surface stays the source of truth rather than a report you refresh.</p>`;
   return `<section id="${esc(section.id)}" class="ds-section ds-app-band" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${head}
@@ -2333,13 +2344,19 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
               <tbody>
                 ${rows
                   .map(
-                    (b) => `<tr data-row-view="${esc(b.title)}" data-row-state="${esc((b.kicker ?? "Queued").toLowerCase())}">
+                    (b, i) => {
+                      const view = section.aside[i]?.title || b.title;
+                      const told = b.title.replace(/\s+/g, " ").trim().toLowerCase();
+                      const detail = [b.points[0], b.body].find(
+                        (part) => part && part.replace(/\s+/g, " ").trim().toLowerCase() !== told,
+                      );
+                      return `<tr data-row-view="${esc(view)}" data-row-state="${esc((b.kicker ?? "Queued").toLowerCase())}">
                       <th scope="row">${esc(b.title)}</th>
                       <td><span class="ds-pill${b.kicker === "Now" ? " ds-pill-signal" : ""}">${esc(b.kicker ?? "Queued")}</span></td>
-                      <td>${esc(b.points[0] ?? b.body ?? b.kicker ?? b.title)}</td>
+                      <td>${esc(detail ?? "")}</td>
                       <td class="ds-num">${esc(b.meta ?? "0")}m</td>
-                    </tr>`,
-                  )
+                    </tr>`;
+                    })
                   .join("")}
               </tbody>
             </table>

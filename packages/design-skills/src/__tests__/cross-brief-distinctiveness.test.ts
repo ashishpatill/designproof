@@ -341,6 +341,17 @@ function plainText(chunk: string): string {
   return chunk.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
+/** Visible proof lines told more than once. A second card, nav slot, or table cell of the same line fails. */
+function repeatedProofLines(proofChunk: string): string[] {
+  const counts = new Map<string, number>();
+  for (const match of proofChunk.matchAll(/>([^<]+)</g)) {
+    const line = match[1]!.replace(/\s+/g, " ").trim().toLowerCase().replace(/[.!?]+$/g, "");
+    if (line.length < 12) continue;
+    counts.set(line, (counts.get(line) ?? 0) + 1);
+  }
+  return [...counts.entries()].filter(([, n]) => n > 1).map(([line]) => line);
+}
+
 /** First-screen titles (feature names the fold actually paints) that the proof still says. */
 function repeatedFoldNames(brief: DesignBriefT, foldChunk: string, proofChunk: string): string[] {
   const fold = plainText(foldChunk);
@@ -392,12 +403,27 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       const proofChunk = sectionChunk(previewHtml, "proof");
       const foldTitles = itemTitles(heroChunk);
       const proofTitles = itemTitles(proofChunk);
+      // A plate that already lists the evidence has no card headings. Those lines are the titles.
+      if (proof!.layout === "marquee-proof" && !/data-proof-board/.test(proofChunk)) {
+        const stack = proofChunk.match(/<svg[^>]*data-figure="stack"[^>]*>[\s\S]*?<\/svg>/);
+        if (stack) {
+          for (const text of stack[0].matchAll(/<text[^>]*font-weight="600"[^>]*>([^<]+)/g)) {
+            const title = text[1]!.replace(/\s+/g, " ").trim().toLowerCase();
+            if (title.length >= 2) proofTitles.add(title);
+          }
+        }
+      }
       const shared = [...foldTitles].filter((title) => proofTitles.has(title));
       expect(shared, `${brief.productName} proof repeats fold titles: ${shared.join(", ")}`).toEqual([]);
       const repeated = repeatedFoldNames(brief, heroChunk, proofChunk);
       expect(
         repeated,
         `${brief.productName} proof repeats first-screen titles: ${repeated.join(", ")}`,
+      ).toEqual([]);
+      const toldTwice = repeatedProofLines(proofChunk);
+      expect(
+        toldTwice,
+        `${brief.productName} proof tells the same line twice: ${toldTwice.join(" | ")}`,
       ).toEqual([]);
       expect(foldTitles.size, `${brief.productName} fold has no item titles`).toBeGreaterThan(0);
       expect(proofTitles.size, `${brief.productName} proof has no item titles`).toBeGreaterThan(0);
@@ -431,7 +457,18 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
     expect(willowHero, "Willowvet fold must not be a single list of names").not.toContain('data-figure="stack"');
     expect(pages[2]!.html).toContain("ds-cutoff-rail");
     expect(pages[2]!.html).toContain("ds-hero-wire");
-    expect(pages[2]!.html).toMatch(/<ul[^>]*\bdata-proof-board\b/);
+    const scaleProof = sectionChunk(pages[2]!.html, "proof");
+    expect(scaleProof).toContain('data-figure="stack"');
+    expect(scaleProof).not.toMatch(/<ul[^>]*\bdata-proof-board\b/);
+    for (const line of ["Named pieces", "Attendance counts", "A parent can check"]) {
+      expect(scaleProof.match(new RegExp(`>${line}<`, "g")) ?? [], line).toHaveLength(1);
+    }
+    const freightProof = sectionChunk(pages[0]!.html, "proof");
+    const load = "A load moves in order: tender, then dock, then release";
+    expect(freightProof.split(load).length - 1).toBe(1);
+    for (const name of ["Tender steps", "Exception queue", "Carrier roster", "Yard notes", "Rate sheet"]) {
+      expect(freightProof, name).not.toContain(name);
+    }
     for (const page of pages) {
       expect(page.html).not.toMatch(/class="ds-bento"/);
     }
