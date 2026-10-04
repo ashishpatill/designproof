@@ -108,6 +108,49 @@ function featureBlocks(copies: FeatureCopy[]): Block[] {
   );
 }
 
+function normTitle(value: string): string {
+  return value.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** Titles already painted on the fold. The proof must not repeat them. */
+function foldTitles(layout: string, names: string[]): Set<string> {
+  // The cutoff rail paints clock labels, not capability names.
+  if (layout === "hero-wire") return new Set(["09:00", "12:00", "15:00", "17:00"]);
+  return new Set(names.map(normTitle));
+}
+
+function titleNotUsed(name: string, description: string, used: Set<string>): string {
+  const nameClean = name.replace(/\s+/g, " ").trim();
+  if (nameClean && !used.has(normTitle(nameClean))) return nameClean;
+  const desc = description.replace(/\s+/g, " ").trim();
+  if (desc && !used.has(normTitle(desc))) return desc;
+  const fallback = desc ? `${desc} — shown in proof` : `${nameClean} detail`;
+  return used.has(normTitle(fallback)) ? `${fallback} (${nameClean})` : fallback;
+}
+
+/** Clauses of a sequence, skipping any title the fold already used. */
+function stageClauses(text: string, used: Set<string>): string[] {
+  const raw = text
+    .split(/[.;,]|\bthen\b|\band\b/i)
+    .map((part) => part.replace(/\s+/g, " ").trim())
+    .filter((part) => part.length >= 3);
+  const out: string[] = [];
+  for (const part of raw) {
+    if (used.has(normTitle(part))) continue;
+    if (out.some((title) => normTitle(title) === normTitle(part))) continue;
+    out.push(part);
+    if (out.length >= 5) break;
+  }
+  let n = 1;
+  while (out.length < 3) {
+    const label = `Step ${n}`;
+    n += 1;
+    if (used.has(normTitle(label))) continue;
+    out.push(label);
+  }
+  return out.slice(0, 5);
+}
+
 export function buildSections(
   brief: DesignBrief,
   analysis: FeatureAnalysis,
@@ -124,6 +167,11 @@ export function buildSections(
     p0Count: p0.length,
     goal: brief.businessGoal,
     hasApprovalWorkflow: analysis.hasApprovalWorkflow,
+    capabilities: features.map((f) => ({
+      name: f.name,
+      description: f.description,
+      priority: f.priority,
+    })),
   });
 
   const eyebrow = eyebrows(brief);
@@ -234,6 +282,15 @@ export function buildSections(
                   })
                 : b;
             }),
+            // Evidence fold is a metric band. Values are declared names — not invented rates.
+            metrics:
+              p.layout === "metric-band"
+                ? (core.length ? core : editorial.features.slice(0, 4)).map((c) => ({
+                    value: c.name,
+                    label: c.tier,
+                    note: "",
+                  }))
+                : [],
             aside: editorial.features
               .slice(0, 4)
               .map((c, i) =>
@@ -759,23 +816,34 @@ export function buildSections(
 
       case "proof": {
         const q = pullQuote(brief, features);
-        // Fill the board. Three chips beside a lonely quote still left a dark void; five evidence
-        // cells from declared features are the matter a proof band is supposed to carry.
+        const fold = plan.find((row) => row.kind === "hero");
+        const topCaps = features.filter((f) => f.priority === "p0");
+        const foldNamed = (topCaps.length ? topCaps : features).slice(0, 4);
+        const usedOnFold = foldTitles(fold?.layout ?? "", foldNamed.map((f) => f.name));
+        const proofFeature = topCaps[1] ?? features[1] ?? features[0];
+        const isWorkflow = p.layout === "workflow-proof";
+        const isConsole = p.layout === "app-shell";
+        const isMatrix = p.layout === "compare-matrix";
+        const isScrub = p.layout === "figure-explainer";
+        const isIndex =
+          p.layout === "feature-index" || p.layout === "feature-rows" || p.layout === "feature-alternating";
+        const isWireProof = p.layout === "hero-wire";
+        const isMetricProof = p.layout === "metric-band";
+        const isMarquee = p.layout === "marquee-proof" || p.layout === "pullquote";
+        // Evidence cells. Titles already on the fold are replaced so the board is not a second copy.
         const evidence = features.slice(0, 5).map((f) =>
           block({
-            title: f.name,
+            title: titleNotUsed(f.name, f.description, usedOnFold),
             body: f.description,
-            // Sentence case — screaming micro-labels inflate the uppercase count and read as chrome.
             meta: f.priority === "p0" ? "Primary" : "In product",
             kicker: f.priority === "p0" ? "Primary" : "In product",
             emphasis: f.priority === "p0" ? "lead" : "normal",
           }),
         );
-        const isWorkflow = p.layout === "workflow-proof";
         /*
-         * Workflow proof stages — five named handoffs that mirror how a careful product ships work.
-         * Titles stay fixed (mechanism vocabulary); bodies come only from declared features.
-         * Authored role/gate copy is used only when hasApprovalWorkflowSignal (and provided).
+         * Stage-by-stage proof. Approval briefs keep the named handoff vocabulary.
+         * Any other sequence uses clauses from the second capability, never the fold's titles,
+         * and never an approve gate that the brief did not declare.
          */
         const workflowBodies = features.slice(0, 5);
         const defaultStages = [
@@ -785,10 +853,20 @@ export function buildSections(
           { id: "review", title: "Review", role: "Human edits before anything ships" },
           { id: "approve", title: "Approve", role: "Explicit gate — never auto-apply" },
         ] as const;
+        const declaredStages = stageClauses(
+          proofFeature?.description || proofFeature?.name || "",
+          usedOnFold,
+        ).map((title, i) => ({
+          id: `step-${i + 1}`,
+          title,
+          role: proofFeature?.description || title,
+        }));
         const stageDefs =
           isWorkflow && analysis.hasApprovalWorkflow && authored?.proof.stages?.length === 5
             ? authored.proof.stages
-            : defaultStages;
+            : analysis.hasApprovalWorkflow
+              ? defaultStages
+              : declaredStages;
         const workflowStages = isWorkflow
           ? stageDefs.map((stage, i) => {
               const src = workflowBodies[i] ?? workflowBodies[workflowBodies.length - 1] ?? features[0];
@@ -798,12 +876,36 @@ export function buildSections(
                   ? sentence(`${stage.role}. Uses ${src.name}: ${src.description || src.name}`)
                   : sentence(stage.role),
                 meta: stage.id,
-                kicker: src?.name ?? "Sample",
-                emphasis: i === 0 ? "lead" : i === 4 ? "lead" : "normal",
-                points: src ? [src.name, stage.role] : [stage.role],
+                kicker: analysis.hasApprovalWorkflow ? (src?.name ?? "Sample") : "Stage",
+                emphasis: i === 0 ? "lead" : i === stageDefs.length - 1 ? "lead" : "normal",
+                points: analysis.hasApprovalWorkflow && src ? [src.name, stage.role] : [stage.role],
               });
             })
           : [];
+        const consoleRows = features.slice(0, 6).map((f, i) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            meta: `${(i + 3) * 7}`,
+            kicker: i === 0 ? "Now" : i < 3 ? "Today" : "Queued",
+            points: [f.description || f.name],
+          }),
+        );
+        const matrixRows = features.map((f) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            meta: f.priority === "p0" ? "Primary" : "In product",
+          }),
+        );
+        const scrubSteps = stageClauses(proofFeature?.description || proofFeature?.name || "", usedOnFold).map(
+          (title) => block({ title }),
+        );
+        const indexRows = features.map((f, i) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            body: f.description,
+            meta: String(i + 1).padStart(2, "0"),
+          }),
+        );
         const proofTitle =
           brief.siteKind === "saas-marketing"
             ? isWorkflow
@@ -852,15 +954,78 @@ export function buildSections(
           analysis.hasApprovalWorkflow && authored?.proof.gateCopy
             ? authored.proof.gateCopy
             : "Human approves before apply";
+        const sequenceClaim = sentence(
+          `${proofFeature?.name ?? brief.productName} in stages, from what was declared`,
+        );
+        const proofBody = isWorkflow
+          ? analysis.hasApprovalWorkflow
+            ? workflowClaim
+            : sequenceClaim
+          : isConsole
+            ? sentence(`Open ${proofFeature?.name ?? "the queue"} and work the list`)
+            : isMatrix
+              ? sentence(`The options side by side, as a table`)
+              : isScrub
+                ? sentence(`Scrub how ${proofFeature?.name ?? brief.productName} works`)
+                : isWireProof
+                  ? sentence(`Movements on ${brief.productName} against the cutoff`)
+                  : marqueeClaim;
+        const proofBlocks = isWorkflow
+          ? workflowStages
+          : isConsole
+            ? consoleRows
+            : isMatrix
+              ? matrixRows
+              : isScrub
+                ? scrubSteps
+                : isIndex
+                  ? indexRows
+                  : evidence;
         sections.push(
           SectionSpec.parse({
             ...base,
-            eyebrow: isWorkflow ? "Sample workflow" : eyebrow.proof,
+            eyebrow: isWorkflow
+              ? analysis.hasApprovalWorkflow
+                ? "Sample workflow"
+                : "Stage by stage"
+              : isConsole
+                ? "Console"
+                : isMatrix
+                  ? "Compared"
+                  : isScrub
+                    ? "How it works"
+                    : isWireProof
+                      ? "Cutoffs"
+                      : eyebrow.proof,
             title: proofTitle,
-            body: isWorkflow ? workflowClaim : marqueeClaim,
-            quote: isWorkflow ? undefined : marqueeClaim,
-            quoteAttribution: isWorkflow ? gateCopy : q.attribution,
-            blocks: isWorkflow ? workflowStages : evidence,
+            body: proofBody,
+            quote: isMarquee ? marqueeClaim : undefined,
+            quoteAttribution: isWorkflow
+              ? analysis.hasApprovalWorkflow
+                ? gateCopy
+                : undefined
+              : isMarquee
+                ? q.attribution
+                : undefined,
+            blocks: proofBlocks,
+            aside: isConsole
+              ? features.slice(0, 6).map((f) => block({ title: titleNotUsed(f.name, f.description, usedOnFold) }))
+              : [],
+            metrics: isConsole
+              ? features.slice(0, 3).map((f, i) => ({
+                  value: String(i + 1).padStart(2, "0"),
+                  label: titleNotUsed(f.name, f.description, usedOnFold),
+                  note: "",
+                }))
+              : isMetricProof
+                ? features.slice(0, 4).map((f) => ({
+                    value: titleNotUsed(f.name, f.description, usedOnFold),
+                    label: f.priority === "p0" ? "Primary" : "In product",
+                    note: "",
+                  }))
+                : [],
+            brandLabel: isConsole ? brief.productName : undefined,
+            ctaLabel: isConsole ? cta.primary : undefined,
           }),
         );
         break;

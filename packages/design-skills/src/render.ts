@@ -880,7 +880,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
           `<li><a href="${w.href}" class="ds-cutoff-chip${i === 1 ? " is-live" : ""}" data-cutoff="${w.id}"><span class="ds-cutoff-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-cutoff-label">${esc(w.label)}</span></a></li>`,
       )
       .join("")}</ol></nav>`;
-    return `<section id="top" class="ds-section ds-hero ds-hero-wire" data-surface="${section.surface}" data-section="${esc(section.id)}">
+    return `<section id="${section.id === "hero" ? "top" : esc(section.id)}" class="ds-section ds-hero ds-hero-wire" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${rail}
       <div class="ds-wrap-wide ds-wire-fold">
         <div class="ds-wire-claim">${copy}</div>
@@ -996,9 +996,10 @@ function renderMetricBand(section: SectionSpec, figures: FigurePlan, spec?: Desi
     spec?.brief.siteKind === "dashboard-webapp"
       ? ""
       : sectionHead(section, 2);
-  return `<section class="ds-section ds-section-tight ds-metrics-band" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+  return `<section class="ds-section ds-section-tight ds-metrics-band" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${section.id === "hero" ? "top" : esc(section.id)}">
     <div class="ds-wrap-wide">
       ${head}
+      ${section.ctaLabel ? actions(section) : ""}
       <div class="ds-metrics">
         ${section.metrics
           .map(
@@ -1215,9 +1216,10 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
-  return `<section class="ds-section" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+  return `<section class="ds-section" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${section.id === "hero" ? "top" : esc(section.id)}">
     <div class="${frame(section)}">
       ${sectionHead(section, 2, frame(section) === "ds-wrap-wide")}
+      ${section.ctaLabel ? actions(section) : ""}
       ${standing}
       ${inner}
       ${rail}

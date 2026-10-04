@@ -455,10 +455,14 @@ describe("Phase 1 connective author", () => {
           `${brief.productName} role "${stage.role}" must name a feature`,
         ).toBe(true);
       }
-      const { previewHtml } = await designFromFeaturesAuthored(brief, {});
+      const { previewHtml, spec } = await designFromFeaturesAuthored(brief, {});
       expect(previewHtml).not.toContain(sharedLegacy);
+      const proof = spec.sections.find((s) => s.id === "proof");
+      // Stage copy is mounted only when the second capability is a sequence.
+      // These briefs are not, so the page must not grow an approve stage.
+      expect(proof?.layout).not.toBe("workflow-proof");
       for (const stage of tissue.proof.stages!) {
-        expect(previewHtml).toContain(stage.role);
+        expect(previewHtml).not.toContain(stage.role);
       }
     }
 

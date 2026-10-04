@@ -10,7 +10,7 @@ import { buildTypeLadder } from "../scale";
 import { DesignBrief, SkillNodeId, type ColorMood } from "../types";
 import { pathPlate } from "../figures";
 
-/** Approval-language SaaS brief — still earns the interactive workflow-proof stage. */
+/** Close drafts are a ledger; the approval queue is a queue. The console is the proof. */
 function ledgerkeepBrief() {
   return DesignBrief.parse({
     productName: "Ledgerkeep",
@@ -122,8 +122,10 @@ describe("premium-content-custom-web engine", () => {
     expect(spec.routedSkills[0]).toBe("website-domain-research");
     expect(spec.customizationHints.some((h) => h.startsWith("Research gate:"))).toBe(true);
     expect(spec.sections.some((s) => s.kind === "hero")).toBe(true);
-    expect(spec.sections.some((s) => s.layout === "marquee-proof")).toBe(true);
-    expect(spec.sections.some((s) => s.layout === "workflow-proof")).toBe(false);
+    // Account scoring is a ranked queue; pipeline coaching is a sequence.
+    expect(spec.sections.find((s) => s.kind === "hero")?.layout).toBe("hero-queue");
+    expect(spec.sections.some((s) => s.layout === "marquee-proof")).toBe(false);
+    expect(spec.sections.some((s) => s.layout === "workflow-proof")).toBe(true);
     expect(previewHtml).toContain("Northstar");
     expect(previewHtml).toContain("Account scoring");
     expect(previewHtml).toContain('data-motion="light-scroll-reveals"');
@@ -131,10 +133,12 @@ describe("premium-content-custom-web engine", () => {
     expect(previewHtml).toContain("animation-timeline:view()");
     expect(previewHtml).toContain(":focus-visible");
     expect(previewHtml).toContain("Skip to content");
-    expect(hasLiveBoard(previewHtml)).toBe(true);
-    expect(hasLiveWorkflow(previewHtml)).toBe(false);
-    expect(previewHtml).not.toContain("htmx.org");
-    expect(previewHtml).not.toContain("Sample workflow");
+    expect(hasLiveBoard(previewHtml)).toBe(false);
+    expect(hasLiveWorkflow(previewHtml)).toBe(true);
+    expect(previewHtml).toContain("htmx.org");
+    expect(previewHtml).toContain('data-rail="priority"');
+    expect(previewHtml).toContain("ds-hero-queue");
+    // The stage rail's own label says "Sample workflow"; the approve gate must still stay off.
     expect(previewHtml).not.toContain("Human gate");
     expect(previewHtml).not.toContain('data-workflow-step="approve"');
     expect(spec.routedSkills).toContain("conversion-landing-craft");
@@ -1138,7 +1142,21 @@ describe("research-backed offerings + implementation basics", () => {
   });
 
   it("keeps the workflow lit plate from hanging into the swap panel", () => {
-    const { previewHtml } = designFromFeatures(ledgerkeepBrief());
+    const sequenceProof = DesignBrief.parse({
+      productName: "Stagekeep",
+      tagline: "Two sequences, no approval gate",
+      audience: "operators",
+      businessGoal: "demos",
+      siteKind: "saas-marketing",
+      lockSiteKind: true,
+      features: [
+        { id: "s1", name: "Open steps", description: "A sequence of steps from request to scheduled", priority: "p0" },
+        { id: "s2", name: "Close steps", description: "A second sequence of steps from done to archived", priority: "p0" },
+        { id: "s3", name: "Roster", description: "People assigned to the work", priority: "p1" },
+      ],
+      taste: { aestheticLean: "conversion-sharp", motion: "light-scroll-reveals", colorMood: "neutral-professional" },
+    });
+    const { previewHtml } = designFromFeatures(sequenceProof);
     expect(hasLiveWorkflow(previewHtml)).toBe(true);
     expect(previewHtml).toMatch(/\.ds-workflow-field \.ds-proof-figure\{transform:none/);
     expect(previewHtml).toMatch(/\.ds-workflow-field\{[^}]*gap:var\(--s-xl\)/);
@@ -1146,35 +1164,39 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toMatch(/\.ds-workflow-rail ol\{[^}]*gap:var\(--s-sm\)/);
   });
 
-  it("gives Northstar a feature-evidence board and Ledgerkeep the approval workflow stage", () => {
+  it("gives Northstar a queue fold plus stage proof, and Ledgerkeep a cutoff rail plus console", () => {
     const northstar = analyzeFeatures(SHOWCASE_BRIEFS.saas!);
     expect(northstar.hasApprovalWorkflow).toBe(false);
     const north = designFromFeatures(SHOWCASE_BRIEFS.saas!);
-    expect(hasLiveBoard(north.previewHtml)).toBe(true);
-    expect(hasLiveWorkflow(north.previewHtml)).toBe(false);
-    expect(north.previewHtml).not.toContain("htmx.org");
+    expect(north.spec.sections.find((s) => s.kind === "hero")?.layout).toBe("hero-queue");
+    expect(hasLiveBoard(north.previewHtml)).toBe(false);
+    expect(hasLiveWorkflow(north.previewHtml)).toBe(true);
+    expect(north.previewHtml).toContain("htmx.org");
     expect(north.previewHtml).not.toContain('data-workflow-step="approve"');
 
     const ledgerAnalysis = analyzeFeatures(ledgerkeepBrief());
     expect(ledgerAnalysis.hasApprovalWorkflow).toBe(true);
     const ledger = designFromFeatures(ledgerkeepBrief());
-    expect(hasLiveWorkflow(ledger.previewHtml)).toBe(true);
-    expect(ledger.previewHtml).toContain("htmx.org");
-    expect(ledger.previewHtml).toContain('data-workflow-step="approve"');
-    expect(ledger.spec.sections.some((s) => s.layout === "workflow-proof")).toBe(true);
+    expect(ledger.spec.sections.find((s) => s.kind === "hero")?.layout).toBe("hero-wire");
+    expect(ledger.spec.sections.find((s) => s.id === "proof")?.layout).toBe("app-shell");
+    expect(hasLiveWorkflow(ledger.previewHtml)).toBe(false);
+    expect(ledger.previewHtml).toContain("data-app-shell");
+    expect(ledger.previewHtml).toContain("ds-cutoff-rail");
+    expect(ledger.previewHtml).not.toContain('data-workflow-step="approve"');
   });
 
   it("fills marketing proof bands with dense evidence — ordinary SaaS uses a board, approval briefs use workflow", () => {
     const saas = designFromFeatures(SHOWCASE_BRIEFS.saas!);
-    expect(hasLiveBoard(saas.previewHtml)).toBe(true);
-    expect(hasLiveWorkflow(saas.previewHtml)).toBe(false);
+    expect(hasLiveBoard(saas.previewHtml)).toBe(false);
+    expect(hasLiveWorkflow(saas.previewHtml)).toBe(true);
     expect(saas.previewHtml).toContain("ds-proof-claim");
     expect(saas.previewHtml).toContain("ds-story");
     expect(saas.previewHtml).not.toContain("How to read this page");
     expect(saas.previewHtml).not.toContain("min-height:min(140vh");
 
     const ledger = designFromFeatures(ledgerkeepBrief());
-    expect(hasLiveWorkflow(ledger.previewHtml)).toBe(true);
+    expect(hasLiveWorkflow(ledger.previewHtml)).toBe(false);
+    expect(ledger.previewHtml).toContain("data-app-shell");
     expect(hasLiveBoard(ledger.previewHtml)).toBe(false);
 
     const fintech = designFromFeatures(SHOWCASE_BRIEFS.fintech!);
