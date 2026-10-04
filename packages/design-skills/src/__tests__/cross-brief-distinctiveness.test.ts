@@ -337,6 +337,19 @@ function sectionChunk(html: string, sectionId: string): string {
 }
 
 /** Item titles on a screen — not the page headline. */
+function plainText(chunk: string): string {
+  return chunk.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** First-screen titles (feature names the fold actually paints) that the proof still says. */
+function repeatedFoldNames(brief: DesignBriefT, foldChunk: string, proofChunk: string): string[] {
+  const fold = plainText(foldChunk);
+  const proof = plainText(proofChunk);
+  return brief.features
+    .map((feature) => feature.name.replace(/\s+/g, " ").trim().toLowerCase())
+    .filter((name) => name.length >= 3 && fold.includes(name) && proof.includes(name));
+}
+
 function itemTitles(chunk: string): Set<string> {
   const found = new Set<string>();
   const patterns = [
@@ -375,10 +388,17 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       expect(fold, `${brief.productName} fold`).toBeTruthy();
       expect(proof, `${brief.productName} proof`).toBeTruthy();
       expect(proof!.layout, `${brief.productName} proof copies the fold`).not.toBe(fold!.layout);
-      const foldTitles = itemTitles(sectionChunk(previewHtml, "hero"));
-      const proofTitles = itemTitles(sectionChunk(previewHtml, "proof"));
+      const heroChunk = sectionChunk(previewHtml, "hero");
+      const proofChunk = sectionChunk(previewHtml, "proof");
+      const foldTitles = itemTitles(heroChunk);
+      const proofTitles = itemTitles(proofChunk);
       const shared = [...foldTitles].filter((title) => proofTitles.has(title));
       expect(shared, `${brief.productName} proof repeats fold titles: ${shared.join(", ")}`).toEqual([]);
+      const repeated = repeatedFoldNames(brief, heroChunk, proofChunk);
+      expect(
+        repeated,
+        `${brief.productName} proof repeats first-screen titles: ${repeated.join(", ")}`,
+      ).toEqual([]);
       expect(foldTitles.size, `${brief.productName} fold has no item titles`).toBeGreaterThan(0);
       expect(proofTitles.size, `${brief.productName} proof has no item titles`).toBeGreaterThan(0);
       return { brief, fold: fold!.layout, proof: proof!.layout, html: previewHtml };
@@ -405,6 +425,10 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
     expect(pages[0]!.html).toContain("data-app-shell");
     expect(pages[1]!.html).toContain("ds-alt-row");
     expect(pages[1]!.html).toContain("data-scrub");
+    const willowHero = sectionChunk(pages[1]!.html, "hero");
+    const willowRows = willowHero.match(/class="ds-alt-row[^"]*"/g) ?? [];
+    expect(willowRows, "Willowvet fold must be one row per choice").toHaveLength(5);
+    expect(willowHero, "Willowvet fold must not be a single list of names").not.toContain('data-figure="stack"');
     expect(pages[2]!.html).toContain("ds-cutoff-rail");
     expect(pages[2]!.html).toContain("ds-hero-wire");
     expect(pages[2]!.html).toMatch(/<ul[^>]*\bdata-proof-board\b/);
@@ -447,8 +471,12 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       const proof = spec.sections.find((s) => s.id === "proof");
       expect(proof?.layout).not.toBe(spec.sections.find((s) => s.kind === "hero")?.layout);
       if (proof?.layout === "marquee-proof") {
-        expect(metric.featureProofTotal, `${brief.productName} evidence board`).toBeGreaterThan(0);
-        expect(metric.featureProofHits).toBe(metric.featureProofTotal);
+        const vocab = briefVocabulary(brief);
+        const grounded = buckets.proof.filter((line) => lineSharesBriefToken(line, vocab));
+        expect(grounded.length, `${brief.productName} evidence board`).toBeGreaterThan(0);
+        const heroChunk = sectionChunk(previewHtml, "hero");
+        const proofChunk = sectionChunk(previewHtml, "proof");
+        expect(repeatedFoldNames(brief, heroChunk, proofChunk)).toEqual([]);
       }
     }
   });

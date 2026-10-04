@@ -3833,7 +3833,7 @@ body[data-mood="soft-brand-accent"] .ds-plan-recommended{border-color:var(--c-ac
 .ds-proof + .ds-story{padding-top:var(--s-xl)}
 .ds-proof-stage{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--s-xl) var(--s-2xl);align-items:start;margin-bottom:var(--s-xl)}
 .ds-proof-head{display:grid;gap:var(--s-md);align-content:start;background-color:var(--c-paper);border:1px solid var(--c-border);padding:var(--s-lg)}
-.ds-proof-head .ds-heading{max-width:22ch}
+.ds-proof-head .ds-heading{max-width:22ch;color:var(--c-ink)}
 .ds-proof-claim{font-family:var(--f-display);font-size:var(--t-subheading-size);line-height:var(--t-subheading-leading);letter-spacing:var(--t-subheading-tracking);font-weight:var(--t-subheading-weight);max-width:52ch;color:var(--surface-muted);text-wrap:balance}
 .ds-proof-foot{font-family:var(--f-mono);font-size:var(--t-caption-size);letter-spacing:var(--t-micro-tracking);text-transform:uppercase;color:var(--surface-quiet);margin-top:var(--s-md);padding-top:var(--s-sm);border-top:1px solid var(--surface-border);max-width:36ch}
 /* Lit plate on the dark stage — forces paper tokens so drawn UI keeps contrast. */
@@ -4092,7 +4092,7 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
   box-sizing:border-box;
 }
 .ds-faq-item p{max-width:none;width:100%}
-.ds-proof-head .ds-heading{max-width:22ch}
+.ds-proof-head .ds-heading{max-width:22ch;color:var(--c-ink)}
 .ds-proof-claim{max-width:52ch}
 /* The recommended lane stands proud of the row. Depth by overlap — no shadow, no blur, nothing to
  * repaint on scroll — and it is the one place on a pricing row where a reader benefits from being
@@ -4184,7 +4184,7 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
 body[data-mood="dark-premium"] .ds-flow-card{background:color-mix(in oklab,var(--c-paper) 8%,transparent)}
 
 /* App shell */
-.ds-app{display:grid;gap:0;border:1px solid var(--c-border);border-radius:var(--r-xl);overflow:hidden;background:var(--c-paper)}
+.ds-app{display:grid;gap:0;border:1px solid var(--c-border);border-radius:var(--r-xl);overflow:hidden;background:var(--c-paper);color:var(--c-ink);--surface-bg:var(--c-paper);--surface-ink:var(--c-ink);--surface-body:var(--c-ink-body);--surface-muted:var(--c-ink-secondary);--surface-quiet:var(--c-ink-tertiary);--surface-border:var(--c-border)}
 .ds-app-top{display:flex;align-items:center;gap:var(--s-sm);padding:var(--s-xs) var(--s-md);border-bottom:1px solid var(--c-border);background:var(--c-paper-raised)}
 .ds-app-crumbs{font-family:var(--f-mono);font-size:var(--t-caption-size);color:var(--c-ink-tertiary)}
 /* One screen. A product surface that needs two screens to show is not a screenshot, it is a page —

@@ -7,7 +7,7 @@
  */
 import { helmSessionTurns } from "./copy";
 import { renderCss } from "./css";
-import { horizonPlot, isReading, miniPageMatter, planFigures, type FigurePlan } from "./figures";
+import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -1131,6 +1131,28 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     }
     if (section.layout === "feature-alternating") {
       /*
+       * Choice fold: every capability is its own row. The name sits on one side and
+       * what it is sits beside it. A stack of every name in a single figure is not
+       * that row, so the hero does not borrow one.
+       */
+      if (section.kind === "hero") {
+        return `<div class="ds-alt">${section.blocks
+          .map(
+            (b) => `<div class="ds-alt-row ds-alt-pair">
+            <div class="ds-alt-name">
+              <h3>${esc(b.title)}</h3>
+              ${b.kicker ? `<p class="ds-alt-tier">${esc(b.kicker)}</p>` : ""}
+            </div>
+            <div class="ds-alt-detail">
+              ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
+              ${b.points.length ? `<ul class="ds-card-points">${b.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>` : ""}
+            </div>
+            <div class="ds-alt-mark" aria-hidden="true">${markFor(b)}</div>
+          </div>`,
+          )
+          .join("")}</div>`;
+      }
+      /*
        * One panel, next to the lead capability only.
        *
        * Every row used to get its own copy, built from `blocks.slice(i, i + 3)`, so a five-row
@@ -1857,9 +1879,19 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         })
         .join("")}</ul>`
     : "";
-  const figure = figures.body
+  const featureNames = new Set(
+    (spec?.brief.features ?? []).map((f) => f.name.replace(/\s+/g, " ").trim().toLowerCase()),
+  );
+  const evidencePlate =
+    Boolean(spec) &&
+    cells.length >= 2 &&
+    cells.every((b) => !featureNames.has(b.title.replace(/\s+/g, " ").trim().toLowerCase()));
+  const plateDrawing = evidencePlate && spec
+    ? stackDiagram(cells, spec.brief.productName, "plate")
+    : figures.body;
+  const figure = plateDrawing
     ? plate(
-        figures.body,
+        plateDrawing,
         section.quoteAttribution ??
           (kind === "dashboard-webapp"
             ? "Live desk"
