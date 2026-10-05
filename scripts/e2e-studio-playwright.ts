@@ -7,8 +7,15 @@ import { chromium, type APIRequestContext, type Page } from "playwright";
 
 const BASE = process.env.DP_E2E_BASE ?? "http://localhost:3000";
 
+/**
+ * Reads rendered text through `textContent` so engine metadata asserted behind a
+ * collapsed <details> is still checked. Studio keeps that panel folded by default
+ * to protect the layout; the content is always in the DOM.
+ */
 async function assertText(page: Page, selector: string, includes: string) {
-  const text = await page.locator(selector).innerText();
+  const locator = page.locator(selector);
+  await locator.waitFor({ state: "attached", timeout: 20_000 });
+  const text = (await locator.textContent()) ?? "";
   if (!text.toLowerCase().includes(includes.toLowerCase())) {
     throw new Error(`Expected ${selector} to include "${includes}", got: ${text.slice(0, 240)}`);
   }
@@ -33,7 +40,7 @@ async function frameMissing(page: Page, testId: string, text: string) {
 }
 
 async function readGeneration(page: Page): Promise<number> {
-  const text = await page.getByTestId("meta-generation").innerText();
+  const text = (await page.getByTestId("meta-generation").textContent()) ?? "";
   const match = text.match(/(\d+)/);
   return match ? Number(match[1]) : 0;
 }

@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  FileCode2,
   Github,
   Link2,
   Loader2,
   Mic,
   MicOff,
+  Sparkles,
   Wand2,
 } from "lucide-react";
 import type { BrandDNA, RedesignProposal, DesignProofReport, UserDesignProfile, Verdict } from "@designproof/schema";
@@ -110,6 +112,15 @@ const PRESET_CHIPS: { key: string; label: string }[] = [
   { key: "explainer", label: "Visual textbook" },
 ];
 
+type FindingFilter = "all" | Verdict;
+
+const FINDING_FILTERS: { id: FindingFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "generic", label: "Generic" },
+  { id: "drift", label: "Drift" },
+  { id: "intentional", label: "Intentional" },
+];
+
 export default function HomePage() {
   const [report, setReport] = useState<DesignProofReport>(emptyReport);
   const [inputUrl, setInputUrl] = useState("");
@@ -151,6 +162,9 @@ export default function HomePage() {
   const [focusCanvas, setFocusCanvas] = useState(false);
   const [mobilePane, setMobilePane] = useState<"critic" | "canvas">("canvas");
   const [openTabs, setOpenTabs] = useState<WorkspaceTab[]>([]);
+  // ── Review-pane state: findings stay the default; direction and proof are one click away ──
+  const [criticTab, setCriticTab] = useState<"findings" | "direction" | "proof">("findings");
+  const [findingFilter, setFindingFilter] = useState<FindingFilter>("all");
 
   // ── GitHub repo setup ──
   const [setupJob, setSetupJob] = useState<SetupJob | null>(null);
@@ -1162,262 +1176,394 @@ export default function HomePage() {
   const showProofWorkflow = Boolean(proposal) || proofState !== "idle";
   const showStateProbes = selectedFinding?.detector === "StateGap";
 
+  const findingVerdict = (id: string) => verdictOf(id);
+
+  const statusTone: "idle" | "working" | "live" | "error" = operationActive
+    ? "working"
+    : captureMeta?.live
+      ? "live"
+      : captureMeta?.error
+        ? "error"
+        : "idle";
+  const statusLabel = operationActive
+    ? "Working"
+    : captureMeta?.live
+      ? "Live capture"
+      : offlineDemo
+        ? "Offline fixture"
+        : captureMeta?.error
+          ? "Capture failed"
+          : designBrief
+            ? "Direction primed"
+            : "Ready";
+
+  const verdictCounts = useMemo<Record<Verdict, number>>(() => {
+    const counts: Record<Verdict, number> = { generic: 0, drift: 0, intentional: 0, uncertain: 0 };
+    for (const finding of report.findings) counts[verdictOf(finding.id)] += 1;
+    return counts;
+  }, [report, verdictOf]);
+
+  const filteredFindings = useMemo(
+    () =>
+      findingFilter === "all"
+        ? report.findings
+        : report.findings.filter((finding) => verdictOf(finding.id) === findingFilter),
+    [report, findingFilter, verdictOf],
+  );
+
   const criticPane = (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={`font-mono text-meta ${
-            operationActive
-              ? "text-accent"
-              : captureMeta?.live
-                ? "text-ok"
-                : offlineDemo || captureMeta?.error
-                  ? "text-drift"
-                  : "text-muted"
-          }`}
-        >
-          {operationActive
-            ? "Working…"
-            : captureMeta?.live
-              ? "Live"
-              : offlineDemo
-                ? "Offline fixture"
-                : captureMeta?.error
-                  ? "Capture failed"
-                  : designBrief
-                    ? "Brief"
-                    : "Ready"}
-          {report.findings.length ? ` · ${scoreLine}` : null}
+    <div className="dp-critic">
+      <header className="dp-critic__head">
+        <span className="dp-critic__status">
+          <span className="dp-critic__status-dot" data-tone={statusTone} aria-hidden />
+          <span className="dp-critic__status-label">{statusLabel}</span>
+          {report.findings.length ? <span className="text-muted">· {report.score.total} findings</span> : null}
         </span>
-        {captureState === "done" && report.findings.length > 0 ? (
-          <button
-            type="button"
-            onClick={shareReport}
-            disabled={sharingReport || operationActive}
-            className="ml-auto inline-flex items-center gap-1.5 font-mono text-meta text-muted transition hover:text-accent disabled:opacity-60"
-          >
-            <Link2 className="h-3.5 w-3.5" />
-            {sharingReport ? "Sharing…" : shareUrl ? "Copy link" : "Share"}
-          </button>
-        ) : null}
-      </div>
-
-      <ConnectAgent />
-
-      {showProofWorkflow ? (
-        <WorkflowRail
-          captured={liveCapture}
-          sourceMapped={sourceContext?.mode === "repo" && sourceContext.filesLoaded > 0}
-          patchReady={Boolean(proposal)}
-          proofState={proofState}
-        />
-      ) : null}
-
-      {designBrief && !captureMeta ? (
-        <div className="border-y border-border py-3">
-          <p className="text-sm text-secondary">
-            Direction is primed. Capture a rendered URL to attach named tells.
-          </p>
-          <a className="mt-2 inline-block font-mono text-meta text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
-            Open in Studio
-          </a>
-        </div>
-      ) : (
-      <div>
-        <p className="mb-2 font-mono text-meta uppercase tracking-[0.14em] text-muted">Findings</p>
-        <div className="divide-y divide-border border-y border-border">
-          {report.findings.map((finding) => {
-            const itemVerdict = verdictOf(finding.id);
-            return (
-              <button
-                key={finding.id}
-                type="button"
-                onClick={() => setSelectedId(finding.id)}
-                className={`flex w-full items-center justify-between gap-3 px-1 py-2.5 text-left transition ${
-                  selectedId === finding.id ? "bg-accent/10 text-text" : "text-secondary hover:text-text"
-                }`}
-              >
-                <span className="font-mono text-sm">{finding.detector}</span>
-                <VerdictBadge verdict={itemVerdict} />
-              </button>
-            );
-          })}
-          {!report.findings.length ? (
-            <p className="py-3 font-mono text-meta text-muted">Capture a page to name the tells.</p>
-          ) : null}
-        </div>
-      </div>
-      )}
-
-      {!(designBrief && !captureMeta) && selectedFinding && verdict ? (
-        <section className="min-w-0 border-l-2 border-accent pl-3">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-xl text-text">{selectedFinding.detector}</h2>
-            <VerdictBadge verdict={verdict.verdict} />
-          </div>
-          <ConfidenceMeter value={verdict.confidence} />
-          <p className="mt-3 text-sm leading-relaxed text-secondary">{verdict.rationale}</p>
-          {selectedFinding.evidence.length ? (
-            <ul className="mt-3 space-y-1.5">
-              {selectedFinding.evidence.map((evidence) => (
-                <li key={`${evidence.label}-${evidence.value}`} className="break-words font-mono text-meta text-muted">
-                  <span className="text-accent">{evidence.label}</span>
-                  {" · "}
-                  {evidence.value}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {showStateProbes && report.capture.stateShots.length > 0 ? (
-            <details className="mt-3">
-              <summary className="cursor-pointer font-mono text-meta text-muted hover:text-secondary">State probes</summary>
-              <ul className="mt-2 flex flex-wrap gap-1.5">
-                {report.capture.stateShots.slice(0, 9).map((shot) => (
-                  <li key={`${shot.selector}-${shot.state}`} className="rounded-sm border border-border px-2 py-0.5 font-mono text-meta text-secondary">
-                    {shot.state}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ) : null}
-          <div className="mt-4 flex flex-wrap gap-2">
+        <div className="dp-critic__head-actions">
+          {captureState === "done" && report.findings.length > 0 ? (
             <button
               type="button"
-              onClick={draftFix}
-              disabled={draftState === "drafting" || operationActive}
-              className="flex items-center gap-2 rounded-sm bg-accent px-3 py-2 text-sm font-semibold text-white transition hover:bg-accent-hover disabled:opacity-60"
+              onClick={shareReport}
+              disabled={sharingReport || operationActive}
+              className="dp-ghost-btn"
             >
-              <Wand2 className="h-4 w-4" /> {draftState === "drafting" ? "Mapping source…" : setupJob?.state === "ready" ? "Plan source fix" : "Draft fix"}
+              <Link2 className="h-3.5 w-3.5" aria-hidden />
+              {sharingReport ? "Sharing…" : shareUrl ? "Copy link" : "Share"}
             </button>
-            <button type="button" onClick={markIntentional} className="rounded-sm border border-border px-3 py-2 text-sm text-secondary transition hover:text-text">
-              Mark intentional
-            </button>
-          </div>
-          {draftError ? <p className="mt-3 font-mono text-xs text-drift">{draftError}</p> : null}
-          {proposal ? (
-            <DiffViewer
-              proposal={proposal}
-              draftState={draftState}
-              sourceContext={sourceContext}
-              patchSource={patchSource}
-              proofState={proofState}
-              proofError={proofError}
-              canProve={captureBelongsToSetup}
-              onCopy={() => copyPatch()}
-              onApply={provePatch}
-            />
-          ) : null}
-        </section>
-      ) : null}
-
-      <section className="border-t border-border pt-3">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Mic className="h-4 w-4 text-accent" />
-            <p className="font-mono text-meta uppercase tracking-[0.14em] text-muted">Direction</p>
-          </div>
-          {directionPlan ? (
-            <span className="font-mono text-meta text-muted">
-              {resolveDirection(directionPlan.presetId).label.toLowerCase()}
-              {directionParsing ? " · …" : null}
-            </span>
           ) : null}
         </div>
-        {designBrief ? (
-          <p className="mb-2 font-mono text-meta text-secondary">
-            Brief: {designBrief}
-            {" · "}
-            <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
-              Studio
-            </a>
-          </p>
-        ) : null}
-        <div className="grid gap-2">
-          <div className="flex gap-2 border border-border bg-bg/50 px-2 py-2 text-secondary">
-            {voice.supported ? (
-              <button
-                type="button"
-                onClick={voice.listening ? voice.stop : voice.start}
-                aria-label={voice.listening ? "Stop listening" : "Start voice direction"}
-                className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center self-start rounded-sm border transition ${
-                  voice.listening ? "animate-pulse border-accent bg-accent/20 text-accent" : "border-border text-secondary hover:border-accent hover:text-accent"
-                }`}
-              >
-                {voice.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </button>
+      </header>
+
+      <div className="dp-critic__tabs" role="tablist" aria-label="Review panes">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "findings"}
+          className="dp-critic__tab"
+          data-active={criticTab === "findings" ? "true" : "false"}
+          onClick={() => setCriticTab("findings")}
+        >
+          Findings
+          <span className="dp-critic__tab-count">{report.findings.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "direction"}
+          className="dp-critic__tab"
+          data-active={criticTab === "direction" ? "true" : "false"}
+          onClick={() => setCriticTab("direction")}
+        >
+          Direction
+          {directionPlan ? <span className="dp-critic__tab-count">●</span> : null}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "proof"}
+          className="dp-critic__tab"
+          data-active={criticTab === "proof" ? "true" : "false"}
+          onClick={() => setCriticTab("proof")}
+        >
+          Proof
+          {showProofWorkflow ? <span className="dp-critic__tab-count">●</span> : null}
+        </button>
+      </div>
+
+      <div className="dp-critic__panes">
+        {criticTab === "findings" ? (
+          <div className="dp-critic__pane dp-critic__pane--findings">
+            {designBrief && !captureMeta ? (
+              <p className="dp-critic__note">
+                Direction is primed. Capture a rendered URL to attach named tells, or{" "}
+                <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
+                  open it in Studio
+                </a>
+                .
+              </p>
             ) : null}
-            <textarea
-              value={voice.transcript}
-              onChange={(event) => {
-                voice.setTranscript(event.target.value);
-                scheduleDirectionParse(event.target.value);
-              }}
-              rows={2}
-              placeholder={voice.listening ? "Listening…" : "Warmer, more editorial, less shadow…"}
-              className="min-h-[3rem] max-h-24 w-full resize-none overflow-y-auto bg-transparent text-sm leading-relaxed text-secondary placeholder:text-muted focus:outline-none"
-            />
-          </div>
-          <div className="flex flex-wrap content-start gap-1.5">
-            {PRESET_CHIPS.map((chip) => {
-              const active = directionId === chip.key;
-              return (
-                <button
-                  key={chip.key}
-                  type="button"
-                  onClick={() => {
-                    const preset = DIRECTION_PRESETS[chip.key as keyof typeof DIRECTION_PRESETS];
-                    const text = preset?.summary ?? chip.label;
-                    voice.setTranscript(text);
-                    const plan = parseDirectionPlan(text);
-                    applyDirectionPlan(plan);
-                    learnFromDirection(plan, text);
-                  }}
-                  className={`rounded-sm border px-2.5 py-1 font-mono text-meta transition ${
-                    active ? "border-accent bg-accent/10 text-accent" : "border-border text-secondary hover:border-accent hover:text-accent"
-                  }`}
-                >
-                  {chip.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        {directionPlan?.actionItems.length ? (
-          <ul className="mt-2 flex flex-wrap gap-1.5">
-            {directionPlan.actionItems.map((item) => (
-              <li key={item.id} className="font-mono text-meta text-muted">
-                {item.label}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
 
-      <details className="border-t border-border pt-2">
-        <summary className="cursor-pointer font-mono text-meta text-muted hover:text-secondary">More — brand DNA & measured change</summary>
-        <div className="mt-3 space-y-3">
-          <BrandDnaBar dna={brandDna} onLearn={learnDna} onClear={clearDna} live={liveCapture} />
-          {!proofResult ? <Scorecard reconciliation={reconciliation} live={liveCapture} /> : null}
-          {!proofResult ? (
-            <WhatChangedList
-              notes={
-                llmRestyle.mode === "ai" && llmRestyle.sheet?.notes.length
-                  ? llmRestyle.sheet.notes
-                  : reconciliation?.directionNotes ?? []
-              }
+            {report.findings.length ? (
+              <div className="dp-findings">
+                <div className="dp-findings__filters" role="group" aria-label="Filter findings by verdict">
+                  {FINDING_FILTERS.map((filter) => (
+                    <button
+                      key={filter.id}
+                      type="button"
+                      className="dp-filter"
+                      data-active={findingFilter === filter.id ? "true" : "false"}
+                      aria-pressed={findingFilter === filter.id}
+                      onClick={() => setFindingFilter(filter.id)}
+                    >
+                      {filter.label}
+                      {filter.id === "all" ? ` ${report.findings.length}` : ` ${verdictCounts[filter.id]}`}
+                    </button>
+                  ))}
+                </div>
+                <ul className="dp-findings__list">
+                  {filteredFindings.map((finding) => (
+                    <li key={finding.id}>
+                      <button
+                        type="button"
+                        className="dp-finding"
+                        data-active={selectedId === finding.id ? "true" : "false"}
+                        aria-current={selectedId === finding.id ? "true" : undefined}
+                        onClick={() => setSelectedId(finding.id)}
+                      >
+                        <span
+                          className="dp-finding__dot"
+                          data-verdict={findingVerdict(finding.id)}
+                          aria-hidden
+                        />
+                        <span className="dp-finding__name">{finding.detector}</span>
+                        <VerdictBadge verdict={findingVerdict(finding.id)} />
+                      </button>
+                    </li>
+                  ))}
+                  {!filteredFindings.length ? (
+                    <li className="px-2 py-3 font-mono text-meta text-muted">
+                      No findings in this band.
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : (
+              <div className="dp-empty">
+                <p>Capture a rendered page to name the tells — or load the offline fixture.</p>
+              </div>
+            )}
+
+            {selectedFinding && verdict ? (
+              <section className="dp-inspector" aria-label={`Selected finding: ${selectedFinding.detector}`}>
+                <div className="dp-inspector__head">
+                  <h2 className="dp-inspector__title">{selectedFinding.detector}</h2>
+                  <VerdictBadge verdict={verdict.verdict} />
+                </div>
+                <div className="dp-inspector__body">
+                  <ConfidenceMeter value={verdict.confidence} />
+                  <p className="dp-inspector__rationale">{verdict.rationale}</p>
+                  {selectedFinding.evidence.length ? (
+                    <ul className="dp-evidence">
+                      {selectedFinding.evidence.map((evidence) => (
+                        <li key={`${evidence.label}-${evidence.value}`}>
+                          <span className="dp-evidence__label">{evidence.label}</span>
+                          <span>{evidence.value}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {showStateProbes && report.capture.stateShots.length > 0 ? (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer font-mono text-meta text-muted hover:text-secondary">
+                        State probes
+                      </summary>
+                      <ul className="mt-2 flex flex-wrap gap-1.5">
+                        {report.capture.stateShots.slice(0, 9).map((shot) => (
+                          <li
+                            key={`${shot.selector}-${shot.state}`}
+                            className="rounded-sm border border-border px-2 py-0.5 font-mono text-meta text-secondary"
+                          >
+                            {shot.state}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </div>
+                {proposal ? (
+                  <div className="dp-ready-strip">
+                    <span>
+                      Patch ready · {proposal.files.length} file{proposal.files.length === 1 ? "" : "s"}
+                    </span>
+                    <button type="button" onClick={() => setCriticTab("proof")}>
+                      Review patch →
+                    </button>
+                  </div>
+                ) : null}
+                {draftError ? <p className="dp-inspector__error">{draftError}</p> : null}
+                <div className="dp-inspector__actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCriticTab("proof");
+                      void draftFix();
+                    }}
+                    disabled={draftState === "drafting" || operationActive}
+                    className="dp-btn dp-btn--primary"
+                  >
+                    <Wand2 className="h-4 w-4" aria-hidden />
+                    {draftState === "drafting"
+                      ? "Mapping source…"
+                      : setupJob?.state === "ready"
+                        ? "Plan source fix"
+                        : "Draft fix"}
+                  </button>
+                  <button type="button" onClick={markIntentional} className="dp-btn dp-btn--quiet">
+                    Mark intentional
+                  </button>
+                </div>
+              </section>
+            ) : null}
+          </div>
+        ) : null}
+
+        {criticTab === "direction" ? (
+          <div className="dp-critic__pane">
+            <section className="dp-panel">
+              <div className="dp-panel__head">
+                <p className="dp-panel__title">Art direction</p>
+                {directionPlan ? (
+                  <span className="font-mono text-meta text-muted">
+                    {resolveDirection(directionPlan.presetId).label.toLowerCase()}
+                    {directionParsing ? " · thinking…" : null}
+                  </span>
+                ) : null}
+              </div>
+              <div className="dp-panel__body space-y-3">
+                {designBrief ? (
+                  <p className="font-mono text-meta text-secondary">
+                    Brief: {designBrief}
+                    {" · "}
+                    <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
+                      Studio
+                    </a>
+                  </p>
+                ) : null}
+                <div className="dp-form-field">
+                  <span className="dp-form-field__label">Say it in plain English</span>
+                  <div className="dp-voice">
+                    {voice.supported ? (
+                      <button
+                        type="button"
+                        onClick={voice.listening ? voice.stop : voice.start}
+                        aria-label={voice.listening ? "Stop listening" : "Start voice direction"}
+                        className="dp-voice__mic"
+                        data-listening={voice.listening ? "true" : "false"}
+                      >
+                        {voice.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                      </button>
+                    ) : null}
+                    <textarea
+                      value={voice.transcript}
+                      onChange={(event) => {
+                        voice.setTranscript(event.target.value);
+                        scheduleDirectionParse(event.target.value);
+                      }}
+                      rows={2}
+                      placeholder={voice.listening ? "Listening…" : "Warmer, more editorial, less shadow…"}
+                      className="dp-voice__input"
+                      aria-label="Direction in plain English"
+                    />
+                  </div>
+                </div>
+                <div className="dp-chips" role="group" aria-label="Direction presets">
+                  {PRESET_CHIPS.map((chip) => {
+                    const active = directionId === chip.key;
+                    return (
+                      <button
+                        key={chip.key}
+                        type="button"
+                        className="dp-chip"
+                        data-active={active ? "true" : "false"}
+                        onClick={() => {
+                          const preset = DIRECTION_PRESETS[chip.key as keyof typeof DIRECTION_PRESETS];
+                          const text = preset?.summary ?? chip.label;
+                          voice.setTranscript(text);
+                          const plan = parseDirectionPlan(text);
+                          applyDirectionPlan(plan);
+                          learnFromDirection(plan, text);
+                        }}
+                      >
+                        {chip.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {directionPlan?.actionItems.length ? (
+                  <ul className="flex flex-wrap gap-2">
+                    {directionPlan.actionItems.map((item) => (
+                      <li key={item.id} className="font-mono text-meta text-muted">
+                        {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </section>
+
+            <details className="dp-panel">
+              <summary className="dp-panel__head cursor-pointer list-none">
+                <span className="dp-panel__title">More — brand DNA &amp; measured change</span>
+                <span className="font-mono text-meta text-muted">expand</span>
+              </summary>
+              <div className="dp-panel__body space-y-3">
+                <BrandDnaBar dna={brandDna} onLearn={learnDna} onClear={clearDna} live={liveCapture} />
+                {!proofResult ? <Scorecard reconciliation={reconciliation} live={liveCapture} /> : null}
+                {!proofResult ? (
+                  <WhatChangedList
+                    notes={
+                      llmRestyle.mode === "ai" && llmRestyle.sheet?.notes.length
+                        ? llmRestyle.sheet.notes
+                        : reconciliation?.directionNotes ?? []
+                    }
+                  />
+                ) : null}
+                {!proofResult ? (
+                  <ReconciliationTable reconciliation={reconciliation} live={liveCapture} />
+                ) : null}
+              </div>
+            </details>
+          </div>
+        ) : null}
+
+        {criticTab === "proof" ? (
+          <div className="dp-critic__pane">
+            <WorkflowRail
+              captured={liveCapture}
+              sourceMapped={sourceContext?.mode === "repo" && sourceContext.filesLoaded > 0}
+              patchReady={Boolean(proposal)}
+              proofState={proofState}
             />
-          ) : null}
-          {!proofResult ? <ReconciliationTable reconciliation={reconciliation} live={liveCapture} /> : null}
-        </div>
-      </details>
+
+            {proposal ? (
+              <DiffViewer
+                proposal={proposal}
+                draftState={draftState}
+                sourceContext={sourceContext}
+                patchSource={patchSource}
+                proofState={proofState}
+                proofError={proofError}
+                canProve={captureBelongsToSetup}
+                onCopy={() => copyPatch()}
+                onApply={provePatch}
+              />
+            ) : (
+              <div className="dp-empty">
+                <p>
+                  Nothing drafted yet. Pick a finding, then <strong className="text-text">Draft fix</strong> to
+                  see the patch and its measured changes here.
+                </p>
+              </div>
+            )}
+
+            <ConnectAgent />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 
   const canvasPane = (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-2">
-        <label className="flex min-w-[240px] flex-1 items-center gap-2 rounded-card border border-border bg-surface px-3 py-2 font-mono text-sm text-secondary">
-          {isRepo ? <Github className="h-4 w-4 shrink-0 text-accent" /> : <span className="text-muted">url</span>}
+    <div className="dp-canvas">
+      <div className="dp-canvas__bar">
+        <label className="dp-canvas__target">
+          {isRepo ? (
+            <Github className="h-4 w-4 shrink-0 text-accent" aria-hidden />
+          ) : (
+            <span className="dp-canvas__target-icon" aria-hidden>
+              URL
+            </span>
+          )}
           <input
             value={inputUrl}
             onChange={(e) => setInputUrl(e.target.value)}
@@ -1428,7 +1574,7 @@ export default function HomePage() {
             spellCheck={false}
             data-testid="capture-url"
             aria-label="URL to capture or GitHub repo to run"
-            className="min-w-0 flex-1 bg-transparent text-text outline-none placeholder:text-muted disabled:cursor-wait disabled:opacity-70"
+            className="dp-canvas__input"
             placeholder="https://your-app.com  ·  or  github.com/owner/repo"
           />
         </label>
@@ -1437,26 +1583,32 @@ export default function HomePage() {
           onClick={onPrimary}
           disabled={operationActive}
           data-testid="capture-submit"
-          className="inline-flex items-center gap-2 rounded-md bg-accent px-3 py-2 font-semibold text-white transition hover:bg-accent-hover active:scale-[0.99] disabled:opacity-60"
+          className="dp-btn dp-btn--primary"
         >
           {setupActive ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Setting up…
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Setting up…
             </>
           ) : captureState === "capturing" ? (
             "Capturing…"
           ) : isRepo ? (
             <>
-              <Github className="h-4 w-4" /> Set up &amp; run
+              <Github className="h-4 w-4" aria-hidden /> Set up &amp; run
             </>
           ) : (
             "Capture"
           )}
         </button>
+        <div className="dp-canvas__meta">
+          <span className="dp-badge" data-tone="accent">
+            direction: {dirMeta.id}
+          </span>
+          {hasProofSurface ? <span>{report.score.total} findings</span> : null}
+        </div>
       </div>
 
       {designBrief && !liveCapture ? (
-        <div className="rounded-card border border-accent/35 bg-accent/10 px-4 py-3 text-sm text-secondary">
+        <div className="dp-critic__note">
           Paste a live URL or GitHub repo above to ground this direction
           {" · "}
           <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
@@ -1467,13 +1619,16 @@ export default function HomePage() {
 
       {isRepo && !setupJob ? (
         <p className="flex items-center gap-2 font-mono text-meta text-secondary">
-          <Github className="h-3.5 w-3.5 text-accent" />
-          Design Proof will clone this repo, read its README to find the run command, start it, and capture the localhost URL for you.
+          <Github className="h-3.5 w-3.5 text-accent" aria-hidden />
+          Design Proof clones this repo, reads its README to find the run command, starts it, and captures the
+          localhost URL for you.
         </p>
       ) : null}
 
       {setupError ? (
-        <div className="rounded-card border border-drift/40 bg-drift/10 px-4 py-3 text-sm text-drift">{setupError}</div>
+        <div className="rounded-card border border-drift/40 bg-drift/10 px-4 py-3 text-sm text-drift">
+          {setupError}
+        </div>
       ) : null}
 
       {setupJob ? (
@@ -1490,7 +1645,8 @@ export default function HomePage() {
 
       {needsRecapture ? (
         <div className="rounded-card border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-secondary">
-          URL changed to <span className="font-mono text-text">{inputUrl.trim()}</span> — click <strong className="text-text">Capture</strong> to rescan.
+          URL changed to <span className="font-mono text-text">{inputUrl.trim()}</span> — click{" "}
+          <strong className="text-text">Capture</strong> to rescan.
         </div>
       ) : null}
 
@@ -1508,6 +1664,72 @@ export default function HomePage() {
         />
       ) : null}
 
+      <section className="dp-stage">
+        <div className="dp-stage__head">
+          <h2 className="dp-stage__title" aria-live="polite">
+            {canvasTitle}
+          </h2>
+          {hasProofSurface ? <span className="dp-canvas__meta">{scoreLine}</span> : null}
+        </div>
+        <div className={hasProofSurface ? "dp-stage__body--flush" : "dp-stage__body"}>
+          {operationActive ? (
+            <div className="p-4">
+              <OperationPlaceholder title={operationTitle} detail={operationDetail} />
+            </div>
+          ) : !hasProofSurface ? (
+            <div className="p-4">
+              <div className="dp-empty" style={{ minHeight: "16rem" }}>
+                <div>
+                  <p className="font-display text-2xl text-text">
+                    {captureMeta?.error ? "Capture did not land" : designBrief ? "Ground the brief" : "No capture yet"}
+                  </p>
+                  <p className="mx-auto mt-2 max-w-md text-sm text-secondary">
+                    {captureMeta?.error
+                      ? captureMeta.error
+                      : designBrief
+                        ? "Paste a live URL or GitHub repo to attach findings and the before/after seam — Design Proof will not invent the demo site."
+                        : "Paste a live URL and capture. The offline fixture loads only from Offline mode."}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setComposerMode("offline");
+                        loadOfflineFixture();
+                      }}
+                      className="dp-btn dp-btn--quiet"
+                    >
+                      <FileCode2 className="h-4 w-4" aria-hidden /> Load offline fixture
+                    </button>
+                    <a className="dp-btn dp-btn--quiet" href={studioBriefHref}>
+                      <Sparkles className="h-4 w-4" aria-hidden /> Open Studio
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <BeforeAfterSeam
+              seam={seam}
+              setSeam={setSeam}
+              findings={report.findings}
+              reconciliation={reconciliation}
+              selectedId={selectedId}
+              onSelectFinding={(id) => {
+                setSelectedId(id);
+                setCriticTab("findings");
+              }}
+              snapshotHtml={report.capture.snapshotHtml || undefined}
+              screenshotBase64={report.capture.screenshotBase64 || undefined}
+              llmStatus={llmRestyle.status}
+              llmSheet={llmRestyle.sheet}
+              llmMode={llmRestyle.mode}
+              onLlmModeChange={llmRestyle.setMode}
+            />
+          )}
+        </div>
+      </section>
+
       {liveCapture ? (
         <ScenarioMatrixPanel
           state={matrixState}
@@ -1519,62 +1741,6 @@ export default function HomePage() {
           }}
         />
       ) : null}
-
-      <section className="min-w-0 rounded-card border border-border bg-surface p-4 shadow-card">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.16em] text-secondary" aria-live="polite">
-              {canvasTitle}
-            </p>
-            {hasProofSurface ? <p className="mt-1 font-mono text-meta text-muted">{scoreLine}</p> : null}
-          </div>
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-xs text-accent">
-            direction: {dirMeta.id}
-          </span>
-        </div>
-        {operationActive ? (
-          <OperationPlaceholder title={operationTitle} detail={operationDetail} />
-        ) : !hasProofSurface ? (
-          <div className="grid min-h-[280px] place-items-center rounded-md border border-dashed border-border bg-bg/40 px-6 text-center">
-            <div>
-              <p className="font-display text-2xl text-text">
-                {captureMeta?.error ? "Capture did not land" : designBrief ? "Ground the brief" : "No capture yet"}
-              </p>
-              <p className="mt-2 max-w-md text-sm text-secondary">
-                {captureMeta?.error
-                  ? captureMeta.error
-                  : designBrief
-                    ? "Paste a live URL or GitHub repo to attach findings and the before/after seam — Design Proof will not invent the demo site."
-                    : "Paste a live URL and capture. The offline fixture loads only from Offline mode."}
-              </p>
-              {captureMeta?.error ? (
-                <button
-                  type="button"
-                  onClick={loadOfflineFixture}
-                  className="mt-4 font-mono text-meta text-accent underline-offset-2 hover:underline"
-                >
-                  Load offline fixture instead
-                </button>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <BeforeAfterSeam
-            seam={seam}
-            setSeam={setSeam}
-            findings={report.findings}
-            reconciliation={reconciliation}
-            selectedId={selectedId}
-            onSelectFinding={setSelectedId}
-            snapshotHtml={report.capture.snapshotHtml || undefined}
-            screenshotBase64={report.capture.screenshotBase64 || undefined}
-            llmStatus={llmRestyle.status}
-            llmSheet={llmRestyle.sheet}
-            llmMode={llmRestyle.mode}
-            onLlmModeChange={llmRestyle.setMode}
-          />
-        )}
-      </section>
 
       {proofResult ? (
         <VerifiedProofPanel
@@ -1590,6 +1756,7 @@ export default function HomePage() {
       ) : null}
     </div>
   );
+
 
   return (
     <>

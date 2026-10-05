@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import "./shell.css";
+import "./layout.css";
 
 export function AppShell({
   rail,

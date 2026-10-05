@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listTemplates, type DesignTemplate } from "@designproof/design-skills";
 import { ProductShell } from "@/components/shell";
 import { ShowcaseAnthologyReel } from "@/components/showcase/ShowcaseAnthologyReel";
-import { TemplatePreview } from "@/components/showcase/TemplatePreview";
+import { TemplateGallery, type GalleryItem } from "@/components/showcase/TemplateGallery";
 import { templateHtmlSrc, templateOpenHref } from "@/components/showcase/templateSrc";
 import "./showcase.css";
 
@@ -13,19 +13,12 @@ export const metadata = {
     "Crease cricket and Baseline tennis matchday plus research-backed site kinds — filmstrip reels play on hover; the hero slowly tours best beats across templates.",
 };
 
-type FilmstripCell = {
-  key: string;
-  label: string;
-  marketJob: string;
-  siteKind: string;
-  index: string;
-  href: string;
-  src: string;
-};
+type FilmstripCell = GalleryItem;
 
 /** Hand-crafted sport templates — pinned near the top of the filmstrip (not engine templates). */
 const CREASE_CELL: Omit<FilmstripCell, "index"> = {
   key: "crease",
+  pinned: "crease",
   label: "Crease",
   marketJob:
     "Cricket matchday companion — Core six multipage IA, glance-live score spine, pavilion-evening taste.",
@@ -36,6 +29,7 @@ const CREASE_CELL: Omit<FilmstripCell, "index"> = {
 
 const BASELINE_CELL: Omit<FilmstripCell, "index"> = {
   key: "baseline",
+  pinned: "baseline",
   label: "Baseline",
   marketJob:
     "Tennis court board — nested sets|games|points, server + pressure flags, best-of-3/5 lens, light-airy taste.",
@@ -55,14 +49,8 @@ function buildFilmstrip(): FilmstripCell[] {
     src: templateHtmlSrc(t.key),
   }));
   return [
-    {
-      ...CREASE_CELL,
-      index: "01",
-    },
-    {
-      ...BASELINE_CELL,
-      index: "02",
-    },
+    { ...CREASE_CELL, index: "01" },
+    { ...BASELINE_CELL, index: "02" },
     ...templates,
   ];
 }
@@ -74,6 +62,7 @@ function buildFilmstrip(): FilmstripCell[] {
  */
 export default function ShowcaseGalleryPage() {
   const offerings = buildFilmstrip();
+  const filmstripItems: GalleryItem[] = offerings;
   const anthologySlides = offerings.map((o) => ({
     key: o.key,
     label: o.label,
@@ -131,71 +120,19 @@ export default function ShowcaseGalleryPage() {
 
         <section className="sx-filmstrip" id="reels" aria-labelledby="sx-reels-title">
           <div className="sx-index-head">
-            <h2 id="sx-reels-title">The filmstrip</h2>
+            <h2 id="sx-reels-title">Design templates</h2>
             <p>
-              {offerings.length} offerings · Crease + Baseline first · hover a cell to play its craft
-              reel. No autoplay in the strip.
+              {offerings.length} templates · Crease + Baseline first · filter by kind, then hover a cell to
+              play its craft reel. No autoplay in the strip.
             </p>
           </div>
 
-          <ol className="sx-cells">
-            {offerings.map((o) => (
-              <li key={o.key} className="sx-cell">
-                <Link
-                  className="sx-cell-link"
-                  href={o.href}
-                  prefetch={false}
-                  data-testid={`showcase-link-${o.key}`}
-                  data-pinned={
-                    o.key === "crease" ? "crease" : o.key === "baseline" ? "baseline" : undefined
-                  }
-                >
-                  <div className="sx-cell-frame">
-                    <div className="sx-cell-sprockets" aria-hidden="true">
-                      <span />
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <TemplatePreview
-                      className="sx-thumb sx-thumb-reel"
-                      title={`${o.label} craft reel`}
-                      src={o.src}
-                      designWidth={1440}
-                      designHeight={900}
-                      mode="cinema"
-                      prefer="figure"
-                      decorative
-                      lazy
-                      autoplayInView={false}
-                      testId={`showcase-thumb-${o.key}`}
-                    />
-                    <div className="sx-cell-sprockets sx-cell-sprockets-end" aria-hidden="true">
-                      <span />
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                  </div>
-                  <div className="sx-cell-meta">
-                    <span className="sx-num" aria-hidden="true">
-                      {o.index}
-                    </span>
-                    <div className="sx-row-copy">
-                      <h3>{o.label}</h3>
-                      <p className="sx-kind">{o.siteKind}</p>
-                    </div>
-                    <p className="sx-row-job">{o.marketJob}</p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ol>
+          <TemplateGallery items={filmstripItems} />
         </section>
 
         <footer className="sx-foot">
           <p>
-            Deepened by the recursive improve loop · hero tours many templates; strip reels wait for
+            Deepened by the recursive improve loop · the hero tours many templates; strip reels wait for
             hover.
           </p>
         </footer>
