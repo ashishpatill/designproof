@@ -34,7 +34,7 @@ description: >-
 | Hover / focus / press | CSS tokens (`--m-*`) | — |
 | Once-only section enter | CSS `animation-timeline: view()` + IO fallback; siteKind `@keyframes` signatures | Blur / bounce / replay-on-scroll |
 | Pinned chapter / scrub progress | CSS sticky + progress; optional **GSAP** ScrollTrigger if CSS fails | Dashboard / docs density |
-| React layout / exit / gesture | **Motion** (ex-Framer Motion) on `apps/web` only | Marketing HTML templates |
+| React layout / exit / gesture | **Motion**, the React animation library, on `apps/web` only | Marketing HTML templates |
 | Smooth inertia scroll | **Lenis** (~3 KB) with one timeline partner | Product apps, dashboards |
 | Framework-agnostic timeline / SVG morph | **Anime.js** *or* GSAP — pick one | Already on the other |
 | Data series, axes, joins, enter/update/exit | **D3** (or vanilla SVG + D3 *patterns*: scales, path generators, stroke-draw) | Decorating non-data UI |

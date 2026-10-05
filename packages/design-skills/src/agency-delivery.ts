@@ -66,10 +66,10 @@ export function assertAgencyDelivery(
 
   const deadHash = /\shref=["']#["']/.test(html);
 
+  // Names of specific award programmes are deliberately absent — the detector catches the
+  // *class* of unverifiable award claim, not any one organisation.
   const awardClaims =
-    /award[- ]winning|awwwards|site of the day|sotd|css design awards|honors? recognition/i.test(
-      html,
-    );
+    /award[- ]winning|site of the day|\bsotd\b|design awards?|honou?rs? recognition/i.test(html);
 
   const fakeTrustTheater =
     /trusted by (thousands|millions|fortune|industry leaders)|logos? of (our )?(partners|customers) you('ll)? recognize/i.test(

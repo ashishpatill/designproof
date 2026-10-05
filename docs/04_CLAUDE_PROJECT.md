@@ -51,14 +51,13 @@ fix.
 
 ## 4. Why now (grounded)
 
-- **Agentic coding creates a "sameness tax."** Cursor, v0, Bolt, and every AI builder converge on
-  the same visual defaults. The industry joke — "you can tell it was built with AI" — is now a
-  product problem, not a meme.
-- **Static token-diffing is saturated** (designlang, Atomize, Token Auditor, Firebender, Figma's
-  checker). Nobody guards the *rendered* surface — what users actually see — nor assesses whether
-  divergence is generic vs intentional.
-- **Codebase-viz + voice onboarding is crowded** (CodeMap, Codelore, Understand-Anything, Nexo,
-  GENIE). We do not compete there. Design Proof reads *design*, not architecture.
+- **Agentic coding creates a "sameness tax."** Every AI builder converges on the same visual
+  defaults. The industry joke — "you can tell it was built with AI" — is now a product problem,
+  not a meme.
+- **Static token-diffing is saturated.** Nobody guards the *rendered* surface — what users actually
+  see — nor assesses whether divergence is generic vs intentional.
+- **Codebase-viz + voice onboarding is crowded.** We do not compete there. Design Proof reads
+  *design*, not architecture.
 - **"Taste" is the named missing layer** in the original Cursor statement. Models wire up UI and
   still make bland, inconsistent choices. The hard part is knowing when something is *wrong* — and
   showing a better direction. That is precisely what wins the track.
@@ -159,16 +158,16 @@ flowchart LR
 
 ## 9. Competitive landscape (position, don't repeat)
 
-- **Static token drift** (designlang, Atomize, Token Auditor, Firebender): solved/crowded. We do not
-  compete here.
-- **AI site builders** (v0, Bolt, Lovable): generate generic UI; they don't *diagnose* or *critique*
-  existing surfaces with taste.
-- **Codebase visualization + voice** (CodeMap, Codelore, Understand-Anything, Nexo, GENIE): read
-  architecture, not design. Crowded; not our lane.
-- **Visual regression** (Chromatic, Percy): pixel diffs without judgment — no "this is generic" or
-  "this is intentional."
-- **Design-context-for-agents** (skills, DESIGN.md): feeds rules *to* agents; does not *detect*
-  rendered genericness or reviewer drift on the live surface.
+Named products are deliberately omitted here; describe the lane, not the vendor.
+
+- **Static token drift checkers:** solved and crowded. We do not compete here.
+- **Prompt-to-page generators:** produce a first draft, then stop. They don't *diagnose* or *critique*
+  an existing surface against taste.
+- **Codebase visualisers / voice assistants:** read architecture, not design. Crowded; not our lane.
+- **Visual regression tools:** pixel diffs without judgment — no "this is generic" or "this is
+  intentional."
+- **Design-context-for-agents** (skills files, design docs): feed rules *to* agents; they do not
+  *detect* rendered genericness or reviewer drift on the live surface.
 
 Design Proof's defensible slice: **rendered-surface genericness detection + consistency drift + taste verdicts
 + voice art-direction + measurable reconciliation, in Cursor.** No shipped product occupies it.

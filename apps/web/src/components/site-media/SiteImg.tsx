@@ -38,6 +38,10 @@ export function SiteImg({
       loading={priority ? "eager" : "lazy"}
       decoding={decoding ?? (priority ? "sync" : "async")}
       className={className}
+      /* Deliberate lowercase custom attribute: React 18 does not know `fetchPriority`, and the
+         camelCase spelling reaches the DOM as `fetchPriority`, which never matches the real
+         `fetchpriority` content attribute — the LCP hint would be silently dropped. Keep the
+         lowercase attribute (React logs a dev-only unknown-prop warning; ignore it). */
       {...{ fetchpriority: priority ? "high" : "low" }}
       {...rest}
     />

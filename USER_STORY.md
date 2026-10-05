@@ -30,7 +30,7 @@ Ashish's internal monologue:
 | Ask Cursor Agent to "make it prettier" | Agent picks the same defaults — another violet gradient |
 | Figma token diff tools | He never had Figma tokens; he vibe-coded in Cursor |
 | Hire a designer for a day | $800 and 2-week queue; demo is tomorrow |
-| Copy a Dribbble shot | Looks pasted-on; breaks his component structure |
+| Copy a shot from a design gallery | Looks pasted-on; breaks his component structure |
 
 ---
 
