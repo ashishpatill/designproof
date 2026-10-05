@@ -1,6 +1,6 @@
 ---
 name: dp-recursive-improve
-description: Recursive self-improvement loop for Design Proof templates, showcase, and design-skills — champion vs challenger, eye+critique evals, persistent learnings. Use when showcase previews look wrong, craft stalls, or after any session that shipped a visual miss (truncated thumbs, gutters, overlap). Inspired by EvidenceLoom / skill-RSI style loops; Design Proof-specific harness.
+description: Recursive self-improvement loop for Design Proof templates, showcase, and design-skills — champion vs challenger, eye+critique evals, persistent learnings. Use when showcase previews look wrong, craft stalls, or after any session that shipped a visual miss (truncated thumbs, gutters, overlap). Champion/challenger rounds with an evidence ledger; Design Proof-specific harness.
 ---
 
 # Design Proof recursive improve (champion → challenger → learnings)
