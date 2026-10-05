@@ -20,6 +20,7 @@ import {
   saasQuestions,
   sentence,
   studioQuestions,
+  corporateQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -322,7 +323,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
           ? fintechQuestions(brief, brief.features)
           : brief.siteKind === "art-directed-studio"
             ? studioQuestions(brief, brief.features)
-            : questions(brief, brief.features);
+            : brief.siteKind === "corporate-story"
+              ? corporateQuestions(brief, brief.features)
+              : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

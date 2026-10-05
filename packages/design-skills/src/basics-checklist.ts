@@ -933,12 +933,17 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
          * them printed every capability description again, cut short in a drawing and then in full.
          */
         if (kind === "fintech-marketing") return /data-figure="wire-ledger"/.test(html) && !hasBoard;
+        /*
+         * Corporate pages prove with the fold's posture grid. The shared board on them printed
+         * every description again, right after the catalogue had printed each one.
+         */
+        if (kind === "corporate-story") return /data-figure="posture-grid"/.test(html) && !hasBoard;
         if (kind === "saas-marketing") {
           return saasProofMatches(spec, html, hasBoard);
         }
         return hasBoard;
       })(),
-      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; fintech pages prove with their fold ledger; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
+      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; fintech pages prove with their fold ledger; corporate pages prove with their posture grid; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
     ),
   ];
 

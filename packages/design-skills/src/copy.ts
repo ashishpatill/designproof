@@ -8,6 +8,7 @@
  * The rule that keeps this honest: if a sentence would read the same for a different product,
  * it does not ship.
  */
+import { APPROVAL_WORKFLOW_SIGNAL } from "./analyze";
 import { payoffLine, type FeatureCopy } from "./editorial";
 import type { DesignBrief, FeatureSpec } from "./types";
 
@@ -185,6 +186,9 @@ export function ctaFor(
         note: "Runs on your machine — no invented host, no waitlist.",
       };
     }
+    // Corporate: "Everything here is verifiable before you commit" was a promise no brief made, and
+    // it opened every corporate page, a marina's or a pottery studio's included.
+    if (siteKind === "corporate-story") return { ...GOAL_CTA[goal], note: "" };
     return GOAL_CTA[goal];
   })();
   // Agency brief "one CTA" wins when set — every page repeats the same verb.
@@ -737,6 +741,51 @@ export function studioQuestions(brief: DesignBrief, features: FeatureSpec[]): Ar
   return out;
 }
 
+/**
+ * Corporate questions. Every answer is built from this brief: its product, its audience, and its
+ * capability names. The shared `questions` promised "cancel anytime", a comparison table, a result
+ * in "one session" on the reader's data, a person who answers procurement and security, a named
+ * human approval gate, and a rollback path when something fails mid-flight. Those were printed on
+ * every corporate page whatever the product did. The approval question stays only when the brief
+ * itself declares an approval step, and its answer names the capability that carries it.
+ */
+export function corporateQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  const n = count(features.length);
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(
+      features.length > 1
+        ? `${Audience}. ${brief.productName} is the ${n} capabilities described above, and nothing else`
+        : Audience,
+    ),
+  });
+  // The priorities section already says which capabilities lead, so no answer here repeats it.
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: "Who approves irreversible actions?",
+      body: sentence(`${approval.name} is where that happens. Its description is in the list above`),
+    });
+  }
+  out.push({
+    title: `What does ${brief.productName} leave out?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of the ${n} capabilities above`
+        : `Anything not named above`,
+    ),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `Where do we go from here with ${brief.productName}?`,
+    body: sentence(`Use "${cta}" at the top or the bottom of this page`),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -904,7 +953,9 @@ export function navFor(
           ? "Send path"
           : siteKind === "docs-educational"
             ? "Cost path"
-            : "Sequence",
+            : siteKind === "corporate-story"
+              ? "Priorities"
+              : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
     compare: "Included",
     faq: "Questions",

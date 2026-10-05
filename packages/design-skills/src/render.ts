@@ -191,7 +191,8 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.brief.siteKind === "saas-marketing" ||
     spec.brief.siteKind === "dashboard-webapp" ||
     spec.brief.siteKind === "fintech-marketing" ||
-    spec.brief.siteKind === "art-directed-studio"
+    spec.brief.siteKind === "art-directed-studio" ||
+    spec.brief.siteKind === "corporate-story"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
@@ -824,7 +825,16 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const grid = figures.hero
       ? `<figure class="ds-posture-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const principles = (section.aside.length ? section.aside : section.blocks).slice(0, 5);
+    /*
+     * The spine indexes this page's own sections. It used to list the first four capability names,
+     * right beside a posture grid that named the same four, above a catalogue that named them again.
+     */
+    const present = new Set(spec.sections.map((s) => s.id));
+    const principles = [
+      { id: "features", title: "Capabilities" },
+      { id: "story", title: "Priorities" },
+      { id: "faq", title: "Questions" },
+    ].filter((p) => present.has(p.id));
     const spine = `<aside class="ds-principle-spine" aria-hidden="true"><ol>${principles
       .map((b, i) => `<li class="${i === 0 ? "is-live" : ""}"><span>${String(i + 1).padStart(2, "0")}</span><b>${esc(b.title)}</b></li>`)
       .join("")}</ol></aside>`;
@@ -1198,8 +1208,11 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
        * the same names. Every row is name, description, mark.
        */
       // Studio likewise: the drawing beside the first piece listed every name again under the board.
+      // Corporate too: the drawing beside the lead row listed every name again under the posture grid.
       const leadFigure =
-        spec.brief.siteKind !== "fintech-marketing" && spec.brief.siteKind !== "art-directed-studio";
+        spec.brief.siteKind !== "fintech-marketing" &&
+        spec.brief.siteKind !== "art-directed-studio" &&
+        spec.brief.siteKind !== "corporate-story";
       return `<div class="ds-alt">${section.blocks
         .map((b, i) => {
           if (i === 0 && leadFigure) {
@@ -1389,9 +1402,9 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
   const count = section.blocks.length;
   // Titles + marks only when the same catalogue prose already runs in features/hero/proof.
   // Studio chapters are priority groups, so the sentence naming each group's parts is the content.
+  // Corporate chapters are priority tiers, so the sentence naming each tier's capabilities is the content.
   const quietChapters =
     spec?.brief.siteKind === "consumer-craft" ||
-    spec?.brief.siteKind === "corporate-story" ||
     spec?.brief.siteKind === "press-atelier" ||
     spec?.brief.siteKind === "fintech-marketing" ||
     spec?.brief.siteKind === "saas-marketing" ||
@@ -1407,7 +1420,11 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "agent-harness";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${spec?.brief.siteKind === "art-directed-studio" ? "" : secMeta("Chapters", `${count} beats · editorial order`)}
+      ${
+        spec?.brief.siteKind === "art-directed-studio" || spec?.brief.siteKind === "corporate-story"
+          ? ""
+          : secMeta("Chapters", `${count} beats · editorial order`)
+      }
       ${sectionHead(section, 2, true)}
       <ol class="ds-chapters">
         ${section.blocks
@@ -2927,7 +2944,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
   const pageDescription =
     spec.brief.siteKind === "dashboard-webapp" ||
     spec.brief.siteKind === "fintech-marketing" ||
-    spec.brief.siteKind === "art-directed-studio"
+    spec.brief.siteKind === "art-directed-studio" ||
+    spec.brief.siteKind === "corporate-story"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

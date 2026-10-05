@@ -8,6 +8,18 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-05 — Corporate template says each thing once
+
+- The corporate page drops the specimen strip of bare capability names, the shared proof board, the "also included" second band, and the "what is included" table whose own lede called it "the same list as above", so it goes from ten sections (eleven on a five-capability brief) to seven. The page is now first screen, one catalogue, priorities, questions, closing, footer.
+- Each capability description is printed once. Before, some were printed three times (fold drawing, catalogue, proof board), and on a five-capability brief one capability had no catalogue row at all. The catalogue now holds every capability; the lead row stays a bare name because the first screen already uses its sentence, and there is no second drawing beside the first row listing every name again.
+- The first-screen posture grid names each capability once, up to six, with no descriptions, no "diligence posture" title, and no "Principle 01" labels. The spine beside it lists this page's own sections instead of the first four capability names.
+- The chapters now group the work by the priority the brief gives (core, supporting, additional) and say how many capabilities sit in each, instead of listing every name again under "language, principles, outcomes, posture — the diligence path in order". With a single priority the section is left out.
+- The questions and the closing line are built from the brief's own names. They no longer promise cancelling anytime, a result in "one session" on your data, a comparison table, a person for procurement and security, a human approval gate, or a rollback path. The approval question stays only when the brief itself declares an approval step, and its answer names that capability. The close no longer says "see it against your own material" or "one conversation", and the first screen no longer says "everything here is verifiable before you commit". The page description is the product's own tagline and audience.
+- On four sample briefs, repeated lines fell from 11–33 to 3–6, the lead capability name from 2–10 mentions to 2–4, lines that read the same on every product's page from 23 to 5, and lines copied word for word from other templates from 21–44 to 4–20. Page height on the sample fell from 8136px to 3899px.
+- New test: `packages/design-skills/src/__tests__/corporate-template-once.test.ts`. The other sixteen templates render byte-for-byte the same.
+
+---
+
 ## 2026-10-05 — Studio template says each thing once
 
 - The art-directed studio page drops the raised band of bare capability names, the specimen strip that drew them again as numbered stages, the step chart with its "cost · cumulative" axis, and the "also in practice" second band, so it goes from eleven sections to seven. The page is now first screen, one selected-work register, the order of work, questions, closing, footer.
