@@ -329,8 +329,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    */
   if (siteKind === "art-directed-studio") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-statement", surface: "paper", columns: split.hero });
-    // Capability register on raised — stakes without inventing dark-stage metrics theatre.
-    plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: "raised" });
+    /*
+     * One selected-work register, then questions and the close. The page used to add a raised band
+     * that listed the capability names as bare values, a specimen strip that drew them again as
+     * numbered "stages", a method chapter list that named them a fourth time as "steps" under a
+     * heading written for one design studio ("without the pitch theatre"), a step chart with a
+     * "cost · cumulative" axis no brief gave, and an "also in practice" band for the tail. A pottery
+     * studio's page got the same five name lists and the same studio-only lines. The fold's work
+     * board already shows every capability once, and the register holds every description once.
+     * The method chapters stay, but they now group the work by the priority the brief gives
+     * (first, next, alongside), so they say something the register does not.
+     */
     plans.push({
       id: "features",
       kind: "features",
@@ -338,8 +347,6 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.feature,
     });
-    // Quiet type-led valley — honest weight variation without empty height.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -348,19 +355,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       bond: true,
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    if (featureCount >= 4) {
-      plans.push({ id: "features-2", kind: "features", layout: "feature-index", surface: "paper" });
-    }
-    // No shared marquee-proof — selected-work figure + chapters already prove the craft.
-    // Bolting the same "Proof / declared scope" board onto every offering is the uniqueness miss.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // One controlled inverse close for tonal range — not an inverse-heavy scroll.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });

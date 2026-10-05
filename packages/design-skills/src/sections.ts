@@ -26,6 +26,8 @@ import {
   saasQuestions,
   workspaceQuestions,
   fintechQuestions,
+  studioQuestions,
+  spoken,
   riskReversal,
   sentence,
 } from "./copy";
@@ -303,7 +305,9 @@ export function buildSections(
         ? workspaceQuestions(brief, features)
         : brief.siteKind === "fintech-marketing"
           ? fintechQuestions(brief, features)
-          : questions(brief, features);
+          : brief.siteKind === "art-directed-studio"
+            ? studioQuestions(brief, features)
+            : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -466,10 +470,12 @@ export function buildSections(
         // SaaS keeps one complete catalogue (see featureLayouts), so its single band holds every row.
         // Workspace has one catalogue band too; splitting it left the last capabilities with no row.
         // Fintech as well: its second band printed the tail as bare names under "also included".
+        // Studio too: its "also in practice" band held the tail under a line about handoffs.
         const first =
           brief.siteKind === "saas-marketing" ||
           brief.siteKind === "dashboard-webapp" ||
           brief.siteKind === "fintech-marketing" ||
+          brief.siteKind === "art-directed-studio" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -502,7 +508,9 @@ export function buildSections(
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
-            : brief.siteKind === "dashboard-webapp" || brief.siteKind === "fintech-marketing"
+            : brief.siteKind === "dashboard-webapp" ||
+                brief.siteKind === "fintech-marketing" ||
+                brief.siteKind === "art-directed-studio"
               ? rawSlice.map((b) =>
                   b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
                 )
@@ -603,7 +611,8 @@ export function buildSections(
                           ? sentence(`The quieter checks that keep a finish honest`)
                   : sentence(`The rest of what ships with ${brief.productName}`)
               : isStudio
-                ? sentence(`Work that still holds after the launch week`)
+                // The launch-week line was written for one design studio and sat on every studio page.
+                ? sentence(`The ${count(features.length)} parts of ${brief.productName}`)
                 : isConsumer
                   ? sentence(`Built for the day you actually have`)
                   : isFoundry
@@ -663,7 +672,8 @@ export function buildSections(
                           ? sentence(`Steer pins, finish checks, and the rails that stop a session from inventing a host`)
                   : sentence(`Smaller surface area, same standard — these remove the objections that stall a rollout`)
               : isStudio
-                ? sentence(`Each engagement is a composed surface — identity, product, and motion under one grid`)
+                // "Identity, product, and motion under one grid" described one sample studio's work.
+                ? ""
                 : isConsumer
                   ? sentence(`Each capability is something you can point at on the product — not a lifestyle claim`)
                   : isFoundry
@@ -862,13 +872,45 @@ export function buildSections(
       }
 
       case "story":
+        /*
+         * Studio: the chapters were the capability names again as "Step 01" to "Step 06" under
+         * "How a system gets made here" and "without the pitch theatre", lines written for one
+         * design studio. Now each chapter is one priority from the brief and names its parts once.
+         * With a single priority there is no order to show, so the section is left out.
+         */
+        if (brief.siteKind === "art-directed-studio") {
+          const groups = (
+            [
+              ["p0", "First"],
+              ["p1", "Next"],
+              ["p2", "Alongside"],
+            ] as const
+          )
+            .map(([priority, label]) => ({ label, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((g) => g.names.length);
+          if (groups.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Order of work",
+              title: sentence(`The order ${brief.productName} works in`),
+              body: "",
+              blocks: groups.map((g, i) =>
+                block({
+                  title: g.label,
+                  body: sentence(spoken(g.names.map((n, j) => (j === 0 ? n : lower(n))))),
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         sections.push(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "art-directed-studio"
-                ? "Method"
-                : brief.siteKind === "consumer-craft"
+              brief.siteKind === "consumer-craft"
                   ? "In use"
                   : brief.siteKind === "editorial-foundry"
                     ? "Composition notes"
@@ -892,9 +934,7 @@ export function buildSections(
                           ? "Turn notes"
                   : eyebrow.story,
             title:
-              brief.siteKind === "art-directed-studio"
-                ? sentence(`How a system gets made here`)
-                : brief.siteKind === "consumer-craft"
+              brief.siteKind === "consumer-craft"
                   ? sentence(`A day with ${brief.productName}`)
                   : brief.siteKind === "editorial-foundry"
                     ? sentence(`How the face is set on a real page`)
@@ -928,9 +968,7 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "art-directed-studio"
-                ? sentence(`The sequence from first critique to handoff, without the pitch theatre`)
-                : brief.siteKind === "consumer-craft"
+              brief.siteKind === "consumer-craft"
                   ? sentence(`From morning pack to evening empty — what you actually do with it`)
                   : brief.siteKind === "editorial-foundry"
                     ? sentence(`Measure, hierarchy, and the notes that keep a layout from drifting`)
@@ -1380,6 +1418,9 @@ export function buildSections(
                         ? `Chart the next ${brief.productName} pathway`
                       : brief.siteKind === "agent-harness"
                         ? `Start the next ${brief.productName} session`
+                // Studio: "your own material" closed every studio page, a pottery studio's included.
+                : brief.siteKind === "art-directed-studio" && features[0]
+                  ? `Start with ${lower(features[0].name)} at ${brief.productName}`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
                   // The audience's last word is not who the reader shows a product to: "revenue
@@ -1416,6 +1457,11 @@ export function buildSections(
                         ? `Stage marks, care plates, and the rounds a ward lead actually charts`
                       : brief.siteKind === "agent-harness"
                         ? `Turn marks, tool permits, and the finish checks a harness engineer actually runs`
+                // Studio: the count the brief gives and where the rest sit.
+                : brief.siteKind === "art-directed-studio" && features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "part sits" : "parts sit"
+                    } in the list above`
                 // Workspace: a count the brief gives, not a stock "one conversation" line.
                 : brief.siteKind === "dashboard-webapp" && features.length > 1
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
