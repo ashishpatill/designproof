@@ -8,7 +8,7 @@
  * rows by cycling five names, and the specimen printed every name three times.
  */
 import { describe, expect, it } from "vitest";
-import { designFromFeatures } from "../orchestrate";
+import { designFromFeatures, designFromFeaturesAuthored } from "../orchestrate";
 import { SHOWCASE_BRIEFS } from "../templates";
 import { DesignBrief } from "../types";
 
@@ -141,5 +141,17 @@ describe("SaaS template says each thing once", () => {
     // Once in the rail, once as the panel heading — never again as a cycled row.
     expect(fold.split(`>${lead}<`).length - 1).toBeLessThanOrEqual(2);
     expect(fold).toContain('class="ds-draw"');
+  });
+});
+
+describe("SaaS template on the Studio and plugin path", () => {
+  it("uses the same brief-built FAQ when the page is authored without a key", async () => {
+    for (const brief of briefs) {
+      const { previewHtml } = await designFromFeaturesAuthored(brief, {});
+      const text = visible(previewHtml);
+      expect(text).not.toContain("the comparison table");
+      expect(text).toContain(`who is ${brief.productName.toLowerCase()} for`);
+      expect(text).toContain("which lane includes");
+    }
   });
 });
