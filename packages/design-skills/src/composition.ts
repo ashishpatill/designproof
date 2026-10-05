@@ -233,9 +233,12 @@ function heroLayout(siteKind: SiteKind, lean: AestheticLean): LayoutVariant {
  */
 function featureLayouts(count: number, p0: number, lean: AestheticLean, siteKind?: SiteKind): LayoutVariant[] {
   // Marketing: count only decides whether a second catalogue band exists, not which shape.
-  if (siteKind === "saas-marketing") {
-    return count >= 5 ? ["feature-index", "feature-index"] : ["feature-index"];
-  }
+  /*
+   * Marketing: one catalogue, whatever the count. A second "also included" band re-listed the
+   * tail of the same index under a stock heading, so every capability past the third was named in
+   * two catalogues on one page.
+   */
+  if (siteKind === "saas-marketing") return ["feature-index"];
   if (count <= 2) return ["feature-alternating"];
   if (lean === "minimal-clean") return count >= 6 ? ["feature-index", "feature-rows"] : ["feature-rows"];
   if (lean === "refined-story") return ["feature-alternating", "feature-index"];
@@ -923,23 +926,33 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     columns: roleShapes?.proof === "app-shell" ? "260px 1fr" : split.feature,
   });
 
-  plans.push({
-    id: "story",
-    kind: "story",
-    layout: "story-chapters",
-    // Raised after inverse proof so the sequence lands as a lit register, not another paper void.
-    surface: "raised",
-    bond: true,
-    columns: split.wide,
-  });
+  /*
+   * SaaS has no chapter register. It listed every capability a fifth time in "editorial order"
+   * under a heading written for one sample product, directly after the catalogue and the proof had
+   * already told each of them. Corporate keeps its chapters.
+   */
+  if (siteKind !== "saas-marketing") {
+    plans.push({
+      id: "story",
+      kind: "story",
+      layout: "story-chapters",
+      // Raised after inverse proof so the sequence lands as a lit register, not another paper void.
+      surface: "raised",
+      bond: true,
+      columns: split.wide,
+    });
+  }
 
   // Fintech / studio / consumer / educational / archive return earlier — only SaaS/corporate here.
   if (siteKind === "saas-marketing" && featureCount >= 3) {
     const lanes = goal === "sales" || goal === "leads" || goal === "demos";
-    if (lanes) plans.push({ id: "pricing", kind: "pricing", layout: "pricing-lanes", surface: "raised" });
-    // The matrix is what the lanes mean, not a second subject. Bonded, the two arrive as the one
-    // screen a reader compares on; separated, they were two screens asking the same question twice.
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: lanes ? "raised" : "paper", bond: lanes });
+    if (lanes) {
+      // The lanes are the comparison: each one names only what it adds. A matrix under them
+      // printed the same capability list a second time and said so in its own lede.
+      plans.push({ id: "pricing", kind: "pricing", layout: "pricing-lanes", surface: "raised" });
+    } else {
+      plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "paper" });
+    }
   }
 
   if (siteKind === "corporate-story") {

@@ -468,6 +468,117 @@ export function plans(brief: DesignBrief, features: FeatureSpec[]): Array<{ titl
   ];
 }
 
+/**
+ * SaaS lanes: each lane names only what it adds to the one before it.
+ *
+ * The cumulative form listed the first capability in every lane and then printed the whole set a
+ * fourth time in a matrix underneath. Billing words (monthly, annual, savings) are not declared by
+ * any brief, so they are not printed here either.
+ */
+export function addedLanes(
+  brief: DesignBrief,
+  features: FeatureSpec[],
+): Array<{ title: string; body: string; meta: string; points: string[]; recommended: boolean }> {
+  if (features.length < 3) return [];
+  const cuts = [
+    Math.max(1, Math.ceil(features.length / 3)),
+    Math.max(2, Math.ceil((features.length * 2) / 3)),
+    features.length,
+  ];
+  const titles = ["Core", "Standard", "Full"];
+  const lanes: Array<{ title: string; body: string; meta: string; points: string[]; recommended: boolean }> = [];
+  let from = 0;
+  cuts.forEach((to, i) => {
+    const added = features.slice(from, to);
+    from = Math.max(from, to);
+    if (!added.length) return;
+    const previous = lanes[lanes.length - 1];
+    lanes.push({
+      title: titles[i]!,
+      body: previous ? `Everything in ${previous.title}, plus` : "The smallest scope",
+      meta: `${to} of ${features.length} capabilities`,
+      points: added.map((f) => f.name),
+      recommended: i === 1,
+    });
+  });
+  return lanes;
+}
+
+/**
+ * SaaS objection answers. Same questions a buyer asks, but every answer is built from this brief:
+ * its audience, its capability names, and the lane each capability sits in. A line that would read
+ * the same on any product page does not ship.
+ */
+export function saasQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const lead = features[0];
+  const last = features[features.length - 1];
+  const lanes = addedLanes(brief, features);
+  const laneOf = (name: string) => lanes.find((l) => l.points.includes(name));
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(
+      `${Audience}. The ${features.length} capabilities on this page are the whole product; there is no hidden tier`,
+    ),
+  });
+  if (lead) {
+    out.push({
+      title: `What does the first session with ${brief.productName} cover?`,
+      body: sentence(
+        brief.businessGoal === "activation"
+          ? `${lead.name}, set up on your own data in the first sitting`
+          : `${lead.name}, run on your own data rather than a prepared sandbox`,
+      ),
+    });
+    out.push({
+      title: `Do we need ${lower(lead.name)} before the rest is useful?`,
+      body: sentence(
+        `No. It is the usual first step, and every other capability here works without unlocking a secret tier`,
+      ),
+    });
+  }
+  if (last && lanes.length >= 2) {
+    const home = laneOf(last.name);
+    const before = lanes[lanes.indexOf(home!) - 1];
+    if (home) {
+      out.push({
+        title: `Which lane includes ${lower(last.name)}?`,
+        body: sentence(
+          before
+            ? `${home.title}. It arrives on top of everything in ${before.title}`
+            : `${home.title}, from the first lane on`,
+        ),
+      });
+    }
+  }
+  const nextLane = lanes[1];
+  if (nextLane?.points[0]) {
+    out.push({
+      title: `What happens when we outgrow a lane?`,
+      body: sentence(
+        `Move to the next one. It adds named capabilities, such as ${lower(nextLane.points[0])}, not an opaque overage`,
+      ),
+    });
+  }
+  out.push({
+    title: `What is deliberately not in ${brief.productName}?`,
+    body: sentence(`Anything ${brief.productName} does not do yet. This page lists capabilities, not intentions`),
+  });
+  out.push({
+    title: `Can we pause ${brief.productName} without a long contract?`,
+    body: sentence(`Yes. ${brief.productName} starts on a reversible path, and nothing here needs an annual lock to try`),
+  });
+  out.push({
+    title: `Who answers procurement questions about ${brief.productName}?`,
+    body: sentence(
+      `The same ${brief.businessGoal === "demos" ? "walkthrough" : "contact"} path on this page. A person answers scope, security, and sequencing`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {

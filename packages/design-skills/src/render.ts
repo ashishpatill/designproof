@@ -180,7 +180,16 @@ function catalogue(spec: DesignSpec): Block[] {
 function figuresFor(spec: DesignSpec): FigurePlan {
   const bySection = (kind: SectionSpec["kind"]): SectionSpec | undefined =>
     spec.sections.find((s) => s.kind === kind);
-  const features = catalogue(spec);
+  /*
+   * SaaS drawings carry names, not sentences. Each description is printed once, in the catalogue;
+   * a fold console and a specimen band that also reprinted them, cut mid-word, were the second and
+   * third telling of every line on the page.
+   */
+  const listed = catalogue(spec);
+  const features =
+    spec.brief.siteKind === "saas-marketing"
+      ? listed.map((b) => ({ ...b, body: "", points: [] }))
+      : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
   return planFigures({
     productName: spec.brief.productName,
@@ -1115,7 +1124,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "archive-index" ||
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
-        spec.brief.siteKind === "saas-marketing" ||
+        // SaaS rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "dashboard-webapp" ||
         spec.brief.siteKind === "agent-harness";
       return `<ol class="ds-index">${section.blocks
@@ -1233,8 +1242,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   // The alternating layout sets the figure beside its lead row. Every other feature layout is a
   // list, and a list of capabilities with nothing drawn beside it is where these pages used to run
   // for three full screens without giving the eye anything but type.
+  // SaaS skips it: the drawing was the first three catalogue names again, set beside the catalogue.
   const standing =
-    section.layout !== "feature-alternating" && section.id === "features"
+    section.layout !== "feature-alternating" && section.id === "features" && spec.brief.siteKind !== "saas-marketing"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -2053,14 +2063,22 @@ function renderWorkflowProof(section: SectionSpec, figures: FigurePlan, spec?: D
   </section>`;
 }
 
-function renderPlans(section: SectionSpec): string {
+function renderPlans(section: SectionSpec, spec?: DesignSpec): string {
+  /*
+   * SaaS lanes print no billing cadence and no closing reassurance. No brief declares monthly or
+   * annual terms or a saving, and the close of the page already carries the risk line once.
+   */
+  const saas = spec?.brief.siteKind === "saas-marketing";
+  const cadence = saas
+    ? ""
+    : `<div class="ds-cadence" data-pricing-cadence role="group" aria-label="Billing cadence">
+        <button type="button" class="ds-cadence-chip is-live" data-cadence="monthly" aria-pressed="true">Monthly</button>
+        <button type="button" class="ds-cadence-chip" data-cadence="annual" aria-pressed="false">Annual <span class="ds-cadence-save">Save on annual</span></button>
+      </div>`;
   return `<section class="ds-section" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${sectionHead(section)}
-      <div class="ds-cadence" data-pricing-cadence role="group" aria-label="Billing cadence">
-        <button type="button" class="ds-cadence-chip is-live" data-cadence="monthly" aria-pressed="true">Monthly</button>
-        <button type="button" class="ds-cadence-chip" data-cadence="annual" aria-pressed="false">Annual <span class="ds-cadence-save">Save on annual</span></button>
-      </div>
+      ${cadence}
       <ul class="ds-plans">
         ${section.blocks
           .map(
@@ -2073,7 +2091,7 @@ function renderPlans(section: SectionSpec): string {
               ${
                 section.ctaLabel
                   ? `<a class="ds-btn ${b.emphasis === "lead" ? "ds-btn-primary" : "ds-btn-secondary"}" href="#cta">${esc(
-                      b.emphasis === "lead" ? section.ctaLabel : "Compare plans",
+                      b.emphasis === "lead" ? section.ctaLabel : section.secondaryLabel ?? "Compare plans",
                     )}</a>`
                   : ""
               }
@@ -2081,7 +2099,7 @@ function renderPlans(section: SectionSpec): string {
           )
           .join("")}
       </ul>
-      <p class="ds-pricing-risk">Limits and lanes come from declared capabilities only. Cancel or pause without a surprise lock-in.</p>
+      ${saas ? "" : `<p class="ds-pricing-risk">Limits and lanes come from declared capabilities only. Cancel or pause without a surprise lock-in.</p>`}
     </div>
   </section>`;
 }
@@ -2458,7 +2476,7 @@ function renderSection(
     case "workflow-proof":
       return wrapped(renderWorkflowProof(section, figures, spec));
     case "pricing-lanes":
-      return wrapped(renderPlans(section));
+      return wrapped(renderPlans(section, spec));
     case "compare-matrix":
       return wrapped(renderMatrix(section));
     case "faq-columns":
