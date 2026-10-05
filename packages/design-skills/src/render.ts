@@ -2008,11 +2008,16 @@ function renderWorkflowProof(section: SectionSpec, figures: FigurePlan, spec?: D
     })
     .join("");
 
-  const figure = figures.body
-    ? plate(figures.body, section.quoteAttribution ?? "Sample workflow", "ds-proof-figure ds-plate-lit")
-    : figures.field
-      ? `<figure class="ds-proof-figure ds-proof-figure-field" aria-hidden="true">${figures.field}</figure>`
-      : "";
+  // Approval briefs carry a gate. A declared sequence does not, and its plate would be a
+  // stack of every capability name the first screen already painted.
+  const approval = stages.some((b) => (b.meta ?? "").toLowerCase() === "approve");
+  const figure = !approval
+    ? ""
+    : figures.body
+      ? plate(figures.body, section.quoteAttribution ?? "Sample workflow", "ds-proof-figure ds-plate-lit")
+      : figures.field
+        ? `<figure class="ds-proof-figure ds-proof-figure-field" aria-hidden="true">${figures.field}</figure>`
+        : "";
 
   // Honest integration marks — capability names only; never invent partner logos.
   const markNames = (spec?.brief.features ?? [])
@@ -2028,7 +2033,7 @@ function renderWorkflowProof(section: SectionSpec, figures: FigurePlan, spec?: D
 
   return `<section class="ds-section ds-proof ds-workflow" data-surface="${section.surface}" data-section="${esc(section.id)}" data-workflow-proof id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Workflow", "Sample · five named states · human approve")}
+      ${approval ? secMeta("Workflow", "Sample · five named states · human approve") : secMeta("Declared sequence", `${stages.length} steps from the brief`)}
       <div class="ds-proof-stage ds-workflow-stage" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "5fr 7fr"))}">
         <header class="ds-proof-head">
           ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}

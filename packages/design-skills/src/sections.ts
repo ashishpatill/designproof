@@ -200,8 +200,10 @@ function evidencePhrases(
 }
 
 /** "Scrub how How a visit works works" doubles words the capability name already has. */
-function scrubClaim(name: string, description: string): string {
+function scrubClaim(name: string, description: string, used: Set<string> = new Set()): string {
   const raw = name.trim();
+  // The first screen already named this capability. Saying it again is the repeat.
+  if (used.has(normTitle(raw))) return sentence("Scrub the mechanism");
   const template = `Scrub how ${raw} works`;
   const repeated = raw
     .toLowerCase()
@@ -230,7 +232,12 @@ function titleNotUsed(name: string, description: string, used: Set<string>): str
 
 /** Clauses of a sequence, skipping any title the fold already used. */
 function stageClauses(text: string, used: Set<string>): string[] {
-  const raw = text
+  // "Each bed goes through stages: prepared, sown" — the steps are after the colon.
+  const colon = text.indexOf(":");
+  const afterColon = colon >= 0 && text.slice(colon + 1).trim().length >= 3 ? text.slice(colon + 1) : text;
+  // "from intake to discharge" names two real steps. Split them instead of padding with "Step 1".
+  const steps = afterColon.replace(/,?\s*\bfrom\s+([^,.;]+?)\s+to\s+([^,.;]+)/i, ", $1, $2");
+  const raw = steps
     .split(/[.;,]|\bthen\b|\band\b/i)
     .map((part) => part.replace(/\s+/g, " ").trim())
     .filter((part) => part.length >= 3);
@@ -238,7 +245,7 @@ function stageClauses(text: string, used: Set<string>): string[] {
   for (const part of raw) {
     if (used.has(normTitle(part))) continue;
     if (out.some((title) => normTitle(title) === normTitle(part))) continue;
-    out.push(part);
+    out.push(part.charAt(0).toUpperCase() + part.slice(1));
     if (out.length >= 5) break;
   }
   let n = 1;
@@ -1003,15 +1010,27 @@ export function buildSections(
         const workflowStages = isWorkflow
           ? stageDefs.map((stage, i) => {
               const src = workflowBodies[i] ?? workflowBodies[workflowBodies.length - 1] ?? features[0];
+              // A declared sequence: the step is the line. Naming every other capability
+              // under it, or repeating the whole sentence, tells the fold's lines again.
+              if (!analysis.hasApprovalWorkflow) {
+                return block({
+                  title: stage.title,
+                  body: "",
+                  meta: stage.id,
+                  kicker: `Step ${i + 1} of ${stageDefs.length}`,
+                  emphasis: i === 0 ? "lead" : i === stageDefs.length - 1 ? "lead" : "normal",
+                  points: [],
+                });
+              }
               return block({
                 title: stage.title,
                 body: src
                   ? sentence(`${stage.role}. Uses ${src.name}: ${src.description || src.name}`)
                   : sentence(stage.role),
                 meta: stage.id,
-                kicker: analysis.hasApprovalWorkflow ? (src?.name ?? "Sample") : "Stage",
+                kicker: src?.name ?? "Sample",
                 emphasis: i === 0 ? "lead" : i === stageDefs.length - 1 ? "lead" : "normal",
-                points: analysis.hasApprovalWorkflow && src ? [src.name, stage.role] : [stage.role],
+                points: src ? [src.name, stage.role] : [stage.role],
               });
             })
           : [];
@@ -1104,7 +1123,9 @@ export function buildSections(
             ? authored.proof.gateCopy
             : "Human approves before apply";
         const sequenceClaim = sentence(
-          `${proofFeature?.name ?? brief.productName} in stages, from what was declared`,
+          proofFeature && !usedOnFold.has(normTitle(proofFeature.name))
+            ? `${proofFeature.name} in stages, from what was declared`
+            : `${brief.productName}, one step at a time, as declared`,
         );
         const proofBody = isWorkflow
           ? analysis.hasApprovalWorkflow
@@ -1115,7 +1136,7 @@ export function buildSections(
             : isMatrix
               ? sentence(`The options side by side, as a table`)
               : isScrub
-                ? scrubClaim(proofFeature?.name ?? brief.productName, proofFeature?.description ?? "")
+                ? scrubClaim(proofFeature?.name ?? brief.productName, proofFeature?.description ?? "", usedOnFold)
                 : isWireProof
                   ? sentence(`Movements on ${brief.productName} against the cutoff`)
                   : marqueeClaim;
