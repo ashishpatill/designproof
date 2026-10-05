@@ -549,7 +549,7 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
     }
   });
 
-  it("scores corporate/fintech “Who approves irreversible actions?” FAQ when questions() emits it", () => {
+  it("scores corporate “Who approves irreversible actions?” FAQ when questions() emits it, and fintech no longer invents it", () => {
     const corporate = DesignBrief.parse({
       productName: "Boardpack",
       tagline: "Diligence packs for mid-market boards",
@@ -579,7 +579,13 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       taste: { aestheticLean: "conversion-sharp", motion: "light-scroll-reveals", colorMood: "neutral-professional" },
     });
 
-    for (const brief of [corporate, fintech]) {
+    // Fintech answers come from its own lanes and names; no brief here declared a human gate or a
+    // rollback path, so the page does not promise one.
+    const fintechPage = designFromFeatures(fintech).previewHtml;
+    expect(fintechPage).not.toMatch(/Who approves irreversible actions/i);
+    expect(fintechPage).not.toMatch(/rollback path/i);
+
+    for (const brief of [corporate]) {
       const analysis = analyzeFeatures(brief);
       const { previewHtml } = designFromFeatures(brief);
       const buckets = extractAuthoredNodes(brief, previewHtml, analysis.hasApprovalWorkflow);

@@ -11,7 +11,16 @@
  * CI / no-key path stays on deterministic tables — missing Gemini must not fail.
  */
 import { hasApprovalWorkflowSignal } from "./analyze";
-import { ctaFor, lower, questions, riskReversal, saasQuestions, sentence, workspaceQuestions } from "./copy";
+import {
+  ctaFor,
+  fintechQuestions,
+  lower,
+  questions,
+  riskReversal,
+  saasQuestions,
+  sentence,
+  workspaceQuestions,
+} from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
 
 const STOP = new Set([
@@ -307,7 +316,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
       ? saasQuestions(brief, brief.features)
       : brief.siteKind === "dashboard-webapp"
         ? workspaceQuestions(brief, brief.features)
-        : questions(brief, brief.features);
+        : brief.siteKind === "fintech-marketing"
+          ? fintechQuestions(brief, brief.features)
+          : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

@@ -303,27 +303,18 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.feature,
     });
     plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "inverse" });
-    plans.push({ id: "features-2", kind: "features", layout: "feature-index", surface: "raised", bond: true });
-    plans.push({
-      id: "proof",
-      kind: "proof",
-      layout: "marquee-proof",
-      surface: "inverse",
-      columns: split.feature,
-    });
-    plans.push({
-      id: "story",
-      kind: "story",
-      layout: "story-chapters",
-      surface: "paper",
-      bond: true,
-      columns: split.wide,
-    });
+    /*
+     * One catalogue, no proof board, no send-path chapters, and no table under the lanes. The
+     * "also included" band re-listed the catalogue's tail as bare names; the proof board printed
+     * every description again, cut short in a drawing and then in full; the chapters listed the
+     * names a fifth time under a heading written for one treasury product ("wire, wallet,
+     * approval, FX") that every fintech brief received; and the table's own lede said it was "the
+     * same list as above". The lanes stay, and each lane names only what it adds.
+     */
     if (featureCount >= 3) {
       plans.push({ id: "pricing", kind: "pricing", layout: "pricing-lanes", surface: "raised" });
-      plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised", bond: true });
     }
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

@@ -228,7 +228,6 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           /ds-hero-wire/.test(html)
           && /ds-cutoff-rail/.test(html)
           && /data-figure="wire-ledger"/.test(html)
-          && /ds-tolerance-strip/.test(html)
           && !/class="[^"]*ds-hero-stackfold/.test(html)
         ),
       "Fintech owns a wire fold (cutoff rail + wire ledger) — not SaaS stackfold with extra inverse bands.",
@@ -929,12 +928,17 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
          * in full underneath, right after the catalogue.
          */
         if (kind === "dashboard-webapp") return /\bdata-app-shell\b/.test(html) && !hasBoard;
+        /*
+         * Fintech pages prove with the fold ledger and the product picture. The shared board on
+         * them printed every capability description again, cut short in a drawing and then in full.
+         */
+        if (kind === "fintech-marketing") return /data-figure="wire-ledger"/.test(html) && !hasBoard;
         if (kind === "saas-marketing") {
           return saasProofMatches(spec, html, hasBoard);
         }
         return hasBoard;
       })(),
-      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
+      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; fintech pages prove with their fold ledger; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
     ),
   ];
 

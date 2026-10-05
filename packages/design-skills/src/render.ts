@@ -188,7 +188,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
   const listed = catalogue(spec);
   // Workspace drawings follow the same rule: names in the pictures, sentences in the catalogue.
   const features =
-    spec.brief.siteKind === "saas-marketing" || spec.brief.siteKind === "dashboard-webapp"
+    spec.brief.siteKind === "saas-marketing" ||
+    spec.brief.siteKind === "dashboard-webapp" ||
+    spec.brief.siteKind === "fintech-marketing"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
@@ -872,19 +874,26 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
 
   /*
    * Wire fold — fintech-marketing signature.
-   * Sticky cutoff rail + split fold: claim left, wire ledger right + tolerance strip.
+   * Sticky section rail + split fold: claim left, ledger right. The "±0.4% tolerance" strip under
+   * it was a number no brief gave.
    */
   if (section.layout === "hero-wire") {
     const ledger = figures.hero
       ? `<figure class="ds-wire-ledger" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
+    /*
+     * The rail indexes this page's own sections. It used to read 09:00, 12:00, 15:00, 17:00 as
+     * wire cut-off times on every fintech page, a marina's or a pottery studio's included, and one
+     * chip pointed at a proof board that is no longer drawn.
+     */
+    const present = new Set(spec.sections.map((s) => s.id));
     const windows = [
-      { id: "am", label: "09:00", href: "#features" },
-      { id: "noon", label: "12:00", href: "#specimen" },
-      { id: "pm", label: "15:00", href: "#proof" },
-      { id: "eod", label: "17:00", href: "#cta" },
-    ];
-    const rail = `<nav class="ds-cutoff-rail" aria-label="Wire cutoffs"><ol>${windows
+      { id: "features", label: "Capabilities", href: "#features" },
+      { id: "specimen", label: "Product", href: "#specimen" },
+      { id: "pricing", label: "Lanes", href: "#pricing" },
+      { id: "faq", label: "Questions", href: "#faq" },
+    ].filter((w) => present.has(w.id));
+    const rail = `<nav class="ds-cutoff-rail" aria-label="On this page"><ol>${windows
       .map(
         (w, i) =>
           `<li><a href="${w.href}" class="ds-cutoff-chip${i === 1 ? " is-live" : ""}" data-cutoff="${w.id}"><span class="ds-cutoff-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-cutoff-label">${esc(w.label)}</span></a></li>`,
@@ -896,7 +905,6 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
         <div class="ds-wire-claim">${copy}</div>
         <div class="ds-wire-field">${ledger}</div>
       </div>
-      <div class="ds-tolerance-strip" aria-hidden="true"><span>Tolerance floor</span><b>±0.4%</b><span>illustrative</span></div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
   }
@@ -971,9 +979,11 @@ function renderSpecimen(section: SectionSpec, figures: FigurePlan, spec?: Design
   }
   if (!drawing) return "";
   const quietHead = siteKind === "docs-educational";
-  // Workspace: the drawing already labels each mark, so a callout rail beside it named them twice.
+  // Workspace and fintech: the drawing already labels each mark, so a callout rail beside it named
+  // them twice.
   const annotate =
     siteKind !== "dashboard-webapp" &&
+    siteKind !== "fintech-marketing" &&
     (spec?.taste.aestheticLean === "system-crafted" || spec?.taste.colorMood === "dark-premium");
   const callouts = annotate
     ? catalogue(spec!)
@@ -1181,9 +1191,15 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
        * which reads as a layout that lost its content rather than one that chose to be quiet.
        */
       const cols = section.columns ?? "6fr 6fr";
+      /*
+       * Fintech: no product drawing beside the lead row. It drew every capability name twice (a
+       * rail and a table) with made-up percentages, right under a fold ledger that had just drawn
+       * the same names. Every row is name, description, mark.
+       */
+      const leadFigure = spec.brief.siteKind !== "fintech-marketing";
       return `<div class="ds-alt">${section.blocks
         .map((b, i) => {
-          if (i === 0) {
+          if (i === 0 && leadFigure) {
             return `<div class="ds-alt-row ds-split" style="grid-template-columns:${esc(splitTemplate(cols))}">
               <div class="ds-alt-copy">
                 ${b.kicker ? `<p class="ds-eyebrow">${esc(b.kicker)}</p>` : ""}
@@ -1229,9 +1245,11 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   })();
 
   // Workspace: chips reading "information-rich" and "subtle-micro" are this engine's settings, not
-  // anything the product does, and they read the same on every workspace page.
+  // anything the product does, and they read the same on every workspace page. Fintech likewise.
   const rail =
-    spec.taste.aestheticLean === "system-crafted" && spec.brief.siteKind !== "dashboard-webapp"
+    spec.taste.aestheticLean === "system-crafted" &&
+    spec.brief.siteKind !== "dashboard-webapp" &&
+    spec.brief.siteKind !== "fintech-marketing"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -2076,7 +2094,8 @@ function renderPlans(section: SectionSpec, spec?: DesignSpec): string {
    * SaaS lanes print no billing cadence and no closing reassurance. No brief declares monthly or
    * annual terms or a saving, and the close of the page already carries the risk line once.
    */
-  const saas = spec?.brief.siteKind === "saas-marketing";
+  // Fintech lanes follow the same rule.
+  const saas = spec?.brief.siteKind === "saas-marketing" || spec?.brief.siteKind === "fintech-marketing";
   const cadence = saas
     ? ""
     : `<div class="ds-cadence" data-pricing-cadence role="group" aria-label="Billing cadence">
@@ -2903,7 +2922,7 @@ export function renderPreviewHtml(spec: DesignSpec): string {
    * motion" was this tool's own settings, read aloud by screen readers and shown by search results.
    */
   const pageDescription =
-    spec.brief.siteKind === "dashboard-webapp"
+    spec.brief.siteKind === "dashboard-webapp" || spec.brief.siteKind === "fintech-marketing"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

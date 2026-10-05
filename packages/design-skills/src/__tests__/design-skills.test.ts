@@ -544,14 +544,16 @@ describe("research-backed offerings + implementation basics", () => {
     expect(harness.siteKind).toBe("agent-harness");
   });
 
-  it("gives fintech an inverse-heavy plan distinct from SaaS conversion", () => {
+  it("gives fintech a wire fold with an inverse product picture and close, distinct from SaaS conversion", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.fintech!);
     expect(spec.brief.siteKind).toBe("fintech-marketing");
     const inverse = spec.sections.filter((s) => s.surface === "inverse").map((s) => s.kind);
-    expect(inverse.filter((k) => k === "metrics" || k === "specimen" || k === "proof" || k === "cta").length).toBeGreaterThanOrEqual(3);
+    // The proof board is gone (it reprinted every description); the picture and the close stay dark.
+    expect(inverse).toEqual(["specimen", "cta"]);
     expect(previewHtml).toContain('data-sitekind="fintech-marketing"');
     expect(previewHtml).toContain("ds-hero-overfigure");
-    expect(previewHtml).toContain("ds-proof-board");
+    expect(previewHtml).toContain("ds-hero-wire");
+    expect(previewHtml).toContain('data-figure="wire-ledger"');
   });
 
   it("gives studio a paper-led selected-work plan distinct from SaaS and fintech", () => {
@@ -1199,12 +1201,10 @@ describe("research-backed offerings + implementation basics", () => {
     expect(ledger.previewHtml).toContain("data-app-shell");
     expect(hasLiveBoard(ledger.previewHtml)).toBe(false);
 
+    // Fintech proves with its fold ledger; the shared board reprinted every description.
     const fintech = designFromFeatures(SHOWCASE_BRIEFS.fintech!);
-    expect(hasLiveBoard(fintech.previewHtml)).toBe(true);
-    expect(fintech.previewHtml).toContain("ds-proof-board-wire");
-    expect(fintech.previewHtml).toContain("ds-proof-cell");
-    const cells = fintech.previewHtml.match(/ds-proof-cell/g) ?? [];
-    expect(cells.length).toBeGreaterThanOrEqual(4);
+    expect(hasLiveBoard(fintech.previewHtml)).toBe(false);
+    expect(fintech.previewHtml).toContain('data-figure="wire-ledger"');
 
     const dashboard = designFromFeatures(SHOWCASE_BRIEFS.dashboard!);
     expect(dashboard.previewHtml).toContain("ds-proof-board-stack");
