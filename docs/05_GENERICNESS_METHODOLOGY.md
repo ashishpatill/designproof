@@ -173,7 +173,7 @@ rotate/re-band accent; (6) swap default fonts for a §7 pairing matched to the d
 ---
 
 *Sources: WCAG 2.1 (1.4.3/1.4.6/1.4.11); Material Design spacing & elevation; IBM Carbon spacing;
-Tim Brown "More Meaningful Typography" (A List Apart); type-scale.com; Bringhurst, Elements of
-Typographic Style; Butterick, Practical Typography; Wathan & Schoger, Refactoring UI; Josh Comeau
-"Designing Beautiful Shadows"; Spec.fm 8-pt grid; Tailwind default theme; AI-slop teardowns
-(prg.sh, 925studios, vibecodekit, superdesign.dev, DEV Community).*
+modular type-scale practice and readable-line-length guidance; Elements of Typographic Style;
+Practical Typography; Refactoring UI; shadow-design guidance; the 8-pt grid; Tailwind default theme;
+and teardowns of AI-default landing pages observed in the field. Individual authors, studios and
+product pages are deliberately not named.*

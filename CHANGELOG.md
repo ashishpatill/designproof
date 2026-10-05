@@ -8,6 +8,32 @@ Design Proof is the **Cursor / Grok Build plugin** for world-class site and app 
 
 ---
 
+## 2026-10-06 — Renamed to Design Proof; review workspace rebuilt around the loop
+
+**Naming.** The product is now **Design Proof**, and the gallery is **Design Templates** — everywhere a person reads or greps: UI copy, headings, page metadata, doc titles, code comments, skills, rules, filenames and paths. Under the hood the rename is complete too, so nothing is half-branded:
+
+- Package scope `@tell/*` → `@designproof/*` (all eight workspace packages, lockfile, imports).
+- CSS prefix `tell-` → `dp-`, custom properties `--tell-*` → `--dp-*`, DOM attribute `data-tell-id` → `data-dp-id` (capture, detectors, reconcile, fixtures and corpus all moved together).
+- Env vars `TELL_*` → `DP_*`; localStorage keys `tell:*` → `dp:*`; MCP server key and tool namespace `tell_*` → `designproof_*`; CLI `tell` → `designproof`.
+- Gallery artifacts: `Specimen*` → `Template*`, `specimenSrc` → `templateSrc`, `specimenBeats` → `templateBeats`, `docs/06_TELL_PROOF.md` → `docs/06_DESIGN_PROOF.md`.
+
+**Kept on purpose.** The common noun *tell* (a genericness giveaway) and detector names ending in `Tell` still name the domain concept, not the product. External identifiers also stay: deployed hostnames (`tell-five.vercel.app`, `tell-capture.onrender.com`) and remote repo slugs cannot be renamed from inside this checkout without breaking live services. **Deploy note:** hosts with `TELL_*` environment variables must be updated to the `DP_*` names before the next deploy. See [`.env.example`](./.env.example).
+
+**Layout + UX.** The review workspace is rebuilt around the four beats the product actually performs.
+
+- **Home** is a two-column editorial surface: the composer on the left with its modes framed above the input and a labelled primary action, and a four-beat loop rail (Capture → Diagnose → Direct → Prove) on the right. The empty shelf carries its own next actions instead of dead space.
+- **Project workspace** replaces the single long critic column with three focused panes — Findings, Direction, Proof. The findings list is scroll-bounded and filterable by verdict band, and the selected finding docks as an inspector so the verdict, evidence and primary action stay on screen. Drafting a fix moves you to Proof, where the patch, its measured changes and the agent wiring live. The split now fills the viewport, and notices dock bottom-centre instead of covering pane controls.
+- **Studio** pins the preview to the viewport while the controls column scrolls, and groups controls into Product / What it does / Taste / Magic edit. Engine internals (routed skills, sections, generation, hints) fold into a collapsed *Engine detail* panel.
+- **Templates** gallery gains job-based family filters — filtering by raw site kind returned one card per chip.
+- **Report handoff** page gains a score summary, the captured surface, and per-finding verdicts with confidence.
+- Narrow viewports stop trapping the review pane: it flows with the page so findings, inspector and actions are all reachable.
+
+New shared layout primitives live in `apps/web/src/components/shell/layout.css`; the superseded home/composer/recent rules and the unrendered tabs bar left `shell.css`.
+
+Verification: 323 tests pass, `pnpm typecheck` clean, `next build` clean.
+
+---
+
 ## 2026-10-05 — Design-engine quality diagnosis + plugin distribution plan
 
 - Add [`docs/16_DESIGN_ENGINE_QUALITY.md`](./docs/16_DESIGN_ENGINE_QUALITY.md): a measured diagnosis of why `packages/design-skills` still generates generic pages, a corpus-grounded benchmark of what separates tier-one work, and the target architecture (`ArtDirection` + `PageProgram` + media layer) with milestones M1–M7.

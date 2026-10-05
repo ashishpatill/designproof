@@ -21,6 +21,8 @@ Closed in git (see [`CHANGELOG.md`](../CHANGELOG.md)):
 - Design-skills engine + skill graph (research auto-trigger, craft nodes, media budgets). Agency pipeline + learn split (developer corpus vs end-user session).
 - Templates: 17 engine offerings plus Crease / Baseline matchday; Tiller hero-helm in-repo (`/showcase/harness`); Roundspool care pathway; Ember Gate path atlas; Lattice without the Z-stroke.
 - Captioned 5-beat README demo (2026-08-26). Ink-on-paper product shell.
+- **Renamed to Design Proof, gallery to Design Templates** (2026-10-06) — brand, package scope `@designproof/*`, CSS prefix `dp-`, `--dp-*` tokens, `data-dp-*` attributes, `DP_*` env vars, `dp:*` storage keys, `designproof_*` MCP tools, CLI, docs, comments and paths. The domain noun *tell* and detector names ending in `Tell` are kept deliberately. Hosts holding `TELL_*` env vars need the `DP_*` names before the next deploy.
+- **Review workspace rebuilt around the loop** (2026-10-06) — Home is a two-column composer + four-beat loop surface; the project workspace is three panes (Findings / Direction / Proof) over a scroll-bounded, verdict-filterable findings list with a docked inspector; Studio pins its preview and folds engine internals into an *Engine detail* panel; the templates gallery filters by job family; the report handoff page carries score, capture and per-finding verdicts. Shared primitives live in `apps/web/src/components/shell/layout.css`.
 - Thin local training sink: Studio routes and (as of 2026-08-25) MCP writes into sibling `dp-design-data` when that checkout exists. Missing sibling ⇒ no-op.
 
 ---

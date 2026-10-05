@@ -242,8 +242,8 @@ buckets, never names, hosts, or URLs.
   with a paper-led selected-work plan — not a recolored SaaS/fintech skeleton. Iterate with critique
   + Playwright eye until satisfactory.
 - **Evidence used:** art-directed-studio category (foldFigure median 1.0, figureArea ~0.57,
-  invertedShare ~0, display high corridor, alignment axes ~4). Open-design craft notes only for
-  anti-slop / editorial hierarchy plumbing checks already encoded in basics.
+  invertedShare ~0, display high corridor, alignment axes ~4). Editorial-hierarchy craft notes were
+  used only for the anti-slop checks already encoded in basics.
 - **Closed:**
   - New `art-directed-studio` siteKind + `studio` template + `/showcase/studio` + critique brief
   - Plan: overfigure fold → raised metrics → alternating selected work → sunken template → method

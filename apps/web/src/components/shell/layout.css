@@ -456,6 +456,8 @@
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: rgb(var(--text-secondary));
@@ -1213,12 +1215,18 @@
     padding: 1.75rem 1rem 3rem;
   }
 
-  .dp-critic__pane--findings {
-    overflow-y: auto;
+  .dp-critic {
+    height: auto;
   }
 
+  .dp-critic__pane,
+  .dp-critic__pane--findings {
+    overflow: visible;
+  }
+
+  /* Keep the inspector reachable: the list scrolls inside a bounded box. */
   .dp-findings {
-    max-height: 46vh;
+    max-height: 58vh;
   }
 
   .dp-inspector {

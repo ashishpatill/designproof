@@ -456,10 +456,13 @@
     display: none;
   }
 
+  /* Narrow viewports stop trapping the pane: the review column flows with the
+     page so findings, inspector and actions are all reachable by scrolling. */
   .dp-split__critic {
     border-right: none;
     border-bottom: 1px solid rgb(var(--border) / 0.4);
-    max-height: 48vh;
+    max-height: none;
+    overflow: visible;
   }
 
   .dp-split[data-mobile-pane="canvas"] .dp-split__critic {
