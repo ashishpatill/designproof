@@ -186,8 +186,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
    * third telling of every line on the page.
    */
   const listed = catalogue(spec);
+  // Workspace drawings follow the same rule: names in the pictures, sentences in the catalogue.
   const features =
-    spec.brief.siteKind === "saas-marketing"
+    spec.brief.siteKind === "saas-marketing" || spec.brief.siteKind === "dashboard-webapp"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
@@ -970,8 +971,10 @@ function renderSpecimen(section: SectionSpec, figures: FigurePlan, spec?: Design
   }
   if (!drawing) return "";
   const quietHead = siteKind === "docs-educational";
+  // Workspace: the drawing already labels each mark, so a callout rail beside it named them twice.
   const annotate =
-    spec?.taste.aestheticLean === "system-crafted" || spec?.taste.colorMood === "dark-premium";
+    siteKind !== "dashboard-webapp" &&
+    (spec?.taste.aestheticLean === "system-crafted" || spec?.taste.colorMood === "dark-premium");
   const callouts = annotate
     ? catalogue(spec!)
         .slice(0, 4)
@@ -1124,8 +1127,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "archive-index" ||
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
-        // SaaS rows carry their description: the catalogue is its one home on the page.
-        spec.brief.siteKind === "dashboard-webapp" ||
+        // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "agent-harness";
       return `<ol class="ds-index">${section.blocks
         .map(
@@ -1226,8 +1228,10 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       .join("")}</ol>`;
   })();
 
+  // Workspace: chips reading "information-rich" and "subtle-micro" are this engine's settings, not
+  // anything the product does, and they read the same on every workspace page.
   const rail =
-    spec.taste.aestheticLean === "system-crafted"
+    spec.taste.aestheticLean === "system-crafted" && spec.brief.siteKind !== "dashboard-webapp"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1243,8 +1247,12 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   // list, and a list of capabilities with nothing drawn beside it is where these pages used to run
   // for three full screens without giving the eye anything but type.
   // SaaS skips it: the drawing was the first three catalogue names again, set beside the catalogue.
+  // Workspace skips it too: the working surface above already draws every name.
   const standing =
-    section.layout !== "feature-alternating" && section.id === "features" && spec.brief.siteKind !== "saas-marketing"
+    section.layout !== "feature-alternating" &&
+    section.id === "features" &&
+    spec.brief.siteKind !== "saas-marketing" &&
+    spec.brief.siteKind !== "dashboard-webapp"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -2327,7 +2335,7 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
       <div class="ds-app" data-app-shell>
         <div class="ds-app-top">
           <span class="ds-wordmark">${esc(section.brandLabel ?? spec.brief.productName)}</span>
-          <span class="ds-app-crumbs">workspace / ${esc(section.title.toLowerCase())}</span>
+          <span class="ds-app-crumbs">${isDash ? "workspace" : `workspace / ${esc(section.title.toLowerCase())}`}</span>
           <span class="ds-pill ds-pill-signal" style="margin-left:auto">live</span>
         </div>
         <div class="ds-app-grid" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "260px 1fr"))}">
@@ -2343,9 +2351,9 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
             </ul>
             <p class="ds-eyebrow">Filters</p>
             <ul class="ds-app-nav" role="list" data-app-filters>
-              <li><button type="button" class="ds-app-nav-item" data-filter="now" aria-pressed="false">Needs a human</button></li>
-              <li><button type="button" class="ds-app-nav-item" data-filter="today" aria-pressed="false">Assigned to me</button></li>
-              <li><button type="button" class="ds-app-nav-item" data-filter="queued" aria-pressed="false">Resolved today</button></li>
+              <li><button type="button" class="ds-app-nav-item" data-filter="now" aria-pressed="false">${isDash ? "Now" : "Needs a human"}</button></li>
+              <li><button type="button" class="ds-app-nav-item" data-filter="today" aria-pressed="false">${isDash ? "Today" : "Assigned to me"}</button></li>
+              <li><button type="button" class="ds-app-nav-item" data-filter="queued" aria-pressed="false">${isDash ? "Queued" : "Resolved today"}</button></li>
             </ul>
           </aside>
           <div class="ds-app-main">
@@ -2363,7 +2371,9 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
                 .join("")}
             </div>
             <table class="ds-table" data-app-table>
-              <thead><tr><th scope="col">Item</th><th scope="col">State</th><th scope="col">Detail</th><th scope="col" class="ds-num">Age</th></tr></thead>
+              <thead><tr><th scope="col">Item</th><th scope="col">State</th><th scope="col">${isDash ? "Tier" : "Detail"}</th>${
+                isDash ? "" : `<th scope="col" class="ds-num">Age</th>`
+              }</tr></thead>
               <tbody>
                 ${rows
                   .map(
@@ -2377,17 +2387,31 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
                       <th scope="row">${esc(b.title)}</th>
                       <td><span class="ds-pill${b.kicker === "Now" ? " ds-pill-signal" : ""}">${esc(b.kicker ?? "Queued")}</span></td>
                       <td>${esc(detail ?? "")}</td>
-                      <td class="ds-num">${esc(b.meta ?? "0")}m</td>
+                      ${isDash ? "" : `<td class="ds-num">${esc(b.meta ?? "0")}m</td>`}
                     </tr>`;
                     })
                   .join("")}
               </tbody>
             </table>
-            <div class="ds-empty" data-app-empty hidden>
+            ${
+              /*
+               * Workspace: the filters are the row states the table shows, and the empty state says
+               * only that nothing matches. "Handled automatically" was a promise no brief makes, and
+               * a button to open the workspace from inside the workspace led nowhere new.
+               */
+              isDash
+                ? // The toggled wrapper carries no class, so its hidden state is not overridden by the
+                  // grid display on .ds-empty; the empty state now shows only when a filter is empty.
+                  `<div data-app-empty hidden><div class="ds-empty">
+              <p class="ds-eyebrow">Nothing in this filter</p>
+              <p class="ds-small">No ${esc(spec.brief.productName)} rows match it right now.</p>
+            </div></div>`
+                : `<div class="ds-empty" data-app-empty hidden>
               <p class="ds-eyebrow">Nothing else needs you</p>
               <p class="ds-small">Everything outside the filters above is handled automatically. This state is the goal, not an error.</p>
               ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
-            </div>
+            </div>`
+            }
           </div>
         </div>
       </div>
@@ -2874,13 +2898,21 @@ export function renderPreviewHtml(spec: DesignSpec): string {
   const authoredSlot = spec.routedSkills.includes("authored-motion-slot")
     ? `<aside class="ds-authored-motion" data-authored-slot="empty" aria-label="Authored motion poster"><span class="ds-sr">Authored motion slot — poster frame until a runtime asset is mounted</span></aside>`
     : "";
+  /*
+   * Workspace pages describe the product, not the engine. "System crafted lean with subtle-micro
+   * motion" was this tool's own settings, read aloud by screen readers and shown by search results.
+   */
+  const pageDescription =
+    spec.brief.siteKind === "dashboard-webapp"
+      ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
+      : spec.summary;
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${esc(spec.brief.productName)} — ${esc(spec.brief.tagline || spec.brief.audience)}</title>
-<meta name="description" content="${esc(spec.summary)}"/>
+<meta name="description" content="${esc(pageDescription)}"/>
 <meta name="color-scheme" content="${spec.taste.colorMood === "dark-premium" ? "dark" : "light"}"/>
 ${responsive ? `<meta name="tell-responsive-performance" content="webp-display-budgets;lazy-below-fold;run-media-site-after-photography"/>` : ""}
 ${spec.researchPlan ? `<meta name="tell-research-gate" content="${esc(spec.researchPlan.researchNodes.join(" → "))}"/>` : ""}
@@ -2894,7 +2926,7 @@ ${needsHtmx ? `<script src="https://unpkg.com/htmx.org@2.0.4" defer></script>` :
 <body data-lean="${esc(spec.taste.aestheticLean)}" data-motion="${esc(spec.taste.motion)}" data-density="${esc(spec.taste.density)}" data-mood="${esc(spec.taste.colorMood)}" data-sitekind="${esc(spec.brief.siteKind)}" data-depth="${esc(depth)}"${paperFrame ? ` data-frame="paper-technical"` : ""}${atmosphere ? ` data-atmosphere="static"` : ""}${responsive ? ` data-responsive-performance="required"` : ""}${researchMeta}>
 ${atmosphereLayer}
 <a class="ds-skip" href="#main">Skip to content</a>
-<p class="ds-sr">${esc(spec.summary)}</p>
+<p class="ds-sr">${esc(pageDescription)}</p>
 ${authoredSlot}
 ${spec.sections
   .filter((s) => s.layout === "nav")

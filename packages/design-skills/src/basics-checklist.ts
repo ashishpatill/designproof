@@ -923,12 +923,18 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           "agent-harness",
         ].includes(kind);
         if (craftProof) return !hasBoard;
+        /*
+         * Workspace pages prove with the working application shell itself. The shared board on
+         * them printed every capability description a second time, cut short in a drawing and then
+         * in full underneath, right after the catalogue.
+         */
+        if (kind === "dashboard-webapp") return /\bdata-app-shell\b/.test(html) && !hasBoard;
         if (kind === "saas-marketing") {
           return saasProofMatches(spec, html, hasBoard);
         }
         return hasBoard;
       })(),
-      "Craft templates prove with their own story instrument; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
+      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
     ),
   ];
 

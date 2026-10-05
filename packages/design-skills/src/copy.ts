@@ -579,6 +579,64 @@ export function saasQuestions(brief: DesignBrief, features: FeatureSpec[]): Arra
   return out;
 }
 
+/** "A, B, and C" — names joined the way a person would say them. */
+function spoken(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
+/**
+ * Workspace questions. Every answer is built from this brief: its product, its audience, its
+ * capability names and their priority. Nothing here states a timeline, a contract term, a limit,
+ * or a person who answers, because no brief declares any of those. Shared `questions` promised
+ * "minutes" to a first view, "cancel anytime", and a comparison table this page does not have.
+ */
+export function workspaceQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const lead = features[0];
+  const last = features[features.length - 1];
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  const others = Math.max(0, features.length - 1);
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(
+      others
+        ? `${Audience}, working across ${count(features.length)} views in one workspace`
+        : Audience,
+    ),
+  });
+  const core = features.filter((f) => f.priority === "p0");
+  const rest = features.filter((f) => f.priority !== "p0");
+  if (core.length && rest.length) {
+    out.push({
+      title: `Which parts of ${brief.productName} are core?`,
+      body: sentence(
+        `${spoken(core.map((f) => f.name))}. ${spoken(rest.map((f, i) => (i === 0 ? f.name : lower(f.name))))} ${
+          rest.length === 1 ? "is" : "are"
+        } there alongside them`,
+      ),
+    });
+  }
+  if (last && last !== lead) {
+    out.push({
+      title: `Is ${lower(last.name)} part of ${brief.productName}?`,
+      body: sentence(`Yes. It is one of the ${count(features.length)} views in ${brief.productName}`),
+    });
+  }
+  out.push({
+    title: `What is deliberately not in ${brief.productName}?`,
+    body: sentence(`Anything this page does not name. ${brief.productName} lists what it does, not what it might do later`),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `How do we try ${brief.productName} on our own work?`,
+    body: sentence(`Use "${cta}" at the top or the bottom of this page`),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
