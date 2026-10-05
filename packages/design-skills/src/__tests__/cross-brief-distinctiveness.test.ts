@@ -594,4 +594,62 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       expect(previewHtml).toMatch(/Who approves irreversible actions/i);
     }
   });
+  it("briefs these rules were not written against keep first-screen names out of the proof", () => {
+    const fresh = (
+      productName: string,
+      tagline: string,
+      audience: string,
+      caps: [string, string][],
+    ): DesignBriefT =>
+      DesignBrief.parse({
+        productName,
+        tagline,
+        audience,
+        businessGoal: "demos",
+        siteKind: "saas-marketing",
+        lockSiteKind: true,
+        features: caps.map(([name, description], i) => ({
+          id: `n${i}`,
+          name,
+          description,
+          priority: i < 2 ? "p0" : i < 4 ? "p1" : "p2",
+        })),
+        taste: { aestheticLean: "conversion-sharp", motion: "light-scroll-reveals", colorMood: "neutral-professional" },
+      });
+    const briefs = [
+      fresh("Harborbook", "Berth planning for small marinas", "marina harbour masters", [
+        ["Berth requests", "Incoming boat requests sorted by urgency so the harbour master works the most urgent first"],
+        ["Fuel log", "Every fuel sale posted against the berth account and reconciled each night"],
+        ["Crew list", "Who is on shift at the dock"],
+        ["Weather board", "Today's wind and tide"],
+        ["Mooring map", "Where each boat is tied up"],
+      ]),
+      fresh("Plotwise", "Planning software for community gardens", "garden coordinators", [
+        ["Plot plans", "Compare three plot layouts side by side before the season"],
+        ["Season stages", "Each bed goes through stages: prepared, sown, growing, harvested"],
+        ["Member roll", "Gardeners and their plots"],
+        ["Tool shed", "Which tools are out"],
+        ["Water rota", "Who waters on which day"],
+      ]),
+      fresh("Brightdesk", "Help desk for school IT teams", "school IT leads", [
+        ["Uptime report", "98 percent of tickets closed inside the SLA, with an audit of every one"],
+        ["Repair walkthrough", "Explains how a laptop repair works, from drop-off to return"],
+        ["Device list", "Every device the school owns"],
+        ["Staff notes", "Notes for teachers"],
+        ["Loan cart", "Spare laptops on loan"],
+      ]),
+    ];
+    const shapes = new Set<string>();
+    for (const brief of briefs) {
+      const { previewHtml, spec } = designFromFeatures(brief);
+      const fold = sectionChunk(previewHtml, "hero");
+      const proof = sectionChunk(previewHtml, "proof");
+      expect(proof.length, `${brief.productName} must render a proof`).toBeGreaterThan(200);
+      expect(repeatedFoldNames(brief, fold, proof), `${brief.productName} proof repeats the first screen`).toEqual([]);
+      // No approve gate the brief never declared.
+      expect(proof, `${brief.productName} proof invents an approval`).not.toMatch(/human approve/i);
+      shapes.add(spec.sections.map((s) => s.layout).join(","));
+    }
+    expect(shapes.size).toBe(briefs.length);
+  });
 });
