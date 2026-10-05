@@ -13,7 +13,7 @@ const repoRoot = path.resolve(here, "..");
 const outDir = here;
 
 function injectSheet(html: string, sheet: { css: string; fontImport: string }): string {
-  const style = `<style data-tell-reconcile>\n${sheet.fontImport}\n${sheet.css}\n</style>`;
+  const style = `<style data-dp-reconcile>\n${sheet.fontImport}\n${sheet.css}\n</style>`;
   if (/<\/body>/i.test(html)) return html.replace(/<\/body>/i, `${style}</body>`);
   if (/<\/html>/i.test(html)) return html.replace(/<\/html>/i, `${style}</html>`);
   return html + style;
@@ -26,14 +26,14 @@ async function screenshotHtml(page: import("playwright").Page, html: string, fil
 }
 
 async function main() {
-  const { TellReport } = await import(pathToFileURL(path.join(repoRoot, "packages/schema/src/index.ts")).href);
+  const { DesignProofReport } = await import(pathToFileURL(path.join(repoRoot, "packages/schema/src/index.ts")).href);
   const { RECONCILE_DIRECTIONS, reconcile } = await import(
     pathToFileURL(path.join(repoRoot, "packages/redesign/src/reconcile.ts")).href,
   );
 
   await mkdir(outDir, { recursive: true });
-  const reportPath = path.join(repoRoot, "fixtures/reports/tell-report.json");
-  const report = TellReport.parse(JSON.parse(await readFile(reportPath, "utf8")));
+  const reportPath = path.join(repoRoot, "fixtures/reports/dp-report.json");
+  const report = DesignProofReport.parse(JSON.parse(await readFile(reportPath, "utf8")));
   const html = report.capture.snapshotHtml;
   if (!html) throw new Error("Report missing snapshotHtml");
 

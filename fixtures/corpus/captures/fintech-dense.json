@@ -6,12 +6,12 @@
     "height": 1100
   },
   "screenshotBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "snapshotHtml": "<html><body data-tell-corpus=\"1\"><p>corpus://fintech-dense</p></body></html>",
+  "snapshotHtml": "<html><body data-dp-corpus=\"1\"><p>corpus://fintech-dense</p></body></html>",
   "cssVariables": [],
   "styles": [
     {
       "selector": "body",
-      "tellId": "body",
+      "dpId": "body",
       "tag": "body",
       "role": "surface",
       "rect": {
@@ -34,7 +34,7 @@
     },
     {
       "selector": "h1",
-      "tellId": "h1",
+      "dpId": "h1",
       "tag": "h1",
       "role": "display",
       "rect": {
@@ -57,7 +57,7 @@
     },
     {
       "selector": "h2",
-      "tellId": "h2",
+      "dpId": "h2",
       "tag": "h2",
       "role": "heading",
       "rect": {
@@ -80,7 +80,7 @@
     },
     {
       "selector": "h3",
-      "tellId": "h3",
+      "dpId": "h3",
       "tag": "h3",
       "role": "heading",
       "rect": {
@@ -103,7 +103,7 @@
     },
     {
       "selector": "button.primary",
-      "tellId": "buttonprimar",
+      "dpId": "buttonprimar",
       "tag": "button",
       "role": "button",
       "rect": {
@@ -126,7 +126,7 @@
     },
     {
       "selector": "button.ghost",
-      "tellId": "buttonghost",
+      "dpId": "buttonghost",
       "tag": "button",
       "role": "button",
       "rect": {
@@ -149,7 +149,7 @@
     },
     {
       "selector": "input",
-      "tellId": "input",
+      "dpId": "input",
       "tag": "input",
       "role": "input",
       "rect": {
@@ -172,7 +172,7 @@
     },
     {
       "selector": "nav",
-      "tellId": "nav",
+      "dpId": "nav",
       "tag": "nav",
       "role": "nav",
       "rect": {
@@ -195,7 +195,7 @@
     },
     {
       "selector": "a",
-      "tellId": "a",
+      "dpId": "a",
       "tag": "a",
       "role": "link",
       "rect": {
@@ -218,7 +218,7 @@
     },
     {
       "selector": ".panel-0",
-      "tellId": "panel-0",
+      "dpId": "panel-0",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -241,7 +241,7 @@
     },
     {
       "selector": ".panel-1",
-      "tellId": "panel-1",
+      "dpId": "panel-1",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -264,7 +264,7 @@
     },
     {
       "selector": ".panel-2",
-      "tellId": "panel-2",
+      "dpId": "panel-2",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -287,7 +287,7 @@
     },
     {
       "selector": ".panel-3",
-      "tellId": "panel-3",
+      "dpId": "panel-3",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -310,7 +310,7 @@
     },
     {
       "selector": ".panel-4",
-      "tellId": "panel-4",
+      "dpId": "panel-4",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -333,7 +333,7 @@
     },
     {
       "selector": ".panel-5",
-      "tellId": "panel-5",
+      "dpId": "panel-5",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -356,7 +356,7 @@
     },
     {
       "selector": ".panel-6",
-      "tellId": "panel-6",
+      "dpId": "panel-6",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -379,7 +379,7 @@
     },
     {
       "selector": ".panel-7",
-      "tellId": "panel-7",
+      "dpId": "panel-7",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -402,7 +402,7 @@
     },
     {
       "selector": ".panel-8",
-      "tellId": "panel-8",
+      "dpId": "panel-8",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -425,7 +425,7 @@
     },
     {
       "selector": ".panel-9",
-      "tellId": "panel-9",
+      "dpId": "panel-9",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -448,7 +448,7 @@
     },
     {
       "selector": ".panel-10",
-      "tellId": "panel-10",
+      "dpId": "panel-10",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -471,7 +471,7 @@
     },
     {
       "selector": ".panel-11",
-      "tellId": "panel-11",
+      "dpId": "panel-11",
       "tag": "div",
       "role": "card",
       "rect": {
@@ -494,7 +494,7 @@
     },
     {
       "selector": ".metric-0",
-      "tellId": "metric-0",
+      "dpId": "metric-0",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -517,7 +517,7 @@
     },
     {
       "selector": ".metric-1",
-      "tellId": "metric-1",
+      "dpId": "metric-1",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -540,7 +540,7 @@
     },
     {
       "selector": ".metric-2",
-      "tellId": "metric-2",
+      "dpId": "metric-2",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -563,7 +563,7 @@
     },
     {
       "selector": ".metric-3",
-      "tellId": "metric-3",
+      "dpId": "metric-3",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -586,7 +586,7 @@
     },
     {
       "selector": ".metric-4",
-      "tellId": "metric-4",
+      "dpId": "metric-4",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -609,7 +609,7 @@
     },
     {
       "selector": ".metric-5",
-      "tellId": "metric-5",
+      "dpId": "metric-5",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -632,7 +632,7 @@
     },
     {
       "selector": ".metric-6",
-      "tellId": "metric-6",
+      "dpId": "metric-6",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -655,7 +655,7 @@
     },
     {
       "selector": ".metric-7",
-      "tellId": "metric-7",
+      "dpId": "metric-7",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -678,7 +678,7 @@
     },
     {
       "selector": ".metric-8",
-      "tellId": "metric-8",
+      "dpId": "metric-8",
       "tag": "span",
       "role": "body",
       "rect": {
@@ -701,7 +701,7 @@
     },
     {
       "selector": ".metric-9",
-      "tellId": "metric-9",
+      "dpId": "metric-9",
       "tag": "span",
       "role": "body",
       "rect": {

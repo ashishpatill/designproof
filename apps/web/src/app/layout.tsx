@@ -25,7 +25,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tell — Every AI-built UI has a tell",
+  title: "Design Proof — Every AI-built UI has a tell",
   description:
     "Capture your product, name what's generic, art-direct a direction, and apply the fix in Cursor.",
 };

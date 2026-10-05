@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-/** Injects Tell orchestration context at session start */
+/** Injects Design Proof orchestration context at session start */
 const msg = {
   additional_context: [
-    "Tell hackathon build. Read ORCHESTRATION.md for model routing.",
+    "Design Proof hackathon build. Read ORCHESTRATION.md for model routing.",
     "User: Ashish — solo founder, AI UI looks generic, demo tomorrow.",
     "Composer 2.5 orchestrates; Opus 4.8 for core/taste; GPT 5.5 for copy.",
     "Subagents in .cursor/agents/ — delegate by role.",

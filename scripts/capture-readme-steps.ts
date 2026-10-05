@@ -13,8 +13,8 @@ import { spawnSync } from "node:child_process";
 import { unlinkSync } from "node:fs";
 import { resolve } from "node:path";
 
-const BASE = process.env.TELL_E2E_BASE ?? "http://127.0.0.1:3000";
-const FIXTURE = process.env.TELL_FIXTURE_URL ?? "http://127.0.0.1:3001";
+const BASE = process.env.DP_E2E_BASE ?? "http://127.0.0.1:3000";
+const FIXTURE = process.env.DP_FIXTURE_URL ?? "http://127.0.0.1:3001";
 const OUT = resolve(__dirname, "../docs/media");
 
 function toWebp(png: string, webp: string, maxw = 1100) {
@@ -65,7 +65,7 @@ async function main() {
     await liveUrlMode.click();
     await page.waitForTimeout(400);
   }
-  const composer = page.locator("textarea.tell-composer__input, [data-testid='capture-url']").first();
+  const composer = page.locator("textarea.dp-composer__input, [data-testid='capture-url']").first();
   await composer.waitFor({ timeout: 20_000 });
   await composer.click({ clickCount: 3 });
   await composer.fill(FIXTURE);
@@ -73,7 +73,7 @@ async function main() {
   await shot(page, "step-capture");
 
   const captureBtn = page
-    .locator(".tell-composer__submit, [data-testid='capture-submit']")
+    .locator(".dp-composer__submit, [data-testid='capture-submit']")
     .or(page.getByRole("button", { name: /capture|set up|diagnose|start/i }))
     .first();
   await captureBtn.click();

@@ -1,7 +1,7 @@
-# Tell learnings (recursive improve)
+# Design Proof learnings (recursive improve)
 
 Persistent lessons across sessions. Read before changing showcase, templates, or preview chrome.
-Pattern keys match `tell-recursive-improve`.
+Pattern keys match `dp-recursive-improve`.
 
 ---
 
@@ -41,7 +41,7 @@ Pattern keys match `tell-recursive-improve`.
 
 ## 2026-08-12 — `home:no-third-party-composer-templates`
 
-- **Do not:** Show third-party product brands as starter templates/chips under the Tell home composer. Guard: `apps/web/src/lib/composer-brand-denylist.ts` + vitest. Prefer Tell specimens / `listTemplates()` labels only — or nothing.
+- **Do not:** Show third-party product brands as starter templates/chips under the Design Proof home composer. Guard: `apps/web/src/lib/composer-brand-denylist.ts` + vitest. Prefer Design templates / `listTemplates()` labels only — or nothing.
 
 ## 2026-08-12 — `home:design-controls-shared`
 
@@ -49,9 +49,9 @@ Pattern keys match `tell-recursive-improve`.
 
 ## 2026-08-08 — `template:craft-bleed-into-rail`
 
-- **Failure:** Forme Desk (press-atelier) full-bleed specimen/flow stages painted under the Sig
+- **Failure:** Forme Desk (press-atelier) full-bleed template/flow stages painted under the Sig
   A–H rail; masthead border kissed the brand (2px); registration crosshairs (`z-index:3`) sat over
-  claim type. Herbarium pins/SVG head mono sat under the absolute specimen tag.
+  claim type. Herbarium pins/SVG head mono sat under the absolute template tag.
 - **Fix:** `--craft-rail` insets `.ds-bleed` / plate figs for press/lantern/archive/observatory;
   move `.ds-press-regs` inside the field; restore masthead/claim padding; pin epins + plate head
   mono to the right of the voucher tag. Gates `craft-rail-clears-bleed`, `press-regs-frame-field`.
@@ -73,28 +73,28 @@ Pattern keys match `tell-recursive-improve`.
   `Note 0N` then the capability SVG, so the drawing slid through the label (nested frames,
   bars, junction targets). Mark SVGs also drew ink at ~4.5px from the top edge.
 - **Fix:** Drop those note-adjacent negative margins; keep band-boundary overlaps
-  (specimen / proof-figure / closing). Add `note + mark { margin-top: var(--s-lg) }`
+  (template / proof-figure / closing). Add `note + mark { margin-top: var(--s-lg) }`
   clearance; pad capabilityMark to 14px; basics gate `story-note-clears-mark`. Rebuild
-  `@tell/design-skills` dist so showcase iframes pick up CSS.
+  `@designproof/design-skills` dist so showcase iframes pick up CSS.
 - **Do not:** Score layeredElements by pulling labeled drawings under their own captions.
 
 ## 2026-08-06 — `showcase:preview-gutter`
 
 - **Failure:** Featured + index iframes used `scale(calc(100cqw / 1440))` which never applied; fixed `0.48` / `0.14` left ~88px empty on the right of thumbs.
-- **Fix:** `SpecimenPreview` / measured `--sx-scale = clientWidth / 1440`.
+- **Fix:** `TemplatePreview` / measured `--sx-scale = clientWidth / 1440`.
 - **Do not:** Trust `@supports (1cqw)` on iframe transforms.
 
 ## 2026-08-06 — `showcase:nav-only-thumb`
 
 - **Failure:** Thumbs were 5.5rem tall at ~0.14–0.20 scale → only sticky nav + truncated type. Agent screenshots clipped the same strip and called it proof.
 - **Fix:** Taller thumbs (~10.5rem); scroll still frame to **figure/claim beat** (skip y=0); featured **cinema reel** through beats; screenshot contract requires a craft beat, not chrome.
-- **Do not:** Ship gallery shots of the top 400px of a 1440 page and call it a specimen.
+- **Do not:** Ship gallery shots of the top 400px of a 1440 page and call it a template.
 
 ## 2026-08-06 — `showcase:sticky-nav-in-still`
 
 - **Failure:** Even after beat scroll, sticky nav still occupied the top of every plate/thumb.
-- **Fix:** Inject preview-only CSS in `SpecimenPreview` that hides `.ds-nav` / skip link inside the iframe.
-- **Do not:** Treat nav chrome as part of the specimen proof.
+- **Fix:** Inject preview-only CSS in `TemplatePreview` that hides `.ds-nav` / skip link inside the iframe.
+- **Do not:** Treat nav chrome as part of the template proof.
 
 
 ## 2026-08-06 — `template:svg-text-steals-display`
@@ -147,7 +147,7 @@ Pattern keys match `tell-recursive-improve`.
   starved and the unique index grammar below the fold.
 - **Fix:** `hero-register` keeps a compact claim, hangs `.ds-register-field` under a soft paper fade,
   and lets `index-ledger` own the first viewport. Quiet display clamp 45–52px; alpha-rail is chrome
-  (hidden in SpecimenPreview).
+  (hidden in TemplatePreview).
 - **Do not:** Put a product plate *below* a shouty claim and call an archive index shipped.
 
 ## 2026-08-07 — `template:display-clamp-invalid`
@@ -162,18 +162,18 @@ Pattern keys match `tell-recursive-improve`.
 ## 2026-08-07 — `template:ledger-rule-flood`
 
 - **Failure:** Index-ledger drew 3×18 ruled rows (+ random underlines) → rules/screen **9.94**
-  (band ≤4.33). Stack specimen compounded the flood.
-- **Fix:** Sparse 2×5 ledger; specimen figure order prefers horizon over stack for archive.
+  (band ≤4.33). Stack template compounded the flood.
+- **Fix:** Sparse 2×5 ledger; template figure order prefers horizon over stack for archive.
   Rules **9.94 → 4.29**; craft **91.3 → 97.6**.
 - **Do not:** Equate “dense index grammar” with hundreds of SVG hairlines per page.
 
 ## 2026-08-07 — `template:dashboard-shell-smears-bands`
 
 - **Failure:** Dashboard band-variation sat at ~0.235 (corridor 0.422–0.896). The app shell’s character
-  mass spanned two equal-height probe bands, and the late inverse specimen used a stack ledger with
+  mass spanned two equal-height probe bands, and the late inverse template used a stack ledger with
   body prose — so every strip read as medium-dense. Empty 140vh statement voids (Loop 6) are not an
   allowed recovery.
-- **Fix:** Sunken horizon specimen (titles only) between metrics and shell; pack the shell under
+- **Fix:** Sunken horizon template (titles only) between metrics and shell; pack the shell under
   ~1vh; stretch the drawn plate so the shell aligns into one measured band; quiet metric chrome;
   keep proof-claim at body measure so it does not steal the prose corridor. Score **97.8 → 99.9**;
   band-variation **0.235 → 0.474**.
@@ -202,10 +202,10 @@ Pattern keys match `tell-recursive-improve`.
 ## 2026-08-07 — `showcase:stage-class-collision`
 
 - **Failure:** Gallery `.sx-stage { max-width:1440px; margin:auto; display:grid }` leaked into
-  specimen `ShowcaseFrame` pages → proof iframe sat as a centered card with huge dark gutters
-  ("empty Specimens page").
+  template `ShowcaseFrame` pages → proof iframe sat as a centered card with huge dark gutters
+  ("empty Templates page").
 - **Fix:** Scope gallery stage under `.sx-root .sx-stage`; reset `.sx-chrome .sx-stage` to
-  full-bleed block. SpecimenPreview nudges cinema beats deeper into ledger/figure ink.
+  full-bleed block. TemplatePreview nudges cinema beats deeper into ledger/figure ink.
 - **Do not:** Reuse gallery layout class names for proof chrome without a reset.
 
 ## 2026-08-07 — `template:css-rule-density-not-svg`
@@ -216,7 +216,7 @@ Pattern keys match `tell-recursive-improve`.
   `hr`) ÷ screens — **not** SVG strokes. A later `border-color:` shorthand on archive `.ds-index-row`
   also undid transparent even-row tops. Matrix `td/th` border-bottoms each count as a rule.
 - **Fix:** Thin CSS bordered rows (every 3rd); put thinning rules last; restore tall ledger and fill
-  cells with dual ink + stamps; quiet educational specimen (titles-only horizon) for band-variation;
+  cells with dual ink + stamps; quiet educational template (titles-only horizon) for band-variation;
   widen educational body measure so scrub/aside columns cannot steal the body candidate.
 - **Do not:** Confuse SVG strokes with `ruleDensity`, or shrink page height to "fix" empty cells.
 
@@ -234,10 +234,10 @@ Pattern keys match `tell-recursive-improve`.
 
 - **Failure:** Press-sheet SIG cells were empty white rectangles — showcase + proof screenshots
   read as a sparse wireframe, not an imposition forme. Featured cinema also drifted onto
-  specimen/horizon beats that looked basic.
+  template/horizon beats that looked basic.
 - **Fix:** Draw 2×2 mini pages (text bars, media blocks, folios) inside every SIG cell; densitometer
-  as filled patches not rule ticks; lock SpecimenPreview reel to figure→spread→proof when a craft
-  figure exists; skip instruments/specimen in discovery; land press still at y≥360 into filled
+  as filled patches not rule ticks; lock TemplatePreview reel to figure→spread→proof when a craft
+  figure exists; skip instruments/template in discovery; land press still at y≥360 into filled
   matter. Keep SVG mono at 11px (`FT.micro`) so type-steps stay ≤14; prefer filled rects over
   dashed fold crosses so rule-structure stays in band.
 - **Do not:** Ship an imposition grid whose cells are blank paper and call it craft.
@@ -254,11 +254,11 @@ Pattern keys match `tell-recursive-improve`.
 ## 2026-08-07 — `engine:encode-empty-void-gates`
 
 - **Failure class:** Press densify + showcase craft-first were one-off patches; the next cell-grid
-  figure could ship empty stroked voids and the next cinema could reopen on specimen.
+  figure could ship empty stroked voids and the next cinema could reopen on template.
 - **Fix (engine):** Export `miniPageMatter` / `densitometerStrip` / `FIG_MONO_PX`; clamp mono in
   `text()`; `data-dense="ink"` on densified frames; `assertBasics` gates `fig-mono-floor`,
   `craft-figure-dense`, `fold-owns-craft`; shared fold-owns secondary-CTA hide across dossier /
-  chrono / archive / press; extract `specimenBeats` with craft-first cinema + unit tests.
+  chrono / archive / press; extract `templateBeats` with craft-first cinema + unit tests.
 - **Do not:** Patch one siteKind's empty cells without leaving a reusable helper + basics gate.
 
 ## Process
@@ -274,7 +274,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
   it still reads as the same grammar.
 - **Challenger:** Two structural siteKinds that invent unreplicable press/voucher grammars —
   `commerce-loom` (size-tape + warp/weft photo loom + hangtag + Care label) and `field-guide`
-  (taxon rail + specimen plate + range beads + Voucher) with copyright-free photo stock embedded
+  (taxon rail + template plate + range beads + Voucher) with copyright-free photo stock embedded
   as matter, not lifestyle cards.
 - **Eval:** Critique loom/field **97.6** (only ink-variation above corridor, same class as archive);
   matrix **98.9**; holdout gap 0.5. Playwright eye: fold shows photo cells / botanical plate, not
@@ -297,7 +297,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
   (claim column + figure) — a density/chrome swap on the archive/observatory recipe, not marvel
   craft. Soft packs lose to structure; this structure was still the same recipe.
 - **Challenger:** Drawloom (headline as weft picks through warp; cloth below; size treadles at
-  bottom) + glassine press (specimen under peeled translucent sheet; museum label; corner pins;
+  bottom) + glassine press (template under peeled translucent sheet; museum label; corner pins;
   binomial strip at bottom).
 - **Eval:** Critique after dogfood **97.6 / 97.6** (matrix **98.9**). Desktop fold shots show
   woven weft lines and pinned glassine peel — not left sticky chrome.
@@ -319,7 +319,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 - **Failure named (champion):** After Loop 21, hard eye still read loom as serif-over-graph-paper
   and field as a floating label card on a photo — metaphor chrome, not unreplicable structure.
 - **Challenger:** SVG warp shed + flying shuttle + fell line; cork dissecting tray with hinged
-  glassine lid, entomology pins, specimen tag, vernier.
+  glassine lid, entomology pins, template tag, vernier.
 - **Eval:** Loom **97.6**, field **98.7** (↑), matrix **99.0**. Desktop folds show shuttle on
   shed and numbered pins in a tray well.
 - **Do not:** Stop at renaming chrome. Ask whether a density slider + stock photo could emit the
@@ -338,17 +338,17 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 - **Failure:** Skills/agents documented 4 MCP tools while the server shipped 8 (+ growing) — agents
   called wrong/missing tools; install was clone-and-edit-JSON only.
-- **Fix:** `McpToolName` / `MCP_TOOL_NAMES` in `@tell/schema`, `REGISTERED_MCP_TOOLS` + vitest drift
-  guard, `buildInstallInfo` + `GET /api/install-info`, `tell mcp install cursor`, `tell_voice`,
-  report `id` for redesign chain, `TELL_CAPTURE_API_TOKEN` gate.
+- **Fix:** `McpToolName` / `MCP_TOOL_NAMES` in `@designproof/schema`, `REGISTERED_MCP_TOOLS` + vitest drift
+  guard, `buildInstallInfo` + `GET /api/install-info`, `designproof mcp install cursor`, `designproof_voice`,
+  report `id` for redesign chain, `DP_CAPTURE_API_TOKEN` gate.
 - **Do not:** Document MCP tools only in prose — gate names with schema + a test that reads
   `packages/mcp/src/index.ts`.
 
 ## 2026-08-07 — `platform:next-js-extension-reexports`
 
-- **Failure:** After splitting `@tell/schema` into `install-info.ts` / `resolve-intent.ts`, Next
+- **Failure:** After splitting `@designproof/schema` into `install-info.ts` / `resolve-intent.ts`, Next
   `transpilePackages` failed with `Can't resolve './install-info.js'` on every API route.
-- **Fix:** Re-export with extensionless paths (`./install-info`) like `@tell/taste` — webpack maps
+- **Fix:** Re-export with extensionless paths (`./install-info`) like `@designproof/taste` — webpack maps
   them to `.ts` under transpilePackages; tsup still bundles fine.
 - **Do not:** Use NodeNext `.js` suffixes in packages that Next transpiles from source.
 
@@ -405,7 +405,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 - **Failure (human):** "Rarely a visual component should be reused… cheating… same template again
   and again with minor modifications." First five still shared one conversion skeleton
-  (`nav → stackfold → metrics → features → specimen → proof → chapters → faq`) with figure ORDER
+  (`nav → stackfold → metrics → features → template → proof → chapters → faq`) with figure ORDER
   swaps and proof-title retunes.
 - **Root cause:** `kind-marketing-stackfold` *enforced* sameness. Craft kinds (foundry/dossier/
   observatory/…) prove the real pattern: dedicated `hero-*` layout + dedicated SVG kind + CSS rail
@@ -417,13 +417,13 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 ## 2026-08-07 — `showcase:hover-reel-vs-anthology-hero`
 
 - **Failure (human):** Template filmstrip reels autoplayed the same 2–3 beats of one offering on
-  loop; the hero stage also looped a single specimen instead of touring craft across the catalog.
+  loop; the hero stage also looped a single template instead of touring craft across the catalog.
 - **Fix:** Filmstrip `autoplayInView={false}` — cinema only on hover. Featured stage is
   `ShowcaseAnthologyReel`: slow (~5.2s) still-craft tour across distinct siteKinds (archive →
   observatory → … → fintech), one best beat per offering, hover pauses. Prefer-figure stills; no
   intra-template cinema on the hero.
 - **Do not:** Autoplay every thumb in view. Do not call a single-template 3-beat loop an "across
-  specimens" tour.
+  templates" tour.
 
 ## 2026-08-07 — `template:claim-band-starves-fold-instrument`
 
@@ -525,9 +525,9 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 - **Fix:** `agency-quality-site` skill + `pnpm agency:pipeline` enforce Phase 0 ban list, 3-ref
   board, five-block brief, then typography-only → spacing-only → motion-only → 375px with
   screenshots. `assertAgencyDelivery` + `applyAgencyPolish` encode the gates in
-  `@tell/design-skills`. `primaryCta` on `DesignBrief` keeps the one action repeated.
+  `@designproof/design-skills`. `primaryCta` on `DesignBrief` keeps the one action repeated.
 - **Do not:** Ask for type, space, and motion in the same message; do not install external skill
-  marketplaces into the repo — encode principles and run Tell gates.
+  marketplaces into the repo — encode principles and run Design Proof gates.
 
 ## 2026-08-09 — `pipeline:one-phase-goal-loop`
 
@@ -543,7 +543,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 - **Failure:** Agency pipeline had ban lists and polish axes but no explicit compositional
   lane / craft-node choice — builds stayed competent without a unique spatial thesis.
-- **Fix:** `DESIGN_RIGOR.md` (thesis, one lane, 1–2 Tell crafts, honest assets, reject list).
+- **Fix:** `DESIGN_RIGOR.md` (thesis, one lane, 1–2 Design Proof crafts, honest assets, reject list).
   `DIRECTION.md` template requires those fields. `assertAgencyDelivery` adds rigor gates
   (no award claims, no fake trust theater, one motion system, authored hero). Glass check
   counts `.ds-glass*` markup only (shared CSS comments false-fired).
@@ -564,7 +564,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 ## 2026-08-09 — `shell:empty-recent-thumb`
 
-- **Failure:** Entry-home "Recent diagnoses" cards used empty flat `.tell-recent__thumb` fills —
+- **Failure:** Entry-home "Recent diagnoses" cards used empty flat `.dp-recent__thumb` fills —
   only mode/count chrome, no capture craft beat (same class as `showcase:nav-only-thumb`).
 - **Fix:** `svgSessionThumb` / `thumbFromScreenshotBase64` write a compact craft plate (accent
   field + title + findings) into `RecentSession.thumbDataUrl`; EntryHome always renders an
@@ -706,9 +706,9 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 ## 2026-08-09 — `platform:mcp-compat-catalog`
 
-- **Failure:** Tell only wrote Cursor MCP config; other hosts (Claude, Codex, OpenCode, Grok, Cline, …) had no `tell mcp install` parity with mainstream agent-compat tables.
-- **Fix:** `PlatformId` + `buildPlatformCatalog` in `@tell/schema`, `platforms[]` on `InstallInfo`, CLI writers for json/toml/yaml/opencode/openclaw, README + Connect Agent table. Muse/Z Code remain snippet-only until paths are verified.
-- **Do not:** Spawn third-party coding agents as Tell subprocesses — compatibility = MCP install into the agent Ashish already uses.
+- **Failure:** Design Proof only wrote Cursor MCP config; other hosts (Claude, Codex, OpenCode, Grok, Cline, …) had no `designproof mcp install` parity with mainstream agent-compat tables.
+- **Fix:** `PlatformId` + `buildPlatformCatalog` in `@designproof/schema`, `platforms[]` on `InstallInfo`, CLI writers for json/toml/yaml/opencode/openclaw, README + Connect Agent table. Muse/Z Code remain snippet-only until paths are verified.
+- **Do not:** Spawn third-party coding agents as Design Proof subprocesses — compatibility = MCP install into the agent Ashish already uses.
 
 ## 2026-08-10 — `template:field-press-essay-aside-clone`
 
@@ -756,7 +756,7 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 - **Research:** Category cricket portals expose fixtures, teams, players, stats/records,
   commentary, partnerships, FoW, points tables, and dual-axis rankings beyond Core six —
   as directory/footer surfaces, not primary-nav sprawl (host names omitted).
-- **Fix:** Crease specimen adds `/crease/fixtures|teams|players|stats`; deepens live/scorecard/
+- **Fix:** Crease template adds `/crease/fixtures|teams|players|stats`; deepens live/scorecard/
   series/rankings/home; pack routes = Core six + secondary; primary nav stays ≤6.
 - **Gate:** `pnpm verify:crease-scorecard` for baseline-aligned boards; all ten routes 200.
 - **Do not:** Grow primary nav past 6 with commerce before score.
@@ -767,17 +767,17 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
   and empty multipage IA — blank-slate risk for matchday builds.
 - **Research:** `loadPriorDomain("sport:tennis")` → gap-diff → Core six under `/baseline/*`;
   format lens best-of-3 / best-of-5; light-airy taste seed.
-- **Fix:** Enrich tennis vernacular pack + BASELINE specimen (nested sets|games|points, server
+- **Fix:** Enrich tennis vernacular pack + BASELINE template (nested sets|games|points, server
   marker, textual BREAK/SET/MATCH POINT, surface rankings, notebook separated from glance-live).
 - **Do not:** Flatten tennis to a single scoreline or hide who is serving.
 
 ## 2026-08-11 — `site:media-webp-autoload`
 
-- **Failure:** Specimen photography shipped as multi-MB JPEG; loading opts and research/craft
+- **Failure:** Template photography shipped as multi-MB JPEG; loading opts and research/craft
   skills required a human to ask to wire them.
 - **Fix:** `pnpm media:site` (display-sized WebP + prune) auto-runs at end of `agency:run`;
-  `SiteImg` applies lazy/LCP/CLS defaults; always-applied `tell-site-build-autoload` + expanded
-  `responsive-performance` / `tell-domain-research` require executing routed skills without prompt.
+  `SiteImg` applies lazy/LCP/CLS defaults; always-applied `dp-site-build-autoload` + expanded
+  `responsive-performance` / `dp-domain-research` require executing routed skills without prompt.
 - **Do not:** Commit hot-path multi-MB jpg/png heroes or wait for “convert to webp / run research”.
 
 ## 2026-08-11 — `template:skill-metadata-only`
@@ -921,12 +921,12 @@ Ship with `ship-loop`: analyze → fix → semantic commits (no attribution) →
 
 ## 2026-08-25 — `chrome:rail-ghost-contrast`
 
-- **Failure:** Product sidebar (`.tell-rail`) is a light `--surface-paper` panel. Labels used
+- **Failure:** Product sidebar (`.dp-rail`) is a light `--surface-paper` panel. Labels used
   dark-theme cream `--text` (paper-on-dark). Home / Showcase / Studio were nearly invisible.
   `#64` added `--text-on-paper` but painted with `rgb(var(--text-on-paper))`, which Next CSS
   minify can drop, so cream leaked again. The measured gate `pnpm eye:shell` never landed on
   master, so the regression shipped in README stills.
-- **Fix:** Scope hex `--ink-on-paper` / `--ink-on-paper-muted` on `.tell-rail`. Restore
+- **Fix:** Scope hex `--ink-on-paper` / `--ink-on-paper-muted` on `.dp-rail`. Restore
   `scripts/eye-shell-contrast.ts` (`pnpm eye:shell`, floor 4.5:1). Dogfood + recursive-improve
   require the probe - vision captions miss this.
 - **Do not:** Put dark-theme light text on a light chrome surface. Do not ship shell changes

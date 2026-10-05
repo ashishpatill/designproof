@@ -99,7 +99,7 @@ function inferSiteKind(text: string): IntentSiteKind | undefined {
 
 /**
  * Deterministic keyword/heuristic intent resolver (no LLM).
- * Shared by web CaptureBar suggestions, MCP `tell_resolve_intent`, and CLI `tell resolve`.
+ * Shared by web CaptureBar suggestions, MCP `designproof_resolve_intent`, and CLI `tell resolve`.
  */
 export function resolveIntent(text: string, options: ResolveIntentOptions = {}): ResolvedIntent {
   const trimmed = text.trim();
@@ -120,7 +120,7 @@ export function resolveIntent(text: string, options: ResolveIntentOptions = {}):
       scenario: "dogfood",
       defaults: { url: fixtureUrl },
       confidence: 0.92,
-      rationale: "You asked to dogfood — scan Tell's own UI against the detector rules.",
+      rationale: "You asked to dogfood — scan Design Proof's own UI against the detector rules.",
     });
   }
 
@@ -129,7 +129,7 @@ export function resolveIntent(text: string, options: ResolveIntentOptions = {}):
       scenario: "mcp-setup",
       defaults: {},
       confidence: 0.9,
-      rationale: "Sounds like MCP install — fetch install-info and wire Tell into your agent.",
+      rationale: "Sounds like MCP install — fetch install-info and wire Design Proof into your agent.",
     });
   }
 

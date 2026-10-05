@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { trace, SpanStatusCode, type Span } from "@opentelemetry/api";
-import { parseDirectionPlan, parseDirectionWithGemini } from "@tell/taste";
+import { parseDirectionPlan, parseDirectionWithGemini } from "@designproof/taste";
 import { resolveGeminiKey } from "@/lib/byok";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
-const tracer = trace.getTracer("tell.voice");
+const tracer = trace.getTracer("designproof.voice");
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
@@ -17,10 +17,10 @@ export async function POST(request: Request) {
   const apiKey = resolveGeminiKey(request);
   const source = apiKey ? "gemini" : "local";
 
-  return tracer.startActiveSpan("tell.voice", async (span: Span) => {
+  return tracer.startActiveSpan("designproof.voice", async (span: Span) => {
     span.setAttributes({
-      "tell.voice.source": source,
-      "tell.voice.transcript_length": transcript.length,
+      "designproof.voice.source": source,
+      "designproof.voice.transcript_length": transcript.length,
     });
 
     try {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         ? await parseDirectionWithGemini(transcript, apiKey)
         : parseDirectionPlan(transcript);
 
-      span.setAttributes({ "tell.voice.preset": plan.presetId ?? "(none)" });
+      span.setAttributes({ "designproof.voice.preset": plan.presetId ?? "(none)" });
       span.setStatus({ code: SpanStatusCode.OK });
       span.end();
 

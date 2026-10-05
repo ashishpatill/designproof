@@ -6,7 +6,7 @@ description: Sub-skill of premium-content-custom-web — responsive performance.
 # responsive-performance
 
 Mobile-first. Fast. Accessible. Shared across all surfaces.
-**Auto-triggered** on every site via `routeSkills` + always-applied `tell-site-build-autoload`.
+**Auto-triggered** on every site via `routeSkills` + always-applied `dp-site-build-autoload`.
 
 ## Rules
 
@@ -19,7 +19,7 @@ Mobile-first. Fast. Accessible. Shared across all surfaces.
   - Other stills: ≤1000w @ ~78
   - Prefer `--prune` to drop superseded jpg/png
 - **One LCP image** — `loading="eager"` + `fetchPriority="high"`; all other media lazy + async decode
-- Specimen sites: use `SiteImg` (`apps/web/src/components/site-media/SiteImg.tsx`) which rewrites to `.webp` and applies the defaults above
+- Template sites: use `SiteImg` (`apps/web/src/components/site-media/SiteImg.tsx`) which rewrites to `.webp` and applies the defaults above
 - README / docs media: `pnpm media:webp` (includes site media)
 
 ## Anti-patterns

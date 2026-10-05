@@ -54,7 +54,7 @@ Beam `xOffset`, `coreWidth` (keep extremely thin), `glowWidth`, `smokeDensity`, 
 - Smoke blooms near beam, dissipates outward
 - **Content readability wins** over bloom
 
-## Tell constraints
+## Design Proof constraints
 
 - Default marketing engine uses a **CSS accent beam vignette** (no WebGL) for dark-premium
 - Full WebGL path only when briefly requested and dogfood contrast still passes

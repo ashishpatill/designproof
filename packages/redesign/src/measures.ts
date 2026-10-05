@@ -1,7 +1,7 @@
 // The 6-axis genericness scorecard (docs/05_GENERICNESS_METHODOLOGY.md §8).
 // Every sub-score is measured from the grounded per-element capture — no vibes.
 
-import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint, Scorecard, ScoreAxis } from "@tell/schema";
+import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint, Scorecard, ScoreAxis } from "@designproof/schema";
 import {
   clamp, contrastRatio, parseColor, px, pxList, rgbToHsl, round1, type Hsl,
 } from "./color";
@@ -42,7 +42,7 @@ function effectiveBg(sample: ComputedStyleSample, fallback: string): string {
 export type AxisFacts = {
   contrast: number; typescale: number; spacing: number; depth: number; accent: number; identity: number;
   text: Record<keyof typeof AXIS_WEIGHTS, string>;
-  tellScore: number;
+  dpScore: number;
   accentHex: string;
   accentHsl: Hsl | null;
 };
@@ -129,7 +129,7 @@ export function measureAxes(capture: CapturePayload, fingerprint: DesignFingerpr
   const commit = dWeight >= 600 ? 1 : 0.8;
   const identity = clamp(familyFactor * classContrast * commit, 0, 1);
 
-  // ── §1 cliché flags → tellScore ──
+  // ── §1 cliché flags → dpScore ──
   let flags = 0;
   if (soleDefault) flags += 1; else if (families.length === 1 && SOFT_DEFAULT_RE.test(families[0] ?? "")) flags += 0.5;
   if (fingerprint.gradientDetected) flags += 1;
@@ -139,7 +139,7 @@ export function measureAxes(capture: CapturePayload, fingerprint: DesignFingerpr
   if (fingerprint.emojiInUiCount >= 3) flags += 1;
   if (fingerprint.centeredBlockRatio >= 0.8) flags += 1;
   if (fingerprint.nearDuplicateGrays.length > 0) flags += 1;
-  const tellScore = clamp(flags / 8, 0, 1);
+  const dpScore = clamp(flags / 8, 0, 1);
 
   // DNA-aware nudges: reward matching the target brand, penalise diverging.
   let identityAdj = identity, accentAdj = accentQ;
@@ -154,7 +154,7 @@ export function measureAxes(capture: CapturePayload, fingerprint: DesignFingerpr
 
   return {
     contrast, typescale, spacing, depth, accent: accentAdj, identity: identityAdj,
-    tellScore, accentHex: accent ?? "", accentHsl,
+    dpScore, accentHex: accent ?? "", accentHsl,
     text: {
       contrast: `${total ? Math.round(wcagPass * 100) : 80}% WCAG pass · hierarchy ${round1(H)}×${fingerprint.nearDuplicateGrays.length ? " · gray-mush" : ""}`,
       typescale: `${distinctSizes} sizes · ${fit >= 0.85 ? "coherent" : fit >= 0.6 ? "drifting" : "no clean ratio"} (best ${inferredRatio})`,
@@ -220,7 +220,7 @@ function band(score: number): Scorecard["band"] {
 }
 
 /** Genericness 0..100 (lower = better) from the six quality sub-scores + tell modifier. §8 */
-export function genericness(axes: { contrast: number; typescale: number; spacing: number; depth: number; accent: number; identity: number }, tellScore = 0): number {
+export function genericness(axes: { contrast: number; typescale: number; spacing: number; depth: number; accent: number; identity: number }, dpScore = 0): number {
   const base = 100 * (
     AXIS_WEIGHTS.contrast * (1 - axes.contrast) +
     AXIS_WEIGHTS.typescale * (1 - axes.typescale) +
@@ -229,18 +229,18 @@ export function genericness(axes: { contrast: number; typescale: number; spacing
     AXIS_WEIGHTS.accent * (1 - axes.accent) +
     AXIS_WEIGHTS.identity * (1 - axes.identity)
   );
-  return Math.round(Math.min(100, base + 12 * tellScore));
+  return Math.round(Math.min(100, base + 12 * dpScore));
 }
 
 /** Public: the captured page's scorecard (before any redesign). */
 export function computeMeasures(capture: CapturePayload, fingerprint: DesignFingerprint, dna?: BrandDNA): Scorecard {
   const f = measureAxes(capture, fingerprint, dna);
-  const score = genericness(f, f.tellScore);
+  const score = genericness(f, f.dpScore);
   const mk = (key: ScoreAxis["key"], label: string, val: number): ScoreAxis => ({
     key, label, weight: AXIS_WEIGHTS[key], before: round1(val), after: round1(val), beforeText: f.text[key], afterText: f.text[key], rationale: "",
   });
   return {
-    score, band: band(score), tellScore: round1(f.tellScore), scoredAgainst: dna ? "brand-dna" : "baseline",
+    score, band: band(score), dpScore: round1(f.dpScore), scoredAgainst: dna ? "brand-dna" : "baseline",
     axes: [
       mk("contrast", "Contrast & hierarchy", f.contrast),
       mk("typescale", "Type scale", f.typescale),

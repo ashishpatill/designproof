@@ -5,10 +5,10 @@
 > agent/harness sessions and design interactions into accurate local training data for a
 > model that generates high-quality websites and web apps.  
 > **Companion product plan:** [`docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md`](../docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md)  
-> **Collector implementation:** separate developer repo `tell-design-data` (local-only;
-> does **not** ship inside Tell).  
+> **Collector implementation:** separate developer repo `dp-design-data` (local-only;
+> does **not** ship inside Design Proof).  
 > **Note:** This survey deliberately names papers, datasets, and guides. Product-facing
-> Tell docs normally avoid third-party product names; this file is research literature.
+> Design Proof docs normally avoid third-party product names; this file is research literature.
 
 ---
 
@@ -29,7 +29,7 @@ Sources were retrieved from arXiv abstracts/HTML, NeurIPS proceedings, Hugging F
 cards, OpenAI / Hugging Face TRL docs, and trace-to-dataset engineering playbooks (Aug 2026).
 
 **Limitation.** This is a literature + practice survey, not a replication study. Claims below
-cite primary papers; Tell-specific experiments are proposed, not yet run.
+cite primary papers; Design Proof-specific experiments are proposed, not yet run.
 
 ---
 
@@ -67,7 +67,7 @@ A design-focused model is not one task. Training data must cover distinct object
 | `RESP` | Responsive parity | Multi-viewport linked samples | Multi-image SFT |
 
 **Critical gap in public corpora:** most open datasets optimize `D2C` reconstruction.
-Tell’s product advantage is `CRITIC` + `C2C` + `RANK` + human-approved `REPAIR` — exactly
+Design Proof’s product advantage is `CRITIC` + `C2C` + `RANK` + human-approved `REPAIR` — exactly
 the data public WebSight-style sets lack.
 
 ---
@@ -100,7 +100,7 @@ response **quality** and prompt **diversity** matter more than raw count.
 - Diverse prompt sources ≫ homogeneous sources at equal N
 - Scaling quantity alone without quality/diversity is weak
 
-**Tell application:** Prefer ~hundreds of gold accepted redesign episodes over tens of
+**Design Proof application:** Prefer ~hundreds of gold accepted redesign episodes over tens of
 thousands of ungraded harness logs.
 
 ### 3.3 Constitutional AI / RLAIF
@@ -111,7 +111,7 @@ arXiv:2212.08073.
 **Technique:** AI critiques/revises against a written constitution; AI preference labels
 train a preference model (RLAIF), optionally mixed with human helpfulness labels.
 
-**Tell application:** Encode a **Design Constitution** (contrast floors, anti-generic
+**Design Proof application:** Encode a **Design Constitution** (contrast floors, anti-generic
 rules, hero budget, no Inter+violet defaults) as critique principles for AI labeling —
 but calibrate against human designer rankings and deterministic probes (do not trust AI
 labels alone for taste).
@@ -126,7 +126,7 @@ slot; sample self-synthesized queries + responses; filter for quality.
 
 **Caution for design:** synthetic instructions help scale *chat* alignment; for visual
 design they risk reinforcing average web aesthetics unless filtered by UI quality models
-(UIClip) and Tell detectors.
+(UIClip) and Design Proof detectors.
 
 ### 3.5 Semantic / near-duplicate removal
 
@@ -137,7 +137,7 @@ NVIDIA NeMo Curator semantic dedup docs.
 **Technique:** Embed examples → cluster → drop near-centroid semantic duplicates;
 combine with exact hash and MinHash n-gram near-dup.
 
-**Tell application:** Dedup on (brief embedding + screenshot embedding + diff hash)
+**Design Proof application:** Dedup on (brief embedding + screenshot embedding + diff hash)
 before merging curated JSONL batches.
 
 ---
@@ -220,7 +220,7 @@ Fine-Tuning of Code Agents* (ICIC 2026). arXiv:2607.17205.
 random with statistical significance.  
 **Eval when resolve rate ≈ 0:** held-out CE loss + first-action generation proxies.
 
-**Tell application:** score design agent trajectories on:
+**Design Proof application:** score design agent trajectories on:
 - retry/thrash rate
 - whether a craft-beat screenshot was produced (not nav-only)
 - detector clearance deltas
@@ -235,7 +235,7 @@ random with statistical significance.
 - **Hierarchical Preference Learning (HPL)** (ICLR 2026 work / open code): trajectory-,
   step-, and group-level preferences for long-horizon agents
 
-**Tell application:** store both episode-level accept/reject *and* step-level “this patch
+**Design Proof application:** store both episode-level accept/reject *and* step-level “this patch
 attempt was worse” when humans discard intermediate proposals.
 
 ### 5.5 Trace → dataset engineering (practitioner)
@@ -274,7 +274,7 @@ Documented patterns (Langfuse datasets docs; continuous-training playbooks; tool
 | **Web2Code** (2024) arXiv:2406.20098 | ~1.18M instruct | refined + synthetic + QA | Webpage understanding + code | Synthetic bias risk |
 | **MultiUI** (2024) arXiv:2410.13824 | 7.3M tasks / 1M sites | a11y-tree grounded UI tasks | Grounding, OCR, UI reasoning | Not code generation taste |
 | **ScreenParse** (2026) | 1.4M shots | dense element parse | Complete screen structure | Parsing ≠ generation |
-| **UIClip** (Wu et al., UIST 2024) arXiv:2404.12500 | 2.3M jitter pairs + 1.2k designer ratings | quality ranking | **Design quality score** | Needs Tell-specific constitution |
+| **UIClip** (Wu et al., UIST 2024) arXiv:2404.12500 | 2.3M jitter pairs + 1.2k designer ratings | quality ranking | **Design quality score** | Needs Design Proof-specific constitution |
 
 ### 6.2 Design2Code — eval methods that matter
 
@@ -300,7 +300,7 @@ From WebSight writeups:
 **Lesson:** synthetic is fine for **pretrain fluency**; **do not** use it as the only
 preference/taste signal.
 
-### 6.4 UIClip — closest public analog to Tell’s reward model
+### 6.4 UIClip — closest public analog to Design Proof’s reward model
 
 **Technique:**
 1. Crawl real UIs
@@ -309,7 +309,7 @@ preference/taste signal.
 4. Fine-tune / validate with professional designer ratings
 5. Downstream: filter codegen, tip generation, example search
 
-**Tell parallel:** Tell detectors + craft-band critique + human accept ≈ a stronger,
+**Design Proof parallel:** Design Proof detectors + craft-band critique + human accept ≈ a stronger,
 domain-specific reward stack than generic CLIP aesthetics. UIClip-style **synthetic
 degradation** is an excellent recipe for hard negatives (Inter-only, violet gradients,
 equal cards, shadow spam, nav-only crops).
@@ -353,7 +353,7 @@ probes; calibrate thresholds on a designer-rated set (UIClip lesson).
 
 ### T7 — Jittered hard negatives (UIClip)
 
-From a good page, programmatically inject Tell’s known failure modes; store as rejected
+From a good page, programmatically inject Design Proof’s known failure modes; store as rejected
 or as CRITIC examples.
 
 ### T8 — Trajectory trim
@@ -389,7 +389,7 @@ Compose a scalar (or vector) reward for ranking — never a single LLM vibe scor
 R = w_h · HumanAccept
   + w_c · ContrastFloor          # deterministic
   + w_b · BasicsGates            # a11y/focus/state
-  + w_d · DetectorClearance      # Tell findings reduced
+  + w_d · DetectorClearance      # Design Proof findings reduced
   + w_k · CritiqueBandFit        # research corridors, not median chase
   + w_u · UIClipOrAesthetic      # optional learned UI quality
   + w_v · VisualSimilarityToIntent
@@ -452,9 +452,9 @@ UIClip practice). Use R for rejection sampling and DPO pair mining.
 
 ---
 
-## 10. Mapping literature → Tell’s existing artifacts
+## 10. Mapping literature → Design Proof’s existing artifacts
 
-| Tell artifact | Best literature analog | Training use |
+| Design Proof artifact | Best literature analog | Training use |
 |---|---|---|
 | `CapturePayload` + screenshot | WebCode2M / Design2Code inputs | Multimodal conditioning |
 | `DesignFingerprint` | Layout/structure features | Compact state; CRITIC features |
@@ -473,11 +473,11 @@ UIClip practice). Use R for rejection sampling and DPO pair mining.
 ## 11. Proposed research program (evidence-backed order)
 
 1. **Freeze eval card** (OpenAI practice) — real pages only for holdout (Design2Code lesson)  
-2. **Completeness audit** — map 20 Tell episodes onto taxonomy §2; list missing fields  
+2. **Completeness audit** — map 20 Design Proof episodes onto taxonomy §2; list missing fields  
 3. **Reward ablation** — detectors-only vs +critique vs +human vs +UIClip-like jitter model  
 4. **Pair construction bake-off** — best-vs-worst vs μ−2σ vs human-correction-only  
 5. **Trajectory quality scoring** — implement Efficiency/Style; measure Top-Q vs random at N∈{200,500,2000}  
-6. **Synthetic hard-negative bank** — UIClip jitter + Tell anti-patterns  
+6. **Synthetic hard-negative bank** — UIClip jitter + Design Proof anti-patterns  
 7. **Dedup + scrub constitution** — SemDeDup + secret redaction fidelity study  
 8. **Small LIMA-style SFT** on gold accepted episodes before any large DPO  
 9. **Only then** instrument local episode export (consent, gitignored)
@@ -493,7 +493,7 @@ UIClip practice). Use R for rejection sampling and DPO pair mining.
 | Cross-task preference pairs | Learns task preference, not response quality | DPO practitioner recipes |
 | Absolute-worst rejects | Trivial signal | μ−2σ guidance |
 | AI judge as sole accept gate | Taste drift / sycophancy | Constitutional AI caveats; UIClip uses humans |
-| Optimize to corpus median | Sameness failure mode | Tell research bands philosophy |
+| Optimize to corpus median | Sameness failure mode | Design Proof research bands philosophy |
 | Skip holdout | Inflated eval | Universal |
 
 ---
@@ -502,11 +502,11 @@ UIClip practice). Use R for rejection sampling and DPO pair mining.
 
 - [ ] Deep-read remaining PDFs for UltraFeedback, WebUI (HF), TongUI, ScreenCoder  
 - [ ] Add table of public HF dataset cards with license notes for local experimentation  
-- [ ] Run Tell W1–W3 experiments and append empirical results  
-- [ ] Compare UIClip scores vs Tell critique scores on the same pages (calibration study)
+- [ ] Run Design Proof W1–W3 experiments and append empirical results  
+- [ ] Compare UIClip scores vs Design Proof critique scores on the same pages (calibration study)
 
 ---
 
 ## Changelog
 
-- **2026-08-09 v1** — Initial full literature survey with technique catalog and Tell mapping.
+- **2026-08-09 v1** — Initial full literature survey with technique catalog and Design Proof mapping.

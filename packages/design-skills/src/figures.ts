@@ -137,7 +137,7 @@ export type FigureKind =
   | "signal-lattice"
   | "index-ledger"
   | "loom-weave"
-  | "specimen-plate"
+  | "template-plate"
   | "press-sheet"
   | "path-plate"
   | "care-plate"
@@ -208,7 +208,7 @@ export type FigureRole = "column" | "band" | "plate";
 const BLEED_INSET = 0.07;
 
 /**
- * The height a full-bleed specimen is drawn to, in the same units as its own width.
+ * The height a full-bleed template is drawn to, in the same units as its own width.
  *
  * A quiet screen is one with almost no text on it. It is not one with almost nothing on it, and the
  * difference is the whole reason the beat exists: a wide, shallow drawing centred in a reserved
@@ -428,7 +428,7 @@ export function interfacePlate(
 /**
  * The working surface given a whole screen.
  *
- * A full-bleed product surface is the specimen beat most premium software pages build a screen
+ * A full-bleed product surface is the template beat most premium software pages build a screen
  * around, and it is the one drawing where extra width buys more product rather than more margin:
  * the rail, the table and the detail panel are all on show at once, at the proportion the surface
  * actually has, instead of a narrow plate enlarged until its own chrome looks heavy.
@@ -779,7 +779,7 @@ export function horizonPlot(marks: Block[], seed: string, role: FigureRole = "pl
   const band = role === "band";
   const W = band ? 1200 : 720;
   // Editorial fold bands were drawing a thin timeline into a reserved screen — studio-class folds
-  // fill the viewport with one composed surface. Match the specimen target when spanning.
+  // fill the viewport with one composed surface. Match the template target when spanning.
   const H = band ? Math.round(BAND_TARGET_H * 0.82) : 208;
   const left = band ? 16 : 8;
   const right = W - left;
@@ -1031,7 +1031,7 @@ export function typeLadder(
     .join("") || "AH";
   /*
    * Prefer letterforms whose construction reads at hairline weight on inverse.
-   * Arc-heavy glyphs (C/G/O/S) vanish on the dark seam at specimen scale; map to clear cousins
+   * Arc-heavy glyphs (C/G/O/S) vanish on the dark seam at template scale; map to clear cousins
    * so the ladder always shows a paired sample a buyer can actually see.
    */
   const clearGlyph = (ch: string): string => {
@@ -3018,19 +3018,19 @@ export function loomWeave(
 }
 
 /**
- * Specimen plate — field-guide signature figure.
+ * Template plate — field-guide signature figure.
  *
  * Pressed-leaf silhouette + copyright-free botanical photo inset in a voucher window, taxonomic
  * mono labels ≤11px, range ticks. Soft theme packs float glass cards; they do not invent a
  * herbarium voucher with pressed geometry and a taxon rail.
  */
-export function specimenPlate(
+export function templatePlate(
   productName: string,
   features: Block[],
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const r = rng(`${seed}:specimen-plate:${role}`);
+  const r = rng(`${seed}:template-plate:${role}`);
   const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
   const H = role === "band" ? 720 : role === "column" ? 520 : 480;
   const padX = role === "band" ? 44 : 26;
@@ -3044,20 +3044,28 @@ export function specimenPlate(
   );
 
   const headY = padY + 14;
-  // Keep head mono on the right half — left is reserved for the absolute specimen tag.
+  // Keep head mono on the right half — left is reserved for the absolute template tag.
   parts.push(
     `<text class="ds-fig-mono" x="${round(W * 0.52)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Voucher · herbarium</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 22))} · Specimen</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 22))} · Template</text>`,
   );
   parts.push(
     `<line x1="${round(padX)}" y1="${round(headY + 8)}" x2="${round(W - padX)}" y2="${round(headY + 8)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
 
-  // Taxon rank ticks along the right — left is reserved for the absolute specimen tag.
+  // Taxon rank ticks along the right — left is reserved for the absolute template tag.
   const rankTop = padY + 36;
   const rankBot = H - padY - 28;
+  /*
+   * The absolute `.ds-template-tag` claim card covers the plate's left edge, so the plate's own mono
+   * labels own everything right of `safeX`. Measured at 1440×900: the tag spans x 169–563px and the
+   * plate paints 1025px wide from x 154 — about 0.399 of the SVG width, 511 units of 1280. "Blot"
+   * was centred at midX ≈ 0.39W and the range label sat at padX+20, both directly under the card;
+   * that is why the fold showed label text running through the claim's lede.
+   */
+  const safeX = Math.round(W * 0.44);
   for (let i = 0; i < ranks.length; i += 1) {
     const y = rankTop + (i / (ranks.length - 1)) * (rankBot - rankTop);
     parts.push(
@@ -3106,7 +3114,7 @@ export function specimenPlate(
     `<ellipse cx="${round(midX + leafW * 0.08)}" cy="${round(midY + leafH * 0.12)}" rx="22" ry="14" fill="${ACCENT_FIELD}" opacity="0.35"/>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(midX + leafW * 0.08)}" y="${round(midY + leafH * 0.12 + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">Blot</text>`,
+    `<text class="ds-fig-mono" x="${round(Math.max(midX + leafW * 0.08, safeX))}" y="${round(midY + leafH * 0.12 + 3)}" font-size="11" fill="var(--surface-quiet)">Blot</text>`,
   );
 
   // Photo voucher window on the right.
@@ -3163,11 +3171,11 @@ export function specimenPlate(
     );
   }
   parts.push(
-    `<text class="ds-fig-mono" x="${round(leafX + 20)}" y="${round(rangeY + 20)}" font-size="11" fill="var(--surface-quiet)">Range · W → E</text>`,
+    `<text class="ds-fig-mono" x="${round(Math.max(leafX + 20, safeX))}" y="${round(rangeY + 20)}" font-size="11" fill="var(--surface-quiet)">Range · W → E</text>`,
   );
 
   parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · specimen plate</text>`,
+    `<text class="ds-fig-mono" x="${round(Math.max(padX + 10, safeX))}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · template plate</text>`,
   );
   parts.push(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">free botanical stock</text>`,
@@ -3176,8 +3184,8 @@ export function specimenPlate(
   return frame(parts.join(""), {
     width: W,
     height: H,
-    kind: "specimen-plate",
-    label: `${productName} specimen plate`,
+    kind: "template-plate",
+    label: `${productName} template plate`,
     inset: role === "band" ? BLEED_INSET : 0,
   });
 }
@@ -3308,7 +3316,7 @@ export interface FigurePlan {
   heroSpans: boolean;
   /** Drawn once in the body, in whichever section owns the explanation. */
   body: string;
-  /** The full-bleed specimen band: one drawing given a screen and a single line of caption. */
+  /** The full-bleed template band: one drawing given a screen and a single line of caption. */
   band: string;
   /** Texture for the quiet full-screen band. */
   field: string;
@@ -3331,7 +3339,7 @@ type Kind =
   | "signal-lattice"
   | "index-ledger"
   | "loom-weave"
-  | "specimen-plate"
+  | "template-plate"
   | "press-sheet"
   | "path-plate"
   | "care-plate"
@@ -3349,7 +3357,7 @@ type Kind =
  * The kind is a content decision, not a style one: a product with an interface shows the interface,
  * an argument about outcomes plots them, a sequence is drawn as stages, a scope is stacked, and a
  * long-hold thesis gets a horizon. The order below is per site kind, and the three big slots — the
- * fold, the body, the specimen band — take the first three that can actually be drawn from this
+ * fold, the body, the template band — take the first three that can actually be drawn from this
  * brief. No kind is used twice on a page; repeating a diagram is the same failure as repeating a
  * paragraph.
  */
@@ -3358,7 +3366,7 @@ const ORDER: Record<string, Kind[]> = {
   "corporate-story": ["horizon", "stack", "series", "flow"],
   // Educational: layer stack owns the fold (mechanism), flow stays in body — never twin studio's flow hero.
   "docs-educational": ["stack", "flow", "interface", "series"],
-  // SaaS: product surface on the fold; series as specimen — not the same band stack as fintech.
+  // SaaS: product surface on the fold; series as template — not the same band stack as fintech.
   "saas-marketing": ["interface", "series", "flow", "stack"],
   // Fintech: horizon cash timeline on the fold (always drawable); interface is the working surface in body.
   // Series is preferred when metrics carry readings, but must not fall through to twin SaaS interface hero.
@@ -3366,20 +3374,20 @@ const ORDER: Record<string, Kind[]> = {
   // Studio: crop-marked selected-work board owns the fold; flow stays interactive mid-page.
   // HTML flow steppers do not count as drawn matter (foldFigure=0).
   "art-directed-studio": ["work-board", "flow", "horizon", "stack"],
-  // Consumer craft is product-surface first; horizon specimen stays type-quiet for rhythm.
+  // Consumer craft is product-surface first; horizon template stays type-quiet for rhythm.
   "consumer-craft": ["interface", "horizon", "flow", "stack"],
   // Foundry: optical-size ladder owns the fold; horizon/stack keep scroll beats distinct.
   "editorial-foundry": ["type-ladder", "horizon", "stack", "flow"],
-  // Dossier: cartographic plate owns the fold; denser stack specimen keeps ink-variation honest.
+  // Dossier: cartographic plate owns the fold; denser stack template keeps ink-variation honest.
   "research-dossier": ["dossier-plate", "stack", "horizon", "flow"],
-  // Observatory: signal lattice owns the fold; denser stack specimen keeps ink-variation honest.
+  // Observatory: signal lattice owns the fold; denser stack template keeps ink-variation honest.
   "signal-observatory": ["signal-lattice", "stack", "horizon", "flow"],
-  // Archive: ledger owns the fold; horizon specimen stays rule-light (stack was flooding rules/screen).
+  // Archive: ledger owns the fold; horizon template stays rule-light (stack was flooding rules/screen).
   "archive-index": ["index-ledger", "horizon", "flow", "stack"],
-  // Commerce loom: weave owns the fold; horizon specimen stays quiet vs soft card grids.
+  // Commerce loom: weave owns the fold; horizon template stays quiet vs soft card grids.
   "commerce-loom": ["loom-weave", "horizon", "flow", "stack"],
-  // Field guide: specimen plate owns the fold; horizon keeps scroll rhythm.
-  "field-guide": ["specimen-plate", "horizon", "flow", "stack"],
+  // Field guide: template plate owns the fold; horizon keeps scroll rhythm.
+  "field-guide": ["template-plate", "horizon", "flow", "stack"],
   "press-atelier": ["press-sheet", "flow", "stack", "horizon"],
   // Lantern path: night cartograph owns the fold; horizon keeps scroll rhythm.
   "lantern-path": ["path-plate", "horizon", "flow", "stack"],
@@ -3442,8 +3450,8 @@ export function planFigures(input: {
         return indexLedger(input.productName, input.features, seed, role);
       case "loom-weave":
         return loomWeave(input.productName, input.features, seed, role);
-      case "specimen-plate":
-        return specimenPlate(input.productName, input.features, seed, role);
+      case "template-plate":
+        return templatePlate(input.productName, input.features, seed, role);
       case "press-sheet":
         return pressSheet(input.productName, input.features, seed, role);
       case "path-plate":
@@ -3482,8 +3490,8 @@ export function planFigures(input: {
    * its labels go under seven pixels. So the slot picks from the kinds that can hold its shape,
    * and only falls back to the site kind's order when none can.
    */
-  const SPANNING: Kind[] = ["permit-plate", "care-plate", "path-plate", "press-sheet", "specimen-plate", "loom-weave", "index-ledger", "signal-lattice", "dossier-plate", "type-ladder", "work-board", "flow", "horizon", "series", "interface", "stack"];
-  const COLUMNAR: Kind[] = ["permit-plate", "care-plate", "path-plate", "press-sheet", "specimen-plate", "loom-weave", "index-ledger", "signal-lattice", "dossier-plate", "type-ladder", "work-board", "interface", "stack", "series"];
+  const SPANNING: Kind[] = ["permit-plate", "care-plate", "path-plate", "press-sheet", "template-plate", "loom-weave", "index-ledger", "signal-lattice", "dossier-plate", "type-ladder", "work-board", "flow", "horizon", "series", "interface", "stack"];
+  const COLUMNAR: Kind[] = ["permit-plate", "care-plate", "path-plate", "press-sheet", "template-plate", "loom-weave", "index-ledger", "signal-lattice", "dossier-plate", "type-ladder", "work-board", "interface", "stack", "series"];
 
   const heroSpans = input.heroLayout !== "hero-split";
   /*
@@ -3508,7 +3516,7 @@ export function planFigures(input: {
   // Observatory chrono fold: the signal lattice always owns the spanning field.
   // Archive register fold: the index ledger always owns the spanning field.
   // Commerce loom fold: the warp/weft weave always owns the spanning field.
-  // Field guide fold: the specimen plate always owns the spanning field.
+  // Field guide fold: the template plate always owns the spanning field.
   // The fold's shape picks the drawing. Site kind is only the fallback when the fold
   // is not one of the instrument layouts (a metric band or side-by-side rows, for example).
   const heroKind =
@@ -3533,7 +3541,7 @@ export function planFigures(input: {
             : input.siteKind === "commerce-loom"
               ? ("loom-weave" as Kind)
               : input.siteKind === "field-guide"
-                ? ("specimen-plate" as Kind)
+                ? ("template-plate" as Kind)
             : input.siteKind === "press-atelier"
               ? ("press-sheet" as Kind)
             : input.siteKind === "lantern-path"

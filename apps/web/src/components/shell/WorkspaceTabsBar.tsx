@@ -28,11 +28,11 @@ export function WorkspaceTabsBar({
   onToggleFocus?: () => void;
 }) {
   return (
-    <div className="tell-tabs" role="tablist" aria-label="Workspace">
+    <div className="dp-tabs" role="tablist" aria-label="Workspace">
       <button
         type="button"
         role="tab"
-        className="tell-tabs__tab"
+        className="dp-tabs__tab"
         data-active={activeId === "home" ? "true" : "false"}
         aria-selected={activeId === "home"}
         onClick={onHome}
@@ -44,7 +44,7 @@ export function WorkspaceTabsBar({
           key={tab.id}
           type="button"
           role="tab"
-          className="tell-tabs__tab"
+          className="dp-tabs__tab"
           data-active={activeId === tab.id ? "true" : "false"}
           aria-selected={activeId === tab.id}
           onClick={() => onSelect(tab.id)}
@@ -55,7 +55,7 @@ export function WorkspaceTabsBar({
             <span
               role="button"
               tabIndex={0}
-              className="tell-tabs__close"
+              className="dp-tabs__close"
               aria-label={`Close ${tab.title}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -74,18 +74,18 @@ export function WorkspaceTabsBar({
           ) : null}
         </button>
       ))}
-      <div className="tell-tabs__actions">
+      <div className="dp-tabs__actions">
         {onToggleFocus ? (
           <button
             type="button"
-            className="tell-rail__btn"
+            className="dp-rail__btn"
             aria-label={focusCanvas ? "Show critic pane" : "Focus canvas"}
             onClick={onToggleFocus}
           >
             {focusCanvas ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </button>
         ) : null}
-        <button type="button" className="tell-rail__btn" aria-label="Settings" onClick={onSettings}>
+        <button type="button" className="dp-rail__btn" aria-label="Settings" onClick={onSettings}>
           <Settings className="h-4 w-4" />
         </button>
       </div>

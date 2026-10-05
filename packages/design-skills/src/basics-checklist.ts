@@ -327,14 +327,14 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       Boolean(spec.researchPlan?.researchNodes?.length) &&
         spec.routedSkills[0] === "website-domain-research" &&
         /data-research-domain=/.test(html) &&
-        /name="tell-research-gate"/.test(html),
+        /name="dp-research-gate"/.test(html),
       "Every template carries a researchPlan and emits research-gate meta so agents execute LoadPrior→gap→IA before craft.",
     ),
     check(
       "responsive-performance-wired",
       spec.routedSkills.includes("responsive-performance") &&
         /data-responsive-performance="required"/.test(html) &&
-        /name="tell-responsive-performance"/.test(html),
+        /name="dp-responsive-performance"/.test(html),
       "responsive-performance is always-on — HTML must mark media:site / WebP budgets required.",
     ),
     check(
@@ -619,10 +619,10 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-hero-glassine/.test(html)
           && /ds-dissecting-tray/.test(html)
           && /ds-glassine-lid/.test(html)
-          && /ds-specimen-tag/.test(html)
+          && /ds-template-tag/.test(html)
           && /ds-epin/.test(html)
           && /ds-binomial-strip/.test(html)
-          && /data-figure="specimen-plate"/.test(html)
+          && /data-figure="template-plate"/.test(html)
           && /ds-range/.test(html)
           && /class="ds-range-ladder"/.test(html)
           && /aria-label="Dichotomous key"/.test(html)
@@ -634,7 +634,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + specimen tag + binomial strip + dichotomous voucher key + Voucher — no pricing, no metrics theatre, zero inverse bands.",
+      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + template tag + binomial strip + dichotomous voucher key + Voucher — no pricing, no metrics theatre, zero inverse bands.",
     ),
     check(
       "kind-press",

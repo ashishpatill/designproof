@@ -1,14 +1,14 @@
 /**
- * Capture /showcase + one fold still per specimen for README.
+ * Capture /showcase + one fold still per template for README.
  *
  * One still per offering — do not also capture a reel still of the same fold
  * (GitHub shows the reel's first frame, which duplicated every template).
  *
- * - Showcase routes: live Tell Specimens UI (featured cinema + filmstrip).
+ * - Showcase routes: live Design Templates UI (featured cinema + filmstrip).
  * - Sport: live /crease and /baseline.
  * - Engine templates: full-bleed HTML from designFromFeatures at 1440×900.
  *
- * Requires `@tell/web` on :3000 for showcase + sport frames.
+ * Requires `@designproof/web` on :3000 for showcase + sport frames.
  *
  * Usage: pnpm capture:readme-showcase
  */
@@ -22,7 +22,7 @@ import { designFromFeatures, getTemplate } from "../packages/design-skills/src/i
 const ROOT = resolve(__dirname, "..");
 const OUT = resolve(ROOT, "docs/media/showcase");
 const ARTIFACTS = "/opt/cursor/artifacts/screenshots";
-const BASE = process.env.TELL_WEB_URL ?? "http://127.0.0.1:3000";
+const BASE = process.env.DP_WEB_URL ?? "http://127.0.0.1:3000";
 const VIEWPORT = { width: 1440, height: 900 };
 
 function webpWidthFor(name: string): number {

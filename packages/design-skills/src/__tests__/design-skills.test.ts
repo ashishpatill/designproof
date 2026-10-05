@@ -179,7 +179,7 @@ describe("premium-content-custom-web engine", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.corporate!);
     expect(spec.brief.siteKind).toBe("corporate-story");
     expect(spec.taste.aestheticLean).toBe("refined-story");
-    expect(spec.tellDirectionId).toBe("explainer");
+    expect(spec.dpDirectionId).toBe("explainer");
     expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
     expect(previewHtml).toContain("ds-chapter");
     expect(previewHtml).toContain("IntersectionObserver");
@@ -549,7 +549,7 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.brief.siteKind).toBe("fintech-marketing");
     const inverse = spec.sections.filter((s) => s.surface === "inverse").map((s) => s.kind);
     // The proof board is gone (it reprinted every description); the picture and the close stay dark.
-    expect(inverse).toEqual(["specimen", "cta"]);
+    expect(inverse).toEqual(["template", "cta"]);
     expect(previewHtml).toContain('data-sitekind="fintech-marketing"');
     expect(previewHtml).toContain("ds-hero-overfigure");
     expect(previewHtml).toContain("ds-hero-wire");
@@ -725,10 +725,10 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain("ds-hero-glassine");
     expect(previewHtml).toContain("ds-dissecting-tray");
     expect(previewHtml).toContain("ds-glassine-lid");
-    expect(previewHtml).toContain("ds-specimen-tag");
+    expect(previewHtml).toContain("ds-template-tag");
     expect(previewHtml).toContain("ds-epin");
     expect(previewHtml).toContain("ds-binomial-strip");
-    expect(previewHtml).toContain('data-figure="specimen-plate"');
+    expect(previewHtml).toContain('data-figure="template-plate"');
     expect(previewHtml).toContain("ds-range");
     expect(previewHtml).toContain('class="ds-range-ladder"');
     expect(previewHtml).toContain('aria-label="Dichotomous key"');

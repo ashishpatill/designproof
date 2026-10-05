@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { TellReport } from "@tell/schema";
-import { compareProofReports, verifyProofPatch } from "@tell/core";
+import { DesignProofReport } from "@designproof/schema";
+import { compareProofReports, verifyProofPatch } from "@designproof/core";
 import { hasRemoteBackend, proxyRemoteBackend } from "@/lib/remote-api";
 import { assertRepoSetupEnabled } from "@/lib/setup-guard";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
@@ -14,8 +14,8 @@ export async function POST(request: Request) {
 
   // Compare mode is pure JSON scoring — always run on the UI host (no Playwright).
   if (mode === "compare") {
-    const parsedBefore = TellReport.safeParse(body.beforeReport);
-    const parsedAfter = TellReport.safeParse(body.afterReport);
+    const parsedBefore = DesignProofReport.safeParse(body.beforeReport);
+    const parsedAfter = DesignProofReport.safeParse(body.afterReport);
     const url = typeof body.url === "string" ? body.url : "";
     if (!parsedBefore.success || !parsedAfter.success || !url) {
       return NextResponse.json({ error: "Compare mode needs url, beforeReport, and afterReport." }, { status: 400 });

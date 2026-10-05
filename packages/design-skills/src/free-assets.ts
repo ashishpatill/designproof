@@ -1,5 +1,5 @@
 /**
- * Copyright-free specimen photographs (Unsplash License).
+ * Copyright-free template photographs (Unsplash License).
  * Embedded as data URIs so critique HTML and showcase stay self-contained.
  * Do not attribute third-party person or brand names here.
  */

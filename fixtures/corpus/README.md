@@ -1,4 +1,4 @@
-# Tell Proof — Open Detector Corpus
+# Design Proof — Open Detector Corpus
 
 Benchmark assets for the open genericness taxonomy.
 
@@ -19,7 +19,7 @@ Benchmark assets for the open genericness taxonomy.
 | `marketplace-clutter` | Busy consumer marketplace (live-site) | Gradient/emoji/shadow + `ResponsiveViewportDrift` |
 | `docs-site-calm` | IBM Plex docs (live-site negative) | **0** detectors |
 | `intentional-brutalist` | Fixture `/brutalist` route | Taste marks intentional |
-| `tell-dogfood` | Tell product UI | 0 generic / 0 drift |
+| `dp-dogfood` | Design Proof product UI | 0 generic / 0 drift |
 
 ## Scenario matrix
 
@@ -39,5 +39,5 @@ pnpm test              # corpus-manifest + taxonomy + matrix golden tests
 Do **not** overwrite hand-tuned `editorial-calm` / `fintech-dense` expectations without re-checking detector golden sets.
 
 Methodology prose: [`docs/05_GENERICNESS_METHODOLOGY.md`](../../docs/05_GENERICNESS_METHODOLOGY.md).  
-Proof overview: [`docs/06_TELL_PROOF.md`](../../docs/06_TELL_PROOF.md).  
+Proof overview: [`docs/06_DESIGN_PROOF.md`](../../docs/06_DESIGN_PROOF.md).  
 Consolidated plan: [`PLAN.md`](../../PLAN.md).

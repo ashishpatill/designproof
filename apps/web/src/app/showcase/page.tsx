@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { listTemplates, type DesignTemplate } from "@tell/design-skills";
+import { listTemplates, type DesignTemplate } from "@designproof/design-skills";
 import { ProductShell } from "@/components/shell";
 import { ShowcaseAnthologyReel } from "@/components/showcase/ShowcaseAnthologyReel";
-import { SpecimenPreview } from "@/components/showcase/SpecimenPreview";
-import { specimenHtmlSrc, specimenOpenHref } from "@/components/showcase/specimenSrc";
+import { TemplatePreview } from "@/components/showcase/TemplatePreview";
+import { templateHtmlSrc, templateOpenHref } from "@/components/showcase/templateSrc";
 import "./showcase.css";
 
 export const dynamic = "force-static";
 export const metadata = {
-  title: "Tell Specimens — Craft reels, not theme packs",
+  title: "Design Templates — Craft reels, not theme packs",
   description:
-    "Crease cricket and Baseline tennis matchday plus research-backed site kinds — filmstrip reels play on hover; the hero slowly tours best beats across specimens.",
+    "Crease cricket and Baseline tennis matchday plus research-backed site kinds — filmstrip reels play on hover; the hero slowly tours best beats across templates.",
 };
 
 type FilmstripCell = {
@@ -23,7 +23,7 @@ type FilmstripCell = {
   src: string;
 };
 
-/** Hand-crafted sport specimens — pinned near the top of the filmstrip (not engine templates). */
+/** Hand-crafted sport templates — pinned near the top of the filmstrip (not engine templates). */
 const CREASE_CELL: Omit<FilmstripCell, "index"> = {
   key: "crease",
   label: "Crease",
@@ -51,8 +51,8 @@ function buildFilmstrip(): FilmstripCell[] {
     marketJob: t.marketJob,
     siteKind: t.siteKind,
     index: String(i + 3).padStart(2, "0"),
-    href: specimenOpenHref(t.key),
-    src: specimenHtmlSrc(t.key),
+    href: templateOpenHref(t.key),
+    src: templateHtmlSrc(t.key),
   }));
   return [
     {
@@ -68,8 +68,8 @@ function buildFilmstrip(): FilmstripCell[] {
 }
 
 /**
- * Specimen gallery — hero anthology (slow cross-template tour) + filmstrip (hover-only reels).
- * Metadata only in the page payload; specimen HTML loads lazily via /api/design/html.
+ * Template gallery — hero anthology (slow cross-template tour) + filmstrip (hover-only reels).
+ * Metadata only in the page payload; template HTML loads lazily via /api/design/html.
  * Crease + Baseline pinned first — sport matchday proof outside the engine template catalog.
  */
 export default function ShowcaseGalleryPage() {
@@ -91,7 +91,7 @@ export default function ShowcaseGalleryPage() {
           <div className="sx-stage-mast">
             <p className="sx-kicker">Craft reels · not theme packs</p>
             <h1 id="sx-hero-title" className="sx-display">
-              Tell Specimens
+              Design Templates
             </h1>
             <p className="sx-lede">
               Crease and Baseline lead the strip — cricket and tennis matchday with live spines. The
@@ -108,7 +108,7 @@ export default function ShowcaseGalleryPage() {
             </div>
           </div>
 
-          <article className="sx-stage-reel" aria-label="Featured craft tour across specimens">
+          <article className="sx-stage-reel" aria-label="Featured craft tour across templates">
             <div className="sx-reel-chrome" aria-hidden="true">
               <span className="sx-sprocket" />
               <span className="sx-sprocket" />
@@ -157,7 +157,7 @@ export default function ShowcaseGalleryPage() {
                       <span />
                       <span />
                     </div>
-                    <SpecimenPreview
+                    <TemplatePreview
                       className="sx-thumb sx-thumb-reel"
                       title={`${o.label} craft reel`}
                       src={o.src}
@@ -195,7 +195,7 @@ export default function ShowcaseGalleryPage() {
 
         <footer className="sx-foot">
           <p>
-            Deepened by the recursive improve loop · hero tours many specimens; strip reels wait for
+            Deepened by the recursive improve loop · hero tours many templates; strip reels wait for
             hover.
           </p>
         </footer>

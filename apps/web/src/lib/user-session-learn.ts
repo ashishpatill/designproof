@@ -11,9 +11,9 @@ import {
   UserDesignProfile,
   type UserDesignProfile as UserDesignProfileT,
   type UserDirectionMemory,
-} from "@tell/schema";
+} from "@designproof/schema";
 
-export const USER_PROFILE_STORAGE_KEY = "tell:user-design-profile";
+export const USER_PROFILE_STORAGE_KEY = "dp:user-design-profile";
 
 export function emptyUserProfile(): UserDesignProfileT {
   return UserDesignProfile.parse({

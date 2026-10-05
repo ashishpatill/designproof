@@ -1,6 +1,6 @@
-# Tell Proof — design contract
+# Design Proof — design contract
 
-Declared tokens for Tell's own UI. Used by the DesignSystemDrift detector when scanning this repo.
+Declared tokens for Design Proof's own UI. Used by the DesignSystemDrift detector when scanning this repo.
 
 ## Typography
 
@@ -30,5 +30,5 @@ Declared tokens for Tell's own UI. Used by the DesignSystemDrift detector when s
 ## Rules
 
 - No Inter-only stacks on product chrome
-- No violet gradient hero on Tell surfaces
+- No violet gradient hero on Design Proof surfaces
 - Semantic Tailwind tokens only in component classNames

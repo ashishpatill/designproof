@@ -80,7 +80,7 @@ export const SiteKind = z.enum([
   "consumer-craft",
   /**
    * Editorial foundry / type-craft marketing — hard-seam fold, typographic spine,
-   * type-ladder specimen, marginalia essay. Calibrated to type-foundry + personal-craft
+   * type-ladder template, marginalia essay. Calibrated to type-foundry + personal-craft
    * + editorial-longform (fold figure ~0.97, figureArea ~0.38, invertedShare ~0,
    * display ~3.3vw, alignment axes ~6). Not a recolored SaaS/studio skeleton.
    */
@@ -118,10 +118,10 @@ export const SiteKind = z.enum([
    */
   "commerce-loom",
   /**
-   * Field guide / herbarium craft — glassine press fold (specimen under peeled sheet + museum
+   * Field guide / herbarium craft — glassine press fold (template under peeled sheet + museum
    * label), binomial strip, free botanical plate, range essay, Voucher close.
    * Calibrated to personal-craft + brand-agency + consumer-craft (figureArea high, quiet display,
-   * paper-led, layered specimen matter). Not soft glass hero collages or theme-pack card stacks.
+   * paper-led, layered template matter). Not soft glass hero collages or theme-pack card stacks.
    */
   "field-guide",
   /**
@@ -214,7 +214,7 @@ export const SkillNodeId = z.enum([
   "scrub-sequence-craft",
   /** Governance beats — approval, audit, rollback — corporate/fintech. */
   "operational-governance-craft",
-  /** Sparse diagnostic annotations for system-crafted specimens. */
+  /** Sparse diagnostic annotations for system-crafted templates. */
   "wireframe-annotation-craft",
   /** Section-bounded ambient atmosphere (static default; full sim in skill). */
   "ambient-atmosphere-craft",
@@ -430,7 +430,7 @@ export const LayoutVariant = z.enum([
    */
   "hero-wire",
   "metric-band",
-  "specimen-band",
+  "template-band",
   "marquee-proof",
   /**
    * Interactive product-proof workflow — stage chips swap HTMX panels
@@ -466,7 +466,7 @@ export const LayoutVariant = z.enum([
    */
   "hero-loom",
   /**
-   * Voucher fold — taxon rail + voucher masthead + spanning specimen plate with photo inset.
+   * Voucher fold — taxon rail + voucher masthead + spanning template plate with photo inset.
    * Field-guide signature; not loom, register, or glassmorphism hero.
    */
   "hero-voucher",
@@ -547,7 +547,7 @@ export const SectionSpec = z.object({
     "hero",
     "metrics",
     "features",
-    "specimen",
+    "template",
     "figure",
     "story",
     "proof",
@@ -605,7 +605,7 @@ export const DesignSpec = z.object({
   /** Research subgraph that must run before craft for this brief. */
   researchPlan: ResearchPlanSpec,
   tokens: DesignTokens,
-  tellDirectionId: z.string(),
+  dpDirectionId: z.string(),
   informationArchitecture: z.array(z.string()),
   sections: z.array(SectionSpec),
   motionNotes: z.array(z.string()),

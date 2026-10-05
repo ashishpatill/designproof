@@ -2,7 +2,7 @@
  * Phase 1 connective-tissue author — CTA / FAQ / proof for ordinary
  * saas-marketing + demos briefs (Freightlane · Willowvet · Scalehouse class).
  *
- * Contract mirrors `@tell/taste` engine.ts:
+ * Contract mirrors `@designproof/taste` engine.ts:
  *   deterministic facts in → optional model judgment → validate against facts →
  *   fall back to today's `copy.ts` lookups.
  *

@@ -1,6 +1,6 @@
-# Tell — AI Design Methods Plan
+# Design Proof — AI Design Methods Plan
 
-> **Separate plan** for how Tell helps humans design *with* AI without shipping the
+> **Separate plan** for how Design Proof helps humans design *with* AI without shipping the
 > generic “AI look.” Complements art-direction presets (including Visual textbook /
 > `explainer`) and `docs/07_VISUALIZATION_PLAN.md`. Does **not** replace `PLAN.md` or
 > `BUILD.md`.
@@ -23,7 +23,7 @@ fails at **taste**: originality, meaning, and intent. The failure mode is recogn
 - Sameness across unrelated products
 
 Most people misunderstand “designing with AI” as “ask AI to design everything.” That
-produces the look Tell exists to name. The correct framing:
+produces the look Design Proof exists to name. The correct framing:
 
 | Human owns | AI owns |
 |---|---|
@@ -34,7 +34,7 @@ produces the look Tell exists to name. The correct framing:
 **Prompts are not taste.** Prompts communicate decisions already made. Better results come
 from better direction — and direction is built deliberately.
 
-This plan defines three Tell-facing **design methods** (speed ↔ quality), how they map to
+This plan defines three Design Proof-facing **design methods** (speed ↔ quality), how they map to
 product options, and the **mandatory process for adding new styles / art directions** so
 new presets do not become another bland default.
 
@@ -45,7 +45,7 @@ new presets do not become another bland default.
 Ashish ships with an agent daily. He can execute. He cannot name why his UI feels generic,
 and “make it prettier” re-selects the same defaults.
 
-Tell must:
+Design Proof must:
 
 1. **Name the sameness** (detectors + critic voice).
 2. **Force a human direction** before wholesale restyle (presets, voice, references).
@@ -72,7 +72,7 @@ orthogonal to **art-direction presets** (editorial, precision, explainer, …).
 **Idea:** Encode prior design judgment into reusable constraints so the model avoids the
 usual traps (default stacks, violet gradients, shadow-everywhere, Inter-only, equal cards).
 
-**Tell mapping (today → planned)**
+**Design Proof mapping (today → planned)**
 
 | Today | Planned |
 |---|---|
@@ -82,7 +82,7 @@ usual traps (default stacks, violet gradients, shadow-everywhere, Inter-only, eq
 
 **User flow**
 
-1. Pick a skill pack / preset (or accept Tell’s recommendation from findings).
+1. Pick a skill pack / preset (or accept Design Proof’s recommendation from findings).
 2. Give short product context (audience, one feeling word, must-keep brand marks).
 3. Generate after-state / patch in 1–3 iterations.
 4. Fix obvious issues; ship.
@@ -131,7 +131,7 @@ Allow AI to ask, not invent:
 - Colour and type temperament?
 - Minimal / playful / premium / technical / experimental / educational?
 
-**Tell implementation sketch:** a “Direction interview” step that outputs a structured
+**Design Proof implementation sketch:** a “Direction interview” step that outputs a structured
 `DirectionBrief` (zod) before any restyle. Deterministic fallback: short form fields.
 
 #### B3. Collect inspiration (how to look)
@@ -141,9 +141,9 @@ Rules for reference intake:
 - Ask **why** a reference works (layout, spacing, type, structure, interaction) — not only “looks good.”
 - Save fragments into folders/tags: nav, hero, pricing, cards, mobile, dashboard, motion, type, diagrams.
 - **Never copy an entire design.** Combine fragments into something that fits *this* product.
-- Taste is deliberate pattern recognition over time — Tell should encourage libraries, not one-shot vibes.
+- Taste is deliberate pattern recognition over time — Design Proof should encourage libraries, not one-shot vibes.
 
-**Tell implementation sketch:** BrandDNA + optional reference image/screenshot set; store
+**Design Proof implementation sketch:** BrandDNA + optional reference image/screenshot set; store
 tagged fragments, not “clone this URL’s CSS.”
 
 #### B4. Map the structure
@@ -172,7 +172,7 @@ Why:
 - Human retains decision control at every seam.
 - Rejects wholesale acceptance of generic assemblies.
 
-**Tell implementation sketch**
+**Design Proof implementation sketch**
 
 - Redesign API accepts `scope: "hero" | "nav" | "cards" | … | "tokens-only" | "page"`.
 - UI: ordered checklist of scopes; seam updates per scope.
@@ -184,7 +184,7 @@ Prefer custom imagery matched to brand tokens over generic stock.
 
 Instructions to generators must include: palette, style, composition, use case.
 
-**Tell:** asset prompts derived from `DirectionBrief` + accent/paper; never invent a second palette.
+**Design Proof:** asset prompts derived from `DirectionBrief` + accent/paper; never invent a second palette.
 
 #### B7. Motion and finish
 
@@ -204,7 +204,7 @@ AI synthesizes a direction for *this* product without copying any one reference.
 4. Generate a fuller pass than Method A, with fewer manual component loops than Method B.
 5. Spot-fix weak sections with Method B slices.
 
-**Tell implementation sketch**
+**Design Proof implementation sketch**
 
 - “Reference board” panel on Voice director / redesign.
 - Board → inferred keywords + token biases + recipe hints (deterministic scoring first).
@@ -221,7 +221,7 @@ Use critic voice; no emoji; no third-party names.
 | Method | One-liner |
 |---|---|
 | Packaged judgment | “Fast guardrails. Decent. Won’t invent a unique brand for you.” |
-| Build by piece | “You direct; Tell executes one piece at a time. Slowest. Sharpest.” |
+| Build by piece | “You direct; Design Proof executes one piece at a time. Slowest. Sharpest.” |
 | Reference board | “Your references carry the taste. Faster than piece-by-piece, clearer than a bare preset.” |
 
 **Decision helper**
@@ -255,7 +255,7 @@ Adding a **new style** always follows §5 — never “drop in another accent he
 
 ## 5. How to add a new design style / option (mandatory process)
 
-This is the operational checklist for agents and humans when extending Tell’s style system
+This is the operational checklist for agents and humans when extending Design Proof’s style system
 (`packages/taste` presets + `packages/redesign` directions + UI chips).
 
 ### 5.1 Gate: meaning first
@@ -312,7 +312,7 @@ button/link/card/section language, numerals, etc.) — not only accent + font.
 
 Order of implementation:
 
-1. `@tell/schema` only if new fields are required (prefer not).
+1. `@designproof/schema` only if new fields are required (prefer not).
 2. `packages/redesign/src/directions.ts` — full `Direction` + aliases.
 3. `packages/taste/src/presets.ts` — keywords + tokenOverrides + summary.
 4. `parse-direction.ts` — scoring + Gemini allow-list (no third-party keywords).
@@ -329,7 +329,7 @@ Before claiming the style ships:
 1. Apply tokens-only to the golden fixture — score must improve or hold honestly.
 2. Spot-check hero, buttons, cards, links as separate scopes.
 3. Verify pairwise CSS overlap vs othis directions stays under the distinctness bar.
-4. Dogfood: Tell’s own UI does **not** adopt a new style that triggers tells.
+4. Dogfood: Design Proof’s own UI does **not** adopt a new style that triggers tells.
 
 ### 5.7 Copy and voice
 
@@ -341,7 +341,7 @@ Before claiming the style ships:
 
 ## 6. Schema / API sketch (planned)
 
-Freeze contracts in `@tell/schema` before splitting agents.
+Freeze contracts in `@designproof/schema` before splitting agents.
 
 ```ts
 // Conceptual — implement when M-D2 starts
@@ -381,7 +381,7 @@ DesignSteerRequest = {
 
 ---
 
-## 7. UI / UX plan (Tell Report)
+## 7. UI / UX plan (Design Proof Report)
 
 ### 7.1 Voice director additions
 
@@ -440,7 +440,7 @@ Taste engine remains fact-bound: skills/presets must not invent findings.
 
 ### M-D2 — Schema + steer request
 
-- [ ] `DesignMethodId`, `DirectionBrief`, `ReferenceFragment` in `@tell/schema`
+- [ ] `DesignMethodId`, `DirectionBrief`, `ReferenceFragment` in `@designproof/schema`
 - [ ] `/api/voice` and `/api/redesign` accept method + brief + optional board
 - [ ] Deterministic fallbacks without keys
 
@@ -464,7 +464,7 @@ Taste engine remains fact-bound: skills/presets must not invent findings.
 
 ### M-D6 — Style addition playbook automation
 
-- [ ] Checklist script or agent skill `tell-add-style` following §5
+- [ ] Checklist script or agent skill `dp-add-style` following §5
 - [ ] Distinctness test gate in CI for new `DIRECTIONS` keys
 
 ---
@@ -516,9 +516,9 @@ A method or style change is done only when:
 | Work | Agent / skill |
 |---|---|
 | Schema + brief types | `@core-engineer` / schema contracts skill |
-| Presets + parsing | `@taste-engineer`, `tell-taste-verdicts` |
-| Recipes + scopes | `@redesign-engineer`, `tell-redesign-diff` |
-| Method UI | `@ui-builder`, `tell-report-ui` |
+| Presets + parsing | `@taste-engineer`, `dp-taste-verdicts` |
+| Recipes + scopes | `@redesign-engineer`, `dp-redesign-diff` |
+| Method UI | `@ui-builder`, `dp-report-ui` |
 | Copy bank | `@ux-copywriter` |
 | New style additions | Follow §5; taste + redesign together after schema freeze |
 | Educational styles | Also `docs/07_VISUALIZATION_PLAN.md` |
@@ -550,7 +550,7 @@ Resolve before M-D3 forks.
 
 ## 16. One-page summary
 
-AI executes; humans supply taste. Tell exposes three methods — **Packaged judgment**,
+AI executes; humans supply taste. Design Proof exposes three methods — **Packaged judgment**,
 **Build by piece**, and **Reference board** — sitting beside art-direction styles.
 Default to piece-by-piece when stakes are high. Add new styles only through meaning →
 principles → full recipe → scoped validation. Never confuse a better prompt with better

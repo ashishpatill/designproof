@@ -30,21 +30,21 @@ if (isWeb && /className=[^>]*#([0-9A-Fa-f]{3,8})/.test(content)) {
   warnings.push("Raw hex in className — use design tokens (dogfood contract).");
 }
 if (isWeb && /font-inter\b|"Inter"/.test(content) && !content.includes("generic-app")) {
-  warnings.push("Inter detected in Tell UI — use Instrument Serif / Source Sans 3.");
+  warnings.push("Inter detected in Design Proof UI — use Instrument Serif / Source Sans 3.");
 }
 
 const isUiSurface =
   /apps\/web\/src\/(app|components)\//.test(filePath) || isRedesign;
 if (isUiSurface) {
   warnings.push(
-    "UI surface changed — after drafting a patch, run tell_proof_verify (or pnpm proof:compare) before merge. Never auto-apply to the main checkout.",
+    "UI surface changed — after drafting a patch, run designproof_proof_verify (or pnpm proof:compare) before merge. Never auto-apply to the main checkout.",
   );
 }
 
 if (warnings.length) {
   console.log(
     JSON.stringify({
-      followup_message: `[Tell dogfood hook] ${filePath}:\n- ${warnings.join("\n- ")}`,
+      followup_message: `[Design Proof dogfood hook] ${filePath}:\n- ${warnings.join("\n- ")}`,
     }),
   );
 }

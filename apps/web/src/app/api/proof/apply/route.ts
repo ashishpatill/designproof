@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { getJob } from "@/lib/repo-runner";
 import { runDiagnose } from "@/lib/run-diagnose";
 import { applyPatchToWorkspace, revertWorkspacePatch } from "@/lib/source-worktree";
@@ -10,7 +10,7 @@ import { recordTrainingEvent } from "@/lib/training-data-sink";
 export const runtime = "nodejs";
 export const maxDuration = 180;
 
-function scoreOf(report: TellReport): number {
+function scoreOf(report: DesignProofReport): number {
   return report.measures?.score ?? Math.min(100, report.score.generic * 12 + report.score.drift * 7);
 }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const jobId = typeof body.jobId === "string" ? body.jobId : "";
   const patch = typeof body.patch === "string" ? body.patch : "";
-  const parsedBefore = TellReport.safeParse(body.beforeReport);
+  const parsedBefore = DesignProofReport.safeParse(body.beforeReport);
   const job = getJob(jobId);
   if (!job || !job.url) return NextResponse.json({ error: "The repo is not running. Set it up again before proving the patch." }, { status: 400 });
   if (!parsedBefore.success) return NextResponse.json({ error: "The baseline report is missing or invalid." }, { status: 400 });

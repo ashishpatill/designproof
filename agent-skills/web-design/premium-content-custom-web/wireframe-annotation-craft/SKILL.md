@@ -1,6 +1,6 @@
 ---
 name: wireframe-annotation-craft
-description: Sub-skill — diagnostic annotation labels and connector rhythm for system-crafted / dark-premium specimens. Sparse mono labels; no glossy 3D spectacle.
+description: Sub-skill — diagnostic annotation labels and connector rhythm for system-crafted / dark-premium templates. Sparse mono labels; no glossy 3D spectacle.
 ---
 
 # wireframe-annotation-craft

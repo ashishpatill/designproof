@@ -21,20 +21,20 @@ describe("design-data companion", () => {
   const dirs: string[] = [];
   afterEach(() => {
     for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
-    delete process.env.TELL_DESIGN_DATA;
-    delete process.env.TELL_DESIGN_DATA_COMMIT;
-    delete process.env.TELL_DEV_CORPUS;
-    delete process.env.TELL_PUBLIC_DEMO;
+    delete process.env.DP_DESIGN_DATA;
+    delete process.env.DP_DESIGN_DATA_COMMIT;
+    delete process.env.DP_DEV_CORPUS;
+    delete process.env.DP_PUBLIC_DEMO;
   });
 
-  function makeTellRoot(): { tellRoot: string; dataRoot: string } {
-    const tellRoot = mkdtempSync(join(tmpdir(), "tell-root-"));
+  function makeDesignProofRoot(): { dpRoot: string; dataRoot: string } {
+    const dpRoot = mkdtempSync(join(tmpdir(), "dp-root-"));
     const dataRoot = mkdtempSync(join(tmpdir(), "design-data-"));
-    dirs.push(tellRoot, dataRoot);
-    mkdirSync(join(tellRoot, "research"), { recursive: true });
-    writeFileSync(join(tellRoot, "pnpm-workspace.yaml"), "packages: []\n");
+    dirs.push(dpRoot, dataRoot);
+    mkdirSync(join(dpRoot, "research"), { recursive: true });
+    writeFileSync(join(dpRoot, "pnpm-workspace.yaml"), "packages: []\n");
     writeFileSync(
-      join(tellRoot, "research/design-data.local.json"),
+      join(dpRoot, "research/design-data.local.json"),
       JSON.stringify({ path: dataRoot, pull: false }),
     );
     writeFileSync(
@@ -74,41 +74,41 @@ describe("design-data companion", () => {
         },
       }),
     );
-    return { tellRoot, dataRoot };
+    return { dpRoot, dataRoot };
   }
 
   it("loads seeds from design-data checkout", () => {
-    const { tellRoot } = makeTellRoot();
-    const { refs, mode } = loadDesignDataSeeds("portfolio-photography", tellRoot);
+    const { dpRoot } = makeDesignProofRoot();
+    const { refs, mode } = loadDesignDataSeeds("portfolio-photography", dpRoot);
     expect(refs).toHaveLength(3);
     expect(mode).toMatch(/design-data:portfolio-photography/);
   });
 
-  it("merges foreign memory bans into Tell memory", () => {
-    const { tellRoot } = makeTellRoot();
-    saveMemory(tellRoot, { ...EMPTY_MEMORY(), bansExtra: ["tell-only-ban"] });
-    const merged = mergeDesignDataMemory(tellRoot);
+  it("merges foreign memory bans into Design Proof memory", () => {
+    const { dpRoot } = makeDesignProofRoot();
+    saveMemory(dpRoot, { ...EMPTY_MEMORY(), bansExtra: ["dp-only-ban"] });
+    const merged = mergeDesignDataMemory(dpRoot);
     expect(merged.bansExtra.some((b) => /personal-corpus-ban/i.test(b))).toBe(true);
-    expect(merged.bansExtra.some((b) => /tell-only-ban/i.test(b))).toBe(true);
+    expect(merged.bansExtra.some((b) => /dp-only-ban/i.test(b))).toBe(true);
   });
 
   it("reads corridor digest from design-data aggregate", () => {
-    const { tellRoot } = makeTellRoot();
-    const digest = corridorDigest("art-directed-studio", tellRoot);
+    const { dpRoot } = makeDesignProofRoot();
+    const digest = corridorDigest("art-directed-studio", dpRoot);
     expect(digest.source).toBe("design-data");
     expect(digest.notes.length).toBeGreaterThan(0);
   });
 
   it("write-backs memory into design-data runs/", () => {
-    const { tellRoot, dataRoot } = makeTellRoot();
-    process.env.TELL_DESIGN_DATA_COMMIT = "0";
-    process.env.TELL_DEV_CORPUS = "1";
-    saveMemory(tellRoot, {
+    const { dpRoot, dataRoot } = makeDesignProofRoot();
+    process.env.DP_DESIGN_DATA_COMMIT = "0";
+    process.env.DP_DEV_CORPUS = "1";
+    saveMemory(dpRoot, {
       ...EMPTY_MEMORY(),
       bansExtra: ["after-learn-ban"],
     });
-    writeFileSync(join(tellRoot, "research/LEARNINGS.md"), "# learnings\n");
-    const msg = writeBackDesignData(tellRoot, {
+    writeFileSync(join(dpRoot, "research/LEARNINGS.md"), "# learnings\n");
+    const msg = writeBackDesignData(dpRoot, {
       runId: "unit-run",
       learnMarkdown: "# Learn unit\n",
     });
@@ -120,20 +120,20 @@ describe("design-data companion", () => {
     expect(existsSync(join(dataRoot, "runs/unit-run/LEARN.md"))).toBe(true);
   });
 
-  it("stays off without developer gate even if TELL_DESIGN_DATA is set", async () => {
+  it("stays off without developer gate even if DP_DESIGN_DATA is set", async () => {
     const { loadDesignDataSeeds, isDevCorpusEnabled } = await import(
       "../../../../scripts/agency-pipeline/design-data"
     );
-    const tellRoot = mkdtempSync(join(tmpdir(), "tell-no-dev-"));
-    dirs.push(tellRoot);
-    mkdirSync(join(tellRoot, "research"), { recursive: true });
-    writeFileSync(join(tellRoot, "pnpm-workspace.yaml"), "packages: []\n");
-    process.env.TELL_DESIGN_DATA = "/tmp/does-not-matter";
-    delete process.env.TELL_DEV_CORPUS;
-    process.env.TELL_PUBLIC_DEMO = "1";
-    expect(isDevCorpusEnabled(tellRoot)).toBe(false);
-    expect(loadDesignDataSeeds("portfolio-photography", tellRoot).refs).toHaveLength(0);
-    delete process.env.TELL_PUBLIC_DEMO;
-    delete process.env.TELL_DESIGN_DATA;
+    const dpRoot = mkdtempSync(join(tmpdir(), "dp-no-dev-"));
+    dirs.push(dpRoot);
+    mkdirSync(join(dpRoot, "research"), { recursive: true });
+    writeFileSync(join(dpRoot, "pnpm-workspace.yaml"), "packages: []\n");
+    process.env.DP_DESIGN_DATA = "/tmp/does-not-matter";
+    delete process.env.DP_DEV_CORPUS;
+    process.env.DP_PUBLIC_DEMO = "1";
+    expect(isDevCorpusEnabled(dpRoot)).toBe(false);
+    expect(loadDesignDataSeeds("portfolio-photography", dpRoot).refs).toHaveLength(0);
+    delete process.env.DP_PUBLIC_DEMO;
+    delete process.env.DP_DESIGN_DATA;
   });
 });

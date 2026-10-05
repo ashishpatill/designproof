@@ -18,7 +18,7 @@ function hostOf(url: string): string {
 
 /** CSS that fills the interactive state matrix without touching brand color/type. */
 export function stateGapCss(): string {
-  return `/* Tell · StateGap — interactive state matrix (not a recolor) */
+  return `/* Design Proof · StateGap — interactive state matrix (not a recolor) */
 button:hover,
 [role="button"]:hover,
 input[type="submit"]:hover,
@@ -63,7 +63,7 @@ export function buildStateGapPatch(
   coverage: StateGapCoverage,
   facts?: { missingHover?: number; probeCount?: number },
 ): { file: string; unifiedDiff: string; summary: string }[] {
-  const file = "tell-state-matrix.css";
+  const file = "dp-state-matrix.css";
   const body = stateGapCss();
   const lines = body.trimEnd().split("\n");
   const hunk = lines.map((l) => `+${l}`).join("\n");

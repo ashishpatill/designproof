@@ -60,14 +60,14 @@ export function assertSkillWiring(spec: DesignSpec, html: string): SkillWiringRe
     ),
     check(
       "wiring-research-html",
-      /data-research-domain=/.test(html) && /name="tell-research-gate"/.test(html),
+      /data-research-domain=/.test(html) && /name="dp-research-gate"/.test(html),
       "Preview HTML must emit research-gate meta + data-research-domain.",
     ),
     check(
       "wiring-responsive",
       routed.has("responsive-performance") &&
         /data-responsive-performance="required"/.test(html) &&
-        /name="tell-responsive-performance"/.test(html),
+        /name="dp-responsive-performance"/.test(html),
       "responsive-performance always-on — HTML must mark media:site / WebP budgets.",
     ),
     check(

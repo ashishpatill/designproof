@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { trace, SpanStatusCode, type Span } from "@opentelemetry/api";
 import { z } from "zod";
-import { BrandDNA, CapturePayload, DesignFingerprint } from "@tell/schema";
-import { restyleWithGemini } from "@tell/redesign/llm";
+import { BrandDNA, CapturePayload, DesignFingerprint } from "@designproof/schema";
+import { restyleWithGemini } from "@designproof/redesign/llm";
 import { resolveGeminiKey } from "@/lib/byok";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const tracer = trace.getTracer("tell.restyle");
+const tracer = trace.getTracer("designproof.restyle");
 
 const RestyleBody = z.object({
   capture: CapturePayload,
@@ -38,10 +38,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "GEMINI_API_KEY not configured" });
   }
 
-  return tracer.startActiveSpan("tell.restyle", async (span: Span) => {
+  return tracer.startActiveSpan("designproof.restyle", async (span: Span) => {
     span.setAttributes({
-      "tell.restyle.direction": directionId,
-      "tell.restyle.has_dna": Boolean(dna),
+      "designproof.restyle.direction": directionId,
+      "designproof.restyle.has_dna": Boolean(dna),
     });
 
     try {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         model: process.env.GEMINI_RESTYLE_MODEL?.trim() || "gemini-2.0-flash",
       });
 
-      span.setAttributes({ "tell.restyle.ok": result.ok });
+      span.setAttributes({ "designproof.restyle.ok": result.ok });
       span.setStatus({ code: SpanStatusCode.OK });
       span.end();
 

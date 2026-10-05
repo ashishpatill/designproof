@@ -109,7 +109,7 @@ export function DesignControls({
   return (
     <div
       ref={rootRef}
-      className={`tell-dc tell-dc--${layout} ${className}`.trim()}
+      className={`dp-dc dp-dc--${layout} ${className}`.trim()}
       data-testid="design-controls"
       data-layout={layout}
       id={rootId}
@@ -174,7 +174,7 @@ export function DesignControls({
         options={motionOptions}
         value={value.motion}
         onSelect={(v) => setField("motion", v)}
-        className={layout === "compact" ? "tell-dc__chip--desktop" : undefined}
+        className={layout === "compact" ? "dp-dc__chip--desktop" : undefined}
       />
       <ChipDropdown
         id={`${rootId}-density`}
@@ -185,23 +185,23 @@ export function DesignControls({
         options={DENSITY_OPTIONS}
         value={value.density}
         onSelect={(v) => setField("density", v)}
-        className={layout === "compact" ? "tell-dc__chip--desktop" : undefined}
+        className={layout === "compact" ? "dp-dc__chip--desktop" : undefined}
       />
 
-      <div className={`tell-dc__more-wrap${open === "more" ? " is-open" : ""}`}>
+      <div className={`dp-dc__more-wrap${open === "more" ? " is-open" : ""}`}>
         <button
           type="button"
-          className="tell-dc__chip tell-dc__chip--more"
+          className="dp-dc__chip dp-dc__chip--more"
           aria-expanded={open === "more"}
           aria-controls={`${rootId}-more-panel`}
           data-active={moreActive || open === "more" ? "true" : "false"}
           onClick={() => setOpen((o) => (o === "more" ? null : "more"))}
         >
-          <span className="tell-dc__chip-value tell-dc__chip-value--solo">
+          <span className="dp-dc__chip-value dp-dc__chip-value--solo">
             {layout === "compact" ? (
               <>
-                <span className="tell-dc__more-full">More</span>
-                <span className="tell-dc__more-short">+ More</span>
+                <span className="dp-dc__more-full">More</span>
+                <span className="dp-dc__more-short">+ More</span>
               </>
             ) : (
               "More"
@@ -211,12 +211,12 @@ export function DesignControls({
         {open === "more" ? (
           <div
             id={`${rootId}-more-panel`}
-            className="tell-dc__more-sheet"
+            className="dp-dc__more-sheet"
             role="dialog"
             aria-label="Type, rounding, and accent"
           >
             {layout === "compact" ? (
-              <div className="tell-dc__more-mobile-extra">
+              <div className="dp-dc__more-mobile-extra">
                 <SegmentRow
                   label="Motion"
                   options={MOTION_OPTIONS_COMPACT}
@@ -249,15 +249,15 @@ export function DesignControls({
               value={value.accentToken}
               onSelect={(v) => setField("accentToken", v)}
             />
-            <p className="tell-dc__more-note">
-              Hidden from the default bar. Shared with Studio — Tell palette only.
+            <p className="dp-dc__more-note">
+              Hidden from the default bar. Shared with Studio — Design Proof palette only.
             </p>
           </div>
         ) : null}
       </div>
 
       {layout === "sidebar" ? (
-        <p className="tell-dc__footnote">Tell-owned SiteKind + taste codes — never third-party starters.</p>
+        <p className="dp-dc__footnote">Design Proof-owned SiteKind + taste codes — never third-party starters.</p>
       ) : null}
     </div>
   );
@@ -321,11 +321,11 @@ function ChipDropdown<T extends string>({
   };
 
   return (
-    <div className={`tell-dc__chip-wrap${className ? ` ${className}` : ""}`}>
+    <div className={`dp-dc__chip-wrap${className ? ` ${className}` : ""}`}>
       <button
         type="button"
         id={id}
-        className="tell-dc__chip"
+        className="dp-dc__chip"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
@@ -333,16 +333,16 @@ function ChipDropdown<T extends string>({
         onClick={onToggle}
         onKeyDown={onKeyDown}
       >
-        <span className="tell-dc__chip-label">{label}</span>
-        <span className="tell-dc__chip-value">{display}</span>
-        <span className="tell-dc__chip-caret" aria-hidden>
+        <span className="dp-dc__chip-label">{label}</span>
+        <span className="dp-dc__chip-value">{display}</span>
+        <span className="dp-dc__chip-caret" aria-hidden>
           {open ? "▴" : "▾"}
         </span>
       </button>
       {open ? (
         <ul
           id={listId}
-          className={`tell-dc__menu${wide ? " tell-dc__menu--wide" : ""}`}
+          className={`dp-dc__menu${wide ? " dp-dc__menu--wide" : ""}`}
           role="listbox"
           aria-labelledby={id}
         >
@@ -352,12 +352,12 @@ function ChipDropdown<T extends string>({
                 type="button"
                 role="option"
                 aria-selected={opt.value === value}
-                className="tell-dc__option"
+                className="dp-dc__option"
                 data-selected={opt.value === value ? "true" : "false"}
                 onClick={() => onSelect(opt.value)}
               >
-                <span className="tell-dc__option-label">{opt.label}</span>
-                {opt.hint ? <span className="tell-dc__option-hint">{opt.hint}</span> : null}
+                <span className="dp-dc__option-label">{opt.label}</span>
+                {opt.hint ? <span className="dp-dc__option-hint">{opt.hint}</span> : null}
               </button>
             </li>
           ))}
@@ -379,14 +379,14 @@ function SegmentRow<T extends string>({
   onSelect: (v: T) => void;
 }): ReactNode {
   return (
-    <div className="tell-dc__segment" role="group" aria-label={label}>
-      <span className="tell-dc__segment-label">{label}</span>
-      <div className="tell-dc__segment-row">
+    <div className="dp-dc__segment" role="group" aria-label={label}>
+      <span className="dp-dc__segment-label">{label}</span>
+      <div className="dp-dc__segment-row">
         {options.map((opt) => (
           <button
             key={opt.value}
             type="button"
-            className="tell-dc__segment-btn"
+            className="dp-dc__segment-btn"
             data-active={opt.value === value ? "true" : "false"}
             aria-pressed={opt.value === value}
             onClick={() => onSelect(opt.value)}

@@ -250,8 +250,8 @@ export function buildTokens(
   };
 }
 
-/** Map aesthetic lean → Tell redesign direction id for seam/reconcile reuse. */
-export function tellDirectionForLean(lean: AestheticLean): string {
+/** Map aesthetic lean → Design Proof redesign direction id for seam/reconcile reuse. */
+export function dpDirectionForLean(lean: AestheticLean): string {
   switch (lean) {
     case "minimal-clean":
       return "precision";

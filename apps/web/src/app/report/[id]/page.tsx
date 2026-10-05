@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { TellReport } from "@tell/schema";
+import type { DesignProofReport } from "@designproof/schema";
 
 export default function SharedReportPage({ params }: { params: { id: string } }) {
-  const [report, setReport] = useState<TellReport | null>(null);
+  const [report, setReport] = useState<DesignProofReport | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function SharedReportPage({ params }: { params: { id: string } })
         <p className="mt-2 text-sm text-muted">
           Links persist when Neon (`DATABASE_URL`) or Vercel Blob is configured on the host.
         </p>
-        <Link href="/" className="mt-4 inline-block text-accent underline">Back to Tell Proof</Link>
+        <Link href="/" className="mt-4 inline-block text-accent underline">Back to Design Proof</Link>
       </main>
     );
   }
@@ -38,12 +38,12 @@ export default function SharedReportPage({ params }: { params: { id: string } })
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 font-sans text-text">
       <header className="mb-8 border-b border-border pb-4">
-        <p className="font-mono text-meta uppercase tracking-[0.14em] text-secondary">Shared Tell Proof report</p>
+        <p className="font-mono text-meta uppercase tracking-[0.14em] text-secondary">Shared Design Proof report</p>
         <h1 className="mt-2 font-display text-3xl">{report.capture.url}</h1>
         <p className="mt-2 font-mono text-label text-muted">
           {report.score.total} findings · {report.score.generic} generic · {report.score.drift} drift
         </p>
-        <Link href="/" className="mt-4 inline-block font-mono text-label text-accent underline">Open in Tell Proof</Link>
+        <Link href="/" className="mt-4 inline-block font-mono text-label text-accent underline">Open in Design Proof</Link>
       </header>
 
       <section className="grid gap-4">

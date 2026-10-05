@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const defaultRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
-/** Only apply Tell's root DESIGN.md when diagnosing Tell's own surfaces. */
+/** Only apply Design Proof's root DESIGN.md when diagnosing Design Proof's own surfaces. */
 export function shouldApplyDesignDoc(url: string): boolean {
   try {
     const parsed = new URL(url);

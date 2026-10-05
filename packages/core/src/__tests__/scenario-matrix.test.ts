@@ -18,10 +18,10 @@ describe("auth storage resolution", () => {
   });
 
   it("throws a clear error when authenticated without storage", () => {
-    const prev = process.env.TELL_AUTH_STORAGE_STATE;
-    delete process.env.TELL_AUTH_STORAGE_STATE;
+    const prev = process.env.DP_AUTH_STORAGE_STATE;
+    delete process.env.DP_AUTH_STORAGE_STATE;
     expect(() => resolveAuthStorageState({ authRole: "authenticated" })).toThrow(/storage state/i);
-    if (prev !== undefined) process.env.TELL_AUTH_STORAGE_STATE = prev;
+    if (prev !== undefined) process.env.DP_AUTH_STORAGE_STATE = prev;
   });
 });
 

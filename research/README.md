@@ -3,7 +3,7 @@
 Evidence for the design engine. Everything here exists so that visual decisions can be argued with
 measurements instead of taste claims.
 
-Product stills (one fold per offering, no duplicate reel-under-fold) live in the root [`README.md`](../README.md) Specimens section.
+Product stills (one fold per offering, no duplicate reel-under-fold) live in the root [`README.md`](../README.md) Templates section.
 
 ## What is committed
 
@@ -21,8 +21,8 @@ Product stills (one fold per offering, no duplicate reel-under-fold) live in the
 | `agency-engine-memory.json` | Machine memory from agency runs (bans, niche boosts, craft hints) |
 | `design-data.README.md` | How to wire a personal design-data checkout for seeds + learn write-back |
 
-**Training data generation** also uses the separate developer harness `tell-design-data`
-(sibling checkout or `TELL_DESIGN_DATA_REPO`). See `docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md`.
+**Training data generation** also uses the separate developer harness `dp-design-data`
+(sibling checkout or `DP_DESIGN_DATA_REPO`). See `docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md`.
 
 ## Agency reference boards (local)
 
@@ -30,7 +30,7 @@ Product stills (one fold per offering, no duplicate reel-under-fold) live in the
 Screenshots land in `research/boards/<run-id>/` (also gitignored). Committed artifacts are the
 skill, runner, brief JSON under `scripts/agency-pipeline/briefs/`, engine memory, and anonymised learnings.
 
-**Personal design-data:** see `design-data.README.md`. Point `TELL_DESIGN_DATA` or
+**Personal design-data:** see `design-data.README.md`. Point `DP_DESIGN_DATA` or
 `research/design-data.local.json` at your private corpus checkout (seeds, measurements,
 memory). `agency:run` reads it and write-backs learnings automatically.
 
@@ -54,7 +54,7 @@ corpus.
 
 `plumbing-reference.local.json` holds the peer design-daemon checkout URL/path used for
 **layout plumbing and platform-pattern study** only (see `docs/11`–`docs/13` and
-`.cursor/rules/tell-plumbing-reference.mdc`). Same anonymity rule. A stub README lives at
+`.cursor/rules/dp-plumbing-reference.mdc`). Same anonymity rule. A stub README lives at
 `plumbing-reference.README.md`.
 
 ## Rebuilding the corpus locally

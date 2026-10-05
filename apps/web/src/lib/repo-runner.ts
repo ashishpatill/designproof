@@ -8,10 +8,10 @@ import type { DetectedPlan, SetupJob, SetupState } from "./setup-types";
 /**
  * Local-only convenience runner: given a GitHub URL, clone the repo, read its
  * README + package.json to figure out how to run it, install deps, start the
- * dev server, and surface the localhost URL Tell can capture.
+ * dev server, and surface the localhost URL Design Proof can capture.
  *
  * SECURITY: this executes arbitrary code from the cloned repo (install +
- * dev scripts). It is intended strictly for a developer running Tell on their
+ * dev scripts). It is intended strictly for a developer running Design Proof on their
  * own machine against repos they trust — never expose this route publicly.
  */
 
@@ -23,9 +23,9 @@ interface RunnerRegistry {
 }
 
 // Survive Next.js dev HMR by parking the registry on globalThis.
-const g = globalThis as unknown as { __tellRunner?: RunnerRegistry };
+const g = globalThis as unknown as { __designproofRunner?: RunnerRegistry };
 const registry: RunnerRegistry =
-  g.__tellRunner ?? (g.__tellRunner = { jobs: new Map(), child: null, childJobId: null, workspaces: new Map() });
+  g.__designproofRunner ?? (g.__designproofRunner = { jobs: new Map(), child: null, childJobId: null, workspaces: new Map() });
 // Older HMR snapshots predate source-aware workspaces.
 registry.workspaces ??= new Map();
 
@@ -121,7 +121,7 @@ async function pathExists(p: string): Promise<boolean> {
 
 /** Restore a proof patch left behind by a browser refresh or server restart. */
 async function restoreStrandedProofPatch(job: SetupJob, repoDir: string): Promise<void> {
-  const marker = path.join(repoDir, ".git", "tell-proof.patch");
+  const marker = path.join(repoDir, ".git", "dp-proof.patch");
   if (!(await pathExists(marker))) return;
   const patch = await fs.readFile(marker, "utf8");
   await new Promise<void>((resolve, reject) => {
@@ -239,7 +239,7 @@ const PORT_FLAG_FRAMEWORKS = new Set(["Vite", "SvelteKit", "Astro", "Angular"]);
 
 /**
  * Build the full run invocation, forcing the app onto `port` so it never
- * collides with Tell (3000) or the fixture (3001).
+ * collides with Design Proof (3000) or the fixture (3001).
  */
 function buildRunArgs(pm: string, script: string, framework: string | null, port: number): string[] {
   const base = runScriptArgs(pm, script);
@@ -461,11 +461,11 @@ function killPrevious() {
 
 async function runPipeline(job: SetupJob, cloneUrl: string) {
   try {
-    const baseDir = path.join(os.tmpdir(), "tell-repos");
+    const baseDir = path.join(os.tmpdir(), "dp-repos");
     await fs.mkdir(baseDir, { recursive: true });
     const slug = job.repoLabel.replace(/[^\w.-]+/g, "-");
     const repoDir = path.join(baseDir, slug);
-    // Run the cloned app on a *free* port so it never collides with Tell (3000)
+    // Run the cloned app on a *free* port so it never collides with Design Proof (3000)
     // or the fixture (3001). We still parse the real URL from the server's stdout.
     const freePort = await findFreePort(4300);
     const env = augmentedEnv(freePort);

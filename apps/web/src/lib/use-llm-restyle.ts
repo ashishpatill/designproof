@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BrandDNA, CapturePayload, DesignFingerprint } from "@tell/schema";
+import type { BrandDNA, CapturePayload, DesignFingerprint } from "@designproof/schema";
 import { byokHeaders } from "@/lib/byok";
 
 /** Which sheet the after-pane is currently showing. */

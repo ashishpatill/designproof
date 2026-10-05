@@ -21,7 +21,7 @@ Concretely, switching between the six directions must visibly change, at minimum
 - CSS-only transformation of the captured snapshot. No DOM restructuring in the deterministic
   path. Pseudo-elements (`::before`/`::after`), CSS counters, and multi-layer backgrounds are
   the tools for adding visual matter.
-- Selectors: `[data-tell-id="…"]` for element-precise ops, plus role/tag-level rules.
+- Selectors: `[data-dp-id="…"]` for element-precise ops, plus role/tag-level rules.
 - Never hide or reflow content destructively: no `display:none`, no `position:absolute` on
   content elements, no font-size below 12px, text contrast ≥ 4.5:1 on owned surfaces.
 - Deterministic path must work with zero API keys. LLM path is an enhancement with fallback.
@@ -114,7 +114,7 @@ background; if ok, swap the after-pane CSS and show an "LLM-refined" badge. Neve
   accentBefore/accentAfter/surface/ink/body/display/radius/direction/remapVars.
 - source-patch.test.ts and source-append.test.ts must keep passing (git-apply-valid diffs).
 - Emitted CSS: `!important` on every declaration (original page CSS is inlined in the snapshot);
-  selectors = `[data-tell-id]` + tag-level; single Google Fonts `@import` for all families;
+  selectors = `[data-dp-id]` + tag-level; single Google Fonts `@import` for all families;
   no `:nth-*` alternation (compute alternation per-element at plan time from rect.y ordering).
 - Sheet budget ≤ 80KB; no `display:none`; no `position` changes on content roles.
 

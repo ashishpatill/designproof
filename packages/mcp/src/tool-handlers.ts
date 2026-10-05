@@ -1,14 +1,14 @@
 /**
  * MCP tool handlers that record into the shared training-data sink
- * (`@tell/design-skills/training-data-sink` — same writer Studio `/api/*` uses).
+ * (`@designproof/design-skills/training-data-sink` — same writer Studio `/api/*` uses).
  *
  * Kind map (do not collapse):
- * - tell_design_from_features → "design" → raw/design/
- * - tell_diagnose → "diagnose" → raw/episodes/
- * - tell_redesign → "redesign" → raw/redesign/
- * - tell_proof_verify → "proof" → raw/proof/
+ * - designproof_design_from_features → "design" → raw/design/
+ * - designproof_diagnose → "diagnose" → raw/episodes/
+ * - designproof_redesign → "redesign" → raw/redesign/
+ * - designproof_proof_verify → "proof" → raw/proof/
  *
- * MCP does not clone or install the sibling tell-design-data repo (Frontend owns that).
+ * MCP does not clone or install the sibling dp-design-data repo (Frontend owns that).
  * Writes reuse the shared sink, including optional harness debounce when the sibling CLI is already installed.
  * Missing sibling ⇒ same honest no-op as the web helper.
  */
@@ -19,23 +19,23 @@ import {
   diagnoseCapture,
   verifyProofPatch,
   revertProofPatch,
-} from "@tell/core";
+} from "@designproof/core";
 import {
   DesignBrief,
   designFromFeaturesAuthored,
   type DesignBrief as DesignBriefType,
-} from "@tell/design-skills";
+} from "@designproof/design-skills";
 import {
   recordTrainingEvent,
   writeTrainingEvent,
-} from "@tell/design-skills/training-data-sink";
-import { OfflineRedesignGenerator } from "@tell/redesign";
+} from "@designproof/design-skills/training-data-sink";
+import { OfflineRedesignGenerator } from "@designproof/redesign";
 import {
-  TellReport,
+  DesignProofReport,
   type Finding,
   type TasteVerdict,
-} from "@tell/schema";
-import { classifyWithTaste, parseDirection } from "@tell/taste";
+} from "@designproof/schema";
+import { classifyWithTaste, parseDirection } from "@designproof/taste";
 
 export type DesignFromFeaturesInput = {
   productName: string;
@@ -65,15 +65,15 @@ function scoreOf(verdicts: TasteVerdict[], findings: Finding[]) {
 }
 
 export function rememberReport(
-  report: TellReport,
-  reportById: Map<string, TellReport>,
-): TellReport {
-  const withId = TellReport.parse({ ...report, id: report.id ?? randomUUID() });
+  report: DesignProofReport,
+  reportById: Map<string, DesignProofReport>,
+): DesignProofReport {
+  const withId = DesignProofReport.parse({ ...report, id: report.id ?? randomUUID() });
   reportById.set(withId.id!, withId);
   return withId;
 }
 
-/** tell_design_from_features — same raw/design dump as POST /api/design. */
+/** designproof_design_from_features — same raw/design dump as POST /api/design. */
 export async function handleDesignFromFeatures(
   input: DesignFromFeaturesInput,
   opts: { awaitSink?: boolean } = {},
@@ -106,7 +106,7 @@ export async function handleDesignFromFeatures(
     productName: brief.productName,
   };
   const meta = {
-    via: "mcp.tell_design_from_features",
+    via: "mcp.designproof_design_from_features",
     siteKind: brief.siteKind,
     productName: brief.productName,
   };
@@ -123,19 +123,19 @@ export async function handleDesignFromFeatures(
   return result;
 }
 
-/** tell_diagnose */
+/** designproof_diagnose */
 export async function handleDiagnose(
   args: { url?: string; reportPath?: string },
-  reportById: Map<string, TellReport>,
+  reportById: Map<string, DesignProofReport>,
   opts: { awaitSink?: boolean } = {},
-): Promise<TellReport> {
-  let report: TellReport;
+): Promise<DesignProofReport> {
+  let report: DesignProofReport;
   let live = false;
   let requestedUrl = "";
 
   if (args.reportPath) {
     const raw = await readFile(args.reportPath, "utf8");
-    report = rememberReport(TellReport.parse(JSON.parse(raw)), reportById);
+    report = rememberReport(DesignProofReport.parse(JSON.parse(raw)), reportById);
   } else if (args.url) {
     const capture = await captureUrl(args.url);
     const base = diagnoseCapture(capture);
@@ -143,19 +143,19 @@ export async function handleDiagnose(
       apiKey: process.env.GEMINI_API_KEY,
     });
     report = rememberReport(
-      TellReport.parse({ ...base, verdicts, score: scoreOf(verdicts, base.findings) }),
+      DesignProofReport.parse({ ...base, verdicts, score: scoreOf(verdicts, base.findings) }),
       reportById,
     );
     live = true;
     requestedUrl = args.url;
   } else {
-    const artifact = process.env.TELL_REPORT_ARTIFACT ?? "fixtures/reports/tell-report.json";
+    const artifact = process.env.DP_REPORT_ARTIFACT ?? "fixtures/reports/dp-report.json";
     const raw = await readFile(artifact, "utf8");
-    report = rememberReport(TellReport.parse(JSON.parse(raw)), reportById);
+    report = rememberReport(DesignProofReport.parse(JSON.parse(raw)), reportById);
   }
 
   const diagnoseMeta = {
-    via: "mcp.tell_diagnose",
+    via: "mcp.designproof_diagnose",
     live,
     requestedUrl: requestedUrl || report.capture?.url || "",
     capturedUrl: report.capture?.url || "",
@@ -168,28 +168,28 @@ export async function handleDiagnose(
   return report;
 }
 
-/** tell_redesign */
+/** designproof_redesign */
 export async function handleRedesign(
   args: { direction: string; findingId?: string; reportId?: string },
   ctx: {
-    reportById: Map<string, TellReport>;
-    lastReport?: TellReport;
-    remember: (r: TellReport) => TellReport;
+    reportById: Map<string, DesignProofReport>;
+    lastReport?: DesignProofReport;
+    remember: (r: DesignProofReport) => DesignProofReport;
   },
   opts: { awaitSink?: boolean } = {},
 ): Promise<Awaited<ReturnType<OfflineRedesignGenerator["propose"]>>> {
   let report =
     (args.reportId ? ctx.reportById.get(args.reportId) : undefined) ?? ctx.lastReport;
   if (!report) {
-    const artifact = process.env.TELL_REPORT_ARTIFACT ?? "fixtures/reports/tell-report.json";
-    report = ctx.remember(TellReport.parse(JSON.parse(await readFile(artifact, "utf8"))));
+    const artifact = process.env.DP_REPORT_ARTIFACT ?? "fixtures/reports/dp-report.json";
+    report = ctx.remember(DesignProofReport.parse(JSON.parse(await readFile(artifact, "utf8"))));
   }
   const directionText = args.direction;
   const direction = parseDirection(directionText);
   const generator = new OfflineRedesignGenerator();
   const proposal = await generator.propose(report, direction, args.findingId);
 
-  const redesignMeta = { via: "mcp.tell_redesign" };
+  const redesignMeta = { via: "mcp.designproof_redesign" };
   const redesignPayload = {
     directionText,
     findingId: args.findingId ?? null,
@@ -208,7 +208,7 @@ export async function handleRedesign(
   return proposal;
 }
 
-/** tell_proof_verify */
+/** designproof_proof_verify */
 export async function handleProofVerify(args: {
   url: string;
   patch: string;
@@ -235,12 +235,12 @@ export async function handleProofVerify(args: {
       patch: args.patch,
       reverted: result.reverted,
     },
-    { via: "mcp.tell_proof_verify", url: args.url, projectRoot },
+    { via: "mcp.designproof_proof_verify", url: args.url, projectRoot },
   );
   return result;
 }
 
-/** tell_proof_revert — no training write (revert only). */
+/** designproof_proof_revert — no training write (revert only). */
 export async function handleProofRevert(args: {
   projectRoot?: string;
   patch?: string;

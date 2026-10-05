@@ -24,5 +24,5 @@ flowchart TD
 
 ## First consumer
 
-CREASE cricket specimen — Core six routes under `/crease/*`.
-BASELINE tennis specimen — Core six routes under `/baseline/*` (nested sets|games|points).
+CREASE cricket template — Core six routes under `/crease/*`.
+BASELINE tennis template — Core six routes under `/baseline/*` (nested sets|games|points).

@@ -1,6 +1,6 @@
 ---
 name: operational-governance-craft
-description: Enterprise governance craft — approvals, audit, rollback — for corporate/fintech Tell pages without inventing compliance claims.
+description: Enterprise governance craft — approvals, audit, rollback — for corporate/fintech Design Proof pages without inventing compliance claims.
 ---
 
 # operational-governance-craft

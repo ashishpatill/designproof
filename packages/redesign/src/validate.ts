@@ -55,7 +55,7 @@ export function validateRestyleSheet(css: string): ValidateResult {
 
   // ── positioning on content roles ──
   // Scan each rule block; if its selector references a content role (via role class or a
-  // [data-tell-id] element rule) and its body sets a non-static position, flag it.
+  // [data-dp-id] element rule) and its body sets a non-static position, flag it.
   const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
   let r: RegExpExecArray | null;
   while ((r = ruleRe.exec(scrub))) {
@@ -66,7 +66,7 @@ export function validateRestyleSheet(css: string): ValidateResult {
     // Decorative pseudo-elements (::before/::after) may be absolutely positioned inside a
     // relatively-positioned content box — that adds a mark, it does not remove content.
     if (/::(before|after)/.test(selector)) continue;
-    const onContent = CONTENT_ROLE_RE.test(selector) || /\[data-tell-id=/.test(selector) || /\b(h[1-6]|p|a|button|body|html|main|section|article|nav|header|footer)\b/.test(selector);
+    const onContent = CONTENT_ROLE_RE.test(selector) || /\[data-dp-id=/.test(selector) || /\b(h[1-6]|p|a|button|body|html|main|section|article|nav|header|footer)\b/.test(selector);
     if (onContent) { violations.push(`position:${pos[1]} on a content selector (${selector.trim().slice(0, 48)})`); break; }
   }
 

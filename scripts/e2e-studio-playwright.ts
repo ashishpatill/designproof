@@ -1,11 +1,11 @@
 /**
- * Real-user Playwright pass over Tell Studio + skill graph + showcases.
+ * Real-user Playwright pass over Design Proof Studio + skill graph + showcases.
  * Usage: pnpm e2e:studio
- * Expects @tell/web on http://localhost:3000
+ * Expects @designproof/web on http://localhost:3000
  */
 import { chromium, type APIRequestContext, type Page } from "playwright";
 
-const BASE = process.env.TELL_E2E_BASE ?? "http://localhost:3000";
+const BASE = process.env.DP_E2E_BASE ?? "http://localhost:3000";
 
 async function assertText(page: Page, selector: string, includes: string) {
   const text = await page.locator(selector).innerText();
@@ -78,7 +78,7 @@ async function apiDesign(
       };
       sections: { kind: string; title: string }[];
       taste: { aestheticLean: string; motion: string };
-      tellDirectionId: string;
+      dpDirectionId: string;
       customizationHints: string[];
       summary: string;
     };

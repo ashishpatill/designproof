@@ -4,13 +4,13 @@ import nextEnv from "@next/env";
 
 const { loadEnvConfig } = nextEnv;
 
-// Monorepo env lives at tell/.env — load it before Next reads server env.
-const tellRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-loadEnvConfig(tellRoot);
+// Monorepo env lives at designproof/.env — load it before Next reads server env.
+const dpRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+loadEnvConfig(dpRoot);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@tell/schema", "@tell/taste", "@tell/redesign", "@tell/core", "@tell/design-skills"],
+  transpilePackages: ["@designproof/schema", "@designproof/taste", "@designproof/redesign", "@designproof/core", "@designproof/design-skills"],
   modularizeImports: {
     "lucide-react": {
       transform: "lucide-react/dist/esm/icons/{{kebabCase member}}",

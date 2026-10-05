@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-export const BYOK_STORAGE_KEY = "tell:byok";
+export const BYOK_STORAGE_KEY = "dp:byok";
 
 export const ByokConfig = z.object({
   geminiApiKey: z.string().optional(),
   cursorApiKey: z.string().optional(),
-  /** @deprecated Not sent by byokHeaders — capture uses server TELL_CAPTURE_API_URL. Kept for localStorage parse only. */
+  /** @deprecated Not sent by byokHeaders — capture uses server DP_CAPTURE_API_URL. Kept for localStorage parse only. */
   captureApiUrl: z.string().optional(),
 });
 export type ByokConfig = z.infer<typeof ByokConfig>;
 
-export const GEMINI_KEY_HEADER = "x-tell-gemini-key";
-export const CURSOR_KEY_HEADER = "x-tell-cursor-key";
+export const GEMINI_KEY_HEADER = "x-dp-gemini-key";
+export const CURSOR_KEY_HEADER = "x-dp-cursor-key";
 
 export function loadByok(): ByokConfig {
   if (typeof window === "undefined") return {};
@@ -28,7 +28,7 @@ export function loadByok(): ByokConfig {
 export function saveByok(config: ByokConfig): void {
   if (typeof window === "undefined") return;
   // Intentionally omit captureApiUrl — it was never applied by byokHeaders();
-  // live capture reads server TELL_CAPTURE_API_URL (see GET /api/health/capture).
+  // live capture reads server DP_CAPTURE_API_URL (see GET /api/health/capture).
   const cleaned: ByokConfig = {
     geminiApiKey: config.geminiApiKey?.trim() || undefined,
     cursorApiKey: config.cursorApiKey?.trim() || undefined,

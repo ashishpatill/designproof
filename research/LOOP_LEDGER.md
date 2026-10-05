@@ -84,13 +84,13 @@ buckets, never names, hosts, or URLs.
 - **Closed:**
   - Figure system (`figures.ts`) — interface plates, series charts, flow/stack diagrams, horizon
     plots, capability marks, metric sparks, signature mark. Deterministic, token-driven, no images.
-  - Fold and specimen bands carry drawings; type-scale outliers from decorative SVG text removed
+  - Fold and template bands carry drawings; type-scale outliers from decorative SVG text removed
     by constructing the closing mark and consolidating figure type onto a page ladder.
   - Editorial allocation so each claim is made once.
 - **Side effects:** SVG hairlines scaled below 1px until `vector-effect: non-scaling-stroke`; dark
-  specimen bands needed `--c-ink-body` emitted to keep figure prose readable.
+  template bands needed `--c-ink-body` emitted to keep figure prose readable.
 - **Qualitative:** pages stopped reading as a white document. The fold shows a product surface;
-  the specimen is a full-bleed drawing. Still too many empty half-columns and hairline grids.
+  the template is a full-bleed drawing. Still too many empty half-columns and hairline grids.
 - **Next weakest:** band variation, rule density, layering, vacancy the score could not see.
 
 ---
@@ -105,12 +105,12 @@ buckets, never names, hosts, or URLs.
   - Layout audit gained a two-dimensional vacancy detector (largest empty rectangle inside the
     content column) and a ghosting detector. One-dimensional row scanning had been reporting split
     layouts as full because every row had ink somewhere.
-  - Sticky nav made opaque; specimen and closing bands size to content; story/FAQ registers use a
+  - Sticky nav made opaque; template and closing bands size to content; story/FAQ registers use a
     spread head over a two-column grid instead of a left-column void beside a list.
   - Figure rules drawn only between things; bonded section pairs (pricing→compare, app→features,
     compare→faq) create density peaks; statement band tall enough that a measured strip lands
     entirely inside it.
-  - Section hangs (specimen, metrics, app, closing, recommended plan, staggered cards) bring
+  - Section hangs (template, metrics, app, closing, recommended plan, staggered cards) bring
     layered-elements into corridor without shadows.
   - Conversion fold gives the figure the majority track; radius ladder painted on plates/marks so
     editorial pages are not stuck at two radii.
@@ -170,7 +170,7 @@ buckets, never names, hosts, or URLs.
 - **Corpus:** unchanged.
 - **Closed:**
   - Basics gate: scroll-margin, z-index scale, focus-ring token, text-wrap pretty/balance, proof-board
-  - Corner-bracketed lit plates; specimen→proof seam tightened; conversion hero more figure-majority
+  - Corner-bracketed lit plates; template→proof seam tightened; conversion hero more figure-majority
   - Sequence rows carry capability marks; bonding meta strips replace empty airways
   - Eyebrow / proof meta moved off screaming uppercase (reduces chrome noise)
 - **Side effects:** none intended to score-game; eye check is the gate.
@@ -205,7 +205,7 @@ buckets, never names, hosts, or URLs.
   - personal-craft: typography spine / large gutters / shared left edges (not figure-led)
 - **Closed:**
   - All `saas-marketing` leans use spanning product fold (system-crafted holdout was still split)
-  - Band target height 780→880; horizon/series band fills; hero/specimen SVG min-heights ~74/70vh
+  - Band target height 780→880; horizon/series band fills; hero/template SVG min-heights ~74/70vh
   - Capability marks enlarged (viewBox + CSS) so registers contribute drawn matter
   - Soft-brand / client-hex accent surfaces and atmosphere dialed down (holdout accent ~0.69 → corridor)
   - Dashboard prose measure floor; softer lead-cell washes (rails over floods)
@@ -219,15 +219,15 @@ buckets, never names, hosts, or URLs.
 - **Qualitative:** fold reads as product-owned (studio/B2B pattern); proof stays a lit board; sequence
   keeps marks. Not yet “multi-million shipped” uniqueness, but no longer a split brochure or accent wash.
 
-## Loop 11 — fifth offering: fintech trust + quiet specimen rhythm
+## Loop 11 — fifth offering: fintech trust + quiet template rhythm
 
 - **Goal:** add a measured demand-gap offering (fintech inverse/bleed ≠ SaaS conversion) and raise
-  section-weight variation honestly by quieting the specimen beat; keep iterating all templates.
+  section-weight variation honestly by quieting the template beat; keep iterating all templates.
 - **Evidence used:** fintech-product category (invertedShare ~0.7, bleedBands ~13, fold figure ~0.88).
 - **Closed:**
   - New `fintech-marketing` siteKind + `fintech` template + `/showcase/fintech` + critique brief
-  - Inverse-heavy plan: metrics / specimen / proof / cta on inverse; lit paper plates on dark stages
-  - Specimen band type-led (titles only) + short head — char valley without empty height
+  - Inverse-heavy plan: metrics / template / proof / cta on inverse; lit paper plates on dark stages
+  - Template band type-led (titles only) + short head — char valley without empty height
   - Shared `--align-rail` across section heads / chapters / indexes
 - **Score:** matrix **99.2**; fintech-trust **100**; saas **99.7**; corporate **99.4**; holdout **98.4**
   (gap 0.7 — generalises).
@@ -246,7 +246,7 @@ buckets, never names, hosts, or URLs.
   anti-slop / editorial hierarchy plumbing checks already encoded in basics.
 - **Closed:**
   - New `art-directed-studio` siteKind + `studio` template + `/showcase/studio` + critique brief
-  - Plan: overfigure fold → raised metrics → alternating selected work → sunken specimen → method
+  - Plan: overfigure fold → raised metrics → alternating selected work → sunken template → method
     story → scrub figure → index → raised proof → FAQ → single inverse CTA (no pricing)
   - Cool light-airy + steel accent (escape cream/terracotta AI cluster); flow-owned fold surface
   - Basics gate: ≤1 inverse, feature-alternating + story/figure, spanning overfigure
@@ -262,12 +262,12 @@ buckets, never names, hosts, or URLs.
 - **Closed:**
   - New `consumer-craft` siteKind + `consumer` template + `/showcase/consumer` + critique brief
   - Plan: product overfigure → raised metrics → alternating in-hand register → quiet horizon
-    specimen → scrub figure → rows → raised proof → day-in-use story → FAQ → one inverse CTA
+    template → scrub figure → rows → raised proof → day-in-use story → FAQ → one inverse CTA
   - Moderate display (~4vw); teal brand accent; site-kind CTAs ("Order yours") instead of plan compare
   - Basics gate: no pricing, feature-alternating, ≤1 inverse, spanning overfigure
 - **Score:** consumer-craft **100**; matrix **99.4**; studio **99.7**; fintech **100**; holdout **98.4**
 - **Qualitative:** fold is a product surface under a short claim; scroll stays paper with a quiet
-  specimen valley; copy no longer asks to "Compare plans". Satisfactory to ship.
+  template valley; copy no longer asks to "Compare plans". Satisfactory to ship.
 
 ## Loop 14 — Fieldmark overlap fix + template-craft skill
 
@@ -276,7 +276,7 @@ buckets, never names, hosts, or URLs.
 - **Plumbing (peer checkout first):** studio/consumer leave absolute overfigure. Stack fold —
   opaque `ds-hero-claimband` in document flow, then labeled figure. Same idea as opaque sticky nav:
   underlayer ink must not share the type's box. Compact claim so figure still enters the fold.
-- **Skill:** `.cursor/skills/tell-template-craft/SKILL.md` — Phase A peer plumbing from
+- **Skill:** `.cursor/skills/dp-template-craft/SKILL.md` — Phase A peer plumbing from
   craft/, Phase B anonymised corridors + screenshot contract. Listed in `AGENTS.md`.
 - **Basics:** studio/consumer require `ds-hero-stackfold` + `ds-hero-claimband`.
 - **Score:** matrix **99.4**; studio-selected **99.8**; consumer **100**; holdout **98.4**.
@@ -306,7 +306,7 @@ buckets, never names, hosts, or URLs.
   `kind-foundry`; showcase `/showcase/foundry` featured on gallery.
 - **Side effects:** foundry ink-variation slightly above corridor ceiling (1.12 vs 0.96) — acceptable
   for a hard-seam fold that must stay dense on one half; do not empty the ladder to game the band.
-- **Qualitative:** fold reads as a foundry specimen board, not a recolored SaaS page. Hard seam +
+- **Qualitative:** fold reads as a foundry template board, not a recolored SaaS page. Hard seam +
   spine + constructed optical sizes are craft a generic design engine will not invent from controls.
 - **Next weakest:** dashboard band-variation; foundry coverage variation; deepen foundry uniqueness
   (second letter clarity on ladder, richer marginalia marks) without score-gaming.
@@ -328,7 +328,7 @@ buckets, never names, hosts, or URLs.
 - **Score:** matrix **99.1**; dossier-research **98.1** (was 94.9 before fold hang + type consolidation);
   holdout **98.4** (gap 0.7 — generalises). Prior matrix ~99.3; no regression on locked SaaS/studio/consumer/foundry.
 - **Closed:** fold-figure into band by compacting claim and hanging the plate; display into band;
-  type-steps 17→15; denser stack specimen cut ink-variation 1.26→1.10; basics gate `kind-dossier`;
+  type-steps 17→15; denser stack template cut ink-variation 1.26→1.10; basics gate `kind-dossier`;
   showcase `/showcase/dossier` featured on gallery.
 - **Side effects:** dossier ink-variation still slightly above corridor ceiling (1.10 vs 0.96) —
   acceptable for a plate-owned fold that must stay dense; do not empty the plate to game the band.
@@ -344,7 +344,7 @@ buckets, never names, hosts, or URLs.
 
 - **Goal:** finish the earlier cinema/GIF showcase intent — gallery must show best craft beats as
   live reels, with Research Dossier featured, not a text list of hover thumbs.
-- **Failure named (champion):** `SpecimenPreview` cinema existed, but `/showcase` still presented as
+- **Failure named (champion):** `TemplatePreview` cinema existed, but `/showcase` still presented as
   a spine register list; beat discovery skipped spread/imprint; thumbs only scrubbed on hover.
 - **Challenger:** redesign gallery as craft stage + filmstrip; enrich beats; autoplay in view.
 - **Eval:** Playwright eye — featured `NOW PLAYING · RESEARCH DOSSIER`, `data-playing=true`,
@@ -352,7 +352,7 @@ buckets, never names, hosts, or URLs.
 - **Closed:** `/showcase` stage + sprocket filmstrip; dossier featured; beat discovery for
   folio/seam/spread/imprint; chapter-rail hidden in preview chrome; learning `showcase:list-not-reel`.
 - **Side effects:** featured is excluded from the strip (8 cells) — intentional so the stage owns it.
-- **Qualitative:** gallery reads as a specimen cinema, not a sitemap of offerings.
+- **Qualitative:** gallery reads as a template cinema, not a sitemap of offerings.
 
 ## Loop 18 — tenth offering: signal observatory (RSI)
 
@@ -389,7 +389,7 @@ buckets, never names, hosts, or URLs.
   band-variation without empty voids.
 - **Observatory:** WINDOW legend + corner ticks, per-channel threshold marks, calibration
   tolerance strip — mono ≤11px, 1px chrome only.
-- **Dashboard:** sunken specimen valley before dense app-shell; pack shell/index/proof as peaks;
+- **Dashboard:** sunken template valley before dense app-shell; pack shell/index/proof as peaks;
   widen body measure out of the 33ch trap. Score **~97.8 → 99.7**; band-variation into floor.
 - **Side effects:** observatory ink-variation still slightly above ceiling — accepted.
 
@@ -405,7 +405,7 @@ buckets, never names, hosts, or URLs.
   - `story-entry` hanging folio + ruled measure
   - paper Registry close — no pricing/metrics/inverse
 - **Score:** matrix **99.2**; archive-index **91.3 → 97.6** after display-clamp fix + ledger
-  rule sparse + horizon specimen; holdout **98.4**. Dashboard parallel pass **99.7**.
+  rule sparse + horizon template; holdout **98.4**. Dashboard parallel pass **99.7**.
 - **Closed:** `template:display-clamp-invalid`, `template:ledger-rule-flood`; basics
   `kind-archive`; `/showcase/archive` featured.
 - **Side effects:** archive ink-variation above corridor (1.32 vs 0.96) — accepted for a
@@ -423,11 +423,11 @@ buckets, never names, hosts, or URLs.
   engine until critique + eye pass.
 - **Failure named (champion):** Eleven offerings still lacked merchandising-press and herbarium
   voucher grammars. Soft public templates win on photography + glass collage; nothing in the catalog
-  forced a size-tape loom or a taxon-rail specimen plate.
+  forced a size-tape loom or a taxon-rail template plate.
 - **Challenger:**
   - `commerce-loom` / `loom` (`Warp Desk`) — sticky size-tape rail, loom-weave figure with free
     textile photo cells + flying shuttle, hangtag essay, Care label close
-  - `field-guide` / `herbarium` (`Vellum Press`) — sticky taxon rail, specimen-plate with pressed
+  - `field-guide` / `herbarium` (`Vellum Press`) — sticky taxon rail, template-plate with pressed
     silhouette + free botanical inset + blot, range essay, Voucher close
 - **Score:** matrix **98.9**; loom-commerce **97.0 → 97.6**; field-herbarium **97.3 → 97.6** after
   fold hang, type-step consolidation, micro-label ceiling, display floor; holdout **98.4** (gap 0.5).
@@ -452,7 +452,7 @@ buckets, never names, hosts, or URLs.
 - **Challenger:**
   - Drawloom — headline as weft picks through warp threads; reed bar; cloth owns lower fold;
     size tape becomes bottom treadles
-  - Glassine press — specimen under translucent peeled sheet; museum label stuck on glassine;
+  - Glassine press — template under translucent peeled sheet; museum label stuck on glassine;
     corner pins + lucida; taxon as bottom binomial strip
 - **Score:** first marvel pass **94.2 / 94.3** (hairline + shadow + short weft measure + fold
   starvation); dogfood → loom **97.6**, field **97.6**, matrix **98.9**, holdout **98.4**.
@@ -499,29 +499,29 @@ buckets, never names, hosts, or URLs.
 - **Next weakest:** press ink-variation; docs rule density; deepen Pressroom uniqueness
   (ink patch legends, forme custody marks) without score-gaming.
 
-## Loop 21 — densify press forme + fix Specimens stage
+## Loop 21 — densify press forme + fix Templates stage
 
-- **Goal:** Human named empty proof/template screenshots and a too-basic Specimens gallery —
+- **Goal:** Human named empty proof/template screenshots and a too-basic Templates gallery —
   SIG cells were blank voids; featured cinema missed the forme; gallery mast|reel CSS never
   applied (wrong parent selector) and fought proof chrome.
-- **Challenger:** filled 2×2 mini pages in every SIG cell; densitometer patches; SpecimenPreview
-  locks figure→spread→proof and skips specimen/instruments when craft figure exists; press still
+- **Challenger:** filled 2×2 mini pages in every SIG cell; densitometer patches; TemplatePreview
+  locks figure→spread→proof and skips template/instruments when craft figure exists; press still
   lands at y≥360; `FT.micro` 10→11; scoped `.sx-shell > .sx-stage` vs `.sx-chrome .sx-stage`.
 - **Score:** matrix **99.1**; press-atelier **97.6** (type-steps 14, rules 3.89, fold-figure 0.69);
   holdout gap **0.1**. No regression on locked kinds.
 - **Closed:** `template:empty-sig-voids`; `showcase:stage-selector-miss`.
 - **Side effects:** ink-variation still above corridor for a forme-owned fold — accepted.
-- **Qualitative:** gallery fold shows Tell Specimens mast beside a filled press sheet on FORME
+- **Qualitative:** gallery fold shows Design Templates mast beside a filled press sheet on FORME
   reel; proof iframe is full-bleed again; SIG cells read as pages, not empty paper.
 - **Next weakest:** press ink-variation; deepen gather/Pressroom without starving the forme.
 
 ## Loop 22 — encode empty-void + craft-first into the engine
 
 - **Goal:** Improve the design engine itself — reusable densify helpers, basics gates, craft-first
-  cinema policy — so the next siteKind cannot regress into empty SIG voids / specimen-first reels.
+  cinema policy — so the next siteKind cannot regress into empty SIG voids / template-first reels.
 - **Challenger:** `miniPageMatter` + `densitometerStrip` + `FIG_MONO_PX` clamp; `data-dense="ink"`;
   assertBasics `fig-mono-floor` / `craft-figure-dense` / `fold-owns-craft`; shared fold-owns CTA
-  hide; `specimenBeats` module + tests.
+  hide; `templateBeats` module + tests.
 - **Score:** matrix **99.1**; press **97.6**; holdout gap **0.1**. No regression.
 - **Closed:** `engine:encode-empty-void-gates`.
 - **Side effects:** none measured; gates are structural.
@@ -531,17 +531,17 @@ buckets, never names, hosts, or URLs.
 
 ## Loop 23 — empty/overlap dogfood + ruleDensity / band valley (parallel RSI)
 
-- **Goal:** clear human-named failures (educational overlaps, Stamp Roll empty cells, Specimens
+- **Goal:** clear human-named failures (educational overlaps, Stamp Roll empty cells, Templates
   gutters) then bring archive/educational rules/screen into band and raise educational
   section-weight variation — without empty-height gaming.
 - **Challenger:**
-  - Educational → stackfold + solid opaque claim; quiet titles-only horizon specimen valley;
+  - Educational → stackfold + solid opaque claim; quiet titles-only horizon template valley;
     hang mechanism figure into fold; thin CSS bordered rows / matrix cells; drop band-flow
     chrome micro-label under claim.
   - Archive ledger → dual-line cell ink + stamps; restore tall plate; CSS rule thinning last
     (do not confuse SVG strokes with `ruleDensity`).
   - Showcase → `.sx-shell > .sx-stage` gallery vs `.sx-chrome .sx-stage` proof; desktop mast|reel;
-    craft-first cinema via `specimenBeats`.
+    craft-first cinema via `templateBeats`.
 - **Score:** matrix **99.1**; docs-educational **98.4 → 99.9**; archive-index **97.4 → 97.6**;
   educational rules **5.27 → 4.28**; archive rules **4.77 → 4.21**; band-variation **~0.34 → 0.485**.
 - **Closed:** `template:overfigure-collides-with-labels`, `template:ledger-cell-void`,
@@ -560,7 +560,7 @@ buckets, never names, hosts, or URLs.
   - Shed-threaded drawloom — SVG warp ends, weft thread + fell line, flying shuttle; cloth
     begins at the fell (probe-safe whole-line weft ink, not per-glyph spans)
   - Dissecting tray — cork well, hinged glassine lid with peel, numbered entomology pins,
-    specimen tag on a string, vernier scale, dichotomous key strip
+    template tag on a string, vernier scale, dichotomous key strip
 - **Score:** first glyph-split loom **93.0** (displayVw 1.74); dogfood → loom **97.6**, field
   **98.7** (↑ from 97.6), matrix **99.0**, holdout **99.1**.
 - **Closed:** `template:claim-over-grid-still-basic`, `template:glyph-split-steals-display`.
@@ -572,7 +572,7 @@ buckets, never names, hosts, or URLs.
 
 ## Loop 25 — lantern-path cinematic night-walk template (RSI)
 
-- **Goal:** Learn from atmospheric multi-chapter night-walk craft and ship a *better* Tell
+- **Goal:** Learn from atmospheric multi-chapter night-walk craft and ship a *better* Design Proof
   offering: unreplicable fold instrument, accessible, critique-green, no third-party names.
 - **Failure named (champion):** Dark glow tourism pages + soft pack card collages cannot emit
   a citeable night atlas; WebGL + AI plates are heavy and off-corridor for our engine.
@@ -685,7 +685,7 @@ buckets, never names, hosts, or URLs.
 - **Score:** care-pathway **98.0 → 98.5**; matrix **95.8** (held); axes **7→4**; shape-run
   **0.545→0.364**; hairline **1.0**; fold-figure **0.666**. Clinical holdout Suture Desk **99.0**
   (gap ≤0.03 vs matrix). Diagnose: zero generic tells (gradient+acid cleared); remaining drifts
-  are specimen-vs-DESIGN.md justified.
+  are template-vs-DESIGN.md justified.
 - **Closed:** three pattern keys above.
 - **Next weakest:** matrix still weak on display-leading / display-scale for non-care siteKinds;
   care band-ink-variation on unseen briefs.
@@ -700,7 +700,7 @@ buckets, never names, hosts, or URLs.
 - **Fix:** Full `animation:ds-lantern-in … forwards` on `.ds-enter`; masthead `padding-top:var(--s-xs)`;
   split heads collapse to one column; sil lift-up only; opaque way-rail + chapter-pin-inner paper.
 - **Evidence:** `pnpm research:audit lantern-path` → **clean**; fold shot shows claim + path atlas;
-  `@tell/design-skills` tests green.
+  `@designproof/design-skills` tests green.
 - **Next weakest:** archive-index / foundry / dossier (same animation-name pattern + display bands).
 
 ## Loop — archive-index fold claim + audit clean (2026-08-12)
@@ -739,7 +739,7 @@ buckets, never names, hosts, or URLs.
   loom **97.5 → 99.4**, observatory **96.7 → 99.9**, foundry **97.5 → 99.9**.
 - **Side effect:** 1-col FAQ at `width:100%` stole body measure (145ch). Capped FAQ copy at 62ch;
   body measure returned to band. Ember rest needed `grid-row:1` after the bead auto-placed.
-- **Evidence:** `pnpm research:audit` → **0 defects / 17 pages**; `@tell/design-skills` tests
+- **Evidence:** `pnpm research:audit` → **0 defects / 17 pages**; `@designproof/design-skills` tests
   **90/90**; fold + mid shots under `/opt/cursor/artifacts/screenshots/` (claim+figure, not nav-only).
 - **Next weakest:** alignment-axes still 7 on consumer-craft / field-herbarium / care-pathway;
   shadow coverage on holdout (`soft-elevation` taste); fold-figure on saas/holdout.
@@ -751,7 +751,7 @@ buckets, never names, hosts, or URLs.
 - **Challenger:** `postureGrid` / `pipelineBoard` stroke-draw moved to a header hairline; ordinals
   carry sequence. Basics gates `posture-grid-no-centroid-stroke`, `pipeline-board-no-title-rail`.
 - **Score:** overall **98.9** (held). Holdout **96.7** (gap 2.2). Corporate-story **98.5**.
-- **Evidence:** `@tell/design-skills` tests **91/91**; typecheck green. Fold PNGs under
+- **Evidence:** `@designproof/design-skills` tests **91/91**; typecheck green. Fold PNGs under
   `/opt/cursor/artifacts/screenshots/` (`lattice-fold-no-z.png`, `pipeline-fold-no-title-rail.png`).
 - **Next weakest:** still consumer/herbarium/care alignment-axes at 7; do not reopen those here.
 
@@ -764,7 +764,7 @@ buckets, never names, hosts, or URLs.
   `catalog-fold-no-metric-reprint`.
 - **Score:** overall **98.9 → 99.0**. Corporate-story **98.5 → 99.5**. SaaS **99.1 → 98.4**
   (inverse metrics gone; proof + CTA still inverse). Holdout **96.8** (gap 2.2).
-- **Evidence:** `@tell/design-skills` tests **92/92**; typecheck green. One fold PNG per
+- **Evidence:** `@designproof/design-skills` tests **92/92**; typecheck green. One fold PNG per
   template under `/opt/cursor/artifacts/screenshots/` (`corporate-fold.png`, `saas-fold.png`).
 - **Next weakest:** consumer/herbarium/care alignment-axes still 7.
 
@@ -776,7 +776,7 @@ buckets, never names, hosts, or URLs.
 - **Fix:** Sampled gentle walk; caption chips in a register below the stroke; ridges/elev in the
   foot; `.ds-path-near` 64px / z-index 1; way-rail absolute inside `.ds-path-field`; gate
   `path-plate-walk-not-scribble`.
-- **Evidence:** `@tell/design-skills` tests 90/90; `pnpm research:audit lantern-path` clean;
+- **Evidence:** `@designproof/design-skills` tests 90/90; `pnpm research:audit lantern-path` clean;
   `pnpm research:critique` overall **98.9** (held), lantern-path **98.8** (was 99.6 — fold-figure
   now 1.0 filling the plate; remaining gap is section-coverage / body measure). Fold PNG under
   `/opt/cursor/artifacts/screenshots/ember-gate-fold.png`.

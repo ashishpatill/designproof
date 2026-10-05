@@ -1,6 +1,6 @@
 ---
 name: agency-run-learn
-description: Automatic post-run learning for the **developer** agency pipeline — corpus memory + LEARNINGS. End-user prefs use tell-user-session-learn (browser). Gates design-data to maintainer machines only.
+description: Automatic post-run learning for the **developer** agency pipeline — corpus memory + LEARNINGS. End-user prefs use dp-user-session-learn (browser). Gates design-data to maintainer machines only.
 ---
 
 # agency-run-learn
@@ -8,10 +8,10 @@ description: Automatic post-run learning for the **developer** agency pipeline �
 **Developer loop.** After `agency:run` / `--mark-pass 4-ship`, extract signals → engine memory →
 optional write-back to a private design-data checkout.
 
-**User loop (separate):** `.cursor/skills/tell-user-session-learn` — localStorage on Ashish's machine.
+**User loop (separate):** `.cursor/skills/dp-user-session-learn` — localStorage on Ashish's machine.
 
 See `research/design-data.README.md` for the two-loop table and enablement gates
-(`design-data.local.json` or `TELL_DESIGN_DATA` + `TELL_DEV_CORPUS=1`; off on Vercel/public demo).
+(`design-data.local.json` or `DP_DESIGN_DATA` + `DP_DEV_CORPUS=1`; off on Vercel/public demo).
 
 After `1-refs`…`4-ship` (or an honest stop), this skill turns the run into:
 
@@ -21,7 +21,7 @@ After `1-refs`…`4-ship` (or an honest stop), this skill turns the run into:
 4. Optional **gate / polish / niche** patches when a miss is repeatable
 
 Parent: `agency-quality-site`  
-Sibling: `tell-recursive-improve`  
+Sibling: `dp-recursive-improve`  
 Data: `research/design-data.README.md`
 
 ---
@@ -32,10 +32,10 @@ Configure once:
 
 ```json
 // research/design-data.local.json (gitignored)
-{ "path": "../tell-design-data", "repoUrl": "git@…", "pull": true }
+{ "path": "../dp-design-data", "repoUrl": "git@…", "pull": true }
 ```
 
-or `export TELL_DESIGN_DATA=/abs/path/to/tell-design-data`.
+or `export DP_DESIGN_DATA=/abs/path/to/dp-design-data`.
 
 Expected files in that repo: `boards.seeds.json`, `agency-engine-memory.json`,
 optional `aggregate.json` / `measurements/`, `LEARNINGS.md`, `runs/`.
@@ -81,7 +81,7 @@ AGENCY_SKIP_LEARN=1 pnpm agency:run -- --query "<requirement>" --fresh
 Use agency-quality-site (learn is automatic via agency-run-learn).
 
 Run-id: <id> already has LEARN.md from the automatic pass.
-If severity=encode and a delivery/basics gate is absent, patch @tell/design-skills
+If severity=encode and a delivery/basics gate is absent, patch @designproof/design-skills
 with a vitest lock. Do not weaken gates. Do not name third-party hosts.
 ```
 
@@ -99,7 +99,7 @@ agency-run-learn LOOP (encode only):
 
 ## Memory contract
 
-`research/agency-engine-memory.json` (committed in Tell; mirrored to design-data):
+`research/agency-engine-memory.json` (committed in Design Proof; mirrored to design-data):
 
 - `bansExtra` → merged into auto briefs
 - `nicheBoosts` → soft classifiers after hand presets
@@ -109,7 +109,7 @@ agency-run-learn LOOP (encode only):
 
 ---
 
-## Improving Tell proof
+## Improving Design proof
 
 Repeatable misses → automatic learn → `assertAgencyDelivery` / `assertBasics` /
 `applyAgencyPolish` / niche presets → vitest → LEARNINGS.  

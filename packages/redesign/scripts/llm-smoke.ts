@@ -1,11 +1,11 @@
 // One-off smoke test for the LLM restyle path — calls the REAL Gemini API using the key in
-// ../../.env (repo root). Run manually: `pnpm --filter @tell/redesign smoke:llm`.
+// ../../.env (repo root). Run manually: `pnpm --filter @designproof/redesign smoke:llm`.
 // Not part of the automated test suite (no live API calls in vitest).
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { restyleWithGemini } from "../src/llm-restyle";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -37,9 +37,9 @@ async function main() {
     return;
   }
 
-  const reportPath = path.join(repoRoot, "fixtures/reports/tell-report.json");
+  const reportPath = path.join(repoRoot, "fixtures/reports/dp-report.json");
   const raw = await readFile(reportPath, "utf8");
-  const report = TellReport.parse(JSON.parse(raw));
+  const report = DesignProofReport.parse(JSON.parse(raw));
 
   console.log(`Loaded report for ${report.capture.url} (${report.capture.styles.length} sampled elements).`);
   console.log(`Calling Gemini for direction "editorial"...`);

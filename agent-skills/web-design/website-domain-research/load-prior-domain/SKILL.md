@@ -6,7 +6,7 @@ description: First node of website-domain-research — load DomainResearchPack, 
 # load-prior-domain
 
 1. Resolve `domainId` from brief / query / siteKind
-2. Load `getDomainPack(domainId)` from `@tell/design-skills` if present
+2. Load `getDomainPack(domainId)` from `@designproof/design-skills` if present
 3. Read `research/*VERNACULAR*` or domain doc if listed on the pack
 4. Merge `research/agency-engine-memory.json` craftHints / pipelineNotes for this domain
 5. Scan `research/LEARNINGS.md` for `domain:` / `sport:` patterns

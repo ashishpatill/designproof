@@ -1,10 +1,22 @@
 # Changelog
 
-Notable Tell Proof work, newest first. Dates follow `git log`. This is not a semver release log.
+Notable Design Proof work, newest first. Dates follow `git log`. This is not a semver release log.
 
-Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app design across many sessions — an independent critic and craft layer beside the coding agent. It is not a Studio web app as the product.
+Design Proof is the **Cursor / Grok Build plugin** for world-class site and app design across many sessions — an independent critic and craft layer beside the coding agent. It is not a Studio web app as the product.
 
 **Quality bar:** stacked images, motion, artistic, unique. Not one-shot AI generate.
+
+---
+
+## 2026-10-05 — Design-engine quality diagnosis + plugin distribution plan
+
+- Add [`docs/16_DESIGN_ENGINE_QUALITY.md`](./docs/16_DESIGN_ENGINE_QUALITY.md): a measured diagnosis of why `packages/design-skills` still generates generic pages, a corpus-grounded benchmark of what separates tier-one work, and the target architecture (`ArtDirection` + `PageProgram` + media layer) with milestones M1–M7.
+  - Measured on all 17 offerings at 1440×900: **97.4% of emitted CSS lines are byte-identical across all 17**, 65 CSS classes appear on all 17 pages, ten offerings share one eight-section tail, mean pairwise copy overlap is 64.4%, and 15 of 17 emit **no real image** (`free-assets.ts` reaches only `loom` and `herbarium`).
+  - The committed craft score (0.989) is a specification-compliance score: running the repo's own `layout-audit` over the same pages finds a **1160×320 empty rectangle inside the corporate hero**, a vacancy in four other heroes, three repeated sentences, and a clipped label.
+  - Root causes RC1–RC10 and the ten vocabulary ceilings, each with `file:line`. Also documents four phantom custom properties that silently break behaviour (`--m-ease-out`, `--nav-h`, `--content-wide`, `--t-small-size`), the boilerplate footer and missing mobile nav, and dead code (`observatory-signal` selector, `.ds-bento`, `ROLE_PROOF` ≡ `ROLE_PROOF_DISTINCT`).
+- Add [`docs/17_AGENT_PLUGIN_DISTRIBUTION.md`](./docs/17_AGENT_PLUGIN_DISTRIBUTION.md): how Design Proof reaches **Codex, Cursor, Claude Code and Grok Build** from one engine — the honest per-host capability matrix (MCP install already ships for 19 hosts; craft delivery does not), the `@designproof/pack` renderer with its "no capability without an in-repo evidence file" rule, workstreams W0–W5, and the ordering judgement that the engine must land before packaging breadth.
+- Registry honesty: [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md) §Plugins now records the decision and the per-host delivery status instead of "do not scaffold a plugin".
+- [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md) and [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md) carry the two new feature rows and the reordered Next list. `.audit/` (render/screenshot/measure scratch) is git-ignored; reproduction commands are in docs/16 §9.
 
 ---
 
@@ -44,13 +56,13 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 - Slim [`AGENTS.md`](./AGENTS.md) to a thin entry (pointer tables + working loop). Do not load all of `docs/`.
 - Add [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md), [`docs/TOOLS-AND-SKILLS.md`](./docs/TOOLS-AND-SKILLS.md), and [`docs/features/`](./docs/features/) (capture→prove, MCP plugin, design dogfood, training-data/MCP sink, showcase/Tiller).
 - Add this changelog and [`docs/PROJECT-STATUS.md`](./docs/PROJECT-STATUS.md) (Done / Pending / Stuck / Needs from Ashish / Next).
-- Registry lists only in-repo skills, the `tell` MCP server, and no Cursor plugin package. No app code.
+- Registry lists only in-repo skills, the `designproof` MCP server, and no Cursor plugin package. No app code.
 
 ---
 
 ## 2026-08-26 — Captioned product demo
 
-- Record and recapture the 5-beat product loop for README (~47s, captioned): capture → named tells → seam → voice → draft fix, then Studio and specimens.
+- Record and recapture the 5-beat product loop for README (~47s, captioned): capture → named tells → seam → voice → draft fix, then Studio and templates.
 - Document the demo in README.
 
 ---
@@ -60,17 +72,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 - Rewrite README as a human-written product overview (masthead, one visual per concept, loop steps).
 - Curate showcase stills and craft-reel policy so GitHub does not reprint the same fold twice.
 - Recapture README media; ink-on-paper sidebar remains readable.
-- MCP tools write training episodes through the shared `tell-design-data` sink when the sibling repo is present. Raw dumps → curated SFT/DPO is **not** closed (see PROJECT-STATUS).
+- MCP tools write training episodes through the shared `dp-design-data` sink when the sibling repo is present. Raw dumps → curated SFT/DPO is **not** closed (see PROJECT-STATUS).
 
 ---
 
-## 2026-08-24 — Specimens: Tiller, Lattice, Ember Gate
+## 2026-08-24 — Templates: Tiller, Lattice, Ember Gate
 
 - Agent-harness **Tiller** hero-helm; turn list reads as a session, not a feature reprint (`#74`, `#75`).
 - Lattice: drop orange Z through cards and pipeline title rail (`#62`).
 - Ember Gate PATH ATLAS: walk, not a broken diagram (`#63`).
 - Ground deterministic CTA note and workflow roles (`#73`).
-- Public showcase/GitHub still flags **Tiller as missing** — in-repo specimen exists; the public gap stays open.
+- Public showcase/GitHub still flags **Tiller as missing** — in-repo template exists; the public gap stays open.
 
 ---
 
@@ -79,7 +91,7 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 - Phase 0–1 Studio honesty: instrument the SaaS-demo blind spot; connective author for `saas` / `demos` briefs (`#72`).
 - Ungate the SaaS product-proof quality bar from the approve workflow; gate workflow-proof on approval language and seed accent hue.
 - Un-nest soft-brand-accent mood so the live wash paints.
-- Close MCP catalog honesty: **eleven** `tell_*` tools (docs matched code; residual eight-tool claim removed).
+- Close MCP catalog honesty: **eleven** `designproof_*` tools (docs matched code; residual eight-tool claim removed).
 - Settings and scenario matrix match real capture contracts.
 
 ---
@@ -88,20 +100,20 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 - Shared DesignControls on Home and Studio; guard composer against third-party brand templates.
 - Template craft audit: layout-audit clean across 16 briefs; vacancy slabs and alignment-axes collapse.
-- Care pathway clinic specimen (Roundspool).
+- Care pathway clinic template (Roundspool).
 - Readable ink-on-paper product sidebar (`#64`).
-- README specimens, craft reels, and demo refresh.
+- README templates, craft reels, and demo refresh.
 
 ---
 
-## 2026-08-09 – 2026-08-11 — Matchday specimens, skill graph, platform
+## 2026-08-09 – 2026-08-11 — Matchday templates, skill graph, platform
 
-- Crease (cricket) and Baseline (tennis) matchday specimens from sport vernacular + domain research; score spine / nested sets; instant nav.
+- Crease (cricket) and Baseline (tennis) matchday templates from sport vernacular + domain research; score spine / nested sets; instant nav.
 - Auto-trigger `website-domain-research` (and sport extension) on site builds; wire research, craft, and media skills into every template run.
 - Unify product nav to one left sidebar; stop silent demo fallback when live capture fails; critic rail simplified; seam pins removed.
 - Phase 9 uniqueness: archive / studio / foundry loops; strip shared marquee-proof; unique mid-page instruments (field key, press forme, observatory waterfall, lantern trail, loom care-tags).
 - Multi-agent MCP install catalog (Cursor, Grok Build, and peers).
-- Local training-data sink into sibling `tell-design-data` (Studio routes + later MCP); agency-run-learn vs end-user session learn split.
+- Local training-data sink into sibling `dp-design-data` (Studio routes + later MCP); agency-run-learn vs end-user session learn split.
 
 ---
 
@@ -110,7 +122,7 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 - Kinetic motion template (Mote); lantern-path cinematic night-walk.
 - Product-proof-stage skill (HTMX workflow proof for SaaS).
 - First-five template plumbing: instruments fill the viewport; dead chips become controls.
-- Phase 8 stretch: `tell_resolve_intent` + Connect Agent UI — catalog stays at eleven tools.
+- Phase 8 stretch: `designproof_resolve_intent` + Connect Agent UI — catalog stays at eleven tools.
 
 ---
 
@@ -118,4 +130,4 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 Sprint MVP **M1–M10** and Phases **1–6** are closed: capture → fingerprint → 14 detectors → taste → Report/seam → voice → redesign diffs → MCP → proof verify → scenario matrix → auth harness. See [`PLAN.md`](./PLAN.md) and [`BUILD.md`](./BUILD.md).
 
-Phase 7 premium craft floor, agency-quality pipeline, and most of Phase 8 (install-info, `tell mcp install`, `tell_voice`) shipped before the August specimen work. Remaining Phase 7 stretch (optional GSAP/Lenis + Rive) and Phase 9 dossier/consumer/marketing polish are still open in PLAN.md — they sit behind the items in PROJECT-STATUS.
+Phase 7 premium craft floor, agency-quality pipeline, and most of Phase 8 (install-info, `designproof mcp install`, `designproof_voice`) shipped before the August template work. Remaining Phase 7 stretch (optional GSAP/Lenis + Rive) and Phase 9 dossier/consumer/marketing polish are still open in PLAN.md — they sit behind the items in PROJECT-STATUS.

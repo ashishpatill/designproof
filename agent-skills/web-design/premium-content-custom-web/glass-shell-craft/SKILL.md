@@ -1,6 +1,6 @@
 ---
 name: glass-shell-craft
-description: Dark glass / frosted panel craft learned in full — tokens, backdrop-filter panels, masked gradient borders, contrast validation. Tell ships at most one frosted shell level — never glass-everywhere.
+description: Dark glass / frosted panel craft learned in full — tokens, backdrop-filter panels, masked gradient borders, contrast validation. Design Proof ships at most one frosted shell level — never glass-everywhere.
 ---
 
 # glass-shell-craft
@@ -27,7 +27,7 @@ description: Dark glass / frosted panel craft learned in full — tokens, backdr
 }
 ```
 
-## Tell constraints
+## Design Proof constraints
 
 | Rule | Why |
 |---|---|

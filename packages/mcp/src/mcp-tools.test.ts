@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { MCP_TOOL_NAMES } from "@tell/schema";
+import { MCP_TOOL_NAMES } from "@designproof/schema";
 import { REGISTERED_MCP_TOOLS } from "../src/registered-tools";
 
 describe("MCP tool drift guard", () => {

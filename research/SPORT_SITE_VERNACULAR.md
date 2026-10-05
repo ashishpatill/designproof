@@ -146,9 +146,9 @@ Tennis is lived in a **nested stack**: point → game → set → match. Fans do
 
 Clay dust, grass sheen, hard-court night, baseline chalk. Surface is atmosphere — never a sticker competing with the spine.
 
-### 3b.7 Multipage IA (BASELINE specimen)
+### 3b.7 Multipage IA (BASELINE template)
 
-Specimen routes under `/baseline/*` — Core six:
+Template routes under `/baseline/*` — Core six:
 
 | Class | Job |
 |---|---|
@@ -206,9 +206,9 @@ These are the tennis equivalents of cricket’s this-over trail. A site without 
 | `DesignBrief.sportId` | Routes `sport-vernacular-craft` after research graph |
 | Agency `niche.ts` | cricket / football / hockey / tennis presets |
 | Skills | `website-domain-research` → `sport-matchday-web` / `sport-site-research` → craft |
-| Specimen | `/crease/*` Core six (multipage) — cricket · `/baseline/*` Core six — tennis |
+| Template | `/crease/*` Core six (multipage) — cricket · `/baseline/*` Core six — tennis |
 | Capture | `scripts/multipage-domain-capture.ts` (domain-agnostic) |
-| Training | `scripts/emit-design-training-episode.ts` → tell-design-data / training.local |
+| Training | `scripts/emit-design-training-episode.ts` → dp-design-data / training.local |
 
 ---
 
@@ -258,7 +258,7 @@ Format chips · live chip · rankings tabs · primary “open scorecard” CTA �
 
 Category portals consistently expose more than Core six — but as **directory / footer / deep-link** surfaces, not primary-nav sprawl. Synthesized across ≥2 major cricket information sites (host names omitted).
 
-| Class | Job | Specimen |
+| Class | Job | Template |
 |---|---|---|
 | fixtures | Before-play schedule — when / format / venue chapters | `/crease/fixtures` |
 | teams | Team hubs — form strip + next fixture + path into Live | `/crease/teams` |

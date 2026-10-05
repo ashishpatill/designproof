@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Check, Clipboard, Loader2 } from "lucide-react";
-import type { InstallInfo } from "@tell/schema";
+import type { InstallInfo } from "@designproof/schema";
 
 type CopyState = "idle" | "copied";
 

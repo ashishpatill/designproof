@@ -5,15 +5,15 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { contrastRatio, parseColor } from "./color";
 import { reconcile, RECONCILE_DIRECTIONS } from "./reconcile";
 import { validateRestyleSheet } from "./validate";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../..");
-const report = TellReport.parse(
-  JSON.parse(readFileSync(path.join(repoRoot, "fixtures/reports/tell-report.json"), "utf8")),
+const report = DesignProofReport.parse(
+  JSON.parse(readFileSync(path.join(repoRoot, "fixtures/reports/dp-report.json"), "utf8")),
 );
 
 const ids = Object.keys(RECONCILE_DIRECTIONS);
@@ -89,14 +89,14 @@ describe("redesign engine v2 — direction distinctness", () => {
 
   it("never pairs forced ink with a retained unreadable fill (the dark-chip bug)", () => {
     for (const r of recons) {
-      // Reconstruct per-element decls from emitted [data-tell-id] rules.
-      const rules = r.css.match(/\[data-tell-id="([^"]+)"\]\{[^}]*\}/g) ?? [];
+      // Reconstruct per-element decls from emitted [data-dp-id] rules.
+      const rules = r.css.match(/\[data-dp-id="([^"]+)"\]\{[^}]*\}/g) ?? [];
       for (const rule of rules) {
-        const id = rule.match(/\[data-tell-id="([^"]+)"\]/)![1];
+        const id = rule.match(/\[data-dp-id="([^"]+)"\]/)![1];
         const colorMatch = rule.match(/[^-]color:\s*([^;!]+)/);
         const bgMatch = rule.match(/background-color:\s*([^;!]+)/);
         if (!colorMatch || bgMatch) continue; // no forced ink, or bg also owned → fine
-        const sample = report.capture.styles.find((s) => s.tellId === id);
+        const sample = report.capture.styles.find((s) => s.dpId === id);
         const ownBg = sample?.backgroundColor;
         if (!ownBg || !parseColor(ownBg)) continue; // transparent fill → reads on page paper
         expect(

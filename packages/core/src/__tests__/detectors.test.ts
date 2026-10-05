@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
-import { CapturePayload } from "@tell/schema";
+import { CapturePayload } from "@designproof/schema";
 import { buildFingerprint } from "../fingerprint/build-fingerprint";
 import { detectFindings } from "../detectors";
 
@@ -131,7 +131,7 @@ describe("ResponsiveViewportDrift baseline", () => {
   function style(i: number) {
     return {
       selector: `p.${i}`,
-      tellId: `t${i}`,
+      dpId: `t${i}`,
       tag: "p",
       role: "body" as const,
       rect: { x: 0, y: 0, w: 100, h: 20 },

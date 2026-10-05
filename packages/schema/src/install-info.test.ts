@@ -10,15 +10,15 @@ describe("buildInstallInfo", () => {
   it("returns schema-valid install info with all MCP tools", () => {
     const info = buildInstallInfo();
     expect(InstallInfo.parse(info).mcp.tools).toEqual([...MCP_TOOL_NAMES]);
-    expect(info.mcp.cursor.mcpServers.tell?.command).toBe("pnpm");
+    expect(info.mcp.cursor.mcpServers.designproof?.command).toBe("pnpm");
     expect(info.deeplink.cursor.startsWith("cursor://")).toBe(true);
     expect(info.deeplink.cursor).toContain("config=");
   });
 
-  it("supports tell-mcp launch mode", () => {
-    const info = buildInstallInfo({ launch: "tell-mcp" });
-    expect(info.mcp.manual.command).toBe("tell-mcp");
-    expect(info.mcp.vscode.servers.tell?.command).toBe("tell-mcp");
+  it("supports dp-mcp launch mode", () => {
+    const info = buildInstallInfo({ launch: "dp-mcp" });
+    expect(info.mcp.manual.command).toBe("dp-mcp");
+    expect(info.mcp.vscode.servers.designproof?.command).toBe("dp-mcp");
   });
 
   it("includes platform compatibility catalog for requested agents", () => {
@@ -46,7 +46,7 @@ describe("buildInstallInfo", () => {
       expect(info.platforms.some((p) => p.id === id)).toBe(true);
     }
     expect(info.platforms.filter((p) => p.status === "supported").length).toBeGreaterThanOrEqual(15);
-    expect(info.cli.tellMcpInstall).toContain("tell mcp install");
+    expect(info.cli.dpMcpInstall).toContain("designproof mcp install");
   });
 });
 
@@ -63,7 +63,7 @@ describe("platform aliases", () => {
 
 describe("buildPlatformCatalog", () => {
   it("marks muse and zcode as snippet-only until paths are verified", () => {
-    const catalog = buildPlatformCatalog({ command: "pnpm", args: ["-F", "@tell/mcp", "start"] });
+    const catalog = buildPlatformCatalog({ command: "pnpm", args: ["-F", "@designproof/mcp", "start"] });
     expect(catalog.find((p) => p.id === "muse")?.status).toBe("snippet");
     expect(catalog.find((p) => p.id === "zcode")?.status).toBe("snippet");
     expect(catalog.find((p) => p.id === "opencode")?.snippet).toContain('"type": "local"');
@@ -73,9 +73,9 @@ describe("buildPlatformCatalog", () => {
 
 describe("McpToolName", () => {
   it("includes voice and install_info", () => {
-    expect(McpToolName.options).toContain("tell_voice");
-    expect(McpToolName.options).toContain("tell_install_info");
-    expect(McpToolName.options).toContain("tell_resolve_intent");
+    expect(McpToolName.options).toContain("designproof_voice");
+    expect(McpToolName.options).toContain("designproof_install_info");
+    expect(McpToolName.options).toContain("designproof_resolve_intent");
     expect(MCP_TOOL_NAMES).toHaveLength(11);
   });
 });

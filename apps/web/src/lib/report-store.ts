@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { neon } from "@neondatabase/serverless";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { head, put } from "@vercel/blob";
 
 const STORE_DIR = path.join(process.cwd(), "data", "shared-reports");
@@ -93,7 +93,7 @@ async function ensureNeonTable(): Promise<void> {
   await neonReady;
 }
 
-async function saveToNeon(id: string, report: TellReport): Promise<void> {
+async function saveToNeon(id: string, report: DesignProofReport): Promise<void> {
   await ensureNeonTable();
   const sql = getSql();
   // Use query() so the JSONB cast binds reliably with the HTTP driver.
@@ -106,29 +106,29 @@ async function saveToNeon(id: string, report: TellReport): Promise<void> {
   );
 }
 
-async function loadFromNeon(id: string): Promise<TellReport | null> {
+async function loadFromNeon(id: string): Promise<DesignProofReport | null> {
   await ensureNeonTable();
   const sql = getSql();
   const rows = await sql`SELECT report FROM shared_reports WHERE id = ${id} LIMIT 1`;
   const row = rows[0] as { report?: unknown } | undefined;
   if (row?.report == null) return null;
   const raw = typeof row.report === "string" ? JSON.parse(row.report) : row.report;
-  return TellReport.parse(raw);
+  return DesignProofReport.parse(raw);
 }
 
-async function loadFromBlob(id: string): Promise<TellReport | null> {
+async function loadFromBlob(id: string): Promise<DesignProofReport | null> {
   const meta = await head(`${BLOB_PREFIX}/${id}.json`);
   const res = await fetch(meta.url);
   if (!res.ok) return null;
-  return TellReport.parse(await res.json());
+  return DesignProofReport.parse(await res.json());
 }
 
-async function loadFromDisk(id: string): Promise<TellReport | null> {
+async function loadFromDisk(id: string): Promise<DesignProofReport | null> {
   const raw = await readFile(path.join(STORE_DIR, `${id}.json`), "utf8");
-  return TellReport.parse(JSON.parse(raw));
+  return DesignProofReport.parse(JSON.parse(raw));
 }
 
-export async function saveSharedReport(report: TellReport): Promise<string> {
+export async function saveSharedReport(report: DesignProofReport): Promise<string> {
   const id = randomBytes(8).toString("hex");
   const payload = JSON.stringify(report);
   const backend = resolveShareBackend();
@@ -152,7 +152,7 @@ export async function saveSharedReport(report: TellReport): Promise<string> {
   return id;
 }
 
-export async function loadSharedReport(id: string): Promise<TellReport | null> {
+export async function loadSharedReport(id: string): Promise<DesignProofReport | null> {
   if (!/^[a-f0-9]{16}$/.test(id)) return null;
 
   // Prefer the write backend, then fall back so Blob-era links still resolve after Neon is enabled.

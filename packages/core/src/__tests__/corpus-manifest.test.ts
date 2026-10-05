@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
-import { CapturePayload, ScenarioMatrix } from "@tell/schema";
+import { CapturePayload, ScenarioMatrix } from "@designproof/schema";
 import { buildFingerprint } from "../fingerprint/build-fingerprint";
 import { detectFindings } from "../detectors";
 import { compareProofMatrices } from "../proof-verify";
@@ -62,7 +62,7 @@ describe("detector golden corpus manifest", () => {
   it("documents intentional and dogfood categories for expansion", () => {
     const ids = manifest.categories.map((c) => c.id);
     expect(ids).toContain("intentional-brutalist");
-    expect(ids).toContain("tell-dogfood");
+    expect(ids).toContain("dp-dogfood");
   });
 });
 

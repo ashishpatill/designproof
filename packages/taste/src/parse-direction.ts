@@ -1,4 +1,4 @@
-import { ArtDirection } from "@tell/schema";
+import { ArtDirection } from "@designproof/schema";
 import { DIRECTION_PRESETS } from "./presets";
 
 export type DirectionPresetId = keyof typeof DIRECTION_PRESETS;
@@ -139,7 +139,7 @@ export function parseDirectionPlan(input: string): DirectionPlan {
 }
 
 const VOICE_SYSTEM_PROMPT = [
-  "You parse voice art-direction instructions for Tell, a UI taste engine.",
+  "You parse voice art-direction instructions for Design Proof, a UI taste engine.",
   "Break compound instructions into separate actionable items.",
   "Pick the closest preset: editorial | precision | warm-minimal | bold-contrast | luxury | brutalist | explainer.",
   "Respond ONLY with JSON:",

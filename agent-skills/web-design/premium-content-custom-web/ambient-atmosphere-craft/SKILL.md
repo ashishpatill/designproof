@@ -1,6 +1,6 @@
 ---
 name: ambient-atmosphere-craft
-description: Section-bounded particle/atmosphere craft learned in full — config knobs, renderer choice, pointer disturbance, visibility pausing, recycle/settle/static modes, DPR caps, teardown. Tell default is sparse static; animated only when motion allows and content stays primary.
+description: Section-bounded particle/atmosphere craft learned in full — config knobs, renderer choice, pointer disturbance, visibility pausing, recycle/settle/static modes, DPR caps, teardown. Design Proof default is sparse static; animated only when motion allows and content stays primary.
 ---
 
 # ambient-atmosphere-craft
@@ -63,7 +63,7 @@ End modes: `recycle` | `exit` | `settle` (height-capped pile) | `static` (determ
 - Resume from current state; never spawn a second loop
 - Teardown: disconnect observers, remove listeners, cancel frame, release resources
 
-## Tell constraints (ship defaults)
+## Design Proof constraints (ship defaults)
 
 | Context | Behavior |
 |---|---|
@@ -75,7 +75,7 @@ End modes: `recycle` | `exit` | `settle` (height-capped pile) | `static` (determ
 
 ## Engine
 
-`@tell/design-skills` emits a **static** sparse mote field under `data-atmosphere` for dark-premium when motion ≠ none. Agents may replace with the full canvas sim when the brief explicitly asks for living atmosphere.
+`@designproof/design-skills` emits a **static** sparse mote field under `data-atmosphere` for dark-premium when motion ≠ none. Agents may replace with the full canvas sim when the brief explicitly asks for living atmosphere.
 
 ## Verify
 

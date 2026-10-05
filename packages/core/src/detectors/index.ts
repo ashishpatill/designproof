@@ -1,4 +1,4 @@
-import { CapturePayload, DesignFingerprint, Finding } from "@tell/schema";
+import { CapturePayload, DesignFingerprint, Finding } from "@designproof/schema";
 import { hexToRgb, saturation } from "../fingerprint/build-fingerprint";
 import { detectDesignSystemDrift, parseDesignDoc, type DesignDocSpec } from "./design-system-drift";
 
@@ -29,7 +29,7 @@ export function detectFindings(
 
   if (primaryFont && primaryFontRatio >= 0.75 && /inter|system-ui|arial/i.test(primaryFont.family)) {
     findings.push(Finding.parse({
-      id: "tell-system-font",
+      id: "dp-system-font",
       family: "tell",
       detector: "SystemFontTell",
       verdictHint: "generic",
@@ -41,7 +41,7 @@ export function detectFindings(
 
   if (fingerprint.gradientDetected) {
     findings.push(Finding.parse({
-      id: "tell-gradient-crutch",
+      id: "dp-gradient-crutch",
       family: "tell",
       detector: "GradientCrutchTell",
       verdictHint: "generic",
@@ -54,7 +54,7 @@ export function detectFindings(
   const dominantShadow = fingerprint.shadows.find((s) => s.value !== "none");
   if (dominantShadow && dominantShadow.count >= Math.max(3, capture.styles.length * 0.35)) {
     findings.push(Finding.parse({
-      id: "tell-shadow-everywhere",
+      id: "dp-shadow-everywhere",
       family: "tell",
       detector: "ShadowEverywhereTell",
       verdictHint: "generic",
@@ -67,7 +67,7 @@ export function detectFindings(
   const dominantRadius = fingerprint.radii.find((r) => r.value !== "0px");
   if (dominantRadius && dominantRadius.count >= Math.max(5, capture.styles.length * 0.5)) {
     findings.push(Finding.parse({
-      id: "tell-radius-monotone",
+      id: "dp-radius-monotone",
       family: "tell",
       detector: "RadiusMonotoneTell",
       verdictHint: "generic",
@@ -79,7 +79,7 @@ export function detectFindings(
 
   if (fingerprint.emojiInUiCount >= 3) {
     findings.push(Finding.parse({
-      id: "tell-emoji-chrome",
+      id: "dp-emoji-chrome",
       family: "tell",
       detector: "EmojiChromeTell",
       verdictHint: "generic",
@@ -103,7 +103,7 @@ export function detectFindings(
     const hits = patterns.filter((p) => p.re.test(hay));
     if (hits.length >= 1) {
       findings.push(Finding.parse({
-        id: "tell-boilerplate-copy",
+        id: "dp-boilerplate-copy",
         family: "tell",
         detector: "BoilerplateCopyTell",
         verdictHint: "generic",
@@ -116,7 +116,7 @@ export function detectFindings(
 
   if (fingerprint.centeredBlockRatio >= 0.7) {
     findings.push(Finding.parse({
-      id: "tell-centered-everything",
+      id: "dp-centered-everything",
       family: "tell",
       detector: "CenteredEverythingTell",
       verdictHint: "generic",
@@ -128,7 +128,7 @@ export function detectFindings(
 
   if (fingerprint.nearDuplicateGrays.length > 0) {
     findings.push(Finding.parse({
-      id: "tell-gray-mush",
+      id: "dp-gray-mush",
       family: "tell",
       detector: "GrayMushTell",
       verdictHint: "generic",
@@ -230,7 +230,7 @@ export function detectFindings(
   });
   if (darkSurface && acidAccent) {
     findings.push(Finding.parse({
-      id: "tell-acid-accent",
+      id: "dp-acid-accent",
       family: "tell",
       detector: "AcidAccentTell",
       verdictHint: "generic",

@@ -7,13 +7,13 @@ import {
   platformListHelp,
   type InstallInfo,
   resolveIntent,
-  TellReport,
-} from "@tell/schema";
+  DesignProofReport,
+} from "@designproof/schema";
 import { installPlatformMcp, printPlatformCompatibilityMarkdown } from "./mcp-install.js";
 
 type CursorInstallScope = "project" | "user";
 
-/** Walk up from cwd (and this file) until we find the Tell monorepo root. */
+/** Walk up from cwd (and this file) until we find the Design Proof monorepo root. */
 function findRepoRoot(start = process.cwd()): string {
   let dir = start;
   for (let i = 0; i < 12; i++) {
@@ -28,17 +28,17 @@ function findRepoRoot(start = process.cwd()): string {
 }
 
 function usage(): never {
-  console.log(`tell — Tell CLI (mirrors MCP / HTTP)
+  console.log(`tell — Design Proof CLI (mirrors MCP / HTTP)
 
 Usage:
-  tell diagnose [--url <url>] [--out <file>] [--fallback]
+  designproof diagnose [--url <url>] [--out <file>] [--fallback]
   tell voice --text <direction>
   tell resolve --text <input>
   tell install-info [--json|--markdown]
-  tell mcp print-config
-  tell mcp platforms
-  tell mcp install <platform> [--project|--user|--print]
-  tell doctor
+  designproof mcp print-config
+  designproof mcp platforms
+  designproof mcp install <platform> [--project|--user|--print]
+  designproof doctor
   tell help
 
 Platforms: ${platformListHelp()}
@@ -62,14 +62,14 @@ function hasFlag(args: string[], name: string): boolean {
 }
 
 async function cmdDiagnose(args: string[]) {
-  const { captureUrl, diagnoseCapture } = await import("@tell/core");
-  const { classifyWithTaste } = await import("@tell/taste");
+  const { captureUrl, diagnoseCapture } = await import("@designproof/core");
+  const { classifyWithTaste } = await import("@designproof/taste");
   const root = findRepoRoot();
-  const url = argValue(args, "--url") ?? process.env.TELL_FIXTURE_URL ?? "http://localhost:3001";
+  const url = argValue(args, "--url") ?? process.env.DP_FIXTURE_URL ?? "http://localhost:3001";
   const out = argValue(args, "--out");
   const allowFallback =
-    hasFlag(args, "--fallback") || process.env.TELL_DIAGNOSE_OFFLINE_FALLBACK === "1";
-  const artifactRel = process.env.TELL_REPORT_ARTIFACT ?? "fixtures/reports/tell-report.json";
+    hasFlag(args, "--fallback") || process.env.DP_DIAGNOSE_OFFLINE_FALLBACK === "1";
+  const artifactRel = process.env.DP_REPORT_ARTIFACT ?? "fixtures/reports/dp-report.json";
   const artifact = path.isAbsolute(artifactRel) ? artifactRel : path.join(root, artifactRel);
   try {
     const capture = await captureUrl(url);
@@ -77,7 +77,7 @@ async function cmdDiagnose(args: string[]) {
     const verdicts = await classifyWithTaste(base.findings, base.fingerprint, {
       apiKey: process.env.GEMINI_API_KEY,
     });
-    const report = TellReport.parse({
+    const report = DesignProofReport.parse({
       ...base,
       verdicts,
       score: {
@@ -93,17 +93,17 @@ async function cmdDiagnose(args: string[]) {
     else console.log(text);
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
-    console.error(`[tell diagnose] live capture failed for ${url}`);
+    console.error(`[designproof diagnose] live capture failed for ${url}`);
     console.error(detail);
     if (!allowFallback) {
-      console.error("Pass --fallback (or TELL_DIAGNOSE_OFFLINE_FALLBACK=1) to emit the offline fixture.");
+      console.error("Pass --fallback (or DP_DIAGNOSE_OFFLINE_FALLBACK=1) to emit the offline fixture.");
       console.log(JSON.stringify({ ok: false, live: false, url, error: detail }, null, 2));
       process.exitCode = 1;
       return;
     }
-    console.error(`[tell diagnose] emitting offline fixture from ${artifact}`);
+    console.error(`[designproof diagnose] emitting offline fixture from ${artifact}`);
     const raw = await readFile(artifact, "utf8");
-    const text = JSON.stringify(TellReport.parse(JSON.parse(raw)), null, 2);
+    const text = JSON.stringify(DesignProofReport.parse(JSON.parse(raw)), null, 2);
     if (out) await writeFile(out, text, "utf8");
     else console.log(text);
     process.exitCode = 2;
@@ -111,7 +111,7 @@ async function cmdDiagnose(args: string[]) {
 }
 
 async function cmdVoice(args: string[]) {
-  const { parseDirectionPlan, parseDirectionWithGemini } = await import("@tell/taste");
+  const { parseDirectionPlan, parseDirectionWithGemini } = await import("@designproof/taste");
   const text = argValue(args, "--text") ?? argValue(args, "--transcript");
   if (!text) {
     console.error("tell voice requires --text <direction>");
@@ -132,7 +132,7 @@ function cmdResolve(args: string[]) {
     console.error("tell resolve requires --text <input>");
     process.exit(1);
   }
-  const fixtureUrl = argValue(args, "--fixture-url") ?? process.env.TELL_FIXTURE_URL ?? "http://localhost:3001";
+  const fixtureUrl = argValue(args, "--fixture-url") ?? process.env.DP_FIXTURE_URL ?? "http://localhost:3001";
   console.log(JSON.stringify(resolveIntent(text, { fixtureUrl }), null, 2));
 }
 
@@ -152,7 +152,7 @@ function printInstallSnippets(info: InstallInfo): string {
     .map((p) => [`## ${p.label} (\`${p.id}\`)`, p.installCommand, "", p.snippet, ""].join("\n"))
     .join("\n");
   return [
-    "# Tell MCP install snippets",
+    "# Design Proof MCP install snippets",
     "",
     "## Cursor deeplink",
     info.deeplink.cursor,
@@ -229,7 +229,7 @@ async function cmdDoctor() {
     ok: existsSync(path.join(root, "pnpm-workspace.yaml")),
     detail: existsSync(path.join(root, "pnpm-workspace.yaml"))
       ? `monorepo root ${root}`
-      : "Run tell from the Tell monorepo (or a child package)",
+      : "Run tell from the Design Proof monorepo (or a child package)",
   });
 
   const mcpProject = path.join(root, ".cursor", "mcp.json");
@@ -238,10 +238,10 @@ async function cmdDoctor() {
     ok: existsSync(mcpProject),
     detail: existsSync(mcpProject)
       ? `.cursor/mcp.json present`
-      : `Missing .cursor/mcp.json — run: tell mcp install cursor --project`,
+      : `Missing .cursor/mcp.json — run: designproof mcp install cursor --project`,
   });
 
-  const offlineRel = process.env.TELL_REPORT_ARTIFACT ?? "fixtures/reports/tell-report.json";
+  const offlineRel = process.env.DP_REPORT_ARTIFACT ?? "fixtures/reports/dp-report.json";
   const offline = path.isAbsolute(offlineRel) ? offlineRel : path.join(root, offlineRel);
   checks.push({
     id: "offline-report",
@@ -254,7 +254,7 @@ async function cmdDoctor() {
   checks.push({
     id: "port-3000",
     ok: true,
-    detail: p3000 ? "3000 free (start with pnpm dev)" : "3000 in use (ok if Tell web is running)",
+    detail: p3000 ? "3000 free (start with pnpm dev)" : "3000 in use (ok if Design Proof web is running)",
   });
   checks.push({
     id: "port-3001",
@@ -305,7 +305,7 @@ async function cmdDoctor() {
     checks.push({
       id: "capture-health",
       ok: true,
-      detail: "skipped (Tell web not listening on 3000)",
+      detail: "skipped (Design Proof web not listening on 3000)",
     });
   }
 

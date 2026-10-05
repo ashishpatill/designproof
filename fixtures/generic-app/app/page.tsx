@@ -1,7 +1,7 @@
 export default function GenericApp() {
   return (
     <main>
-      <div className="pill">Demo input — deliberately generic. Not Tell's UI.</div>
+      <div className="pill">Demo input — deliberately generic. Not Design Proof's UI.</div>
       <nav className="nav">
         <a href="#features">🚀 Features</a>
         <a href="#metrics">📊 Metrics</a>

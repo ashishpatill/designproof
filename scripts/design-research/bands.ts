@@ -6,7 +6,7 @@
  * still land in a band with a dense neighbour. This prints the slices so a loop can see which beats
  * are actually quiet.
  *
- * Usage: pnpm -F @tell/design-skills exec tsx ../../scripts/design-research/bands.ts [briefId]
+ * Usage: pnpm -F @designproof/design-skills exec tsx ../../scripts/design-research/bands.ts [briefId]
  */
 import { createServer } from "node:http";
 import { chromium } from "playwright";

@@ -1,4 +1,4 @@
-import { ArtDirection, DesignFingerprint, Finding, TasteVerdict } from "@tell/schema";
+import { ArtDirection, DesignFingerprint, Finding, TasteVerdict } from "@designproof/schema";
 import { createTasteEngine, deterministicVerdict, type TasteEngine } from "./engine";
 import { parseDirectionPlan } from "./parse-direction";
 import { DIRECTION_PRESETS } from "./presets";

@@ -1,4 +1,4 @@
-import { ArtDirection, BrandDNA, RedesignProposal, TellReport } from "@tell/schema";
+import { ArtDirection, BrandDNA, RedesignProposal, DesignProofReport } from "@designproof/schema";
 import { buildOverridesPatch, reconcile, resolveDirection } from "./reconcile";
 import { buildAppendedOverridePatch, buildSourcePatch, type SourceFile } from "./source-patch";
 import { buildStateGapPatch } from "./state-gap-patch";
@@ -15,7 +15,7 @@ export { buildStateGapPatch, stateGapCss } from "./state-gap-patch";
 export * as color from "./color";
 
 export interface RedesignGenerator {
-  propose(report: TellReport, direction: ArtDirection, findingId?: string, dna?: BrandDNA, sources?: SourceFile[]): Promise<RedesignProposal>;
+  propose(report: DesignProofReport, direction: ArtDirection, findingId?: string, dna?: BrandDNA, sources?: SourceFile[]): Promise<RedesignProposal>;
 }
 
 /**
@@ -30,7 +30,7 @@ export interface RedesignGenerator {
  * patch only — never a full-page palette restyle.
  */
 export class OfflineRedesignGenerator implements RedesignGenerator {
-  async propose(report: TellReport, direction: ArtDirection, findingId?: string, dna?: BrandDNA, sources?: SourceFile[]): Promise<RedesignProposal> {
+  async propose(report: DesignProofReport, direction: ArtDirection, findingId?: string, dna?: BrandDNA, sources?: SourceFile[]): Promise<RedesignProposal> {
     const dir = resolveDirection(direction.id) ?? resolveDirection("editorial");
 
     if (findingId === "drift-state-gap") {

@@ -8,8 +8,8 @@ export type PlatformStdioConfig = {
 };
 
 /**
- * Coding-agent / IDE hosts that can consume Tell as an MCP server.
- * Tell does not spawn these agents as design engines — install only.
+ * Coding-agent / IDE hosts that can consume Design Proof as an MCP server.
+ * Design Proof does not spawn these agents as design engines — install only.
  */
 export const PlatformId = z.enum([
   "cursor",
@@ -35,7 +35,7 @@ export const PlatformId = z.enum([
 export type PlatformId = z.infer<typeof PlatformId>;
 export const PLATFORM_IDS = PlatformId.options;
 
-/** Aliases accepted by `tell mcp install <id>`. */
+/** Aliases accepted by `designproof mcp install <id>`. */
 export const PLATFORM_ALIASES: Record<string, PlatformId> = {
   "claude-code": "claude",
   "grok-build": "grok",
@@ -92,12 +92,12 @@ function stdioJson(stdio: PlatformStdioConfig): string {
 }
 
 function mcpServersBlock(stdio: PlatformStdioConfig): string {
-  return JSON.stringify({ mcpServers: { tell: JSON.parse(stdioJson(stdio)) } }, null, 2);
+  return JSON.stringify({ mcpServers: { designproof: JSON.parse(stdioJson(stdio)) } }, null, 2);
 }
 
 function tomlBlock(stdio: PlatformStdioConfig): string {
   return [
-    "[mcp_servers.tell]",
+    "[mcp_servers.designproof]",
     `command = ${JSON.stringify(stdio.command)}`,
     `args = ${JSON.stringify(stdio.args)}`,
     ...(stdio.env
@@ -115,7 +115,7 @@ function tomlBlock(stdio: PlatformStdioConfig): string {
 function yamlBlock(stdio: PlatformStdioConfig): string {
   const lines = [
     "mcp_servers:",
-    "  tell:",
+    "  designproof:",
     `    command: ${JSON.stringify(stdio.command)}`,
     `    args: [${stdio.args.map((a) => JSON.stringify(a)).join(", ")}]`,
   ];
@@ -132,7 +132,7 @@ function opencodeBlock(stdio: PlatformStdioConfig): string {
   return JSON.stringify(
     {
       mcp: {
-        tell: {
+        designproof: {
           type: "local",
           command: [stdio.command, ...stdio.args],
           enabled: true,
@@ -150,7 +150,7 @@ function openclawBlock(stdio: PlatformStdioConfig): string {
     {
       mcp: {
         servers: {
-          tell: {
+          designproof: {
             command: stdio.command,
             args: stdio.args,
             ...(stdio.env ? { env: stdio.env } : {}),
@@ -167,7 +167,7 @@ function vscodeBlock(stdio: PlatformStdioConfig): string {
   return JSON.stringify(
     {
       servers: {
-        tell: {
+        designproof: {
           type: "stdio",
           command: stdio.command,
           args: stdio.args,
@@ -184,7 +184,7 @@ function zedBlock(stdio: PlatformStdioConfig): string {
   return JSON.stringify(
     {
       context_servers: {
-        tell: {
+        designproof: {
           command: stdio.command,
           args: stdio.args,
           ...(stdio.env ? { env: stdio.env } : {}),
@@ -197,7 +197,7 @@ function zedBlock(stdio: PlatformStdioConfig): string {
 }
 
 /**
- * Single catalog for README / install-info / `tell mcp install`.
+ * Single catalog for README / install-info / `designproof mcp install`.
  * Paths use ~ for user home; writers expand at install time.
  */
 export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompatEntry[] {
@@ -213,7 +213,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Cursor",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install cursor --project",
+      installCommand: "designproof mcp install cursor --project",
       configPath: { project: ".cursor/mcp.json", user: "~/.cursor/mcp.json" },
       snippet: mcpServersBlock(stdio),
       notes: "Also supports Cursor deeplink from install-info.deeplink.cursor",
@@ -223,9 +223,9 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Claude Code",
       status: "supported",
       strategy: "cli",
-      installCommand: "tell mcp install claude",
+      installCommand: "designproof mcp install claude",
       configPath: { project: ".mcp.json", user: "~/.claude.json" },
-      snippet: `claude mcp add-json --scope user tell '${claudeJson}'`,
+      snippet: `claude mcp add-json --scope user designproof '${claudeJson}'`,
       notes: "Falls back to writing project .mcp.json when claude CLI is absent",
     },
     {
@@ -233,7 +233,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Codex CLI",
       status: "supported",
       strategy: "toml-mcp_servers",
-      installCommand: "tell mcp install codex --project",
+      installCommand: "designproof mcp install codex --project",
       configPath: { project: ".codex/config.toml", user: "~/.codex/config.toml" },
       snippet: tomlBlock(stdio),
     },
@@ -242,7 +242,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "VS Code + GitHub Copilot",
       status: "supported",
       strategy: "json-servers",
-      installCommand: "tell mcp install vscode --project",
+      installCommand: "designproof mcp install vscode --project",
       configPath: { project: ".vscode/mcp.json", user: undefined },
       snippet: vscodeBlock(stdio),
     },
@@ -251,7 +251,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Windsurf",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install windsurf --user",
+      installCommand: "designproof mcp install windsurf --user",
       configPath: { user: "~/.codeium/windsurf/mcp_config.json" },
       snippet: mcpServersBlock(stdio),
     },
@@ -260,7 +260,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Zed",
       status: "supported",
       strategy: "json-context_servers",
-      installCommand: "tell mcp install zed --project",
+      installCommand: "designproof mcp install zed --project",
       configPath: { project: ".zed/settings.json", user: "~/.config/zed/settings.json" },
       snippet: zedBlock(stdio),
       notes: "Merges context_servers into settings.json",
@@ -270,7 +270,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "OpenCode",
       status: "supported",
       strategy: "json-opencode",
-      installCommand: "tell mcp install opencode --project",
+      installCommand: "designproof mcp install opencode --project",
       configPath: {
         project: "opencode.json",
         user: "~/.config/opencode/opencode.json",
@@ -282,7 +282,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Cline (VS Code)",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install cline --user",
+      installCommand: "designproof mcp install cline --user",
       configPath: {
         user: "~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json",
       },
@@ -294,7 +294,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Kiro",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install kiro --project",
+      installCommand: "designproof mcp install kiro --project",
       configPath: { project: ".kiro/settings/mcp.json", user: "~/.kiro/settings/mcp.json" },
       snippet: mcpServersBlock(stdio),
     },
@@ -303,7 +303,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Kimi Code",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install kimi --project",
+      installCommand: "designproof mcp install kimi --project",
       configPath: { project: ".kimi-code/mcp.json", user: "~/.kimi-code/mcp.json" },
       snippet: mcpServersBlock(stdio),
     },
@@ -312,7 +312,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Qwen Code",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install qwen --project",
+      installCommand: "designproof mcp install qwen --project",
       configPath: { project: ".qwen/settings.json", user: "~/.qwen/settings.json" },
       snippet: mcpServersBlock(stdio),
     },
@@ -321,7 +321,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Pi Agent",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install pi --user",
+      installCommand: "designproof mcp install pi --user",
       configPath: { project: ".pi/mcp.json", user: "~/.pi/agent/mcp.json" },
       snippet: mcpServersBlock(stdio),
     },
@@ -330,7 +330,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Grok Build",
       status: "supported",
       strategy: "toml-mcp_servers",
-      installCommand: "tell mcp install grok --project",
+      installCommand: "designproof mcp install grok --project",
       configPath: { project: ".grok/config.toml", user: "~/.grok/config.toml" },
       snippet: tomlBlock(stdio),
       notes: "Also discovers Cursor/Claude .mcp.json; prefer native toml",
@@ -340,7 +340,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Trae",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install trae --user",
+      installCommand: "designproof mcp install trae --user",
       configPath: { user: "~/.config/Trae/mcp.json" },
       snippet: mcpServersBlock(stdio),
       notes: "macOS: ~/Library/Application Support/Trae/mcp.json",
@@ -350,7 +350,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Antigravity",
       status: "supported",
       strategy: "json-mcpServers",
-      installCommand: "tell mcp install antigravity --user",
+      installCommand: "designproof mcp install antigravity --user",
       configPath: {
         project: ".agents/mcp_config.json",
         user: "~/.gemini/antigravity/mcp_config.json",
@@ -362,7 +362,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Hermes Agent",
       status: "supported",
       strategy: "yaml-mcp_servers",
-      installCommand: "tell mcp install hermes --user",
+      installCommand: "designproof mcp install hermes --user",
       configPath: { user: "~/.hermes/config.yaml" },
       snippet: yamlBlock(stdio),
     },
@@ -371,7 +371,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "OpenClaw",
       status: "supported",
       strategy: "json-openclaw",
-      installCommand: "tell mcp install openclaw --user",
+      installCommand: "designproof mcp install openclaw --user",
       configPath: { user: "~/.openclaw/openclaw.json" },
       snippet: openclawBlock(stdio),
     },
@@ -380,7 +380,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Muse Code",
       status: "snippet",
       strategy: "manual",
-      installCommand: "tell mcp install muse --print",
+      installCommand: "designproof mcp install muse --print",
       configPath: {},
       snippet: mcpServersBlock(stdio),
       notes: "No verified public MCP path yet — paste mcpServers into Muse settings if supported",
@@ -390,7 +390,7 @@ export function buildPlatformCatalog(stdio: PlatformStdioConfig): PlatformCompat
       label: "Z Code",
       status: "snippet",
       strategy: "manual",
-      installCommand: "tell mcp install zcode --print",
+      installCommand: "designproof mcp install zcode --print",
       configPath: {},
       snippet: mcpServersBlock(stdio),
       notes: "No verified public MCP path yet — paste mcpServers into Z Code settings if supported",

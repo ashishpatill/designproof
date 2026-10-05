@@ -21,4 +21,4 @@ Cursor entry mirrors this playbook. Full graph and nodes live under this directo
 7. `emit-training-episode`
 8. Hand off to design (`sport-matchday-web` or `premium-content-custom-web`)
 
-See [GRAPH.md](./GRAPH.md). Engine: `@tell/design-skills` `DomainResearchPack`.
+See [GRAPH.md](./GRAPH.md). Engine: `@designproof/design-skills` `DomainResearchPack`.

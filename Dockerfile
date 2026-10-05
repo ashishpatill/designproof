@@ -1,9 +1,9 @@
-# Tell — full-stack deployment (Option B: live Playwright capture)
+# Design Proof — full-stack deployment (Option B: live Playwright capture)
 #
 # Layer order is tuned for cache: dependency + Playwright layers survive source-only changes.
 #
-# Build:  docker build -t tell-capture:latest .
-# Run:    docker run --rm -p 3000:3000 --env-file /etc/tell-capture.env tell-capture:latest
+# Build:  docker build -t dp-capture:latest .
+# Run:    docker run --rm -p 3000:3000 --env-file /etc/dp-capture.env dp-capture:latest
 
 FROM node:20-bookworm
 
@@ -28,7 +28,7 @@ COPY fixtures/generic-app/package.json ./fixtures/generic-app/
 RUN pnpm install --frozen-lockfile
 
 # ── Layer 2: Playwright browsers (cache until deps change — skip on code-only edits) ──
-RUN pnpm --filter @tell/core exec playwright install --with-deps chromium
+RUN pnpm --filter @designproof/core exec playwright install --with-deps chromium
 ENV PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
 
 # ── Layer 3: source + build (re-runs when app code changes) ──
@@ -40,13 +40,13 @@ COPY fixtures ./fixtures
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 
-RUN pnpm -F @tell/web... build
+RUN pnpm -F @designproof/web... build
 
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV TELL_REPO_ROOT=/app
-ENV TELL_DISABLE_REPO_SETUP=1
-ENV TELL_CAPTURE_TIMEOUT_MS=90000
+ENV DP_REPO_ROOT=/app
+ENV DP_DISABLE_REPO_SETUP=1
+ENV DP_CAPTURE_TIMEOUT_MS=90000
 
 EXPOSE 3000
 

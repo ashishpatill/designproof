@@ -1,5 +1,5 @@
 /**
- * Niche presets — map a free-text requirement to Tell brief + design-rigor lane.
+ * Niche presets — map a free-text requirement to Design Proof brief + design-rigor lane.
  * No third-party hosts or product names here. Live reference URLs live only in
  * gitignored `research/boards.seeds.local.json` / `research/boards.local.json`.
  * Learned boosts come from research/agency-engine-memory.json (agency:learn).

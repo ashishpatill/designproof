@@ -8,7 +8,7 @@ import { createRequire } from "module";
 const require = createRequire(new URL("../package.json", import.meta.url));
 const { chromium } = require("playwright");
 
-const BASE = process.env.TELL_BASE_URL ?? "http://localhost:3000";
+const BASE = process.env.DP_BASE_URL ?? "http://localhost:3000";
 const MAX_BASELINE_DELTA_PX = 1.5;
 const MAX_COLUMN_DELTA_PX = 1.5;
 

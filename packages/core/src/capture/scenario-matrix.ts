@@ -5,7 +5,7 @@ import {
   type ColorTheme,
   type InteractionState,
   type ViewportPreset,
-} from "@tell/schema";
+} from "@designproof/schema";
 import { captureUrl, type CaptureUrlOptions } from "./capture-url";
 
 export type ScenarioPlanInput = {

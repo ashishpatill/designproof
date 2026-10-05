@@ -6,12 +6,12 @@
     "height": 1100
   },
   "screenshotBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "snapshotHtml": "<html><body data-tell-corpus=\"1\"><p>corpus://marketplace-clutter</p></body></html>",
+  "snapshotHtml": "<html><body data-dp-corpus=\"1\"><p>corpus://marketplace-clutter</p></body></html>",
   "cssVariables": [],
   "styles": [
     {
       "selector": "body",
-      "tellId": "body",
+      "dpId": "body",
       "tag": "body",
       "role": "surface",
       "rect": {
@@ -34,7 +34,7 @@
     },
     {
       "selector": "section.hero",
-      "tellId": "sectionhero",
+      "dpId": "sectionhero",
       "tag": "section",
       "role": "surface",
       "rect": {
@@ -57,7 +57,7 @@
     },
     {
       "selector": "h1",
-      "tellId": "h1",
+      "dpId": "h1",
       "tag": "h1",
       "role": "display",
       "rect": {
@@ -80,7 +80,7 @@
     },
     {
       "selector": "h2",
-      "tellId": "h2",
+      "dpId": "h2",
       "tag": "h2",
       "role": "heading",
       "rect": {
@@ -103,7 +103,7 @@
     },
     {
       "selector": "h3",
-      "tellId": "h3",
+      "dpId": "h3",
       "tag": "h3",
       "role": "heading",
       "rect": {
@@ -126,7 +126,7 @@
     },
     {
       "selector": "button.primary",
-      "tellId": "buttonprimar",
+      "dpId": "buttonprimar",
       "tag": "button",
       "role": "button",
       "rect": {
@@ -149,7 +149,7 @@
     },
     {
       "selector": "button.secondary",
-      "tellId": "buttonsecond",
+      "dpId": "buttonsecond",
       "tag": "button",
       "role": "button",
       "rect": {
@@ -172,7 +172,7 @@
     },
     {
       "selector": "nav",
-      "tellId": "nav",
+      "dpId": "nav",
       "tag": "nav",
       "role": "nav",
       "rect": {
@@ -195,7 +195,7 @@
     },
     {
       "selector": "a",
-      "tellId": "a",
+      "dpId": "a",
       "tag": "a",
       "role": "link",
       "rect": {
@@ -218,7 +218,7 @@
     },
     {
       "selector": ".card-0",
-      "tellId": "card-0",
+      "dpId": "card-0",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -241,7 +241,7 @@
     },
     {
       "selector": ".card-1",
-      "tellId": "card-1",
+      "dpId": "card-1",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -264,7 +264,7 @@
     },
     {
       "selector": ".card-2",
-      "tellId": "card-2",
+      "dpId": "card-2",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -287,7 +287,7 @@
     },
     {
       "selector": ".card-3",
-      "tellId": "card-3",
+      "dpId": "card-3",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -310,7 +310,7 @@
     },
     {
       "selector": ".card-4",
-      "tellId": "card-4",
+      "dpId": "card-4",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -333,7 +333,7 @@
     },
     {
       "selector": ".card-5",
-      "tellId": "card-5",
+      "dpId": "card-5",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -356,7 +356,7 @@
     },
     {
       "selector": ".card-6",
-      "tellId": "card-6",
+      "dpId": "card-6",
       "tag": "article",
       "role": "card",
       "rect": {
@@ -379,7 +379,7 @@
     },
     {
       "selector": ".card-7",
-      "tellId": "card-7",
+      "dpId": "card-7",
       "tag": "article",
       "role": "card",
       "rect": {

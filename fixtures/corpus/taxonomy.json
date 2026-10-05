@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "title": "Tell Proof — Open Genericness Taxonomy",
+  "title": "Design Proof — Open Genericness Taxonomy",
   "description": "Machine-readable benchmark mapping methodology tells (docs/05) to deterministic detectors in packages/core. Use for regression tests, research citations, and external evaluations.",
   "methodologyDoc": "docs/05_GENERICNESS_METHODOLOGY.md",
   "corpusManifest": "fixtures/corpus/manifest.json",

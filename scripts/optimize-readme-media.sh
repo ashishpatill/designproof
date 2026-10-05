@@ -64,25 +64,25 @@ echo "== README demo poster =="
 # Full-length animated WebP of the ~40s demo is larger than the GIF — use a still poster
 # in the README and link the MP4 for motion.
 demo_src=""
-if [[ -f "$MEDIA/tell-proof-demo.mp4" ]]; then
-  demo_src="$MEDIA/tell-proof-demo.mp4"
-elif [[ -f "$MEDIA/tell-proof-demo.gif" ]]; then
-  demo_src="$MEDIA/tell-proof-demo.gif"
+if [[ -f "$MEDIA/dp-proof-demo.mp4" ]]; then
+  demo_src="$MEDIA/dp-proof-demo.mp4"
+elif [[ -f "$MEDIA/dp-proof-demo.gif" ]]; then
+  demo_src="$MEDIA/dp-proof-demo.gif"
 fi
 if [[ -n "$demo_src" ]]; then
   ffmpeg -y -hide_banner -loglevel error -ss 2 -i "$demo_src" -frames:v 1 \
     -vf "scale='min(1100,iw)':-2:flags=lanczos" \
     -c:v libwebp -quality 82 -compression_level 6 \
-    "$MEDIA/tell-proof-demo-poster.webp"
-  echo "  tell-proof-demo-poster.webp  $(du -h "$MEDIA/tell-proof-demo-poster.webp" | awk '{print $1}')  ← still from $(basename "$demo_src")"
+    "$MEDIA/dp-proof-demo-poster.webp"
+  echo "  dp-proof-demo-poster.webp  $(du -h "$MEDIA/dp-proof-demo-poster.webp" | awk '{print $1}')  ← still from $(basename "$demo_src")"
   # Drop accidental full-length animated demo webp (too heavy for README).
-  rm -f "$MEDIA/tell-proof-demo.webp"
+  rm -f "$MEDIA/dp-proof-demo.webp"
 fi
 
 echo
 echo "Totals:"
 du -sh "$SHOW" 2>/dev/null || true
-du -h "$MEDIA/tell-proof-demo-poster.webp" 2>/dev/null || true
+du -h "$MEDIA/dp-proof-demo-poster.webp" 2>/dev/null || true
 if [[ "$PRUNE" -eq 1 ]]; then
   echo "Pruned PNG/GIF sources after WebP encode."
 fi

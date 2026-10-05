@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "paths": {
-      "@tell/schema": ["../schema/src"]
+      "@designproof/schema": ["../schema/src"]
     }
   },
   "include": ["src"]

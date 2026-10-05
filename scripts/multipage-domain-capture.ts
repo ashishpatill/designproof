@@ -10,7 +10,7 @@
  *   pnpm exec tsx scripts/multipage-domain-capture.ts --domain saas-marketing --category saas-landing
  *
  * Env:
- *   TELL_CAPTURE_OUT   override output root under research/boards/
+ *   DP_CAPTURE_OUT   override output root under research/boards/
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -213,7 +213,7 @@ async function main(): Promise<void> {
   const seedsPath =
     argValue("--seeds") ?? join(repoRoot, "research/boards.seeds.local.json");
   const outName =
-    process.env.TELL_CAPTURE_OUT?.trim() ||
+    process.env.DP_CAPTURE_OUT?.trim() ||
     argValue("--out") ||
     (domain.includes("cricket") ? "crease-multipage" : `${domain}-multipage`);
   const outRoot = join(repoRoot, "research/boards", outName, "refs");

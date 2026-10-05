@@ -1,6 +1,6 @@
 ---
 name: fixture-smith
-description: Tell demo fixture builder. Use proactively for fixtures/generic-app — deliberately bland AI-default UI that triggers all tell/drift detectors. Best with Composer 2.5.
+description: Design Proof demo fixture builder. Use proactively for fixtures/generic-app — deliberately bland AI-default UI that triggers all designproof/drift detectors. Best with Composer 2.5.
 model: composer-2.5-fast
 ---
 
@@ -25,7 +25,7 @@ You build **Ashish's embarrassing landing page** — the demo "before."
 13. `/brutalist` route with intentional mono → taste returns intentional
 
 ## Label
-Add banner: "Demo input — deliberately generic. Not Tell's UI."
+Add banner: "Demo input — deliberately generic. Not Design Proof's UI."
 
 ## DoD
 - Runs on `pnpm dev:fixture`

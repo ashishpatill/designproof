@@ -24,7 +24,7 @@ description: Container-led technical shell craft — framed master container, ra
 
 Accent mood from brandAccent; roundness vs crisp frames; funk factor (focal objects); lighting concentrated on hero; structure density of rails/corners
 
-## Tell remap
+## Design Proof remap
 
 - Default accent = Taste `brandAccent` / `--c-accent` (never hardcode fuchsia/violet)
 - SaaS conversion still prefers product-proof over decorative orbs

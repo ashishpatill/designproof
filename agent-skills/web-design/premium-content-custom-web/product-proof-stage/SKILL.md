@@ -13,10 +13,10 @@ Ashish's buyer does not trust another feature grid. They trust a path they can s
 ## When to use
 
 - SaaS / AI product marketing where conversion depends on understanding the loop
-- Redesigns where Tell found “generic SaaS” tells and the hero still sells vibes, not mechanism
+- Redesigns where Design Proof found “generic SaaS” tells and the hero still sells vibes, not mechanism
 - Any brief that already declares P0 capabilities you can stage as workflow states
 
-## Non-negotiables (Tell-shaped)
+## Non-negotiables (Design Proof-shaped)
 
 1. **Declared features only** — every stage title and panel body traces to a brief feature. No invented customers, logos, or percentages.
 2. **Label samples** — if the path is not live app state, mark it `Sample workflow`.
@@ -82,7 +82,7 @@ Stage chip contract:
 - Contrast floor on inverse proof surfaces
 - Mobile: rail wraps or scrolls; panel stacks under claim
 - Reduced motion: settled UI, no autoplay typing
-- Tell path (when available): capture → diagnose → confirm proof stage does not trigger generic tells
+- Design Proof path (when available): capture → diagnose → confirm proof stage does not trigger generic tells
 
 ## Avoid
 
@@ -94,10 +94,10 @@ Stage chip contract:
 
 ## Runtime
 
-`@tell/design-skills` routes this node for `saas-marketing` and emits layout `workflow-proof`.
+`@designproof/design-skills` routes this node for `saas-marketing` and emits layout `workflow-proof`.
 
 ```ts
-import { designFromFeatures } from "@tell/design-skills";
+import { designFromFeatures } from "@designproof/design-skills";
 const { spec, previewHtml } = designFromFeatures(brief);
 // spec.routedSkills includes "product-proof-stage"
 // previewHtml contains data-workflow-proof + HTMX stage swaps

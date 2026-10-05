@@ -13,10 +13,10 @@ description: >-
 
 **Parent research graph for all websites.** Sport uses `sport-matchday-web` (extends this). SaaS/studio/fintech run this then `premium-content-custom-web`.
 
-**Auto-trigger:** Always-applied rule `tell-domain-research` + engine `routeSkills` prepends this node. Agents must execute the research chain, not skip to craft.
+**Auto-trigger:** Always-applied rule `dp-domain-research` + engine `routeSkills` prepends this node. Agents must execute the research chain, not skip to craft.
 
 Full graph: `agent-skills/web-design/website-domain-research/GRAPH.md`  
-Engine: `@tell/design-skills` → `DomainResearchPack`, `routeDomainResearchSkills`, `loadPriorDomain`, `requirementGapDiff`
+Engine: `@designproof/design-skills` → `DomainResearchPack`, `routeDomainResearchSkills`, `loadPriorDomain`, `requirementGapDiff`
 
 ## Non-negotiables
 
@@ -24,7 +24,7 @@ Engine: `@tell/design-skills` → `DomainResearchPack`, `routeDomainResearchSkil
 2. **Gap-diff the user requirement** — customize / gap-only / full walkthrough; forbid blank-slate when a package exists
 3. **Evidence before IA claims** — multipage screenshots (and video when possible) for gaps only
 4. **Anonymise** — no third-party hosts/product names in commits
-5. **Emit a training episode** every build (tell-design-data / sink — never commit JSONL in Tell)
+5. **Emit a training episode** every build (dp-design-data / sink — never commit JSONL in Design Proof)
 6. Always end with Taste Controls when handing off to design
 
 ## Workflow

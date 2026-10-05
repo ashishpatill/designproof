@@ -182,7 +182,7 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.sections.find((s) => s.kind === kind);
   /*
    * SaaS drawings carry names, not sentences. Each description is printed once, in the catalogue;
-   * a fold console and a specimen band that also reprinted them, cut mid-word, were the second and
+   * a fold console and a template band that also reprinted them, cut mid-word, were the second and
    * third telling of every line on the page.
    */
   const listed = catalogue(spec);
@@ -440,7 +440,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     const rail = `<nav class="ds-alpha-rail" aria-label="Alphabetical index"><ol>${letters
       .map((L, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
+        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
         return `<li><a href="${href}" class="ds-alpha-letter${i === 0 ? " is-active" : ""}" data-letter="${L}"><span>${L}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
@@ -484,9 +484,17 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       }
     }
     if (line) picks.push(line);
+    /*
+     * Picks carry a real space, not just a newline between spans.
+     *
+     * `picks` are already balanced at ≤28 chars ("The press that keeps every" / "SKU under one
+     * honest weave"). Joining with "" glued the last word of one pick to the first word of the
+     * next in the DOM, so authored copy and rendered copy disagreed: the fold read "everySKU".
+     * No test could see it, because the engine's copy was correct and only the layout lost a space.
+     */
     const weftPicks = picks
       .map((p, i) => `<span class="ds-weft-pick" style="--pick:${i}"><span class="ds-weft-thread" aria-hidden="true"></span><span class="ds-weft-ink">${esc(p)}</span></span>`)
-      .join("");
+      .join(" ");
     const warpCount = 28;
     const warpEnds = Array.from({ length: warpCount }, (_, i) => {
       const x = ((i + 0.5) / warpCount) * 100;
@@ -498,7 +506,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
     const treadles = `<nav class="ds-tape-rail ds-treadles" aria-label="Size treadles"><ol>${sizes
       .map((S, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
+        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
         return `<li><a href="${href}" class="ds-tape-chip${i === 2 ? " is-active" : ""}" data-size="${S}"><span class="ds-tape-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-tape-label">${S}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
@@ -537,7 +545,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
    *
    * Failure named: museum label still read as a floating SaaS card over a photo.
    * Challenger: cork-edged dissecting tray, hinged glassine lid with peel corner, numbered
-   * entomology pins tied to a specimen tag, vernier scale, dichotomous key as the bottom
+   * entomology pins tied to a template tag, vernier scale, dichotomous key as the bottom
    * instrument. Theme packs invent glass heroes; they do not invent a hinged tray.
    */
   if (section.layout === "hero-voucher") {
@@ -555,7 +563,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     ];
     const binomial = `<nav class="ds-taxon-rail ds-binomial-strip" aria-label="Dichotomous key"><ol>${ranks
       .map((R, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
+        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
         return `<li><a href="${href}" class="ds-taxon-chip${i === 5 ? " is-active" : ""}" data-rank="${R.id}"><span class="ds-taxon-meta">${R.id}</span><span class="ds-taxon-label">${esc(R.label)}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
@@ -583,7 +591,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
             <span class="ds-lid-peel"></span>
           </div>
           ${tagString}
-          <div class="ds-press-label ds-specimen-tag">
+          <div class="ds-press-label ds-template-tag">
             <p class="ds-tag-pinmeta">Pin 02 · voucher</p>
             <p class="ds-brand-mark">${esc(spec.brief.productName)}</p>
             ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
@@ -612,7 +620,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const sigs = "ABCDEFGH".split("");
     const rail = `<nav class="ds-sig-rail" aria-label="Signature index"><ol>${sigs
       .map((S, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
+        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
         return `<li><a href="${href}" class="ds-sig-letter${i === 0 ? " is-active" : ""}" data-sig="${S}"><span>Sig ${S}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
@@ -645,7 +653,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       : "";
     const romans = ["I", "II", "III", "IV", "V"];
     const labels = ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    const hrefs = ["#features", "#figure", "#template", "#story", "#cta"];
     const rail = `<nav class="ds-way-rail" aria-label="Chapter waypoints"><ol>${romans
       .map((R, i) => {
         const href = hrefs[i] ?? "#features";
@@ -686,7 +694,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       : "";
     const stages = ["Intake", "Triage", "Treat", "Follow-up", "Discharge"];
     const nums = ["01", "02", "03", "04", "05"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    const hrefs = ["#features", "#figure", "#template", "#story", "#cta"];
     const rail = `<nav class="ds-care-rail" aria-label="Care stages"><ol>${stages
       .map((label, i) => {
         const href = hrefs[i] ?? "#features";
@@ -889,7 +897,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const present = new Set(spec.sections.map((s) => s.id));
     const windows = [
       { id: "features", label: "Capabilities", href: "#features" },
-      { id: "specimen", label: "Product", href: "#specimen" },
+      { id: "template", label: "Product", href: "#template" },
       { id: "pricing", label: "Lanes", href: "#pricing" },
       { id: "faq", label: "Questions", href: "#faq" },
     ].filter((w) => present.has(w.id));
@@ -949,7 +957,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
 }
 
 /**
- * The specimen band — one drawing, a screen to itself, and a single line saying what it is.
+ * The template band — one drawing, a screen to itself, and a single line saying what it is.
  *
  * This is the beat every reference page has and this engine did not: a screen with almost no text
  * on it, reaching the edges, between two screens that are dense. It is what makes the dense screens
@@ -960,7 +968,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
  * body prose, which flattens char-variation. A horizon plot (titles + ticks only) keeps ink while
  * leaving a real character valley before the dense app shell — without empty-height gaming.
  */
-function renderSpecimen(section: SectionSpec, figures: FigurePlan, spec?: DesignSpec): string {
+function renderTemplate(section: SectionSpec, figures: FigurePlan, spec?: DesignSpec): string {
   let drawing = figures.band;
   const siteKind = spec?.brief.siteKind;
   /*
@@ -994,12 +1002,12 @@ function renderSpecimen(section: SectionSpec, figures: FigurePlan, spec?: Design
         )
         .join("")
     : "";
-  return `<section class="ds-section ds-specimen" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
-    <div class="ds-wrap-wide ds-specimen-head">
+  return `<section class="ds-section ds-template" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+    <div class="ds-wrap-wide ds-template-head">
       <h2 class="ds-heading">${esc(section.title)}</h2>
       ${!quietHead && section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
     </div>
-    <div class="ds-bleed ds-specimen-stage${annotate ? " ds-specimen-annotated" : ""}">
+    <div class="ds-bleed ds-template-stage${annotate ? " ds-template-annotated" : ""}">
       <figure class="ds-plate ds-plate-bleed">
         ${drawing}
       </figure>
@@ -1013,7 +1021,7 @@ function renderMetricBand(section: SectionSpec, figures: FigurePlan, spec?: Desi
   // on trust. The shape sits under the numeral at the width of its own column.
   //
   // Dashboard: drop the section-head prose so the inverse register stays a short stake band —
-  // the quiet specimen that follows needs a real character valley next to denser neighbours.
+  // the quiet template that follows needs a real character valley next to denser neighbours.
   const head =
     spec?.brief.siteKind === "dashboard-webapp"
       ? ""
@@ -1074,7 +1082,7 @@ function frame(section: SectionSpec): string {
     case "hero-editorial":
     case "hero-statement":
     case "metric-band":
-    case "specimen-band":
+    case "template-band":
     case "marquee-proof":
     case "workflow-proof":
     case "pricing-lanes":
@@ -1930,16 +1938,16 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
     cells.every((b) => !featureNames.has(b.title.replace(/\s+/g, " ").trim().toLowerCase()));
   // SaaS evidence is already the plate. Cards under it would tell those lines again.
   // Other kinds keep the board the showcase proofs are built on.
-  const tellOnce = evidencePlate && kind === "saas-marketing";
-  const board = tellOnce ? "" : boardMarkup;
+  const dpOnce = evidencePlate && kind === "saas-marketing";
+  const board = dpOnce ? "" : boardMarkup;
   const drawn = evidencePlate && spec ? stackDiagram(cells, spec.brief.productName, "plate") : figures.body;
-  const plateDrawing = tellOnce
+  const plateDrawing = dpOnce
     ? drawn.replace(/aria-label="[^"]*"/, 'aria-label="Evidence"')
     : drawn;
   const figure = plateDrawing
     ? plate(
         plateDrawing,
-        tellOnce
+        dpOnce
           ? ""
           : section.quoteAttribution ??
             (kind === "dashboard-webapp"
@@ -2293,7 +2301,14 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
 }
 
 function renderFooter(section: SectionSpec, spec: DesignSpec): string {
-  const year = 2026;
+  /*
+   * Copyright year is read at render time, not frozen.
+   *
+   * It was the literal `2026` on all seventeen offerings, so every generated page shipped a stale
+   * copyright the moment the calendar moved. `new Date().getFullYear()` keeps the deterministic
+   * contract — the value is a pure function of when the page is built, like any other rendered fact.
+   */
+  const year = new Date().getFullYear();
   const knownIds = new Set(spec.sections.map((s) => s.id));
   // Closing band always exposes id="cta" even when section.id differs.
   knownIds.add("cta");
@@ -2338,7 +2353,7 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
   const isDash = spec.brief.siteKind === "dashboard-webapp";
   // Dashboard packs the shell into one measured screen: short claim, dense table detail, no
   // duplicated lede. Height under ~1vh keeps the 2200-character peak from smearing into the
-  // quiet specimen valley above.
+  // quiet template valley above.
   const head = isDash
     ? `<div class="ds-app-claim">
         ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
@@ -2484,8 +2499,8 @@ function renderSection(
       return wrapped(renderHero(section, spec, figures));
     case "metric-band":
       return wrapped(renderMetricBand(section, figures, spec));
-    case "specimen-band":
-      return wrapped(renderSpecimen(section, figures, spec));
+    case "template-band":
+      return wrapped(renderTemplate(section, figures, spec));
     case "feature-bento":
     case "feature-index":
     case "feature-rows":
@@ -2880,7 +2895,7 @@ function scripts(spec: DesignSpec): string {
     marks.forEach(function(m, i){
       m.addEventListener('click', function(){ setActive(i); });
     });
-    var sections=['#features','#figure','#specimen','#story','#cta'].map(function(sel){ return document.querySelector(sel); });
+    var sections=['#features','#figure','#template','#story','#cta'].map(function(sel){ return document.querySelector(sel); });
     if('IntersectionObserver' in window){
       var io=new IntersectionObserver(function(entries){
         entries.forEach(function(e){
@@ -2933,8 +2948,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
 <title>${esc(spec.brief.productName)} — ${esc(spec.brief.tagline || spec.brief.audience)}</title>
 <meta name="description" content="${esc(pageDescription)}"/>
 <meta name="color-scheme" content="${spec.taste.colorMood === "dark-premium" ? "dark" : "light"}"/>
-${responsive ? `<meta name="tell-responsive-performance" content="webp-display-budgets;lazy-below-fold;run-media-site-after-photography"/>` : ""}
-${spec.researchPlan ? `<meta name="tell-research-gate" content="${esc(spec.researchPlan.researchNodes.join(" → "))}"/>` : ""}
+${responsive ? `<meta name="dp-responsive-performance" content="webp-display-budgets;lazy-below-fold;run-media-site-after-photography"/>` : ""}
+${spec.researchPlan ? `<meta name="dp-research-gate" content="${esc(spec.researchPlan.researchNodes.join(" → "))}"/>` : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${fonts}&display=swap"/>

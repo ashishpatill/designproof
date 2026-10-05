@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Finding, Reconciliation } from "@tell/schema";
+import type { Finding, Reconciliation } from "@designproof/schema";
 import type { LlmSheet, RestyleMode, RestyleStatus } from "@/lib/use-llm-restyle";
 
 const SLANT = 5;
@@ -23,7 +23,7 @@ function CropMark({ corner }: { corner: "tl" | "tr" | "bl" | "br" }) {
 /** Inject a stylesheet last so it wins the cascade in the "after" render. */
 function injectReconcile(html: string, sheet?: { css: string; fontImport: string }): string {
   if (!sheet) return html;
-  const style = `<style data-tell-reconcile>\n${sheet.fontImport}\n${sheet.css}\n</style>`;
+  const style = `<style data-dp-reconcile>\n${sheet.fontImport}\n${sheet.css}\n</style>`;
   if (/<\/body>/i.test(html)) return html.replace(/<\/body>/i, `${style}</body>`);
   if (/<\/html>/i.test(html)) return html.replace(/<\/html>/i, `${style}</html>`);
   return html + style;
@@ -186,7 +186,7 @@ export function BeforeAfterSeam({
           <div className="max-w-md px-8">
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-secondary">No capture yet</p>
             <h2 className="mt-3 font-display text-3xl text-text">Paste a URL and capture.</h2>
-            <p className="mt-3 text-secondary">Tell renders the real page here, then wipes to the reconciled restyle on the right.</p>
+            <p className="mt-3 text-secondary">Design Proof renders the real page here, then wipes to the reconciled restyle on the right.</p>
           </div>
         </div>
       )}

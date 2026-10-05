@@ -2,7 +2,7 @@
 // Learn a Brand DNA from a reference page, then reconcile a target page toward it and
 // confirm the scorecard flips to scoring against the DNA (not the generic baseline).
 import { captureUrl, diagnoseCapture } from "../index";
-import { learnBrandDNA, reconcile } from "@tell/redesign";
+import { learnBrandDNA, reconcile } from "@designproof/redesign";
 import { buildFingerprint } from "../fingerprint/build-fingerprint";
 
 const referenceUrl = process.argv[2] ?? "http://localhost:3000"; // a brand you trust

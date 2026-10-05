@@ -11,7 +11,7 @@ packages:
   - git
 
 runcmd:
-  - [bash, -lc, "curl -fsSL https://raw.githubusercontent.com/ashishpatill/tell-ai-ui-critic/master/scripts/vultr/setup.sh -o /tmp/tell-setup.sh"]
-  - [bash, /tmp/tell-setup.sh]
+  - [bash, -lc, "curl -fsSL https://raw.githubusercontent.com/ashishpatill/tell-ai-ui-critic/master/scripts/vultr/setup.sh -o /tmp/dp-setup.sh"]
+  - [bash, /tmp/dp-setup.sh]
 
-final_message: "Tell capture installation finished. Add keys to /etc/tell-capture.env, then restart tell-capture."
+final_message: "Design Proof capture installation finished. Add keys to /etc/dp-capture.env, then restart dp-capture."

@@ -76,7 +76,7 @@ function pipeline(args: string[]): { ok: boolean; output: string } {
   const env = { ...process.env, AGENCY_SKIP_LEARN: "1" };
   const result = spawnSync(
     "pnpm",
-    ["-F", "@tell/design-skills", "exec", "tsx", "../../scripts/agency-pipeline/run.ts", "--", ...args],
+    ["-F", "@designproof/design-skills", "exec", "tsx", "../../scripts/agency-pipeline/run.ts", "--", ...args],
     { cwd: root, encoding: "utf8", maxBuffer: 10 * 1024 * 1024, env },
   );
   const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
@@ -268,7 +268,7 @@ async function main(): Promise<void> {
     process.env.AGENCY_SKIP_LEARN === "1" || hasFlag("--skip-learn");
   const dataStatus = ensureDesignData(root);
   const memory = mergeDesignDataMemory(root);
-  // Persist merged memory into Tell so niche/brief and later learn share one snapshot.
+  // Persist merged memory into Design Proof so niche/brief and later learn share one snapshot.
   saveMemory(root, memory);
 
   if (!query && !briefArg) {

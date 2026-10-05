@@ -2,8 +2,8 @@
 name: emit-training-episode
 description: >-
   Auto-trigger required final research/design step — emit anonymised training episode to
-  tell-design-data or training.local stub after every website domain research or design build;
-  never commit JSONL hosts in Tell.
+  dp-design-data or training.local stub after every website domain research or design build;
+  never commit JSONL hosts in Design Proof.
 ---
 
 # emit-training-episode

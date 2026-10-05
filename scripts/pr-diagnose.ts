@@ -3,15 +3,15 @@
  * Diagnose a preview URL for PR checks. Writes markdown to GITHUB_STEP_SUMMARY when set.
  */
 import { appendFileSync, writeFileSync } from "node:fs";
-import { captureUrl, diagnoseCapture, loadDesignDoc, shouldApplyDesignDoc } from "@tell/core";
+import { captureUrl, diagnoseCapture, loadDesignDoc, shouldApplyDesignDoc } from "@designproof/core";
 
 async function main(): Promise<void> {
-  const url = process.env.TELL_PREVIEW_URL ?? process.env.PREVIEW_URL ?? "";
-  const failGenericAbove = Number(process.env.TELL_FAIL_GENERIC_ABOVE ?? "6");
-  const outPath = process.env.TELL_PR_REPORT_PATH ?? "tell-pr-report.json";
+  const url = process.env.DP_PREVIEW_URL ?? process.env.PREVIEW_URL ?? "";
+  const failGenericAbove = Number(process.env.DP_FAIL_GENERIC_ABOVE ?? "6");
+  const outPath = process.env.DP_PR_REPORT_PATH ?? "dp-pr-report.json";
 
   if (!url) {
-    console.error("Set TELL_PREVIEW_URL (or PREVIEW_URL) to a reachable preview deployment.");
+    console.error("Set DP_PREVIEW_URL (or PREVIEW_URL) to a reachable preview deployment.");
     process.exit(1);
   }
 
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
   });
 
   const lines = [
-    "## Tell Proof — preview diagnosis",
+    "## Design Proof — preview diagnosis",
     "",
     `**URL:** ${url}`,
     `**Findings:** ${report.score.total} total · ${report.score.generic} generic · ${report.score.drift} drift`,

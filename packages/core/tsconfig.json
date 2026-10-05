@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "paths": {
-      "@tell/redesign": ["../redesign/src"],
-      "@tell/schema": ["../schema/src"]
+      "@designproof/redesign": ["../redesign/src"],
+      "@designproof/schema": ["../schema/src"]
     }
   },
   "include": ["src"]

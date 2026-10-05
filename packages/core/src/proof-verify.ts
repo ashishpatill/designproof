@@ -1,14 +1,14 @@
 import { spawn } from "node:child_process";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { ProofMatrixResult, type ScenarioMatrix, type TellReport } from "@tell/schema";
+import { ProofMatrixResult, type ScenarioMatrix, type DesignProofReport } from "@designproof/schema";
 import { captureUrl } from "./capture/capture-url";
 import { diagnoseCapture } from "./diagnose";
 
 export type ProofVerifyResult = {
   status: "passed" | "review" | "failed";
-  beforeReport: TellReport;
-  afterReport: TellReport;
+  beforeReport: DesignProofReport;
+  afterReport: DesignProofReport;
   proof: {
     beforeScore: number;
     afterScore: number;
@@ -31,7 +31,7 @@ export type ProofVerifyResult = {
   error?: string;
 };
 
-function scoreOf(report: TellReport): number {
+function scoreOf(report: DesignProofReport): number {
   return report.measures?.score ?? Math.min(100, report.score.generic * 12 + report.score.drift * 7);
 }
 
@@ -55,7 +55,7 @@ export async function verifyProofPatch(input: {
   const projectRoot = path.resolve(input.projectRoot);
   const waitMs = input.waitMs ?? 1800;
   const revertOnFail = input.revertOnFail ?? true;
-  const patchMarker = path.join(projectRoot, ".git", "tell-proof-mcp.patch");
+  const patchMarker = path.join(projectRoot, ".git", "dp-proof-mcp.patch");
 
   const beforeCapture = await captureUrl(input.url);
   const beforeReport = diagnoseCapture(beforeCapture);
@@ -109,7 +109,7 @@ export async function verifyProofPatch(input: {
 
 export async function revertProofPatch(projectRoot: string, patch?: string): Promise<boolean> {
   const root = path.resolve(projectRoot);
-  const marker = path.join(root, ".git", "tell-proof-mcp.patch");
+  const marker = path.join(root, ".git", "dp-proof-mcp.patch");
   const patchText = patch ?? await fs.readFile(marker, "utf8").catch(() => "");
   if (!patchText) return false;
   const reverted = await gitApply(["-R", "--whitespace=nowarn"], root, patchText);
@@ -117,7 +117,7 @@ export async function revertProofPatch(projectRoot: string, patch?: string): Pro
   return reverted.ok;
 }
 
-export function compareProofReports(before: TellReport, after: TellReport, url: string) {
+export function compareProofReports(before: DesignProofReport, after: DesignProofReport, url: string) {
   const proof = buildProof(before, after, url);
   return { status: verdictFromProof(proof), proof };
 }
@@ -200,7 +200,7 @@ export function compareProofMatrices(before: ScenarioMatrix, after: ScenarioMatr
   });
 }
 
-function buildProof(before: TellReport, after: TellReport, url: string) {
+function buildProof(before: DesignProofReport, after: DesignProofReport, url: string) {
   const beforeScore = scoreOf(before);
   const afterScore = scoreOf(after);
   const focusBefore = before.fingerprint.focusRingCoverage;

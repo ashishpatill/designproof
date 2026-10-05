@@ -1,6 +1,6 @@
 import type {
   BrandDNA, CapturePayload, DesignFingerprint, Finding, Reconciliation, ReconTokenRow, ScoreAxis,
-} from "@tell/schema";
+} from "@designproof/schema";
 import { round1 } from "./color";
 import { AXIS_WEIGHTS, genericness, measureAxes } from "./measures";
 import { DIRECTIONS, resolveDirection, type Direction } from "./scales";
@@ -39,11 +39,11 @@ export function reconcile(
 
   const before = measureAxes(capture, fingerprint, dna);
   const after = afterAxes(plan, { contrast: before.contrast });
-  const scoreBefore = genericness(before, before.tellScore);
+  const scoreBefore = genericness(before, before.dpScore);
   const scoreAfter = genericness(after, 0);
 
   const rationale: Record<ScoreAxis["key"], string> = {
-    contrast: "Forced ≥4.5:1 text on surfaces Tell owns; hierarchy from a committed display/body ramp (§6).",
+    contrast: "Forced ≥4.5:1 text on surfaces Design Proof owns; hierarchy from a committed display/body ramp (§6).",
     typescale: `Snapped every size onto a ${dir.ratio} modular scale (§2).`,
     spacing: `Normalized padding onto a ${plan.spacingBase}pt token grid (§3).`,
     depth: `Collapsed shadows to ${Math.max(1, plan.elevationLevels)} considered level(s); ${plan.floatedCount} surface(s) float, the rest sit flat (§4).`,
@@ -125,7 +125,7 @@ function primaryOf(capture: CapturePayload, role: string): string {
 
 // ── Legacy drop-in patch (kept for callers not yet on the source-aware patch) ──
 export function buildOverridesPatch(recon: Reconciliation, url: string): { file: string; unifiedDiff: string; summary: string }[] {
-  const file = "tell-overrides.css";
+  const file = "dp-overrides.css";
   const body = `${recon.fontImport}\n${recon.css}`;
   const lines = body.split("\n");
   const hunk = lines.map((l) => `+${l}`).join("\n");

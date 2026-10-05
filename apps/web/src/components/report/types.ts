@@ -1,4 +1,4 @@
-import type { TellReport } from "@tell/schema";
+import type { DesignProofReport } from "@designproof/schema";
 
 export type CaptureState = "idle" | "capturing" | "done";
 export type DraftState = "idle" | "drafting" | "ready" | "copied" | "error";
@@ -25,7 +25,7 @@ export type PatchSource = "cursor" | "deterministic";
 export type ProofState = "idle" | "applying" | "verifying" | "passed" | "review" | "failed" | "error";
 export type ProofResult = {
   status: "passed" | "review" | "failed";
-  afterReport: TellReport;
+  afterReport: DesignProofReport;
   proof: {
     beforeScore: number;
     afterScore: number;

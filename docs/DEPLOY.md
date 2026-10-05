@@ -1,4 +1,4 @@
-# Deploy Tell
+# Deploy Design Proof
 
 **Recommended production setup:** deploy **Vercel (UI)** + **Vultr or Render (capture)** and wire them together.
 
@@ -8,7 +8,7 @@
 | **Capture engine** | **Vultr VPS** (Docker) or Render | Playwright + Chromium for live URL diagnosis |
 | **Cursor MCP** | Local | Clone repo — stdio server in Cursor |
 
-Set `TELL_CAPTURE_API_URL` on Vercel to your capture backend URL (Vultr: `http://YOUR_IP:3000`).
+Set `DP_CAPTURE_API_URL` on Vercel to your capture backend URL (Vultr: `http://YOUR_IP:3000`).
 
 **Have Vultr credits?** → **[docs/DEPLOY-VULTR.md](./DEPLOY-VULTR.md)** (recommended over Render if MCP is broken)
 
@@ -44,9 +44,9 @@ git push origin master
 ```
 GEMINI_API_KEY=...
 CURSOR_API_KEY=...              # optional
-TELL_DISABLE_REPO_SETUP=1
-TELL_CAPTURE_API_URL=https://YOUR-RENDER-URL.onrender.com
-TELL_CAPTURE_TIMEOUT_MS=90000
+DP_DISABLE_REPO_SETUP=1
+DP_CAPTURE_API_URL=https://YOUR-RENDER-URL.onrender.com
+DP_CAPTURE_TIMEOUT_MS=90000
 ```
 
 4. Deploy. **Share the Vercel URL** — live capture works via Render proxy.
@@ -55,7 +55,7 @@ TELL_CAPTURE_TIMEOUT_MS=90000
 
 Once both are live, ask in Cursor Agent chat:
 
-> "Using Render MCP, set env vars on tell-capture. Using Vercel MCP, set `TELL_CAPTURE_API_URL` to the Render URL and redeploy."
+> "Using Render MCP, set env vars on dp-capture. Using Vercel MCP, set `DP_CAPTURE_API_URL` to the Render URL and redeploy."
 
 Render MCP must be authenticated (Cursor Settings → MCP → Render → sign in). Same for Vercel.
 
@@ -64,7 +64,7 @@ Render MCP must be authenticated (Cursor Settings → MCP → Render → sign in
 1. Open **Vercel URL** → paste any public site → **Capture** (Render runs Playwright).
 2. Drag the **before/after seam**.
 3. Art-direct → **Draft diff** → copy to Cursor.
-4. Optional: show **MCP** locally with `tell_diagnose`.
+4. Optional: show **MCP** locally with `designproof_diagnose`.
 
 ---
 
@@ -104,7 +104,7 @@ git commit -m "Add Vercel and Docker deployment configs"
 git push origin main
 ```
 
-If the repo root is `Raise Build sprint/` and `tell/` is a subfolder, note that path — you'll set it as the **Root Directory** in Vercel/Render.
+If the repo root is `Raise Build sprint/` and `designproof/` is a subfolder, note that path — you'll set it as the **Root Directory** in Vercel/Render.
 
 ### 2. Prepare secrets (never commit these)
 
@@ -121,9 +121,9 @@ Copy keys from your local `.env` into the hosting dashboard only:
 
 ### 3. What works where
 
-- **Vercel (Option A):** Full UI, seam, voice direction, redesign, offline demo report. Live capture falls back to `fixtures/reports/tell-report.json`.
+- **Vercel (Option A):** Full UI, seam, voice direction, redesign, offline demo report. Live capture falls back to `fixtures/reports/dp-report.json`.
 - **Docker (Option B):** Everything above **plus** live capture of any public HTTP URL.
-- **Both:** GitHub repo setup is off (`TELL_DISABLE_REPO_SETUP=1`) — it runs arbitrary code and is local-dev only.
+- **Both:** GitHub repo setup is off (`DP_DISABLE_REPO_SETUP=1`) — it runs arbitrary code and is local-dev only.
 - **Cursor MCP:** Always local. Share the Vercel/Docker URL for the web demo; point viewers at README → “Use it in Cursor” for MCP.
 
 ---
@@ -136,15 +136,15 @@ Best for: **a public link in under 10 minutes** for demo viewers.
 
 1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
 2. **Import** your repository.
-3. Set **Root Directory** to `tell/apps/web` if the repo contains other folders (e.g. `Problem Disection/`). If `tell` *is* the repo root, use `apps/web`.
+3. Set **Root Directory** to `designproof/apps/web` if the repo contains other folders (e.g. `Problem Disection/`). If `designproof` *is* the repo root, use `apps/web`.
 4. Vercel should detect **Next.js**. The repo ships `apps/web/vercel.json` with monorepo install/build commands.
 
 | Setting | Value |
 |---|---|
-| Root Directory | `tell/apps/web` (adjust if your path differs) |
+| Root Directory | `designproof/apps/web` (adjust if your path differs) |
 | Framework | Next.js |
 | Install Command | *(from vercel.json)* `cd ../.. && pnpm install` |
-| Build Command | *(from vercel.json)* `cd ../.. && pnpm -F @tell/web build` |
+| Build Command | *(from vercel.json)* `cd ../.. && pnpm -F @designproof/web build` |
 | Output Directory | *(default)* `.next` |
 
 ### Step 2 — Environment variables
@@ -154,13 +154,13 @@ In **Project → Settings → Environment Variables**, add:
 ```
 GEMINI_API_KEY=your-key
 CURSOR_API_KEY=your-key          # optional
-TELL_DISABLE_REPO_SETUP=1        # already in vercel.json; safe to set again
+DP_DISABLE_REPO_SETUP=1        # already in vercel.json; safe to set again
 DATABASE_URL=postgresql://…@….neon.tech/neondb?sslmode=require
 ```
 
-`TELL_DISABLE_REPO_SETUP=1` blocks the GitHub clone-and-run route on the public internet.
+`DP_DISABLE_REPO_SETUP=1` blocks the GitHub clone-and-run route on the public internet.
 
-**Neon (durable share links):** Vercel → **Storage → Create Database → Neon**, or create at [console.neon.tech](https://console.neon.tech) and paste `DATABASE_URL`. Tell auto-creates the `shared_reports` table on first share.
+**Neon (durable share links):** Vercel → **Storage → Create Database → Neon**, or create at [console.neon.tech](https://console.neon.tech) and paste `DATABASE_URL`. Design Proof auto-creates the `shared_reports` table on first share.
 
 ### Step 3 — Deploy
 
@@ -173,13 +173,13 @@ export VERCEL_TOKEN=…
 pnpm deploy:vercel
 ```
 
-You get: `https://tell-xxxx.vercel.app` (or your custom domain). Then set GitHub Actions variable `TELL_PREVIEW_URL` to that URL.
+You get: `https://tell-xxxx.vercel.app` (or your custom domain). Then set GitHub Actions variable `DP_PREVIEW_URL` to that URL.
 
 ### Step 4 — Demo script for viewers
 
 1. Open the Vercel URL.
 2. The app loads with the committed fixture report — drag the seam, pick a direction, draft a diff.
-3. To show **live capture**, paste a **public** URL (e.g. `https://example.com`). If capture fails (expected on Vercel), Tell loads the offline artifact and shows a clear message.
+3. To show **live capture**, paste a **public** URL (e.g. `https://example.com`). If capture fails (expected on Vercel), Design Proof loads the offline artifact and shows a clear message.
 4. For **full live capture**, use Option B or run locally: `pnpm dev` + `pnpm dev:fixture`.
 
 ### Vercel troubleshooting
@@ -199,7 +199,7 @@ Best for: **live URL capture** in production (Playwright + Chromium on a real se
 
 ### Local smoke test (optional)
 
-From the `tell/` directory:
+From the `designproof/` directory:
 
 ```bash
 docker build -t tell .
@@ -219,13 +219,13 @@ Requires **~2 GB RAM** for the container.
 
 1. Go to [render.com](https://render.com) → **New → Blueprint** (or **Web Service**).
 2. Connect the GitHub repo.
-3. **Blueprint:** Render reads `render.yaml` at repo root — set root to `tell` if needed.
+3. **Blueprint:** Render reads `render.yaml` at repo root — set root to `designproof` if needed.
 4. **Manual Web Service:**
-   - **Root Directory:** `tell`
+   - **Root Directory:** `designproof`
    - **Runtime:** Docker
    - **Dockerfile path:** `Dockerfile`
    - **Instance type:** at least **Starter** (512 MB may OOM on Playwright; prefer 1 GB+)
-5. Add environment variables (same as Vercel table above). `TELL_REPO_ROOT` and `TELL_DISABLE_REPO_SETUP` are set in `render.yaml`.
+5. Add environment variables (same as Vercel table above). `DP_REPO_ROOT` and `DP_DISABLE_REPO_SETUP` are set in `render.yaml`.
 6. Deploy. Note the URL: `https://tell-xxxx.onrender.com`.
 
 Free tier may spin down after idle — first request after sleep is slow (~30–60s).
@@ -235,7 +235,7 @@ Free tier may spin down after idle — first request after sleep is slow (~30–
 ### B2 — Railway
 
 1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub**.
-2. Select the repo; set **Root Directory** to `tell` if applicable.
+2. Select the repo; set **Root Directory** to `designproof` if applicable.
 3. Railway picks up `railway.toml` and `Dockerfile`.
 4. **Variables** tab — add `GEMINI_API_KEY`, `CURSOR_API_KEY` (optional).
 5. **Settings → Networking → Generate Domain**.
@@ -249,7 +249,7 @@ Free tier may spin down after idle — first request after sleep is slow (~30–
 |---|---|
 | Container OOM / crash on capture | Upgrade to 1–2 GB RAM. |
 | `pnpm exec tsx` not found | Rebuild image; ensure full `pnpm install` ran before `playwright install`. |
-| Capture timeout | Increase `TELL_CAPTURE_TIMEOUT_MS` (default `90000` in Docker). |
+| Capture timeout | Increase `DP_CAPTURE_TIMEOUT_MS` (default `90000` in Docker). |
 | Slow cold start (Render free) | Warm the URL before the demo; or use Railway/paid tier. |
 
 ---
@@ -258,16 +258,16 @@ Free tier may spin down after idle — first request after sleep is slow (~30–
 
 | Variable | Default | Description |
 |---|---|---|
-| `TELL_REPO_ROOT` | auto-detected | Monorepo root (set to `/app` in Docker) |
-| `TELL_DISABLE_REPO_SETUP` | unset (enabled locally) | Set to `1` in production to disable GitHub clone-and-run |
-| `TELL_CAPTURE_TIMEOUT_MS` | `60000` local / `90000` Docker | Max wait for Playwright capture |
+| `DP_REPO_ROOT` | auto-detected | Monorepo root (set to `/app` in Docker) |
+| `DP_DISABLE_REPO_SETUP` | unset (enabled locally) | Set to `1` in production to disable GitHub clone-and-run |
+| `DP_CAPTURE_TIMEOUT_MS` | `60000` local / `90000` Docker | Max wait for Playwright capture |
 | `GEMINI_API_KEY` | — | Gemini taste/voice |
 | `CURSOR_API_KEY` | — | Cursor SDK redesign drafts |
-| `TELL_FIXTURE_URL` | `http://localhost:3001` | Local fixture only |
-| `TELL_REPORT_ARTIFACT` | `fixtures/reports/tell-report.json` | Offline demo fallback |
+| `DP_FIXTURE_URL` | `http://localhost:3001` | Local fixture only |
+| `DP_REPORT_ARTIFACT` | `fixtures/reports/dp-report.json` | Offline demo fallback |
 | `DATABASE_URL` | — | Neon (or Postgres) connection string for durable `/api/reports/share` |
 | `BLOB_READ_WRITE_TOKEN` | — | Optional Vercel Blob fallback for share links |
-| `TELL_PREVIEW_URL` | — | GitHub repo variable for PR preview diagnosis CI |
+| `DP_PREVIEW_URL` | — | GitHub repo variable for PR preview diagnosis CI |
 
 ### Share links on Vercel (Neon preferred)
 
@@ -281,7 +281,7 @@ Shared reports (`POST /api/reports/share`) pick a backend in this order:
 
 1. Create a Neon project at [console.neon.tech](https://console.neon.tech) (or **Vercel → Storage → Create Database → Neon**).
 2. Copy the connection string into Vercel **Project → Settings → Environment Variables** as `DATABASE_URL` (Production + Preview).
-3. Redeploy. Tell auto-creates `shared_reports` on first share (`scripts/sql/shared-reports.sql` is the schema reference).
+3. Redeploy. Design Proof auto-creates `shared_reports` on first share (`scripts/sql/shared-reports.sql` is the schema reference).
 4. Optional: also link a Blob store as a secondary fallback.
 
 Without Neon or Blob, share links are ephemeral (lost on cold start).
@@ -292,12 +292,12 @@ In GitHub **Settings → Secrets and variables → Actions → Variables**, set:
 
 | Variable | Example | Purpose |
 |---|---|---|
-| `TELL_PREVIEW_URL` | `https://your-app.vercel.app` | Stable URL for `.github/workflows/pr-diagnose.yml` |
-| `TELL_FAIL_GENERIC_ABOVE` | `6` | Optional — fail CI when generic tell count exceeds threshold |
+| `DP_PREVIEW_URL` | `https://your-app.vercel.app` | Stable URL for `.github/workflows/pr-diagnose.yml` |
+| `DP_FAIL_GENERIC_ABOVE` | `6` | Optional — fail CI when generic tell count exceeds threshold |
 
-The workflow falls back to the first URL in the PR body when `TELL_PREVIEW_URL` is unset.
+The workflow falls back to the first URL in the PR body when `DP_PREVIEW_URL` is unset.
 
-After a fresh Vercel deploy, update `TELL_PREVIEW_URL` to the new production hostname — older hosts like `tell-five.vercel.app` may 404 if the deployment was removed.
+After a fresh Vercel deploy, update `DP_PREVIEW_URL` to the new production hostname — older hosts like `tell-five.vercel.app` may 404 if the deployment was removed.
 
 ---
 
@@ -317,7 +317,7 @@ When you're back:
 
 1. **Web (Vercel):** “Every AI-built UI has a tell — paste a URL, get evidence-backed findings.”
 2. **Seam:** Drag before/after — same page, reconciled tokens.
-3. **Cursor (local):** “Same pipeline in MCP — `tell_diagnose` on localhost, draft diff, apply in editor.”
+3. **Cursor (local):** “Same pipeline in MCP — `designproof_diagnose` on localhost, draft diff, apply in editor.”
 4. **Option B (if live):** Capture a real site on the deployed Docker URL.
 
 ---
@@ -338,12 +338,12 @@ After changing env vars, **redeploy** so runtime picks them up.
 | `compare` | Vercel UI (no Playwright needed) | `{ "mode": "compare", "url", "beforeReport", "afterReport" }` |
 | `patch` | Capture backend (needs git + Playwright) | `{ "url", "patch", "projectRoot" }` |
 
-On Vercel, `POST /api/proof/verify` proxies patch mode to `TELL_CAPTURE_API_URL` when configured. Compare mode scores two already-captured reports — useful for Vercel preview before/after links.
+On Vercel, `POST /api/proof/verify` proxies patch mode to `DP_CAPTURE_API_URL` when configured. Compare mode scores two already-captured reports — useful for Vercel preview before/after links.
 
 ---
 
 ## What not to deploy
 
-- **Supabase / Neon / Grafana** — not app hosts; use only if you add a database later (Tell doesn't need one today).
+- **Supabase / Neon / Grafana** — not app hosts; use only if you add a database later (Design Proof doesn't need one today).
 - **MCP server** — stdio-only, runs inside Cursor on the reviewer's machine.
 - **`.env` files** — secrets belong in the host dashboard only.

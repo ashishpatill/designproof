@@ -1,6 +1,6 @@
 ---
 name: paper-technical-frame
-description: Warm paper + technical outer frame atmosphere for Tell design previews. Emitted as data-frame=paper-technical when routed.
+description: Warm paper + technical outer frame atmosphere for Design Proof design previews. Emitted as data-frame=paper-technical when routed.
 ---
 
 # paper-technical-frame

@@ -6,7 +6,7 @@ description: Sub-skill — build sport matchday UIs from research packs (cricket
 # sport-vernacular-craft
 
 1. Run **sport-site-research** first — refuse to invent a sport UI from a generic sports moodboard
-2. Load `getSportPack(sportId)` from `@tell/design-skills`
+2. Load `getSportPack(sportId)` from `@designproof/design-skills`
 3. Paint **primaryFacts** in order on the glance surface (inverted pyramid)
 4. Apply the active **formatLens** (emphasize / demote)
 5. Keep the score spine **layout-stable**; use tabular numerals

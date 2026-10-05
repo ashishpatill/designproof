@@ -2,7 +2,7 @@
 // The DNA becomes both the TARGET the redesign steers toward and the yardstick the scorecard
 // measures against (see docs/05 and packages/schema BrandDNA). Deterministic, no LLM.
 
-import { BrandDNA, type CapturePayload, type ComputedStyleSample, type DesignFingerprint } from "@tell/schema";
+import { BrandDNA, type CapturePayload, type ComputedStyleSample, type DesignFingerprint } from "@designproof/schema";
 import { parseColor, px, pxList, rgbToHsl, toHex, type Hsl } from "./color";
 import { DEFAULT_FONT_RE, inferTypeScale, resolveDirection } from "./scales";
 

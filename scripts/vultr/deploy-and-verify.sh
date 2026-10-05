@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Tell Vultr — pull latest code, build (cached layers), start, verify.
+# Design Proof Vultr — pull latest code, build (cached layers), start, verify.
 #
 # Usage (on the VPS as root):
-#   bash /opt/tell/scripts/vultr/deploy-and-verify.sh
-#   TELL_FORCE_REBUILD=1 bash ...   # ignore cache / redeploy anyway
-#   TELL_VERCEL_AUTO_DEPLOY=0 bash ...   # verify Vercel without deploying it
+#   bash /opt/designproof/scripts/vultr/deploy-and-verify.sh
+#   DP_FORCE_REBUILD=1 bash ...   # ignore cache / redeploy anyway
+#   DP_VERCEL_AUTO_DEPLOY=0 bash ...   # verify Vercel without deploying it
 #
 # Vercel deploys are optional but automatic when:
 #   - Vercel CLI is installed/authenticated on the VPS, or VERCEL_TOKEN is exported
@@ -14,22 +14,22 @@
 
 set -euo pipefail
 
-REPO="${TELL_REPO:-https://github.com/ashishpatill/tell-ai-ui-critic.git}"
-BRANCH="${TELL_BRANCH:-master}"
-APP_DIR="${TELL_APP_DIR:-/opt/tell}"
-ENV_FILE="${TELL_ENV_FILE:-/etc/tell-capture.env}"
-CONTAINER_NAME="${TELL_CONTAINER_NAME:-tell-capture}"
-IMAGE_NAME="${TELL_IMAGE_NAME:-tell-capture:latest}"
-STATE_DIR="${TELL_STATE_DIR:-/var/lib/tell-capture}"
+REPO="${DP_REPO:-https://github.com/ashishpatill/tell-ai-ui-critic.git}"
+BRANCH="${DP_BRANCH:-master}"
+APP_DIR="${DP_APP_DIR:-/opt/designproof}"
+ENV_FILE="${DP_ENV_FILE:-/etc/dp-capture.env}"
+CONTAINER_NAME="${DP_CONTAINER_NAME:-dp-capture}"
+IMAGE_NAME="${DP_IMAGE_NAME:-dp-capture:latest}"
+STATE_DIR="${DP_STATE_DIR:-/var/lib/dp-capture}"
 DEPLOYED_COMMIT_FILE="$STATE_DIR/deployed-commit"
-CAPTURE_URL="${TELL_TEST_URL:-https://example.com}"
-CAPTURE_TIMEOUT="${TELL_VERIFY_TIMEOUT:-120}"
-PORT="${TELL_PORT:-3000}"
-VERCEL_PROD_URL="${TELL_VERCEL_PROD_URL:-https://tell-five.vercel.app}"
-VERCEL_CLI="${TELL_VERCEL_CLI:-vercel}"
+CAPTURE_URL="${DP_TEST_URL:-https://example.com}"
+CAPTURE_TIMEOUT="${DP_VERIFY_TIMEOUT:-120}"
+PORT="${DP_PORT:-3000}"
+VERCEL_PROD_URL="${DP_VERCEL_PROD_URL:-https://tell-five.vercel.app}"
+VERCEL_CLI="${DP_VERCEL_CLI:-vercel}"
 VERCEL_DEPLOYED_COMMIT_FILE="$STATE_DIR/vercel-deployed-commit"
-VERCEL_AUTO_DEPLOY="${TELL_VERCEL_AUTO_DEPLOY:-1}"
-VERCEL_CHECK="${TELL_VERCEL_CHECK:-1}"
+VERCEL_AUTO_DEPLOY="${DP_VERCEL_AUTO_DEPLOY:-1}"
+VERCEL_CHECK="${DP_VERCEL_CHECK:-1}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -69,7 +69,7 @@ print_github_push_instructions() {
 
 Ship code to GitHub first, then rerun this VPS deploy:
 
-  cd "\${LOCAL_TELL_REPO:-/path/to/tell}"
+  cd "\${LOCAL_DP_REPO:-/path/to/designproof}"
   git status --short
   git add .
   git commit -m "Prepare demo deployment"
@@ -89,7 +89,7 @@ checkout_dirty() {
 
 ensure_repo() {
   if [[ ! -d "$APP_DIR/.git" ]]; then
-    info "Cloning Tell into $APP_DIR..."
+    info "Cloning Design Proof into $APP_DIR..."
     mkdir -p "$(dirname "$APP_DIR")"
     git clone --depth 1 --branch "$BRANCH" "$REPO" "$APP_DIR"
     return 0
@@ -142,10 +142,10 @@ ensure_env_file() {
   cat >"$ENV_FILE" <<'EOF'
 GEMINI_API_KEY=
 CURSOR_API_KEY=
-TELL_DISABLE_REPO_SETUP=0
-TELL_REPO_ROOT=/app
-TELL_REPO_SETUP_TOKEN=__TELL_REPO_SETUP_TOKEN__
-TELL_CAPTURE_TIMEOUT_MS=90000
+DP_DISABLE_REPO_SETUP=0
+DP_REPO_ROOT=/app
+DP_REPO_SETUP_TOKEN=__DP_REPO_SETUP_TOKEN__
+DP_CAPTURE_TIMEOUT_MS=90000
 NODE_ENV=production
 PORT=3000
 EOF
@@ -155,28 +155,28 @@ import sys
 
 path = Path(sys.argv[1])
 token = sys.argv[2]
-path.write_text(path.read_text().replace("__TELL_REPO_SETUP_TOKEN__", token))
+path.write_text(path.read_text().replace("__DP_REPO_SETUP_TOKEN__", token))
 PY
   chmod 600 "$ENV_FILE"
 }
 
 ensure_repo_setup_env() {
-  if ! grep -q '^TELL_REPO_SETUP_TOKEN=.\+' "$ENV_FILE"; then
+  if ! grep -q '^DP_REPO_SETUP_TOKEN=.\+' "$ENV_FILE"; then
     local repo_setup_token
     repo_setup_token="$(generate_repo_setup_token)"
-    printf '\nTELL_REPO_SETUP_TOKEN=%s\n' "$repo_setup_token" >>"$ENV_FILE"
+    printf '\nDP_REPO_SETUP_TOKEN=%s\n' "$repo_setup_token" >>"$ENV_FILE"
     chmod 600 "$ENV_FILE"
-    warn "Added TELL_REPO_SETUP_TOKEN to $ENV_FILE; set the same value on Vercel for repo setup proxying."
+    warn "Added DP_REPO_SETUP_TOKEN to $ENV_FILE; set the same value on Vercel for repo setup proxying."
   fi
 
-  if [[ "${TELL_VULTR_REPO_SETUP:-1}" == "1" ]]; then
-    if grep -q '^TELL_DISABLE_REPO_SETUP=' "$ENV_FILE"; then
-      sed -i 's/^TELL_DISABLE_REPO_SETUP=.*/TELL_DISABLE_REPO_SETUP=0/' "$ENV_FILE"
+  if [[ "${DP_VULTR_REPO_SETUP:-1}" == "1" ]]; then
+    if grep -q '^DP_DISABLE_REPO_SETUP=' "$ENV_FILE"; then
+      sed -i 's/^DP_DISABLE_REPO_SETUP=.*/DP_DISABLE_REPO_SETUP=0/' "$ENV_FILE"
     else
-      printf '\nTELL_DISABLE_REPO_SETUP=0\n' >>"$ENV_FILE"
+      printf '\nDP_DISABLE_REPO_SETUP=0\n' >>"$ENV_FILE"
     fi
   else
-    warn "Leaving repo setup disabled because TELL_VULTR_REPO_SETUP=${TELL_VULTR_REPO_SETUP:-0}"
+    warn "Leaving repo setup disabled because DP_VULTR_REPO_SETUP=${DP_VULTR_REPO_SETUP:-0}"
   fi
 }
 
@@ -189,7 +189,7 @@ needs_rebuild() {
   head="$(current_commit)"
   deployed="$(deployed_commit)"
 
-  if [[ "${TELL_FORCE_REBUILD:-0}" == "1" ]]; then
+  if [[ "${DP_FORCE_REBUILD:-0}" == "1" ]]; then
     info "Force rebuild requested"
     return 0
   fi
@@ -357,7 +357,7 @@ vercel_alias_has_commit() {
 
 deploy_vercel_if_needed() {
   if [[ "$VERCEL_CHECK" != "1" ]]; then
-    warn "Skipping Vercel check because TELL_VERCEL_CHECK=$VERCEL_CHECK"
+    warn "Skipping Vercel check because DP_VERCEL_CHECK=$VERCEL_CHECK"
     return 0
   fi
 
@@ -365,12 +365,12 @@ deploy_vercel_if_needed() {
   head="$(current_commit)"
   known="$(vercel_deployed_commit)"
 
-  if [[ "$known" == "$head" && "${TELL_VERCEL_FORCE_DEPLOY:-0}" != "1" ]]; then
+  if [[ "$known" == "$head" && "${DP_VERCEL_FORCE_DEPLOY:-0}" != "1" ]]; then
     pass "Vercel previously deployed commit $head from this script"
     return 0
   fi
 
-  if vercel_alias_has_commit "$head" && [[ "${TELL_VERCEL_FORCE_DEPLOY:-0}" != "1" ]]; then
+  if vercel_alias_has_commit "$head" && [[ "${DP_VERCEL_FORCE_DEPLOY:-0}" != "1" ]]; then
     mkdir -p "$STATE_DIR"
     echo "$head" >"$VERCEL_DEPLOYED_COMMIT_FILE"
     pass "Vercel alias already points at commit $head"
@@ -380,7 +380,7 @@ deploy_vercel_if_needed() {
   info "Vercel deployed commit: $known | HEAD: $head"
 
   if [[ "$VERCEL_AUTO_DEPLOY" != "1" ]]; then
-    print_github_push_instructions "Vercel may not be on HEAD; auto deploy disabled with TELL_VERCEL_AUTO_DEPLOY=$VERCEL_AUTO_DEPLOY."
+    print_github_push_instructions "Vercel may not be on HEAD; auto deploy disabled with DP_VERCEL_AUTO_DEPLOY=$VERCEL_AUTO_DEPLOY."
     return 0
   fi
 
@@ -397,7 +397,7 @@ deploy_vercel_if_needed() {
   fi
 
   info "Deploying Vercel frontend for commit $head..."
-  if run_vercel deploy --prod --yes --cwd "$APP_DIR" --meta "tellGitCommit=$head"; then
+  if run_vercel deploy --prod --yes --cwd "$APP_DIR" --meta "dpGitCommit=$head"; then
     mkdir -p "$STATE_DIR"
     echo "$head" >"$VERCEL_DEPLOYED_COMMIT_FILE"
     pass "Vercel production deployed @ $head"
@@ -439,12 +439,12 @@ print_summary() {
   commit="$(deployed_commit)"
   echo ""
   echo "════════════════════════════════════════"
-  echo " Tell capture — deploy summary"
+  echo " Design Proof capture — deploy summary"
   echo "════════════════════════════════════════"
   echo " Commit:    $commit"
   echo " API:       http://${ip}:${PORT}"
-  echo " Vercel:    TELL_CAPTURE_API_URL=http://${ip}:${PORT}"
-  echo " Setup:     set Vercel TELL_REPO_SETUP_TOKEN to match $ENV_FILE"
+  echo " Vercel:    DP_CAPTURE_API_URL=http://${ip}:${PORT}"
+  echo " Setup:     set Vercel DP_REPO_SETUP_TOKEN to match $ENV_FILE"
   echo " Frontend:  ${VERCEL_PROD_URL} (script state: $(vercel_deployed_commit))"
   echo " Health:    curl http://127.0.0.1:${PORT}/api/health/capture"
   echo ""

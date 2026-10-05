@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { Reconciliation } from "@tell/schema";
+import type { Reconciliation } from "@designproof/schema";
 import { buildAppendedOverridePatch } from "./source-patch";
 
 const reconciliation = {
@@ -11,7 +11,7 @@ const reconciliation = {
   label: "Editorial",
   summary: "A source-grounded repair.",
   rows: [],
-  css: "body { color: #17130f; }\nbutton { border-radius: 2px; }\n[data-tell-id=\"t7\"]{\n  padding:24px !important;\n}",
+  css: "body { color: #17130f; }\nbutton { border-radius: 2px; }\n[data-dp-id=\"t7\"]{\n  padding:24px !important;\n}",
   fontImport: "@import url('https://fonts.example/test.css');",
   accentBefore: "#8b5cf6",
   accentAfter: "#b95a31",
@@ -35,9 +35,9 @@ describe("buildAppendedOverridePatch", () => {
 
     expect(patch?.file).toBe("src/index.css");
     expect(patch?.unifiedDiff).toContain("+++ b/src/index.css");
-    expect(patch?.unifiedDiff).toContain("+/* Tell Proof · candidate repair");
+    expect(patch?.unifiedDiff).toContain("+/* Design Proof · candidate repair");
     expect(patch?.unifiedDiff).toContain("+body { color: #17130f; }");
-    expect(patch?.unifiedDiff).not.toContain("data-tell-id");
+    expect(patch?.unifiedDiff).not.toContain("data-dp-id");
     expect(patch?.unifiedDiff).not.toContain("@import");
   });
 
@@ -54,7 +54,7 @@ describe("buildAppendedOverridePatch", () => {
   });
 
   it("emits a diff that git can check and apply", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "tell-source-patch-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "dp-source-patch-"));
     try {
       await fs.mkdir(path.join(dir, "src"));
       const original = ":root { color: #111; }\nbody { margin: 0; }\n";
@@ -67,7 +67,7 @@ describe("buildAppendedOverridePatch", () => {
       expect(checked.status, checked.stderr).toBe(0);
       const applied = spawnSync("git", ["apply", "-"], { cwd: dir, input: patch?.unifiedDiff, encoding: "utf8" });
       expect(applied.status, applied.stderr).toBe(0);
-      expect(await fs.readFile(path.join(dir, "src/index.css"), "utf8")).toContain("Tell Proof · candidate repair");
+      expect(await fs.readFile(path.join(dir, "src/index.css"), "utf8")).toContain("Design Proof · candidate repair");
     } finally {
       await fs.rm(dir, { recursive: true, force: true });
     }

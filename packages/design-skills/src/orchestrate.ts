@@ -9,7 +9,7 @@ import { routeDomainResearchSkills } from "./domain-research";
 import { renderPreviewHtml } from "./render";
 import { routeSkills } from "./route";
 import { buildSections } from "./sections";
-import { AESTHETIC_PROFILES, buildTokens, tellDirectionForLean } from "./tokens";
+import { AESTHETIC_PROFILES, buildTokens, dpDirectionForLean } from "./tokens";
 import {
   DesignBrief,
   DesignFromFeaturesResponse,
@@ -216,7 +216,7 @@ export function designFromFeatures(
 
   const evidenceNotes = [
     `Auto-routed website-domain-research (${researchPlan.researchNodes.length} research nodes)`,
-    `responsive-performance always routed — WebP display budgets + SiteImg on specimen media`,
+    `responsive-performance always routed — WebP display budgets + SiteImg on template media`,
     `Display type ${tokens.type[0]?.px}px at 1440 (measured corridor 46–88px)`,
     `Body ${tokens.type.find((t) => t.name === "body")?.px}px at ${tokens.type.find((t) => t.name === "body")?.lineHeight} leading (corridor 1.25–1.5)`,
     `${tokens.declared} declared design tokens (corridor ≥ 100)`,
@@ -243,7 +243,7 @@ export function designFromFeatures(
     routedSkills,
     researchPlan,
     tokens,
-    tellDirectionId: tellDirectionForLean(taste.aestheticLean),
+    dpDirectionId: dpDirectionForLean(taste.aestheticLean),
     informationArchitecture: sections.map((s) => s.id),
     sections,
     motionNotes,
@@ -260,7 +260,7 @@ export function designFromFeatures(
 }
 
 export type DesignFromFeaturesAuthorOptions = DesignFromFeaturesOptions & {
-  /** Gate like taste / tell_voice — omit or empty → deterministic copy.ts. */
+  /** Gate like taste / designproof_voice — omit or empty → deterministic copy.ts. */
   apiKey?: string;
   author?: ContentAuthor;
   fetchImpl?: typeof fetch;

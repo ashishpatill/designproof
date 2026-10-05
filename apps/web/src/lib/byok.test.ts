@@ -57,7 +57,7 @@ describe("byok", () => {
     const headers = new Headers(byokHeaders());
     expect(headers.get(GEMINI_KEY_HEADER)).toBe("g-key");
     expect(headers.get(CURSOR_KEY_HEADER)).toBe("c-key");
-    expect(headers.get("x-tell-capture-url")).toBeNull();
+    expect(headers.get("x-dp-capture-url")).toBeNull();
     expect([...headers.keys()].some((k) => /capture/i.test(k))).toBe(false);
     // saveByok drops the unused capture override so Settings cannot overclaim
     expect(loadByok().captureApiUrl).toBeUndefined();

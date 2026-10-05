@@ -22,7 +22,7 @@ export type Palette = {
 };
 
 const rule = (selector: string, decls: Record<string, string>): EmittedRule => ({ selector, decls });
-const sel = (id: string, pseudo = "") => `[data-tell-id="${id}"]${pseudo}`;
+const sel = (id: string, pseudo = "") => `[data-dp-id="${id}"]${pseudo}`;
 
 // ── page + texture ──────────────────────────────────────────────────
 /** A faint per-direction paper texture, embedded (no external requests). Kept small. */
@@ -66,7 +66,7 @@ export function pageRules(p: Palette): EmittedRule[] {
   };
   const rules: EmittedRule[] = [rule("html,body", decls)];
   if (tex) rules.push(rule("body", { "background-image": tex, "background-attachment": "fixed" }));
-  // Catch light-on-dark authored text that never got a tell-id sample. Element/class
+  // Catch light-on-dark authored text that never got a dp-id sample. Element/class
   // rules with !important still need counterUnsampled / per-el ops; this covers the
   // common unstamped span/p/label/placeholder path that inherits white from a parent.
   rules.push(rule(
@@ -373,8 +373,8 @@ export function numeralRule(p: Palette, cardId: string, resetHost: string): Emit
   // detail for precision/luxury/brutalist. resetHost seeds the counter once.
   return [
     rule(sel(cardId, "::before"), {
-      "counter-increment": "tell-idx",
-      content: 'counter(tell-idx, decimal-leading-zero) " "',
+      "counter-increment": "dp-idx",
+      content: 'counter(dp-idx, decimal-leading-zero) " "',
       display: "block",
       "font-family": `"${p.mono}", ui-monospace, monospace`,
       "font-size": "12px",

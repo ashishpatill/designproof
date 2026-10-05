@@ -5,8 +5,8 @@ import {
   captureScenarioMatrix,
   compareProofMatrices,
   liveScenarioPlan,
-} from "@tell/core";
-import { CaptureScenario, ProofMatrixResult, ScenarioMatrix } from "@tell/schema";
+} from "@designproof/core";
+import { CaptureScenario, ProofMatrixResult, ScenarioMatrix } from "@designproof/schema";
 import { hasRemoteBackend, proxyRemoteBackend } from "@/lib/remote-api";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
@@ -24,7 +24,7 @@ type Body = {
 };
 
 function defaultAuthStoragePath(): string | undefined {
-  const fromEnv = process.env.TELL_AUTH_STORAGE_STATE?.trim();
+  const fromEnv = process.env.DP_AUTH_STORAGE_STATE?.trim();
   if (fromEnv) {
     const path = resolve(fromEnv);
     return existsSync(path) ? path : undefined;
@@ -41,7 +41,7 @@ function defaultAuthStoragePath(): string | undefined {
 function authStorageForUrl(url: string): string | undefined {
   const storage = defaultAuthStoragePath();
   if (!storage) return undefined;
-  if (process.env.TELL_AUTH_STORAGE_STATE?.trim()) return storage;
+  if (process.env.DP_AUTH_STORAGE_STATE?.trim()) return storage;
   try {
     const host = new URL(url).hostname;
     if (host === "localhost" || host === "127.0.0.1") return storage;
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Live scenario matrix needs Playwright. Set TELL_CAPTURE_API_URL on Vercel, or run locally.",
+          "Live scenario matrix needs Playwright. Set DP_CAPTURE_API_URL on Vercel, or run locally.",
       },
       { status: 501 },
     );

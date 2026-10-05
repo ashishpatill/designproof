@@ -7,7 +7,7 @@
 //     -> { ok: true, css, fontImport, notes } | { ok: false, reason }
 // Never throws. Deterministic recipes path always ships if this fails or is skipped.
 
-import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint } from "@tell/schema";
+import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint } from "@designproof/schema";
 
 // ── Direction (local, minimal shape — do not import scales.ts's richer Direction type) ──
 
@@ -29,7 +29,7 @@ function fmtRect(rect: ComputedStyleSample["rect"]): string {
 
 function sampleLine(s: ComputedStyleSample): string {
   const parts = [
-    `#${s.tellId}`,
+    `#${s.dpId}`,
     `<${s.tag}>`,
     `role=${s.role}`,
     fmtRect(s.rect),
@@ -47,7 +47,7 @@ function sampleLine(s: ComputedStyleSample): string {
 }
 
 /**
- * Compact, authoritative grounding text: one line per sampled element (with its real tellId,
+ * Compact, authoritative grounding text: one line per sampled element (with its real dpId,
  * so the model can only ever reference ids that actually exist), plus page-level tokens. Capped
  * to ~12KB so it stays cheap and fits comfortably in a single-turn prompt.
  */
@@ -81,7 +81,7 @@ export function buildPageBrief(capture: CapturePayload, fingerprint: DesignFinge
   );
 
   lines.push("");
-  lines.push("Sampled elements (tellId, tag, role, rect, computed style):");
+  lines.push("Sampled elements (dpId, tag, role, rect, computed style):");
 
   // Prioritize higher-signal roles first so if we truncate for size, the most useful elements
   // (hero/display, headings, buttons, cards, nav) survive over generic "other" nodes.
@@ -96,14 +96,14 @@ export function buildPageBrief(capture: CapturePayload, fingerprint: DesignFinge
   let budget = BRIEF_BYTE_CAP - byteLength(header) - byteLength("\n(truncated — additional elements omitted)");
   const elementLines: string[] = [];
   for (const s of ordered) {
-    if (!s.tellId) continue;
+    if (!s.dpId) continue;
     const line = sampleLine(s);
     const cost = byteLength(line) + 1;
     if (cost > budget) break;
     elementLines.push(line);
     budget -= cost;
   }
-  const omitted = ordered.filter((s) => s.tellId).length - elementLines.length;
+  const omitted = ordered.filter((s) => s.dpId).length - elementLines.length;
 
   const out = [header + elementLines.join("\n")];
   if (omitted > 0) out.push(`\n(truncated — ${omitted} additional elements omitted)`);
@@ -138,7 +138,7 @@ export function buildRestylePrompt(
     : "No brand DNA supplied — invent a coherent, distinctive system consistent with the direction below.";
 
   return [
-    `You are Tell's senior art director. You are given the REAL captured, rendered state of a web page`,
+    `You are Design Proof's senior art director. You are given the REAL captured, rendered state of a web page`,
     `(exact element ids, rects, and computed styles) and must write ONE complete CSS stylesheet that`,
     `art-directs it into the "${direction.label}" direction (mood: ${direction.mood}).`,
     `Direction brief: ${direction.summary}`,
@@ -153,11 +153,11 @@ export function buildRestylePrompt(
     `5. Decorative details (rules, numbers, marks, ::selection) — evidence a designer was here`,
     ``,
     `Hard rules for the CSS you write:`,
-    `- Selectors may ONLY be: [data-tell-id="…"] using ONLY the ids that literally appear in the`,
+    `- Selectors may ONLY be: [data-dp-id="…"] using ONLY the ids that literally appear in the`,
     `  "Sampled elements" list below (never invent an id), plain tag selectors (body, h1, button, a, …),`,
     `  :root, ::selection, and pseudo-elements (::before/::after) attached to any of the above.`,
     `- Do NOT use attribute selectors like [role="button"] or class selectors — use the plain tag or`,
-    `  [data-tell-id="…"] from the brief instead.`,
+    `  [data-dp-id="…"] from the brief instead.`,
     `- EVERY declaration must end with !important.`,
     `- The FIRST line of the sheet must be exactly one @import for Google Fonts, e.g.`,
     `  @import url('https://fonts.googleapis.com/css2?family=...&display=swap');`,
@@ -224,31 +224,31 @@ function extractSelectors(css: string): string[] {
 const ALLOWED_TAG_RE = /^[a-zA-Z][a-zA-Z0-9]*$/;
 const ALLOWED_BARE_RE = /^(:root|::selection)$/;
 
-function isAllowedSimpleBase(base: string, knownTellIds: Set<string>): boolean {
+function isAllowedSimpleBase(base: string, knownDesignProofIds: Set<string>): boolean {
   if (ALLOWED_BARE_RE.test(base)) return true;
   if (ALLOWED_TAG_RE.test(base)) return true;
 
-  const tellMatch = base.match(/^\[data-tell-id=["']([^"']+)["']\]$/);
-  if (tellMatch) return knownTellIds.has(tellMatch[1]!);
+  const dpMatch = base.match(/^\[data-dp-id=["']([^"']+)["']\]$/);
+  if (dpMatch) return knownDesignProofIds.has(dpMatch[1]!);
 
-  const tagTellMatch = base.match(/^[a-zA-Z][a-zA-Z0-9]*\[data-tell-id=["']([^"']+)["']\]$/);
-  if (tagTellMatch) return knownTellIds.has(tagTellMatch[1]!);
+  const tagDesignProofMatch = base.match(/^[a-zA-Z][a-zA-Z0-9]*\[data-dp-id=["']([^"']+)["']\]$/);
+  if (tagDesignProofMatch) return knownDesignProofIds.has(tagDesignProofMatch[1]!);
 
   return false;
 }
 
-function isAllowedSelectorShape(selector: string, knownTellIds: Set<string>): boolean {
+function isAllowedSelectorShape(selector: string, knownDesignProofIds: Set<string>): boolean {
   // Split off trailing pseudo-elements/pseudo-classes (::before, ::after, :hover, :focus, etc.)
   // and validate the base independently.
   const base = selector.replace(/(::?[a-zA-Z-]+(\([^)]*\))?)+$/, "").trim() || selector;
 
-  // Allow simple descendant chains of plain tags / tell-id selectors (e.g. "nav a", "section h2").
+  // Allow simple descendant chains of plain tags / dp-id selectors (e.g. "nav a", "section h2").
   const parts = base.split(/\s+/).filter(Boolean);
   if (parts.length > 1) {
-    return parts.every((part) => isAllowedSimpleBase(part, knownTellIds));
+    return parts.every((part) => isAllowedSimpleBase(part, knownDesignProofIds));
   }
 
-  return isAllowedSimpleBase(base, knownTellIds);
+  return isAllowedSimpleBase(base, knownDesignProofIds);
 }
 
 function countUnimportantDeclarations(css: string): { total: number; withImportant: number } {
@@ -266,7 +266,7 @@ function countUnimportantDeclarations(css: string): { total: number; withImporta
   return { total, withImportant };
 }
 
-/** Strip non-tell-id attribute selectors models sometimes emit (e.g. a[role="button"] → a). */
+/** Strip non-dp-id attribute selectors models sometimes emit (e.g. a[role="button"] → a). */
 export function sanitizeLlmSelectors(css: string): string {
   return css.replace(/([^{}]+)\{/g, (full, selectorPart: string) => {
     const trimmed = selectorPart.trim();
@@ -274,22 +274,22 @@ export function sanitizeLlmSelectors(css: string): string {
     const fixed = selectorPart.split(",").map((sel: string) => {
       let s = sel.trim();
       // Models reliably shorthand stamped ids as #t7 — expand back to the attribute form.
-      s = s.replace(/#(t\d+)\b/g, '[data-tell-id="$1"]');
+      s = s.replace(/#(t\d+)\b/g, '[data-dp-id="$1"]');
       const pseudoMatch = s.match(/((?:\s*::?[a-zA-Z-]+(?:\([^)]*\))?)+)$/);
       const pseudo = pseudoMatch?.[1] ?? "";
       let base = pseudo ? s.slice(0, s.length - pseudo.length).trim() : s;
-      base = base.replace(/\[(?!data-tell-id\s*=)[^\]]+\]/gi, "").trim();
+      base = base.replace(/\[(?!data-dp-id\s*=)[^\]]+\]/gi, "").trim();
       // A selector that was ONLY a stripped attribute (e.g. [aria-hidden]) has no base
       // left — drop it rather than emitting a naked pseudo or an empty selector.
       if (!base) return "";
       return (base + pseudo).trim();
     }).filter(Boolean);
     // Every selector in the list vanished → mark the rule so the final pass removes it.
-    if (!fixed.length) return `.__tell-drop__ {`;
+    if (!fixed.length) return `.__designproof-drop__ {`;
     return `${fixed.join(", ")} {`;
   })
     // Remove rules whose selector list was emptied by sanitization.
-    .replace(/\.__tell-drop__\s*\{[^{}]*\}/g, "");
+    .replace(/\.__designproof-drop__\s*\{[^{}]*\}/g, "");
 }
 
 /** True when every selector in the list is a ::before/::after decoration rule. */
@@ -462,11 +462,11 @@ export function validateLlmSheet(css: string, capture: CapturePayload): Validate
     violations.push(`${keyframeCount} @keyframes blocks, exceeds cap of ${MAX_KEYFRAMES}`);
   }
 
-  // Selector whitelist + tell-id existence.
-  const knownTellIds = new Set(capture.styles.map((s) => s.tellId).filter(Boolean));
+  // Selector whitelist + dp-id existence.
+  const knownDesignProofIds = new Set(capture.styles.map((s) => s.dpId).filter(Boolean));
   const selectors = extractSelectors(css);
   for (const sel of selectors) {
-    if (!isAllowedSelectorShape(sel, knownTellIds)) {
+    if (!isAllowedSelectorShape(sel, knownDesignProofIds)) {
       violations.push(`disallowed selector: "${sel}"`);
     }
   }

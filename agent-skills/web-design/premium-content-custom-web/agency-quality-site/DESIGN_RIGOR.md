@@ -1,4 +1,4 @@
-# Design rigor (Tell-shaped)
+# Design rigor (Design Proof-shaped)
 
 Principle-only craft floor for `agency-quality-site`. Learned from studied web-design
 skill patterns already mapped in `agent-skills/web-design/COVERAGE.md`. **Do not name
@@ -20,7 +20,7 @@ Write, then build:
 | Color system | 4–6 named roles; one accent; no rainbow |
 | Section sequence | Jobs in order (not interchangeable cards) |
 | Motion narrative | What moves, why, 150–300ms; one motion system |
-| Craft nodes | **1–2** Tell crafts from the map below — never a pile of unrelated aesthetics |
+| Craft nodes | **1–2** Design Proof crafts from the map below — never a pile of unrelated aesthetics |
 | Asset honesty | Original / licensed / generated with provenance — or omit |
 
 Extract from references only: hierarchy, pacing, contrast, image treatment, motion principles.
@@ -44,7 +44,7 @@ Never pretend a corridor fallback was a finished craft board. `agency-run-learn`
 - Reject generic stock that could sell any product.
 - **WebP + display budgets (automatic):** after photography lands under `apps/web/public/**`,
   run `pnpm media:site` (hero ≤1600w, editorial ≤1200w, other ≤1000w). Prefer pruning
-  superseded jpg/png. Specimen UIs use `SiteImg` for lazy/LCP defaults. Do not ship
+  superseded jpg/png. Template UIs use `SiteImg` for lazy/LCP defaults. Do not ship
   multi-MB JPEG heroes on the hot path.
 
 ---
@@ -79,7 +79,7 @@ Never pretend a corridor fallback was a finished craft board. `agency-run-learn`
 
 Choose **one** compositional lane for the run (name it in `DIRECTION.md`):
 
-| Lane | Tell crafts | Feel |
+| Lane | Design Proof crafts | Feel |
 |---|---|---|
 | Minimal editorial grid | `agency-minimal-grid`, `minimal-clean` | Oversized type, tiny utility labels, open spans, hairline structure |
 | Nested premium shells | `nested-frame-craft`, `container-tech-shell` | Outer shell → inset feature → inner cards; breathing layers |

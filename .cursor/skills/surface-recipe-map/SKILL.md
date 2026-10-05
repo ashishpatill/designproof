@@ -1,6 +1,6 @@
 ---
 name: surface-recipe-map
-description: Maps every aesthetic/technique pattern to a Tell craft that learned the full script. Constrains defaults — does not skip engineering. See agent-skills/web-design/COVERAGE.md (82/82).
+description: Maps every aesthetic/technique pattern to a Design Proof craft that learned the full script. Constrains defaults — does not skip engineering. See agent-skills/web-design/COVERAGE.md (82/82).
 ---
 
 # surface-recipe-map

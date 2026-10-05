@@ -1,6 +1,6 @@
 /**
  * Re-export the shared local training-data sink.
- * Canonical implementation: `@tell/design-skills/training-data-sink`
+ * Canonical implementation: `@designproof/design-skills/training-data-sink`
  * (used by Studio API routes and Cursor MCP tools).
  */
 export {
@@ -13,4 +13,4 @@ export {
   scheduleDesignDataHarness,
   runDesignDataHarness,
   type TrainingSinkKind,
-} from "@tell/design-skills/training-data-sink";
+} from "@designproof/design-skills/training-data-sink";

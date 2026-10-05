@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 
-/** Demo auth gate: cookie `tell_session=authenticated` unlocks the signed-in surface. */
+/** Demo auth gate: cookie `designproof_session=authenticated` unlocks the signed-in surface. */
 export default function AccountRoute() {
-  const session = cookies().get("tell_session")?.value;
+  const session = cookies().get("designproof_session")?.value;
   const authenticated = session === "authenticated";
 
   return (
@@ -13,7 +13,7 @@ export default function AccountRoute() {
         <a href="/account">Account</a>
       </nav>
       {authenticated ? (
-        <section className="cards" data-tell-auth="authenticated">
+        <section className="cards" data-dp-auth="authenticated">
           <header className="hero" style={{ padding: "48px 24px" }}>
             <p className="pill">Signed in</p>
             <h1 style={{ fontSize: 42 }}>Welcome back, Ashish ✨</h1>
@@ -31,13 +31,13 @@ export default function AccountRoute() {
           </article>
         </section>
       ) : (
-        <section className="cards" data-tell-auth="anonymous">
+        <section className="cards" data-dp-auth="anonymous">
           <header className="hero" style={{ padding: "48px 24px" }}>
             <p className="pill">Account</p>
             <h1 style={{ fontSize: 42 }}>Sign in to continue</h1>
             <p className="muted-a">
-              Tell captures this anonymous gate unless a Playwright storage state supplies{" "}
-              <code>tell_session=authenticated</code>.
+              Design Proof captures this anonymous gate unless a Playwright storage state supplies{" "}
+              <code>designproof_session=authenticated</code>.
             </p>
           </header>
           <article className="card">

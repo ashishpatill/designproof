@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Convert specimen / site photography under apps/web/public to display-sized WebP.
-# Runs for every site folder (crease, baseline, future specimens) — not README-only.
+# Convert template / site photography under apps/web/public to display-sized WebP.
+# Runs for every site folder (crease, baseline, future templates) — not README-only.
 #
 # Budgets (CSS × ~2 for retina):
 #   *hero* / fold  → max 1600w @ q82

@@ -1,4 +1,4 @@
-# Tell — Agent Orchestration
+# Design Proof — Agent Orchestration
 
 > How to use **Composer 2.5**, **Opus 4.8**, and **GPT 5.5** with role-specific subagents for a 2-day build sprint. Ashish's user story is the north star — every agent role exists to ship his journey.
 
@@ -25,12 +25,12 @@
 | `taste-engineer` | Opus 4.8 | `packages/taste`, prompts | Taste verdicts, direction parsing |
 | `redesign-engineer` | Opus 4.8 | `packages/redesign` | Reconciliation, contrast floor, diffs |
 | `mcp-engineer` | Composer 2.5 | `packages/mcp`, `.cursor/mcp.json` | MCP tools, Cursor integration |
-| `ui-builder` | Composer 2.5 | `apps/web`, components | Tell Report, seam, inspector |
+| `ui-builder` | Composer 2.5 | `apps/web`, components | Design Proof Report, seam, inspector |
 | `ux-copywriter` | GPT 5.5 | Copy, USER_STORY, empty states | Any user-visible string |
 | `fixture-smith` | Composer 2.5 | `fixtures/generic-app` | Bland demo app |
 | `deploy-engineer` | Composer 2.5 | Vercel, Docker, Render configs | Public demo URL |
 | `demo-director` | GPT 5.5 | Demo script, compliance, rehearsal | Pre-review, M9 |
-| `dogfood-auditor` | Opus 4.8 | Run Tell on self, a11y | Pre-demo, M10 |
+| `dogfood-auditor` | Opus 4.8 | Run Design Proof on self, a11y | Pre-demo, M10 |
 
 Invoke: *"Use the core-engineer subagent to implement SystemFontTell detector"*
 
@@ -52,7 +52,7 @@ Task 4 [Composer · fixture-smith] → fixtures/generic-app (all planted tells)
 ## Multitask parallel plan (Day 2)
 
 ```
-Task 1 [Composer · ui-builder]  → BeforeAfterSeam + TellReport + inspector + setup/capture states
+Task 1 [Composer · ui-builder]  → BeforeAfterSeam + DesignProofReport + inspector + setup/capture states
 Task 2 [Opus · taste-engineer]  → Live Gemini + reflection loop + direction parser fallback
 Task 3 [Composer · mcp-engineer] → packages/mcp + .cursor/mcp.json smoke test
 Task 4 [Opus · redesign-engineer] → reconcile.ts contrast floor + patch parity with seam
@@ -71,7 +71,7 @@ Task 8 [Opus · dogfood-auditor] → M10 zero tells on apps/web
 | **Rules** | `.cursor/rules/*.mdc` | Role-specific constraints auto-attach by glob |
 | **Skills** | `.cursor/skills/*/SKILL.md` | Feature workflows auto-discovered by task |
 | **Subagents** | `.cursor/agents/*.md` | Delegate with model-appropriate expertise |
-| **MCP** | `.cursor/mcp.json` | `tell_*` tools inside Agent chat |
+| **MCP** | `.cursor/mcp.json` | `designproof_*` tools inside Agent chat |
 | **Hooks** | `.cursor/hooks.json` | Session context + token lint on web edits |
 | **AGENTS.md** | repo root | Composer reads first every session |
 | **CLAUDE.md** | repo root | Claude Code / Project parity |
@@ -114,20 +114,20 @@ Fix any generic tells. Target: zero tells per docs/01_DESIGN_SYSTEM.md §12.
 
 | Skill | Feature area |
 |---|---|
-| `tell-schema-contracts` | Zod contracts in `packages/schema` |
-| `tell-detector-authoring` | 14 genericness + drift detectors in `packages/core` |
-| `tell-capture-fingerprint` | Playwright capture + deterministic fingerprint |
-| `tell-taste-verdicts` | Taste engine + voice art-direction |
-| `tell-redesign-diff` | Reconciliation, contrast floor, patch generation |
-| `tell-mcp-tools` | Cursor MCP `tell_*` tools |
-| `tell-report-ui` | Tell Report, seam, voice director, setup API |
-| `tell-github-setup` | GitHub clone → install → localhost capture |
-| `tell-demo-fixture` | Bland fixture + offline report artifacts |
-| `tell-dogfood-audit` | M10 zero-tells audit on `apps/web` |
-| `tell-deploy` | Vercel, Docker, Render, Railway |
-| `tell-demo-script` | 3-minute demo + compliance |
+| `dp-schema-contracts` | Zod contracts in `packages/schema` |
+| `dp-detector-authoring` | 14 genericness + drift detectors in `packages/core` |
+| `dp-capture-fingerprint` | Playwright capture + deterministic fingerprint |
+| `dp-taste-verdicts` | Taste engine + voice art-direction |
+| `dp-redesign-diff` | Reconciliation, contrast floor, patch generation |
+| `dp-mcp-tools` | Cursor MCP `designproof_*` tools |
+| `dp-report-ui` | Design Proof Report, seam, voice director, setup API |
+| `dp-github-setup` | GitHub clone → install → localhost capture |
+| `dp-demo-fixture` | Bland fixture + offline report artifacts |
+| `dp-dogfood-audit` | M10 zero-tells audit on `apps/web` |
+| `dp-deploy` | Vercel, Docker, Render, Railway |
+| `dp-demo-script` | 3-minute demo + compliance |
 
-Invoke: *"@tell-detector-authoring add StateGap threshold tuning"* or let Cursor auto-attach from the skill description.
+Invoke: *"@dp-detector-authoring add StateGap threshold tuning"* or let Cursor auto-attach from the skill description.
 
 ## External skills to attach manually (Composer session)
 
@@ -145,4 +145,4 @@ Invoke: *"@tell-detector-authoring add StateGap threshold tuning"* or let Cursor
 
 ## Cut line reminder
 
-Live URL capture, GitHub repo setup, contrast-grounded token reconciliation, voice/text direction parsing, and draft-fix diffs are shipped. If something breaks at demo time: fall back to the committed `fixtures/reports/tell-report.json` artifact and the seeded fixture — the offline path still lands Ashish's journey.
+Live URL capture, GitHub repo setup, contrast-grounded token reconciliation, voice/text direction parsing, and draft-fix diffs are shipped. If something breaks at demo time: fall back to the committed `fixtures/reports/dp-report.json` artifact and the seeded fixture — the offline path still lands Ashish's journey.

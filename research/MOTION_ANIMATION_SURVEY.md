@@ -2,10 +2,10 @@
 
 > **Status:** Research survey (v1) · **Date:** 2026-08-09  
 > **Purpose:** Catalog expert practitioners, studios, learning hubs, and the 2026 production
-> tech stack for world-class web motion — then map the gap against Tell's template engine.  
+> tech stack for world-class web motion — then map the gap against Design Proof's template engine.  
 > **Companion product plan:** [`docs/15_MOTION_ANIMATION_PLAN.md`](../docs/15_MOTION_ANIMATION_PLAN.md)  
 > **Note:** This survey deliberately names people, studios, libraries, and hosts. Product-facing
-> Tell docs and the measured corpus (`docs/10`, `research/measurements/`) stay anonymised;
+> Design Proof docs and the measured corpus (`docs/10`, `research/measurements/`) stay anonymised;
 > seed URLs for measurement live only in gitignored `research/motion-corpus.local.json`.
 
 ---
@@ -22,7 +22,7 @@ accessible in 2026?
 2. Studio portfolios known for scroll narratives, WebGL, and motion systems
 3. Practitioner comparisons of animation libraries (GSAP, Motion, Anime.js, Lenis, Rive, Three.js)
 4. Native platform docs (CSS scroll-driven animations, View Transitions API, WAAPI)
-5. Tell-internal evidence: `docs/10_DESIGN_EVIDENCE.md` motion bands + current
+5. Design Proof-internal evidence: `docs/10_DESIGN_EVIDENCE.md` motion bands + current
    `MotionLevel` / agency Phase `3c-motion` behaviour
 
 **Limitation.** This is a craft + stack survey, not a forensics loop. Named sites should be
@@ -32,23 +32,23 @@ added to the local motion corpus and measured before engine defaults change.
 
 ## 1. Executive findings
 
-| Finding | Implication for Tell |
+| Finding | Implication for Design Proof |
 |---|---|
 | **Best sites use a layered stack, not one library.** Native CSS for cheap FX; a timeline engine for choreography; a React motion lib for app UI; authored formats for character/product motion; WebGL only when the metaphor needs it. | Templates today are stuck at CSS hover + IntersectionObserver fade. Expand the motion ladder, not just timing tokens. |
 | **GSAP became free for commercial use (Apr 2025), including ScrollTrigger / SplitText / MorphSVG.** Timeline + scroll narrative is no longer gated. | Optional `scroll-narrative` motion tier can use GSAP without a license story. |
-| **Motion (ex-Framer Motion) remains the React UI default** (~tens of millions weekly downloads). | Tell Report / Studio React surfaces should prefer Motion for layout/exit/gesture; marketing HTML templates should not pull it by default. |
+| **Motion (ex-Framer Motion) remains the React UI default** (~tens of millions weekly downloads). | Design Proof Report / Studio React surfaces should prefer Motion for layout/exit/gesture; marketing HTML templates should not pull it by default. |
 | **Lenis is the de facto smooth-scroll companion** to ScrollTrigger (~3 KB). | One smooth-scroll engine only (see agency DESIGN_RIGOR). Pair with GSAP or skip entirely for product UIs. |
 | **CSS scroll-driven animations + View Transitions** now cover a large share of “scroll reveal” and page morph without JS — compositor-thread, zero bundle. | First upgrade for templates: replace / augment IO reveals with `@supports (animation-timeline: view())` progressive enhancement. |
 | **Rive beats Lottie when the animation must think** (state machines, hover/drag branches). Lottie/DotLottie remains fine for one-shot authored loops. | Product-proof and onboarding mascots should slot Rive; marketing flourishes can stay Lottie/CSS. |
 | **Three.js / React Three Fiber is justified rarely.** Top immersive studios themselves talk clients *out* of full 3D unless story + dwell time reward the cost. | Keep WebGL behind an explicit brief flag; static-first frame must still read. |
-| **Tell’s critique scores motion as perfect while pages feel lifeless.** `motion-restraint` / `motion-speed` only measure CSS transition share and duration. | Add presence / choreography metrics (stagger, scroll-linked, pinned chapters, keyframe narrative count) or qualitative gates will keep passing dull pages. |
+| **Design Proof’s critique scores motion as perfect while pages feel lifeless.** `motion-restraint` / `motion-speed` only measure CSS transition share and duration. | Add presence / choreography metrics (stagger, scroll-linked, pinned chapters, keyframe narrative count) or qualitative gates will keep passing dull pages. |
 | **Agency Phase `3c-motion` goal is under-specified** (“scroll-reveal + hover, 200–300ms”). | That ceiling matches today’s templates. Raise the phase contract to a full motion system (hero entrance, section choreography, micro-feedback, reduced-motion finals). |
 
 ---
 
 ## 2. Expert studios (study their *systems*, measure anonymously)
 
-Use these as **motion reference sources**. Clone craft into Tell-shaped tokens and skills; put
+Use these as **motion reference sources**. Clone craft into Design Proof-shaped tokens and skills; put
 URLs only in `research/motion-corpus.local.json`; committed measurements stay `ref-NNN`.
 
 ### 2.1 Award-leading digital production
@@ -108,11 +108,11 @@ World-class sites almost never pick one tool. They assign **one job per layer**.
 | Lightweight framework-agnostic timelines / SVG | **Anime.js v4** | ~13 KB | Already on GSAP for the same page |
 | Designer-authored vector motion | **Rive** (interactive state machines) or **Lottie / DotLottie** (playback) | runtime + asset | CSS can draw it |
 | 3D / shaders | **Three.js** + **React Three Fiber** + Drei | large | No physical metaphor + short dwell time |
-| Copy-paste “wow” kits | Avoid as system source of truth | — | Always for Tell engine defaults |
+| Copy-paste “wow” kits | Avoid as system source of truth | — | Always for Design Proof engine defaults |
 
 ### 3.2 Recommended combinations
 
-**A. Marketing / brand site (Tell templates default path)**
+**A. Marketing / brand site (Design Proof templates default path)**
 
 ```text
 CSS tokens (duration / easing)
@@ -122,7 +122,7 @@ CSS tokens (duration / easing)
   + WebGL only behind explicit flag
 ```
 
-**B. Product web app / Tell Report UI**
+**B. Product web app / Design Proof Report UI**
 
 ```text
 CSS tokens
@@ -162,7 +162,7 @@ Lenis + GSAP (timeline + ScrollTrigger + SplitText)
 
 ### 3.4 D3.js + data-viz motion
 
-| Job | Prefer | Tell adaptation |
+| Job | Prefer | Design Proof adaptation |
 |---|---|---|
 | Scales, axes, joins, path generators | **D3** in product/research apps | Marketing HTML: vanilla SVG + D3 *patterns* (stroke-draw via `pathLength`, bar enter, scrub) — no D3 bundle by default |
 | Series / sparkline claim | Stroke-draw once on enter | `.ds-draw` + reveal arming |
@@ -181,7 +181,7 @@ Open demos (Codrops-class tutorials, GSAP showcase, Motion examples, community T
 4. Bind to product features / siteKind instruments.
 5. Ship static-first + reduced-motion.
 
-Never treat a kit as the system of record for Tell templates. Encode judgment in
+Never treat a kit as the system of record for Design Proof templates. Encode judgment in
 `motion-stack-craft` (`.cursor/skills/motion-stack-craft`, agent playbook under
 `premium-content-custom-web/motion-stack-craft`).
 
@@ -198,9 +198,9 @@ Never treat a kit as the system of record for Tell templates. Encode judgment in
 
 ## 4. Motion grammar (what experts actually ship)
 
-Abstracted from studio work and agency rigor — encode these as Tell craft nodes, not as named clones.
+Abstracted from studio work and agency rigor — encode these as Design Proof craft nodes, not as named clones.
 
-| Beat | Expert pattern | Tell today | Gap |
+| Beat | Expert pattern | Design Proof today | Gap |
 |---|---|---|---|
 | **Hero entrance** | Orchestrated 300–800ms sequence (type → media → CTA), once | Often none / generic reveal | Missing signature entrance |
 | **Section enter** | Staggered children, small Y/opacity, once | Optional IO `.ds-reveal` | No stagger system; not default on enough sections |
@@ -221,7 +221,7 @@ So the fix is **better choreography inside the restraint band**, not spraying tr
 
 ---
 
-## 5. Gap analysis vs Tell (Aug 2026)
+## 5. Gap analysis vs Design Proof (Aug 2026)
 
 | Layer | Current state | Needed |
 |---|---|---|
@@ -241,7 +241,7 @@ So the fix is **better choreography inside the restraint band**, not spraying tr
 - Codrops case studies (Lusion; Better Off® Lookback)
 - Chrome Developers — “Animate elements on scroll with Scroll-driven animations”
 - Practitioner roundups comparing GSAP / Motion / Anime.js / Lenis / Rive / Three.js / R3F (2026)
-- Tell internals: `docs/10_DESIGN_EVIDENCE.md`, `packages/design-skills` motion types/render, agency `3c-motion` prompts, `research/critique.json` motion dimensions
+- Design Proof internals: `docs/10_DESIGN_EVIDENCE.md`, `packages/design-skills` motion types/render, agency `3c-motion` prompts, `research/critique.json` motion dimensions
 
 ---
 

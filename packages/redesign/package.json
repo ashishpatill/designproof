@@ -1,5 +1,5 @@
 {
-  "name": "@tell/redesign",
+  "name": "@designproof/redesign",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -25,7 +25,7 @@
     "smoke:llm": "tsx scripts/llm-smoke.ts"
   },
   "dependencies": {
-    "@tell/schema": "workspace:*"
+    "@designproof/schema": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

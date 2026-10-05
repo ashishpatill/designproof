@@ -17,11 +17,11 @@ Match typography scale, spacing rhythm, and motion. Do not copy the layouts.
 
 ## 4. Stack
 
-Tell default: `@tell/design-skills` preview HTML + token CSS, served locally for proof.
+Design Proof default: `@designproof/design-skills` preview HTML + token CSS, served locally for proof.
 (Alternate stacks allowed only when the brief names them explicitly.)
 
 ## 5. Ban list
 
 Banned: purple/violet gradients · emoji as icons · Inter as the display font · generic stock-photo placeholders · centered-everything layouts · equal three-card feature grids · shadow-everywhere · cream+#F4F1EA paper with terracotta accent · broadsheet hairline-only dense columns as a default when the brief did not ask for them · award claims without evidence · fake logo-wall theater.
 
-Also read `DESIGN_RIGOR.md` — pick one compositional lane and 1–2 Tell craft nodes before building.
+Also read `DESIGN_RIGOR.md` — pick one compositional lane and 1–2 Design Proof craft nodes before building.

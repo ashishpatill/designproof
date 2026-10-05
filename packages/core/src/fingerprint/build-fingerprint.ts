@@ -1,4 +1,4 @@
-import { CapturePayload, DesignFingerprint } from "@tell/schema";
+import { CapturePayload, DesignFingerprint } from "@designproof/schema";
 
 type Counted = { value: string; count: number };
 

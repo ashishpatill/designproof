@@ -13,11 +13,11 @@ description: >-
 
 **Extends:** `website-domain-research` via parent graph `sport-matchday-web` (LoadPriorDomain first).
 
-**Auto-trigger:** Always-applied `tell-domain-research` + engine routes `website-domain-research` then `sport-matchday-web` when `sportId` is set or query language matches.
+**Auto-trigger:** Always-applied `dp-domain-research` + engine routes `website-domain-research` then `sport-matchday-web` when `sportId` is set or query language matches.
 
 Full playbook: `agent-skills/web-design/premium-content-custom-web/sport-vernacular-craft/SKILL.md`  
 Parent graphs: `website-domain-research` → `sport-matchday-web`  
-Engine packs: `@tell/design-skills` → `loadPriorDomain` / `getSportPack` / `routeDomainResearchSkills` / `sportResearchBriefTemplate`  
+Engine packs: `@designproof/design-skills` → `loadPriorDomain` / `getSportPack` / `routeDomainResearchSkills` / `sportResearchBriefTemplate`  
 Deep notes: `research/SPORT_SITE_VERNACULAR.md`
 
 ## Why this exists
@@ -44,7 +44,7 @@ Building without research produces another purple/card-grid sports shell.
 6. Choose default format lens + access-mode priority (usually glance-live first)
 7. Plan score spine stability + progressive disclosure + Core route classes
 8. emit-training-episode (required)
-9. Only then: agency:run / hand craft / evolve specimen
+9. Only then: agency:run / hand craft / evolve template
 ```
 
 ## Supported packs

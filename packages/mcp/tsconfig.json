@@ -3,12 +3,12 @@
   "compilerOptions": {
     "outDir": "dist",
     "paths": {
-      "@tell/core": ["../core/src"],
-      "@tell/design-skills": ["../design-skills/src"],
-      "@tell/design-skills/training-data-sink": ["../design-skills/src/training-data-sink.ts"],
-      "@tell/redesign": ["../redesign/src"],
-      "@tell/schema": ["../schema/src"],
-      "@tell/taste": ["../taste/src"]
+      "@designproof/core": ["../core/src"],
+      "@designproof/design-skills": ["../design-skills/src"],
+      "@designproof/design-skills/training-data-sink": ["../design-skills/src/training-data-sink.ts"],
+      "@designproof/redesign": ["../redesign/src"],
+      "@designproof/schema": ["../schema/src"],
+      "@designproof/taste": ["../taste/src"]
     }
   },
   "include": ["src"]

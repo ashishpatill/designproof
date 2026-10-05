@@ -1,4 +1,4 @@
-# Tell — Motion & Animation Capability Plan
+# Design Proof — Motion & Animation Capability Plan
 
 > **Research → product plan.**  
 > **Survey (named experts + stacks):** [`research/MOTION_ANIMATION_SURVEY.md`](../research/MOTION_ANIMATION_SURVEY.md)  
@@ -16,7 +16,7 @@ capabilities and stack *categories*. Named people/libraries live in the survey.
 
 ## 0. Problem statement
 
-Tell templates score well on **motion restraint** and **motion speed** in
+Design Proof templates score well on **motion restraint** and **motion speed** in
 `research/critique.json`, yet feel massively under-animated. That is not a contradiction:
 
 - Current metrics only ask “how many elements transition?” and “how long?”
@@ -57,14 +57,14 @@ generic AI spectacle (blur reveals, bounce, purple glow, infinite loops).
 | `scroll-narrative` *(new)* | Pinned/scrub chapters, stagger, hero entrance | CSS + optional timeline engine (GSAP-class) + optional Lenis-class smooth scroll | brand, studio, campaign |
 | `immersive` *(new, gated)* | Metaphor WebGL / shader hero | Above + WebGL thin wrapper | portfolio / campaign only when brief flags |
 
-Schema change lives in `@tell/design-skills` (+ MCP enum if exposed). Default for most templates
+Schema change lives in `@designproof/design-skills` (+ MCP enum if exposed). Default for most templates
 remains `light-scroll-reveals` or `subtle-micro`; `scroll-narrative` is opt-in per lean/siteKind.
 
 ---
 
 ## 3. Motion grammar to encode in the engine
 
-Ship as craft nodes + render helpers (names are Tell-internal):
+Ship as craft nodes + render helpers (names are Design Proof-internal):
 
 | Node / beat | Behaviour | Reduced-motion |
 |---|---|---|
@@ -81,7 +81,7 @@ autoplaying competing video, multi-library scroll hijacks.
 
 ---
 
-## 4. Stack policy for Tell
+## 4. Stack policy for Design Proof
 
 | Surface | Allowed | Default |
 |---|---|---|
@@ -136,8 +136,8 @@ Bundle rule: marketing templates must not import a React motion library. Keep HT
 
 ### W6 — Dogfood
 
-- [ ] Tell Report route transitions (apps/web)
-- [ ] `tell-dogfood-audit` after motion ship
+- [ ] Design Proof Report route transitions (apps/web)
+- [ ] `dp-dogfood-audit` after motion ship
 
 ---
 
@@ -176,7 +176,7 @@ Bundle rule: marketing templates must not import a React motion library. Keep HT
 - Shipping award-clone layouts or naming third parties in engine output
 - Making WebGL the default hero for SaaS templates
 - Auto-applying motion patches via MCP
-- Replacing Tell’s deterministic core with an animation CDN
+- Replacing Design Proof’s deterministic core with an animation CDN
 
 ---
 

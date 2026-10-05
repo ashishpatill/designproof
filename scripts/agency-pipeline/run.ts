@@ -287,7 +287,7 @@ async function captureRefs(refs: NonNullable<BoardsLocal["refs"]>, outDir: strin
         "Fill after eye review (see DESIGN_RIGOR.md):",
         "- Visual thesis: …",
         "- Compositional lane: minimal editorial grid | nested premium shells | image-first stage | documentary chapters | conversion landing",
-        "- Craft nodes (1–2 Tell skills): …",
+        "- Craft nodes (1–2 Design Proof skills): …",
         "- Type: …",
         "- Spacing: …",
         "- Motion: …",

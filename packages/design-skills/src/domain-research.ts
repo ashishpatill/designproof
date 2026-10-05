@@ -102,7 +102,7 @@ export const DomainResearchPack = z.object({
 });
 export type DomainResearchPack = z.infer<typeof DomainResearchPack>;
 
-/** Cricket Core six + secondary directory routes for specimen + capture. */
+/** Cricket Core six + secondary directory routes for template + capture. */
 export const CRICKET_CORE_SIX_ROUTES: DomainMultiPageRoute[] = [
   {
     id: "home",

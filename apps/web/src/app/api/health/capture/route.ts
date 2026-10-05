@@ -11,7 +11,7 @@ export async function GET() {
   if (hasRemoteCaptureBackend()) {
     const base = remoteBackendBaseUrl();
     try {
-      if (!base) throw new Error("TELL_CAPTURE_API_URL is not configured");
+      if (!base) throw new Error("DP_CAPTURE_API_URL is not configured");
       const res = await fetch(`${base}/api/health/capture`, {
         cache: "no-store",
         signal: AbortSignal.timeout(30_000),
@@ -48,7 +48,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       playwrightBrowsersPath: process.env.PLAYWRIGHT_BROWSERS_PATH ?? "(default)",
-      tellRepoRoot: process.env.TELL_REPO_ROOT ?? "(auto)",
+      dpRepoRoot: process.env.DP_REPO_ROOT ?? "(auto)",
       trainingData: trainingSinkStatus(),
     });
   } catch (error) {

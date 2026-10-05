@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { CapturePayload, DesignFingerprint } from "@tell/schema";
+import type { CapturePayload, DesignFingerprint } from "@designproof/schema";
 import {
   buildPageBrief,
   restyleWithGemini,
@@ -27,7 +27,7 @@ function makeCapture(overrides?: Partial<CapturePayload>): CapturePayload {
     },
     styles: [
       {
-        selector: "body", tellId: "t0", tag: "body", role: "body",
+        selector: "body", dpId: "t0", tag: "body", role: "body",
         rect: { x: 0, y: 0, w: 1440, h: 1477 },
         fontFamily: "Inter, system-ui, sans-serif", fontSize: "16px", fontWeight: "400",
         color: "rgb(244, 244, 245)", backgroundColor: "rgb(15, 15, 15)",
@@ -35,7 +35,7 @@ function makeCapture(overrides?: Partial<CapturePayload>): CapturePayload {
         lineHeight: "normal", backgroundImage: "none",
       },
       {
-        selector: "h1", tellId: "t1", tag: "h1", role: "display",
+        selector: "h1", dpId: "t1", tag: "h1", role: "display",
         rect: { x: 40, y: 40, w: 800, h: 120 },
         fontFamily: "Inter, system-ui, sans-serif", fontSize: "48px", fontWeight: "700",
         color: "rgb(244, 244, 245)", backgroundColor: "rgba(0,0,0,0)",
@@ -43,7 +43,7 @@ function makeCapture(overrides?: Partial<CapturePayload>): CapturePayload {
         lineHeight: "1.1", backgroundImage: "none",
       },
       {
-        selector: "button", tellId: "t2", tag: "button", role: "button",
+        selector: "button", dpId: "t2", tag: "button", role: "button",
         rect: { x: 40, y: 200, w: 140, h: 44 },
         fontFamily: "Inter, system-ui, sans-serif", fontSize: "16px", fontWeight: "600",
         color: "rgb(255,255,255)", backgroundColor: "rgb(139, 92, 246)",
@@ -82,16 +82,16 @@ function makeFingerprint(overrides?: Partial<DesignFingerprint>): DesignFingerpr
 
 const GOOD_SHEET = [
   `@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600&display=swap');`,
-  `:root { --tell-accent: #b95a31 !important; }`,
+  `:root { --dp-accent: #b95a31 !important; }`,
   `body { background-color: #f4eee3 !important; color: #17140f !important; }`,
-  `[data-tell-id="t1"] { font-family: Fraunces, serif !important; font-size: 64px !important; }`,
-  `[data-tell-id="t2"] { border-radius: 10px !important; background-color: #b95a31 !important; color: #ffffff !important; }`,
+  `[data-dp-id="t1"] { font-family: Fraunces, serif !important; font-size: 64px !important; }`,
+  `[data-dp-id="t2"] { border-radius: 10px !important; background-color: #b95a31 !important; color: #ffffff !important; }`,
   `button::before { content: "" !important; }`,
   `::selection { background-color: #b95a31 !important; color: #ffffff !important; }`,
 ].join("\n");
 
 describe("buildPageBrief", () => {
-  it("includes tellIds, tokens, and viewport, capped near 12KB", () => {
+  it("includes dpIds, tokens, and viewport, capped near 12KB", () => {
     const brief = buildPageBrief(makeCapture(), makeFingerprint());
     expect(brief).toContain("#t0");
     expect(brief).toContain("#t1");
@@ -103,7 +103,7 @@ describe("buildPageBrief", () => {
 
   it("caps brief size even with many sampled elements", () => {
     const manyStyles = Array.from({ length: 500 }, (_, i) => ({
-      selector: `div.item-${i}`, tellId: `t${i + 10}`, tag: "div", role: "other" as const,
+      selector: `div.item-${i}`, dpId: `t${i + 10}`, tag: "div", role: "other" as const,
       rect: { x: 0, y: i * 10, w: 200, h: 40 },
       fontFamily: "Inter, system-ui, sans-serif", fontSize: "14px", fontWeight: "400",
       color: "rgb(0,0,0)", backgroundColor: "rgb(255,255,255)",
@@ -128,14 +128,14 @@ describe("validateLlmSheet", () => {
     const sheet = [
       `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,700&display=swap');`,
       `body { background-color: #f4eee3 !important; color: #17140f !important; }`,
-      `[data-tell-id="t1"] { font-size: 64px !important; }`,
+      `[data-dp-id="t1"] { font-size: 64px !important; }`,
     ].join("\n");
     const result = validateLlmSheet(sheet, makeCapture());
     expect(result.violations).toEqual([]);
     expect(result.ok).toBe(true);
   });
 
-  it("sanitizeLlmSelectors strips non-tell-id attribute selectors", () => {
+  it("sanitizeLlmSelectors strips non-dp-id attribute selectors", () => {
     const raw = GOOD_SHEET + `\na[role="button"] { color: #17140f !important; }`;
     const sanitized = sanitizeLlmSelectors(raw);
     expect(sanitized).toContain("a { color:");
@@ -149,8 +149,8 @@ describe("validateLlmSheet", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("rejects a selector referencing an unknown tell-id", () => {
-    const bad = GOOD_SHEET + `\n[data-tell-id="t999"] { color: #000 !important; }`;
+  it("rejects a selector referencing an unknown dp-id", () => {
+    const bad = GOOD_SHEET + `\n[data-dp-id="t999"] { color: #000 !important; }`;
     const result = validateLlmSheet(bad, makeCapture());
     expect(result.ok).toBe(false);
     expect(result.violations.some((v) => v.includes("t999"))).toBe(true);
@@ -170,7 +170,7 @@ describe("validateLlmSheet", () => {
     const bad = [
       `@import url('https://fonts.googleapis.com/css2?family=Fraunces&display=swap');`,
       `body { background-color: #f4eee3; color: #17140f; }`,
-      `[data-tell-id="t1"] { font-size: 64px; }`,
+      `[data-dp-id="t1"] { font-size: 64px; }`,
     ].join("\n");
     const result = validateLlmSheet(bad, makeCapture());
     expect(result.ok).toBe(false);
@@ -178,7 +178,7 @@ describe("validateLlmSheet", () => {
   });
 
   it("rejects an oversized sheet", () => {
-    const filler = Array.from({ length: 4000 }, () => `[data-tell-id="t1"] { color: #17140f !important; }`).join("\n");
+    const filler = Array.from({ length: 4000 }, () => `[data-dp-id="t1"] { color: #17140f !important; }`).join("\n");
     const bad = GOOD_SHEET + "\n" + filler;
     const result = validateLlmSheet(bad, makeCapture());
     expect(result.ok).toBe(false);
@@ -240,8 +240,8 @@ describe("restyleWithGemini", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("returns ok:false when the model's sheet fails validation (e.g. unknown tell-id)", async () => {
-    const invalidCss = GOOD_SHEET + `\n[data-tell-id="t999"] { color: #000 !important; }`;
+  it("returns ok:false when the model's sheet fails validation (e.g. unknown dp-id)", async () => {
+    const invalidCss = GOOD_SHEET + `\n[data-dp-id="t999"] { color: #000 !important; }`;
     const fetchImpl = vi.fn(async () =>
       new Response(
         JSON.stringify({

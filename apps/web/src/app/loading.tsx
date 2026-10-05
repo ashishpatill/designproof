@@ -11,7 +11,7 @@ export default function HomeLoading() {
         fontFamily: "var(--font-sans), system-ui, sans-serif",
       }}
     >
-      <p style={{ margin: 0, letterSpacing: "0.04em", fontSize: "0.95rem" }}>Opening Tell…</p>
+      <p style={{ margin: 0, letterSpacing: "0.04em", fontSize: "0.95rem" }}>Opening Design Proof…</p>
     </div>
   );
 }

@@ -32,19 +32,19 @@ importers:
       '@opentelemetry/exporter-trace-otlp-http':
         specifier: ^0.220.0
         version: 0.220.0(@opentelemetry/api@1.9.1)
-      '@tell/core':
+      '@designproof/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@tell/design-skills':
+      '@designproof/design-skills':
         specifier: workspace:*
         version: link:../../packages/design-skills
-      '@tell/redesign':
+      '@designproof/redesign':
         specifier: workspace:*
         version: link:../../packages/redesign
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../../packages/schema
-      '@tell/taste':
+      '@designproof/taste':
         specifier: workspace:*
         version: link:../../packages/taste
       '@vercel/blob':
@@ -126,13 +126,13 @@ importers:
 
   packages/cli:
     dependencies:
-      '@tell/core':
+      '@designproof/core':
         specifier: workspace:*
         version: link:../core
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
-      '@tell/taste':
+      '@designproof/taste':
         specifier: workspace:*
         version: link:../taste
       zod:
@@ -154,10 +154,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@tell/redesign':
+      '@designproof/redesign':
         specifier: workspace:*
         version: link:../redesign
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
       playwright:
@@ -185,7 +185,7 @@ importers:
 
   packages/design-skills:
     dependencies:
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
       zod:
@@ -213,19 +213,19 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.3.0
         version: 1.29.0(zod@3.25.76)
-      '@tell/core':
+      '@designproof/core':
         specifier: workspace:*
         version: link:../core
-      '@tell/design-skills':
+      '@designproof/design-skills':
         specifier: workspace:*
         version: link:../design-skills
-      '@tell/redesign':
+      '@designproof/redesign':
         specifier: workspace:*
         version: link:../redesign
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
-      '@tell/taste':
+      '@designproof/taste':
         specifier: workspace:*
         version: link:../taste
       zod:
@@ -247,7 +247,7 @@ importers:
 
   packages/redesign:
     dependencies:
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
     devDependencies:
@@ -279,7 +279,7 @@ importers:
       '@google/generative-ai':
         specifier: ^0.21.0
         version: 0.21.0
-      '@tell/schema':
+      '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
       zod:

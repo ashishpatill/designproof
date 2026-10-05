@@ -9,7 +9,7 @@ export type ProductNavId = "home" | "showcase" | "studio";
 /**
  * Single app chrome: left sidebar only.
  * Features: Diagnose (home), Showcase, Studio.
- * Specimens / templates are not listed here — they live on /showcase.
+ * Templates / templates are not listed here — they live on /showcase.
  */
 export function ProductSidebar({
   active,
@@ -33,73 +33,73 @@ export function ProductSidebar({
   onToggleFocus?: () => void;
 }) {
   return (
-    <nav className="tell-rail" aria-label="Tell app" data-testid="product-sidebar">
+    <nav className="dp-rail" aria-label="Design Proof app" data-testid="product-sidebar">
       <Link
         href="/"
-        className="tell-rail__brand"
-        aria-label="Tell home"
+        className="dp-rail__brand"
+        aria-label="Design Proof home"
         onClick={onHome}
       >
-        <span className="tell-rail__mark" aria-hidden>
+        <span className="dp-rail__mark" aria-hidden>
           ⊕
         </span>
-        <span className="tell-rail__brand-text">
-          <span className="tell-rail__brand-name">Tell</span>
-          <span className="tell-rail__brand-meta">Proof</span>
+        <span className="dp-rail__brand-text">
+          <span className="dp-rail__brand-name">Design Proof</span>
+          <span className="dp-rail__brand-meta">Proof</span>
         </span>
       </Link>
 
-      <div className="tell-rail__section" aria-label="Features">
+      <div className="dp-rail__section" aria-label="Features">
         <Link
           href="/"
-          className="tell-rail__link"
+          className="dp-rail__link"
           data-active={active === "home" ? "true" : "false"}
           aria-current={active === "home" ? "page" : undefined}
           onClick={onHome}
         >
-          <Home className="tell-rail__icon" aria-hidden />
-          <span className="tell-rail__label">Home</span>
+          <Home className="dp-rail__icon" aria-hidden />
+          <span className="dp-rail__label">Home</span>
         </Link>
         <Link
           href="/showcase"
-          className="tell-rail__link"
+          className="dp-rail__link"
           data-active={active === "showcase" ? "true" : "false"}
           aria-current={active === "showcase" ? "page" : undefined}
         >
-          <FolderKanban className="tell-rail__icon" aria-hidden />
-          <span className="tell-rail__label">Showcase</span>
+          <FolderKanban className="dp-rail__icon" aria-hidden />
+          <span className="dp-rail__label">Showcase</span>
         </Link>
         <Link
           href="/studio"
-          className="tell-rail__link"
+          className="dp-rail__link"
           data-active={active === "studio" ? "true" : "false"}
           aria-current={active === "studio" ? "page" : undefined}
         >
-          <Sparkles className="tell-rail__icon" aria-hidden />
-          <span className="tell-rail__label">Studio</span>
+          <Sparkles className="dp-rail__icon" aria-hidden />
+          <span className="dp-rail__label">Studio</span>
         </Link>
       </div>
 
       {sessions && sessions.length > 0 ? (
-        <div className="tell-rail__sessions" aria-label="Open sessions">
-          <p className="tell-rail__section-label">Sessions</p>
-          <ul className="tell-rail__session-list">
+        <div className="dp-rail__sessions" aria-label="Open sessions">
+          <p className="dp-rail__section-label">Sessions</p>
+          <ul className="dp-rail__session-list">
             {sessions.map((tab) => (
               <li key={tab.id}>
                 <button
                   type="button"
-                  className="tell-rail__session"
+                  className="dp-rail__session"
                   data-active={activeSessionId === tab.id ? "true" : "false"}
                   aria-current={activeSessionId === tab.id ? "true" : undefined}
                   title={tab.title}
                   onClick={() => onSelectSession?.(tab.id)}
                 >
-                  <span className="tell-rail__session-title">{tab.title}</span>
+                  <span className="dp-rail__session-title">{tab.title}</span>
                   {!tab.pinned ? (
                     <span
                       role="button"
                       tabIndex={0}
-                      className="tell-rail__session-close"
+                      className="dp-rail__session-close"
                       aria-label={`Close ${tab.title}`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -123,32 +123,32 @@ export function ProductSidebar({
         </div>
       ) : null}
 
-      <div className="tell-rail__spacer" />
+      <div className="dp-rail__spacer" />
 
-      <div className="tell-rail__footer">
+      <div className="dp-rail__footer">
         {onToggleFocus ? (
           <button
             type="button"
-            className="tell-rail__link"
+            className="dp-rail__link"
             aria-label={focusCanvas ? "Show critic pane" : "Focus canvas"}
             onClick={onToggleFocus}
           >
             {focusCanvas ? (
-              <Minimize2 className="tell-rail__icon" aria-hidden />
+              <Minimize2 className="dp-rail__icon" aria-hidden />
             ) : (
-              <Maximize2 className="tell-rail__icon" aria-hidden />
+              <Maximize2 className="dp-rail__icon" aria-hidden />
             )}
-            <span className="tell-rail__label">{focusCanvas ? "Split view" : "Focus canvas"}</span>
+            <span className="dp-rail__label">{focusCanvas ? "Split view" : "Focus canvas"}</span>
           </button>
         ) : null}
         <button
           type="button"
-          className="tell-rail__link"
+          className="dp-rail__link"
           aria-label="Settings and keys"
           onClick={onSettings}
         >
-          <Settings className="tell-rail__icon" aria-hidden />
-          <span className="tell-rail__label">Settings</span>
+          <Settings className="dp-rail__icon" aria-hidden />
+          <span className="dp-rail__label">Settings</span>
         </button>
       </div>
     </nav>

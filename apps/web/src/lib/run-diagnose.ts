@@ -1,6 +1,6 @@
-import { captureUrl, diagnoseCapture, loadDesignDoc, shouldApplyDesignDoc } from "@tell/core";
-import { TellReport, type Finding, type TasteVerdict } from "@tell/schema";
-import { classifyWithTaste } from "@tell/taste";
+import { captureUrl, diagnoseCapture, loadDesignDoc, shouldApplyDesignDoc } from "@designproof/core";
+import { DesignProofReport, type Finding, type TasteVerdict } from "@designproof/schema";
+import { classifyWithTaste } from "@designproof/taste";
 
 function scoreOf(verdicts: TasteVerdict[], findings: Finding[]) {
   return {
@@ -13,7 +13,7 @@ function scoreOf(verdicts: TasteVerdict[], findings: Finding[]) {
 }
 
 /** Run capture + diagnose in-process (reliable in Docker / Vercel). */
-export async function runDiagnose(url: string): Promise<TellReport> {
+export async function runDiagnose(url: string): Promise<DesignProofReport> {
   try {
     const designDoc = shouldApplyDesignDoc(url) ? await loadDesignDoc() : undefined;
     const base = diagnoseCapture(await captureUrl(url), undefined, designDoc);
@@ -21,7 +21,7 @@ export async function runDiagnose(url: string): Promise<TellReport> {
     const verdicts = await classifyWithTaste(base.findings, base.fingerprint, {
       apiKey: process.env.GEMINI_API_KEY,
     });
-    return TellReport.parse({ ...base, verdicts, score: scoreOf(verdicts, base.findings) });
+    return DesignProofReport.parse({ ...base, verdicts, score: scoreOf(verdicts, base.findings) });
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`Capture pipeline failed: ${detail}`, { cause: error });

@@ -1,6 +1,6 @@
 ---
 name: editorial-chapter-craft
-description: Editorial chapter pacing for studio/corporate Tell designs — proof before explanation, decisive close. Part of premium-content-custom-web.
+description: Editorial chapter pacing for studio/corporate Design Proof designs — proof before explanation, decisive close. Part of premium-content-custom-web.
 ---
 
 # editorial-chapter-craft

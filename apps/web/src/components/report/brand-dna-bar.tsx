@@ -1,7 +1,7 @@
 "use client";
 
 import { Fingerprint } from "lucide-react";
-import type { BrandDNA } from "@tell/schema";
+import type { BrandDNA } from "@designproof/schema";
 
 /** Learn / show / clear the Brand DNA that the redesign steers toward and the scorecard scores against. */
 export function BrandDnaBar({ dna, onLearn, onClear, live }: { dna: BrandDNA | null; onLearn: () => void; onClear: () => void; live: boolean }) {
@@ -23,7 +23,7 @@ export function BrandDnaBar({ dna, onLearn, onClear, live }: { dna: BrandDNA | n
             </p>
           ) : (
             <p className="mt-1 text-sm text-secondary">
-              No brand learned yet — Tell scores against the generic baseline. Capture a page whose look you trust, then remember it.
+              No brand learned yet — Design Proof scores against the generic baseline. Capture a page whose look you trust, then remember it.
             </p>
           )}
         </div>

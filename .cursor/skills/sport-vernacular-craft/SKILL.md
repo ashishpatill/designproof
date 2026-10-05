@@ -1,6 +1,6 @@
 ---
 name: sport-vernacular-craft
-description: Tell craft for sport matchday sites — score spine, format lenses, cultural vernacular. Requires sport-site-research first.
+description: Design Proof craft for sport matchday sites — score spine, format lenses, cultural vernacular. Requires sport-site-research first.
 ---
 
 # sport-vernacular-craft

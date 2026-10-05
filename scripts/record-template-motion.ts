@@ -32,7 +32,7 @@ function repoRoot(from = process.cwd()): string {
 
 const root = repoRoot();
 const ARTIFACTS = "/opt/cursor/artifacts/motion-clips";
-const TMP = "/tmp/tell-motion-clips";
+const TMP = "/tmp/dp-motion-clips";
 
 const SIGNATURE: Record<string, string> = {
   saas: "rise + short stagger (conversion)",

@@ -12,7 +12,7 @@ Turn CREASE from hash-nav single page into Core six routes under `/crease/*` wit
 
 | Track | Deliverable |
 |---|---|
-| Specimen | `/crease`, `/crease/live`, `/crease/scorecard`, `/crease/series`, `/crease/rankings`, `/crease/notebook` + shared nav/footer/live rail |
+| Template | `/crease`, `/crease/live`, `/crease/scorecard`, `/crease/series`, `/crease/rankings`, `/crease/notebook` + shared nav/footer/live rail |
 | Engine | Optional `match-theater` emitter stub; keep DomainResearchPack fields authoritative |
 | Skills | Sport design nodes stubs under `sport-matchday-web` as needed |
 | Training | Emit episode on shell write-back |
@@ -26,8 +26,8 @@ Turn CREASE from hash-nav single page into Core six routes under `/crease/*` wit
 ## Verify
 
 ```bash
-pnpm -F @tell/design-skills test
-pnpm -F @tell/web typecheck
+pnpm -F @designproof/design-skills test
+pnpm -F @designproof/web typecheck
 # Core six routes return 200 with shared shell
 ```
 

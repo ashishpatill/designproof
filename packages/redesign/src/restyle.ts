@@ -1,5 +1,5 @@
 // Grounded, element-precise redesign — v2 "art direction, not token nudging" (docs/06).
-// For each captured element (identified by its stamped data-tell-id) we apply the chosen
+// For each captured element (identified by its stamped data-dp-id) we apply the chosen
 // direction's COMPLETE system: imposed paper + texture, a real hero treatment, per-role
 // component recipes (button/card/nav/input/badge/section/link/footer), section rhythm with
 // surface alternation, and the decorative details that make each direction read as a
@@ -7,7 +7,7 @@
 // depth → accent → recipes → layout. Everything ships as !important element/role rules that
 // win in the sandboxed "after" iframe.
 
-import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint } from "@tell/schema";
+import type { BrandDNA, CapturePayload, ComputedStyleSample, DesignFingerprint } from "@designproof/schema";
 import { clamp, contrastRatio, hslHex, parseColor, px, pxList, rgbToHsl, type Hsl } from "./color";
 import { ELEVATION, snapSpace, snapType, tameAccent } from "./scales";
 import type { Direction } from "./directions";
@@ -18,7 +18,7 @@ import {
   type EmittedRule, type Palette,
 } from "./recipes";
 
-export type ElOp = { tellId: string; role: string; decls: Record<string, string> };
+export type ElOp = { dpId: string; role: string; decls: Record<string, string> };
 
 export type RestylePlan = {
   direction: Direction;
@@ -169,12 +169,12 @@ export function buildRestylePlan(
   // while inheriting the new ink (dark-on-dark chips) or keeps authored light text on the
   // new paper (white-on-cream). Read the snapshot's inlined stylesheet and counter simple
   // selectors whose solid fill / text color the new paper can't read.
-  // Element-precise [data-tell-id] ops are emitted later, so they win ties.
+  // Element-precise [data-dp-id] ops are emitted later, so they win ties.
   rules.push(...counterUnsampledFills(capture.snapshotHtml ?? "", p));
   rules.push(...counterUnsampledLightText(capture.snapshotHtml ?? "", p));
 
   // ── (recipes) hero ──
-  const heroHeading = styles.find((s) => s.tellId === layout.heroHeadingId);
+  const heroHeading = styles.find((s) => s.dpId === layout.heroHeadingId);
   const heroSize = fitHeroSize(dir.recipe.hero.px, heroHeading?.rect?.w ?? null);
   const heroRuleSet = heroRules(p, layout.heroHeadingId, layout.heroContainerId, heroSize);
   rules.push(...heroRuleSet);
@@ -191,8 +191,8 @@ export function buildRestylePlan(
   // ── per-element pass ──
   let cardCol = 0;
   for (const s of styles) {
-    if (!s.tellId || s.tag === "body" || s.tag === "html") continue;
-    if (s.tellId === layout.heroHeadingId || s.tellId === layout.heroContainerId) continue; // hero handled above
+    if (!s.dpId || s.tag === "body" || s.tag === "html") continue;
+    if (s.dpId === layout.heroHeadingId || s.dpId === layout.heroContainerId) continue; // hero handled above
     const decls: Record<string, string> = {};
     const size = px(s.fontSize);
 
@@ -240,8 +240,8 @@ export function buildRestylePlan(
     } else if (s.role === "input") {
       Object.assign(decls, inputDecls(p));
     } else if (s.role === "card" || s.role === "surface") {
-      const isSection = sectionIndex.has(s.tellId);
-      const isTile = cardSet.has(s.tellId);
+      const isSection = sectionIndex.has(s.dpId);
+      const isTile = cardSet.has(s.dpId);
       if (s.tag === "footer") {
         Object.assign(decls, footerDecls(p));
       } else if (isTile) {
@@ -252,11 +252,11 @@ export function buildRestylePlan(
         if (cd["box-shadow"] && cd["box-shadow"] !== "none") floated++;
         noteShadow(cd["box-shadow"]);
         if (numeralsOn) {
-          rules.push(...numeralRule(p, s.tellId, "body"));
+          rules.push(...numeralRule(p, s.dpId, "body"));
           numeralHost = true;
         }
       } else if (isSection) {
-        const idx = sectionIndex.get(s.tellId)!;
+        const idx = sectionIndex.get(s.dpId)!;
         Object.assign(decls, sectionDecls(p, idx), {
           "max-width": `${dir.recipe.contentMax}px`, "margin-left": "auto", "margin-right": "auto",
           "column-gap": `${dir.recipe.gridGap}px`, "row-gap": `${dir.recipe.gridGap}px`, "text-align": contentAlign,
@@ -322,10 +322,10 @@ export function buildRestylePlan(
     // radius unification for controls that still lack one
     if ((s.role === "button" || s.role === "card" || s.role === "input") && decls["border-radius"] === undefined && px(s.borderRadius) > 0) decls["border-radius"] = p.radius;
 
-    if (Object.keys(decls).length) ops.push({ tellId: s.tellId, role: s.role, decls });
+    if (Object.keys(decls).length) ops.push({ dpId: s.dpId, role: s.role, decls });
   }
 
-  if (numeralHost) rules.push({ selector: "body", decls: { "counter-reset": "tell-idx" } });
+  if (numeralHost) rules.push({ selector: "body", decls: { "counter-reset": "dp-idx" } });
 
   // remap the page's own accent custom properties
   const remapVars = (capture.cssVariables ?? []).filter((v) => nearAccent(v.value, accent?.hsl ?? null, 26)).map((v) => ({ name: v.name, value: p.accent }));
@@ -377,7 +377,7 @@ function buildDirectionNotes(p: Palette, heroSize: number, floated: number, layo
  * chips on the new paper. Gradients, compound selectors, and page roots are left alone.
  */
 function counterUnsampledFills(snapshotHtml: string, p: Palette): EmittedRule[] {
-  const inlined = snapshotHtml.match(/<style[^>]*data-tell-inlined[^>]*>([\s\S]*?)<\/style>/i);
+  const inlined = snapshotHtml.match(/<style[^>]*data-dp-inlined[^>]*>([\s\S]*?)<\/style>/i);
   if (!inlined) return [];
   const out: EmittedRule[] = [];
   const seen = new Set<string>();
@@ -413,7 +413,7 @@ function counterUnsampledFills(snapshotHtml: string, p: Palette): EmittedRule[] 
  * and also allows simple descendant forms like `.nav a` / `.hero h1`.
  */
 function counterUnsampledLightText(snapshotHtml: string, p: Palette): EmittedRule[] {
-  const inlined = snapshotHtml.match(/<style[^>]*data-tell-inlined[^>]*>([\s\S]*?)<\/style>/i);
+  const inlined = snapshotHtml.match(/<style[^>]*data-dp-inlined[^>]*>([\s\S]*?)<\/style>/i);
   if (!inlined) return [];
   const out: EmittedRule[] = [];
   const seen = new Set<string>();
@@ -439,18 +439,18 @@ function counterUnsampledLightText(snapshotHtml: string, p: Palette): EmittedRul
 
 export function emitRestyleCss(plan: RestylePlan): string {
   const p = plan.palette;
-  const header = `/* Tell · ${plan.direction.label} — v2 art-directed restyle of the captured page */
+  const header = `/* Design Proof · ${plan.direction.label} — v2 art-directed restyle of the captured page */
 :root{
-  --tell-display:"${plan.display}";
-  --tell-body:"${plan.body}";
-  --tell-mono:"${plan.mono}";
-  --tell-accent:${plan.accentAfter};
-  --tell-accent-ink:${plan.accentInk};
-  --tell-accent-text:${p.accentText};
-  --tell-radius:${plan.radius};
-  --tell-paper:${plan.surface};
-  --tell-paper-alt:${p.paperAlt};
-  --tell-ink:${plan.ink};
+  --dp-display:"${plan.display}";
+  --dp-body:"${plan.body}";
+  --dp-mono:"${plan.mono}";
+  --dp-accent:${plan.accentAfter};
+  --dp-accent-ink:${plan.accentInk};
+  --dp-accent-text:${p.accentText};
+  --dp-radius:${plan.radius};
+  --dp-paper:${plan.surface};
+  --dp-paper-alt:${p.paperAlt};
+  --dp-ink:${plan.ink};
 }`;
   const remap = plan.remapVars.length
     ? `\n:root{\n${plan.remapVars.map((v) => `  ${v.name}: ${plan.accentAfter} !important;`).join("\n")}\n}`
@@ -460,7 +460,7 @@ export function emitRestyleCss(plan: RestylePlan): string {
     `${selector}{\n${Object.entries(decls).map(([k, v]) => `  ${k}:${v} !important;`).join("\n")}\n}`;
 
   const globalRules = plan.rules.map((r) => serialize(r.selector, r.decls)).join("\n");
-  const elRules = plan.ops.map((op) => serialize(`[data-tell-id="${op.tellId}"]`, op.decls)).join("\n");
+  const elRules = plan.ops.map((op) => serialize(`[data-dp-id="${op.dpId}"]`, op.decls)).join("\n");
 
   return `${header}${remap}\n${globalRules}\n${elRules}\n`;
 }

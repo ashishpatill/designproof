@@ -29,11 +29,11 @@ Close the loop from “open PR” to “merged on the base branch.” No vibes. 
 | 7. Ready | Undraft if still draft |
 | 8. Merge | Only if user asked (`merge` / `merge when ready`). Prefer local green over remote CI. |
 
-## Local gates (Tell)
+## Local gates (Design Proof)
 
 ```bash
-pnpm -F @tell/design-skills test   # if engine touched
-pnpm -F @tell/web typecheck
+pnpm -F @designproof/design-skills test   # if engine touched
+pnpm -F @designproof/web typecheck
 pnpm test                          # if broader
 ```
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Eye, Split } from "lucide-react";
-import type { Verdict } from "@tell/schema";
+import type { Verdict } from "@designproof/schema";
 
 export const badgeStyles: Record<Verdict, string> = {
   generic: "border-accent/40 bg-accent/10 text-accent",

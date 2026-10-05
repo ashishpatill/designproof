@@ -1,10 +1,10 @@
 {
-  "name": "@tell/mcp",
+  "name": "@designproof/mcp",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "tell-mcp": "./dist/index.js"
+    "dp-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.3.0",
-    "@tell/core": "workspace:*",
-    "@tell/design-skills": "workspace:*",
-    "@tell/redesign": "workspace:*",
-    "@tell/schema": "workspace:*",
-    "@tell/taste": "workspace:*",
+    "@designproof/core": "workspace:*",
+    "@designproof/design-skills": "workspace:*",
+    "@designproof/redesign": "workspace:*",
+    "@designproof/schema": "workspace:*",
+    "@designproof/taste": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

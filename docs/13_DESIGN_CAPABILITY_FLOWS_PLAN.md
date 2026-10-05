@@ -1,20 +1,20 @@
-# Tell — Design Capability Flows Plan
+# Design Proof — Design Capability Flows Plan
 
 > Exhaustive plan for common design tasks and complex functionalities.
 > Patterns adapted from study of a peer local-first design daemon (identity
 > only in gitignored `research/plumbing-reference.local.json`). **Do not name
 > that peer in commits, code, docs, or copy.** Do not copy templates, craft
-> aesthetics, or implementation — learn **flow shapes** and encode Tell-native
+> aesthetics, or implementation — learn **flow shapes** and encode Design Proof-native
 > equivalents (capture → diagnose → art-direct → reconcile → patch).
 >
 > Content/craft authority remains: `docs/09`, `docs/10`, `design-research-loop`,
-> `tell-template-craft` (plumbing floors only).
+> `dp-template-craft` (plumbing floors only).
 
 ---
 
-## 0. Mapping peer flow shapes → Tell product loop
+## 0. Mapping peer flow shapes → Design Proof product loop
 
-| Peer flow shape (abstract) | Tell equivalent | Status |
+| Peer flow shape (abstract) | Design Proof equivalent | Status |
 |---|---|---|
 | Creation intent rail → default scenario | Studio brief + `inferSiteKind` / `routeSkills` | Partial |
 | Skill + design-system push/pull into agent prompt | Staged run guidance + report findings | Partial |
@@ -27,10 +27,10 @@
 | Media generation tools | Out of scope for critic product | Non-goal |
 | Collab comments cloud | Share links only | Partial |
 | Creative memory preferences | Future; offline report is memory enough for demo | Missing |
-| Plugin pipeline atoms | Tell keeps packages, not plugin marketplace | Non-goal for MVP |
+| Plugin pipeline atoms | Design Proof keeps packages, not plugin marketplace | Non-goal for MVP |
 | Library / clipper | Future tab capture | Missing |
 
-**Product identity check:** Tell is a **taste critic + measurable redesign**, not a general design IDE. Prefer deepening the Ashish loop over cloning peer surfaces.
+**Product identity check:** Design Proof is a **taste critic + measurable redesign**, not a general design IDE. Prefer deepening the Ashish loop over cloning peer surfaces.
 
 ---
 
@@ -41,7 +41,7 @@
 **Happy path**
 
 1. Ashish pastes `http://localhost:3001` (or public URL)
-2. CaptureBar → `POST /api/diagnose` **or** MCP `tell_diagnose` **or** `tell diagnose`
+2. CaptureBar → `POST /api/diagnose` **or** MCP `designproof_diagnose` **or** `designproof diagnose`
 3. Playwright capture → fingerprint → detectors → optional taste
 4. Report UI: named tells + evidence on real page
 5. Offline fallback if capture unhealthy (`meta.live=false`)
@@ -62,12 +62,12 @@
 
 - [ ] Clearer progress events (clone / install / boot / capture)
 - [ ] HMAC upgrade per `docs/12` Wave A2
-- [ ] MCP local-only `tell_setup_*` (docs/11 Wave 7)
+- [ ] MCP local-only `designproof_setup_*` (docs/11 Wave 7)
 
 ### 1.3 Multi-page / drift scan
 
 1. Pages strip / matrix → `/pricing` etc.
-2. `tell_capture_matrix` / `POST /api/proof/matrix`
+2. `designproof_capture_matrix` / `POST /api/proof/matrix`
 3. Drift detectors (viewport, design-system)
 
 **Gaps**
@@ -78,11 +78,11 @@
 ### 1.4 Art-direct with voice / text
 
 1. “warmer, editorial, less shadow”
-2. `/api/voice` **or** MCP `tell_voice` → action items + reconciliation table update
+2. `/api/voice` **or** MCP `designproof_voice` → action items + reconciliation table update
 
 **Gaps**
 
-- [x] MCP + CLI parity (`tell_voice` / `tell voice`)
+- [x] MCP + CLI parity (`designproof_voice` / `tell voice`)
 - [ ] Compound direction → structured action items always schema-valid with deterministic fallback
 
 ### 1.5 Seam / reconcile preview
@@ -91,7 +91,7 @@
 2. Deterministic token reconciliation + contrast floor
 3. Explain measured improvement
 
-**Gaps (peer srcdoc-bridge lessons, Tell-shaped)**
+**Gaps (peer srcdoc-bridge lessons, Design Proof-shaped)**
 
 - [ ] Versioned postMessage contract if Studio iframe edit modes expand
 - [ ] Preview scope tokens for sandboxed asset GETs (if preview leaves srcdoc)
@@ -100,14 +100,14 @@
 ### 1.6 Draft fix → apply in Cursor
 
 1. Redesign → proposal
-2. Copy patch / `tell_apply` returns text
+2. Copy patch / `designproof_apply` returns text
 3. Human or Cursor agent applies
 
 **Invariant:** Never auto-apply.
 
 ### 1.7 Design from features (Studio)
 
-1. Brief → `designFromFeatures` / `tell_design_from_features`
+1. Brief → `designFromFeatures` / `designproof_design_from_features`
 2. Taste Controls
 3. Copy HTML / viewport matrix
 4. Optional handoff to diagnose on preview
@@ -124,13 +124,13 @@
 
 **Gaps**
 
-- [ ] CLI `tell proof verify` as sole entry
+- [ ] CLI `design proof verify` as sole entry
 - [ ] install-info documents CI snippet
 
-### 1.9 Dogfood Tell itself
+### 1.9 Dogfood Design Proof itself
 
-1. Capture Tell web → expect zero tells
-2. `tell-dogfood-audit` skill
+1. Capture Design Proof web → expect zero tells
+2. `dp-dogfood-audit` skill
 
 **Gaps**
 
@@ -144,9 +144,9 @@
 
 Peer lesson: home submit never “naked” — kind maps to default scenario.
 
-**Tell-shaped**
+**Design Proof-shaped**
 
-- [x] `tell_resolve_intent({ text, fixtureUrl? })` → zod:
+- [x] `designproof_resolve_intent({ text, fixtureUrl? })` → zod:
 
 ```ts
 ResolvedIntent = {
@@ -171,14 +171,14 @@ ResolvedIntent = {
 
 Peer lesson: small prompt injection (USAGE/DESIGN/tokens) + on-demand rich files.
 
-**Tell-shaped**
+**Design Proof-shaped**
 
 | Channel | Content | When |
 |---|---|---|
 | Push | Top findings titles, severity, contrast deltas, taste one-liner | Always with report |
 | Pull | Full evidence screenshots, fingerprint JSON, staged skills | On agent tool read |
 
-- [ ] MCP resources (optional): `tell://report/active`, `tell://findings/{id}`
+- [ ] MCP resources (optional): `designproof://report/active`, `designproof://findings/{id}`
 - [ ] Keep payloads small for push; use resources/tools for pull
 
 ### 2.3 Sandboxed preview contract
@@ -190,7 +190,7 @@ Peer lesson: small prompt injection (USAGE/DESIGN/tokens) + on-demand rich files
 
 ### 2.4 Critique / taste divergence
 
-Peer “design jury” uses tagged multi-role stream. Tell already has:
+Peer “design jury” uses tagged multi-role stream. Design Proof already has:
 
 - Deterministic detectors
 - Taste verdict (Gemini + fallback)
@@ -199,12 +199,12 @@ Peer “design jury” uses tagged multi-role stream. Tell already has:
 **Plan**
 
 - [ ] Do **not** port multi-panelist theater into product MVP
-- [ ] Optionally add MCP `tell_critique_research` for engine maintainers (internal)
+- [ ] Optionally add MCP `designproof_critique_research` for engine maintainers (internal)
 - [ ] Product: keep critic voice single-narrator (Ashish clarity)
 
 ### 2.5 Brand / system extraction
 
-Peer brand-extract measures DOM. Tell fingerprint + detectors already measure rendered UI.
+Peer brand-extract measures DOM. Design Proof fingerprint + detectors already measure rendered UI.
 
 **Plan**
 
@@ -216,11 +216,11 @@ Peer brand-extract measures DOM. Tell fingerprint + detectors already measure re
 
 Refreshable data-backed artifacts are a peer specialty.
 
-**Tell decision:** **Non-goal for critic MVP.** If ever: only as proof that a redesigned dashboard still reads live data — separate plan, after Waves in docs/11.
+**Design Proof decision:** **Non-goal for critic MVP.** If ever: only as proof that a redesigned dashboard still reads live data — separate plan, after Waves in docs/11.
 
 ### 2.7 Figma
 
-**Tell decision:** Non-goal for cut line. If requested later: import as capture target (rendered preview URL) rather than file format parsers.
+**Design Proof decision:** Non-goal for cut line. If requested later: import as capture target (rendered preview URL) rather than file format parsers.
 
 ### 2.8 Collaboration
 
@@ -232,16 +232,16 @@ Refreshable data-backed artifacts are a peer specialty.
 
 Peer RFC: prefer/avoid injection from past edits.
 
-**Tell-shaped stretch**
+**Design Proof-shaped stretch**
 
-- [ ] Store accepted vs rejected directions per report in `TELL_DATA_DIR`
+- [ ] Store accepted vs rejected directions per report in `DP_DATA_DIR`
 - [ ] Next redesign suggests prior accepted leans
 - [ ] Raw events append-only; derived prefs are cache
 - [ ] Never blocks offline demo
 
 ### 2.10 Template craft loop (already specified)
 
-Authority: `tell-template-craft` + `design-research-loop`.
+Authority: `dp-template-craft` + `design-research-loop`.
 
 - Phase A: peer **plumbing** checkout (local path from `plumbing-reference.local.json`) — landmarks, sticky, focus, stacking — encode in `basics-checklist.ts`
 - Phase B: measured designer corridors — never peer aesthetics
@@ -273,14 +273,14 @@ Authority: `tell-template-craft` + `design-research-loop`.
 
 ### Wave C0 — Parity & intent
 
-- [x] `tell_voice` + CLI voice
-- [x] `tell_resolve_intent` + CaptureBar suggestions
+- [x] `designproof_voice` + CLI voice
+- [x] `designproof_resolve_intent` + CaptureBar suggestions
 - [x] Persist `reportId` across redesign/apply
 
 ### Wave C1 — Run staging
 
-- [ ] After diagnose, write `.tell/runs/<id>/` with report + skill fragments + MANIFEST
-- [ ] MCP resource or tool `tell_get_run_context`
+- [ ] After diagnose, write `.designproof/runs/<id>/` with report + skill fragments + MANIFEST
+- [ ] MCP resource or tool `designproof_get_run_context`
 
 ### Wave C2 — Preview/edit contract
 
@@ -322,7 +322,7 @@ Done when Wave DoD is met and tests stay green.
 ## 7. Status log
 
 ```
-[2026-08-21] Catalog honesty: tell_voice + tell_resolve_intent are registered MCP tools (eleven total); docs no longer claim they are missing.
-[2026-08-07] Wave C0: tell_voice MCP + CLI; report id on diagnose for redesign chain; intent resolver shipped later same day.
+[2026-08-21] Catalog honesty: designproof_voice + designproof_resolve_intent are registered MCP tools (eleven total); docs no longer claim they are missing.
+[2026-08-07] Wave C0: designproof_voice MCP + CLI; report id on diagnose for redesign chain; intent resolver shipped later same day.
 [2026-08-07] Plan authored. Core loop strong; remaining gaps: run staging, preview edit contract.
 ```

@@ -33,20 +33,20 @@ Entry skill for multi-million-dollar-quality marketing sites, corporate stories,
 5. **Foundation** — run `design-system-foundation` before section work
 6. **Generate** — IA, tokens, section specs, preview/code
 7. **Taste Controls** — offer density / motion / lean / color / type / rounding options
-8. **Verify** — if Tell is available, capture → diagnose → optional redesign with `tellDirectionId`
+8. **Verify** — if Design Proof is available, capture → diagnose → optional redesign with `dpDirectionId`
 
 ## Runtime engine
 
-Prefer the deterministic package `@tell/design-skills`:
+Prefer the deterministic package `@designproof/design-skills`:
 
 ```ts
-import { designFromFeatures } from "@tell/design-skills";
+import { designFromFeatures } from "@designproof/design-skills";
 const { spec, previewHtml } = designFromFeatures(brief);
 ```
 
 Studio UI: `/studio` · Showcases: `/showcase/saas`, `/showcase/dashboard`, `/showcase/corporate`, `/showcase/educational`
 
-**Offerings vs plumbing:** Templates/offerings deepen only via the expert research loop (`design-research-loop`). Open-source design builders are consulted only for implementation basics the engine keeps failing (`assertBasics` in `@tell/design-skills`). Do not invent aesthetics or new templates from those tools.
+**Offerings vs plumbing:** Templates/offerings deepen only via the expert research loop (`design-research-loop`). Open-source design builders are consulted only for implementation basics the engine keeps failing (`assertBasics` in `@designproof/design-skills`). Do not invent aesthetics or new templates from those tools.
 
 ## Taste Controls (always offer)
 

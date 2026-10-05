@@ -1,4 +1,4 @@
-# Tell — Interactive Visualization Plan
+# Design Proof — Interactive Visualization Plan
 
 > **Separate plan** for illustration-first, book-like educational and blog surfaces.
 > Complements the `explainer` / Visual textbook art direction. Does **not** replace
@@ -21,7 +21,7 @@ Educational and long-form blog products fail the “generic AI UI” test differ
 - Illustrations treated as stock decoration rather than the primary explanation
 - Interactive widgets that look like product UI, not like instruments of understanding
 
-This plan defines how Tell should **recognize, art-direct, and (later) propose** visualization-first educational surfaces: calm prose + precise diagrams + restrained interactivity, integrated as one composition.
+This plan defines how Design Proof should **recognize, art-direct, and (later) propose** visualization-first educational surfaces: calm prose + precise diagrams + restrained interactivity, integrated as one composition.
 
 ### In scope
 
@@ -39,7 +39,7 @@ This plan defines how Tell should **recognize, art-direct, and (later) propose**
 - Auto-applying patches to user repos
 - LLM calls inside `packages/core`
 - Building a full physics/WebGL authoring product in the sprint MVP
-- Replacing Tell’s own print-atelier identity (Tell Report stays on `docs/01_DESIGN_SYSTEM.md`)
+- Replacing Design Proof’s own print-atelier identity (Design Proof Report stays on `docs/01_DESIGN_SYSTEM.md`)
 - Shipping a public plugin marketplace or naming external design hosts in-repo
 
 ---
@@ -60,7 +60,7 @@ Success for this plan: a captured educational page can be steered into a surface
 
 ## 2. Core design principles
 
-These principles are normative for any Visual textbook redesign and for any future diagram components Tell ships or recommends.
+These principles are normative for any Visual textbook redesign and for any future diagram components Design Proof ships or recommends.
 
 ### 2.1 Book-like reading experience
 
@@ -231,7 +231,7 @@ Escalate only when the lower rung cannot express the teaching point.
 
 **Rules of thumb**
 
-- Prefer L0/L1 for Tell-proposed educational redesigns in the near term.
+- Prefer L0/L1 for Design Proof-proposed educational redesigns in the near term.
 - Never introduce L3 for decoration.
 - If accuracy requires math, implement the math explicitly; do not fake motion that implies false physics.
 - Keep sources readable in development builds when shipping reference demos (learning value > obfuscation).
@@ -239,9 +239,9 @@ Escalate only when the lower rung cannot express the teaching point.
 
 ---
 
-## 6. Recommended engineering stack (Tell monorepo)
+## 6. Recommended engineering stack (Design Proof monorepo)
 
-Aligned with existing Tell stack; no new framework unless a milestone explicitly requires it.
+Aligned with existing Design Proof stack; no new framework unless a milestone explicitly requires it.
 
 | Concern | Choice | Notes |
 |---|---|---|
@@ -382,7 +382,7 @@ Visual-textbook articles should occasionally interleave **short “why we built 
 - Do not turn the article into a tooling diary; cap at roughly one tool-aside per major instrument introduction.
 - No vendor, author, or site names—describe the capability.
 
-**Tell product angle:** detectors may later flag “illustration starvation”; redesign notes may suggest “introduce a reusable figure instrument for recurring diagram families.” Execution remains human-applied.
+**Design Proof product angle:** detectors may later flag “illustration starvation”; redesign notes may suggest “introduce a reusable figure instrument for recurring diagram families.” Execution remains human-applied.
 
 ---
 
@@ -424,7 +424,7 @@ Mandatory sequence — do not skip to interaction.
 
 1. Place the figure at the narrative moment of need.
 2. Ensure preceding prose sets up what to look for; following prose deepens, does not re-describe.
-3. Dogfood: run Tell diagnose on the page; Visual textbook direction should not fight the figure styles.
+3. Dogfood: run Design Proof diagnose on the page; Visual textbook direction should not fight the figure styles.
 
 ---
 
@@ -456,7 +456,7 @@ When implementation begins, freeze a small token set shared by all explainer fig
 
 ---
 
-## 9. Tell product integration map
+## 9. Design Proof product integration map
 
 ### 9.1 Already shipped (adjacent)
 
@@ -464,7 +464,7 @@ When implementation begins, freeze a small token set shared by all explainer fig
 |---|---|---|
 | Visual textbook art direction | `packages/redesign` `explainer`, `packages/taste` presets | Page-level tokens, column, chrome restraint |
 | Voice parsing keywords | `parse-direction.ts` | Maps education(al)/blog/diagram/how-it-works/book language → explainer |
-| UI chip | Tell Report preset chips | Manual selection |
+| UI chip | Design Proof Report preset chips | Manual selection |
 
 ### 9.2 Planned workstreams
 
@@ -511,7 +511,7 @@ Ship a minimal internal kit for demos/fixtures — not a public framework:
 - `PaletteGrid` (I3) data→SVG swatch matrices with grayscale / multi-hue modes
 - One reference interactive figure in `fixtures/` used by demo narrative
 
-DoD: kit uses viz tokens; keyboard + reduced-motion; Tell dogfood on the fixture page reports zero product tells on Tell itself (fixture may still be labeled input).
+DoD: kit uses viz tokens; keyboard + reduced-motion; Design Proof dogfood on the fixture page reports zero product tells on Design Proof itself (fixture may still be labeled input).
 
 #### W4 — MDX / article pipeline (stretch)
 
@@ -660,8 +660,8 @@ A figure is done only when all are true:
 
 | Work | Agent / skill |
 |---|---|
-| Detectors + fixtures | `@core-engineer`, `@fixture-smith`, `tell-detector-authoring`, `tell-demo-fixture` |
-| Explainer recipe / reconcile | `@redesign-engineer`, `tell-redesign-diff` |
+| Detectors + fixtures | `@core-engineer`, `@fixture-smith`, `dp-detector-authoring`, `dp-demo-fixture` |
+| Explainer recipe / reconcile | `@redesign-engineer`, `dp-redesign-diff` |
 | Voice / preset copy | `@taste-engineer`, `@ux-copywriter` |
 | Figure UI primitives | `@ui-builder` |
 | Color/mesh/kernel instruments | `@ui-builder` + `@core-engineer` (math purity); keep LLM out of core math |

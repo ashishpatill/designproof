@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CapturePayload, DesignFingerprint, ScenarioMatrix } from "@tell/schema";
+import { CapturePayload, DesignFingerprint, ScenarioMatrix } from "@designproof/schema";
 import { compareProofMatrices, compareProofReports } from "../proof-verify";
 import { buildScenario } from "../capture/scenario-matrix";
 
@@ -31,7 +31,7 @@ function stubReport(
     screenshotBase64: screenshot,
     styles: Array.from({ length: styles }, (_, i) => ({
       selector: `p.${i}`,
-      tellId: `t${i}`,
+      dpId: `t${i}`,
       tag: "p",
       role: "body",
       rect: { x: 0, y: 0, w: 100, h: 20 },
@@ -75,7 +75,7 @@ function stubReport(
     measures: {
       score: generic * 12,
       band: "template" as const,
-      tellScore: 0,
+      dpScore: 0,
       scoredAgainst: "baseline" as const,
       axes: [
         axis("contrast", 0.8, 0.8),

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { specimenHtmlSrc, specimenOpenHref } from "./specimenSrc";
-import { SpecimenPreview } from "./SpecimenPreview";
+import { templateHtmlSrc, templateOpenHref } from "./templateSrc";
+import { TemplatePreview } from "./TemplatePreview";
 
 export type AnthologySlide = {
   key: string;
@@ -35,7 +35,7 @@ export const ANTHOLOGY_KEYS = [
 
 type ShowcaseAnthologyReelProps = {
   slides: AnthologySlide[];
-  /** Slow autoplay dwell per specimen (ms). */
+  /** Slow autoplay dwell per template (ms). */
   dwellMs?: number;
   totalCount: number;
   testId?: string;
@@ -43,7 +43,7 @@ type ShowcaseAnthologyReelProps = {
 
 /**
  * Featured hero reel: slow tour across best craft beats from *different* templates.
- * Loads one specimen document at a time via cached HTML API — not 14× inline HTML.
+ * Loads one template document at a time via cached HTML API — not 14× inline HTML.
  */
 export function ShowcaseAnthologyReel({
   slides,
@@ -101,7 +101,7 @@ export function ShowcaseAnthologyReel({
     if (!next) return;
     const link = document.createElement("link");
     link.rel = "prefetch";
-    link.href = specimenHtmlSrc(next.key);
+    link.href = templateHtmlSrc(next.key);
     link.as = "document";
     document.head.appendChild(link);
     return () => {
@@ -123,17 +123,17 @@ export function ShowcaseAnthologyReel({
       onMouseLeave={() => setHovering(false)}
     >
       <div className="sx-featured-label">
-        <span>Across specimens</span>
+        <span>Across templates</span>
         <span>
           {String(idx + 1).padStart(2, "0")} / {String(sequence.length).padStart(2, "0")} · {slide.label}
         </span>
       </div>
       <div className="sx-plate sx-plate-stage">
-        <SpecimenPreview
+        <TemplatePreview
           key={slide.key}
           className="sx-plate-frame"
           title={`${slide.label} craft beat`}
-          src={specimenHtmlSrc(slide.key)}
+          src={templateHtmlSrc(slide.key)}
           lazy={false}
           designWidth={1440}
           designHeight={1200}
@@ -144,12 +144,12 @@ export function ShowcaseAnthologyReel({
         <div className="sx-plate-meta">
           <h2>{slide.label}</h2>
           <p>{slide.marketJob}</p>
-          <Link href={slide.href ?? specimenOpenHref(slide.key)} prefetch={false}>
-            Open full specimen →
+          <Link href={slide.href ?? templateOpenHref(slide.key)} prefetch={false}>
+            Open full template →
           </Link>
         </div>
       </div>
-      <div className="sx-anthology-dots" aria-label="Specimen tour">
+      <div className="sx-anthology-dots" aria-label="Template tour">
         {sequence.map((s, i) => (
           <button
             key={s.key}

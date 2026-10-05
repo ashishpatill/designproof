@@ -88,15 +88,15 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
   const captureOk = captureHealthState === "idle" && captureHealth?.ok === true;
 
   return (
-    <div className="tell-dialog-backdrop" role="presentation" onClick={onClose}>
+    <div className="dp-dialog-backdrop" role="presentation" onClick={onClose}>
       <div
-        className="tell-dialog"
+        className="dp-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="tell-dialog__head">
+        <div className="dp-dialog__head">
           <div>
             <h2 id={titleId} className="font-display text-2xl text-text">
               Keys &amp; integrations
@@ -107,7 +107,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           </div>
           <button
             type="button"
-            className="tell-rail__btn"
+            className="dp-rail__btn"
             aria-label="Close settings"
             onClick={onClose}
           >
@@ -115,10 +115,10 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           </button>
         </div>
 
-        <label htmlFor="tell-byok-gemini">
+        <label htmlFor="dp-byok-gemini">
           Gemini API key
           <input
-            id="tell-byok-gemini"
+            id="dp-byok-gemini"
             type="password"
             autoComplete="off"
             spellCheck={false}
@@ -128,10 +128,10 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           />
         </label>
 
-        <label htmlFor="tell-byok-cursor">
+        <label htmlFor="dp-byok-cursor">
           Cursor API key
           <input
-            id="tell-byok-cursor"
+            id="dp-byok-cursor"
             type="password"
             autoComplete="off"
             spellCheck={false}
@@ -156,7 +156,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
         </p>
         <p className="mt-2 font-mono text-meta text-muted">
           Live capture uses server Playwright (or{" "}
-          <code className="text-secondary">TELL_CAPTURE_API_URL</code>). Browser settings do not override
+          <code className="text-secondary">DP_CAPTURE_API_URL</code>). Browser settings do not override
           that URL.
         </p>
 

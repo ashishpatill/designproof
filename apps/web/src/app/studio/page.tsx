@@ -12,7 +12,7 @@ import {
   type RoundingDepth,
   type SiteKind,
   type TypeWeight,
-} from "@tell/design-skills";
+} from "@designproof/design-skills";
 import { DesignControls } from "@/components/design-controls";
 import { ProductShell } from "@/components/shell";
 import {
@@ -201,7 +201,7 @@ export default function StudioPage() {
     if (/consumer|everyday|lifestyle|shopper|retail|dtc/.test(text)) {
       next = { ...next, siteKind: "consumer-craft", aestheticLean: "conversion-sharp", density: "balanced" };
     }
-    if (/foundry|typeface|specimen|optical|glyph|typography/.test(text)) {
+    if (/foundry|typeface|template|optical|glyph|typography/.test(text)) {
       next = { ...next, siteKind: "editorial-foundry", aestheticLean: "refined-story", density: "sparse" };
     }
     if (/dossier|briefing|folio|capital brief|research desk|imprint|memo/.test(text)) {
@@ -272,10 +272,10 @@ export default function StudioPage() {
     <ProductShell active="studio">
     <div className="min-h-screen bg-bg text-text" data-testid="studio-page">
       <div className="border-b border-border px-4 py-4 md:px-6">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-secondary">Tell Studio</p>
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-secondary">Design Proof Studio</p>
         <h1 className="font-display text-xl font-semibold tracking-tight">Premium content-custom design</h1>
         <p className="mt-1 max-w-2xl text-sm text-secondary">
-          Describe the product and taste. Specimens live on Showcase — Studio starts from your brief.
+          Describe the product and taste. Templates live on Showcase — Studio starts from your brief.
         </p>
       </div>
 
@@ -521,7 +521,7 @@ export default function StudioPage() {
                 <strong className="text-text">Sections:</strong> {result.spec.sections.map((s) => s.kind).join(", ")}
               </p>
               <p data-testid="meta-direction">
-                <strong className="text-text">Tell direction:</strong> {result.spec.tellDirectionId}
+                <strong className="text-text">Design Proof direction:</strong> {result.spec.dpDirectionId}
               </p>
               <p data-testid="meta-generation">
                 <strong className="text-text">Generation:</strong> {generation}

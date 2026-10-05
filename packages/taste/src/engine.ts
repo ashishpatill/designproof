@@ -1,4 +1,4 @@
-import { Finding, TasteVerdict, Verdict } from "@tell/schema";
+import { Finding, TasteVerdict, Verdict } from "@designproof/schema";
 
 /** Compact, authoritative facts handed to the model — it must not contradict these. */
 export interface TasteContext {
@@ -85,7 +85,7 @@ export function contradictionReason(finding: Finding, candidate: TasteVerdict): 
 // ── Gemini engine (real, guarded, degrades to deterministic) ─────────
 
 const SYSTEM_PROMPT = [
-  "You are Tell's taste engine. You classify rendered-UI findings.",
+  "You are Design Proof's taste engine. You classify rendered-UI findings.",
   "You are given deterministic facts you MUST NOT contradict.",
   "Decide one verdict: generic | drift | intentional | uncertain.",
   "generic = a default AI-built pattern; drift = the visual system fractures;",

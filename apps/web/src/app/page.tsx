@@ -9,9 +9,9 @@ import {
   MicOff,
   Wand2,
 } from "lucide-react";
-import type { BrandDNA, RedesignProposal, TellReport, UserDesignProfile, Verdict } from "@tell/schema";
-import { DIRECTION_PRESETS, parseDirectionPlan, type DirectionPlan } from "@tell/taste";
-import { RECONCILE_DIRECTIONS, buildOverridesPatch, learnBrandDNA, reconcile, resolveDirection } from "@tell/redesign";
+import type { BrandDNA, RedesignProposal, DesignProofReport, UserDesignProfile, Verdict } from "@designproof/schema";
+import { DIRECTION_PRESETS, parseDirectionPlan, type DirectionPlan } from "@designproof/taste";
+import { RECONCILE_DIRECTIONS, buildOverridesPatch, learnBrandDNA, reconcile, resolveDirection } from "@designproof/redesign";
 import { demoReport } from "@/lib/demo-report";
 import { emptyReport } from "@/lib/empty-report";
 import dynamic from "next/dynamic";
@@ -111,7 +111,7 @@ const PRESET_CHIPS: { key: string; label: string }[] = [
 ];
 
 export default function HomePage() {
-  const [report, setReport] = useState<TellReport>(emptyReport);
+  const [report, setReport] = useState<DesignProofReport>(emptyReport);
   const [inputUrl, setInputUrl] = useState("");
   const [captureMeta, setCaptureMeta] = useState<CaptureMeta | null>(null);
   const [selectedId, setSelectedId] = useState("");
@@ -175,7 +175,7 @@ export default function HomePage() {
   const [userProfile, setUserProfile] = useState<UserDesignProfile | null>(null);
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("tell:brand-dna");
+      const raw = localStorage.getItem("dp:brand-dna");
       if (raw) setBrandDna(JSON.parse(raw) as BrandDNA);
     } catch {
       /* ignore malformed cache */
@@ -354,7 +354,7 @@ export default function HomePage() {
     const dna = learnBrandDNA(report.capture, report.fingerprint, siteLabel(report.capture.url));
     setBrandDna(dna);
     try {
-      localStorage.setItem("tell:brand-dna", JSON.stringify(dna));
+      localStorage.setItem("dp:brand-dna", JSON.stringify(dna));
     } catch {
       /* storage unavailable — keep it in memory for this session */
     }
@@ -363,14 +363,14 @@ export default function HomePage() {
     showNotice({
       tone: "success",
       title: "Brand DNA saved",
-      message: `Tell now scores against ${dna.displayFont} / ${dna.bodyFont} · ${dna.accent}. Redesigns steer toward this brand.`,
+      message: `Design Proof now scores against ${dna.displayFont} / ${dna.bodyFont} · ${dna.accent}. Redesigns steer toward this brand.`,
     });
   }, [report, showNotice]);
 
   const clearDna = useCallback(() => {
     setBrandDna(null);
     try {
-      localStorage.removeItem("tell:brand-dna");
+      localStorage.removeItem("dp:brand-dna");
     } catch {
       /* ignore */
     }
@@ -421,7 +421,7 @@ export default function HomePage() {
           body: JSON.stringify({ url: target }),
         });
         const payload = (await res.json()) as {
-          report: TellReport | null;
+          report: DesignProofReport | null;
           meta: CaptureMeta;
         };
 
@@ -439,7 +439,7 @@ export default function HomePage() {
           setSelectedId("");
           setCaptureState("idle");
           setDraftState("idle");
-          setDraftError(payload.meta?.error ?? `Tell could not capture ${target}.`);
+          setDraftError(payload.meta?.error ?? `Design Proof could not capture ${target}.`);
           const sid = sessionId || newSessionId();
           setSessionId(sid);
           const title = sessionTitleFromUrl(target);
@@ -453,7 +453,7 @@ export default function HomePage() {
             title: "Capture failed",
             message:
               payload.meta?.error ??
-              `Tell could not reach ${siteLabel(target)}. Fix the URL or capture backend — the demo fixture was not loaded.`,
+              `Design Proof could not reach ${siteLabel(target)}. Fix the URL or capture backend — the demo fixture was not loaded.`,
           });
           return;
         }
@@ -519,7 +519,7 @@ export default function HomePage() {
         showNotice({
           tone: "success",
           title: "Capture complete",
-          message: `Tell scanned ${siteLabel(liveReport.capture.url)} and found ${liveReport.score.total} findings.`,
+          message: `Design Proof scanned ${siteLabel(liveReport.capture.url)} and found ${liveReport.score.total} findings.`,
         });
       } catch {
         setCaptureNote(`Capture failed for ${siteLabel(target)}.`);
@@ -527,12 +527,12 @@ export default function HomePage() {
           live: false,
           requestedUrl: target,
           capturedUrl: "",
-          error: "Network error while contacting Tell's capture API.",
+          error: "Network error while contacting Design Proof's capture API.",
         });
         setReport(emptyReport);
         setSelectedId("");
         setCaptureState("idle");
-        setDraftError("Network error while contacting Tell's capture API.");
+        setDraftError("Network error while contacting Design Proof's capture API.");
         showNotice({
           tone: "error",
           title: "Capture failed",
@@ -1010,7 +1010,7 @@ export default function HomePage() {
           id: reconciliation.directionId,
           label: reconciliation.label,
           keywords: [],
-          tokenOverrides: { "--tell-accent": reconciliation.accentAfter, "--tell-paper": reconciliation.surfaceAfter },
+          tokenOverrides: { "--dp-accent": reconciliation.accentAfter, "--dp-paper": reconciliation.surfaceAfter },
           summary: reconciliation.summary,
         },
         reconciliation,
@@ -1018,7 +1018,7 @@ export default function HomePage() {
       });
       setPatchSource("deterministic");
       setDraftState("ready");
-      setDraftError("Cursor-backed draft was unavailable, so Tell used the deterministic patch.");
+      setDraftError("Cursor-backed draft was unavailable, so Design Proof used the deterministic patch.");
     }
   }
 
@@ -1055,7 +1055,7 @@ export default function HomePage() {
         title: result.status === "passed" ? "Verified against rendered truth" : "Human review required",
         message: result.status === "passed"
           ? `The live recapture improved by ${Math.abs(result.proof.scoreDelta)} points with no focus regression.`
-          : "Tell kept the change isolated and surfaced the measured tradeoffs for review.",
+          : "Design Proof kept the change isolated and surfaced the measured tradeoffs for review.",
       });
     } catch (error) {
       setProofState("error");
@@ -1078,7 +1078,7 @@ export default function HomePage() {
       });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error ?? "Could not revert the proof patch.");
-      if (!payload.reverted) throw new Error("Tell could not find an applied proof patch to revert.");
+      if (!payload.reverted) throw new Error("Design Proof could not find an applied proof patch to revert.");
       setProofResult(null);
       setProofState("idle");
       setProofError("");
@@ -1123,7 +1123,7 @@ export default function HomePage() {
     if (!proposal) return;
     const patch = proposal.files.map((file) => file.unifiedDiff).join("\n\n");
     const cursorHandoff = [
-      `Tell generated a UI fix for ${report.capture.url}.`,
+      `Design Proof generated a UI fix for ${report.capture.url}.`,
       "",
       "Apply this unified diff in the matching local repository, then run the app and verify the affected route visually.",
       sourceContext?.mode === "repo"
@@ -1468,7 +1468,7 @@ export default function HomePage() {
       {isRepo && !setupJob ? (
         <p className="flex items-center gap-2 font-mono text-meta text-secondary">
           <Github className="h-3.5 w-3.5 text-accent" />
-          Tell will clone this repo, read its README to find the run command, start it, and capture the localhost URL for you.
+          Design Proof will clone this repo, read its README to find the run command, start it, and capture the localhost URL for you.
         </p>
       ) : null}
 
@@ -1544,7 +1544,7 @@ export default function HomePage() {
                 {captureMeta?.error
                   ? captureMeta.error
                   : designBrief
-                    ? "Paste a live URL or GitHub repo to attach findings and the before/after seam — Tell will not invent the demo site."
+                    ? "Paste a live URL or GitHub repo to attach findings and the before/after seam — Design Proof will not invent the demo site."
                     : "Paste a live URL and capture. The offline fixture loads only from Offline mode."}
               </p>
               {captureMeta?.error ? (

@@ -8,7 +8,7 @@ import type { ComposerMode, RecentSession } from "@/lib/recent-sessions";
 import { svgSessionThumb } from "@/lib/session-thumb";
 
 // Never show third-party product brands as templates/chips under the composer
-// (see composer-brand-denylist.ts). Starters must be Tell specimens only.
+// (see composer-brand-denylist.ts). Starters must be Design templates only.
 
 const MODES: { id: ComposerMode; label: string; icon: typeof PenLine }[] = [
   { id: "design", label: "Design brief", icon: PenLine },
@@ -56,26 +56,26 @@ export function EntryHome({
   const visible = showAllRecent ? recent : recent.slice(0, 6);
 
   return (
-    <div className="tell-home">
-      <div className="tell-home__hero">
-        <div className="tell-home__mark" aria-hidden>
+    <div className="dp-home">
+      <div className="dp-home__hero">
+        <div className="dp-home__mark" aria-hidden>
           ⊕
         </div>
-        <h1 className="tell-home__title">What do you want to design?</h1>
-        <p className="tell-home__sub">
-          Name the product story. Shape the surface with Tell-owned controls — never third-party brands.
+        <h1 className="dp-home__title">What do you want to design?</h1>
+        <p className="dp-home__sub">
+          Name the product story. Shape the surface with Design Proof-owned controls — never third-party brands.
         </p>
       </div>
 
       <form
-        className="tell-composer"
+        className="dp-composer"
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
         }}
       >
         <textarea
-          className="tell-composer__input"
+          className="dp-composer__input"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -88,13 +88,13 @@ export function EntryHome({
             }
           }}
         />
-        <div className="tell-composer__toolbar">
+        <div className="dp-composer__toolbar">
           <p className="font-mono text-meta text-muted">
             {mode === "offline" ? "No URL needed — submit to open the fixture session" : "⌘/Ctrl + Enter to run"}
           </p>
           <button
             type="submit"
-            className="tell-composer__submit"
+            className="dp-composer__submit"
             disabled={submitting}
             aria-label="Start"
           >
@@ -111,12 +111,12 @@ export function EntryHome({
       </form>
 
       {COMPOSER_STARTER_CHIPS.length > 0 && mode === "design" ? (
-        <div className="tell-modes" role="group" aria-label="Starter templates">
+        <div className="dp-modes" role="group" aria-label="Starter templates">
           {COMPOSER_STARTER_CHIPS.map((chip) => (
             <button
               key={chip.id}
               type="button"
-              className="tell-modes__pill"
+              className="dp-modes__pill"
               onClick={() => onChange(chip.brief ?? chip.label)}
             >
               {chip.label}
@@ -125,14 +125,14 @@ export function EntryHome({
         </div>
       ) : null}
 
-      <div className="tell-modes" role="group" aria-label="Composer mode">
+      <div className="dp-modes" role="group" aria-label="Composer mode">
         {MODES.map((m) => {
           const Icon = m.icon;
           return (
             <button
               key={m.id}
               type="button"
-              className="tell-modes__pill"
+              className="dp-modes__pill"
               data-active={mode === m.id ? "true" : "false"}
               onClick={() => onModeChange(m.id)}
             >
@@ -144,15 +144,15 @@ export function EntryHome({
       </div>
 
       {mode === "design" ? (
-        <p className="tell-home__controls-note">
-          v1 Design Controls — Tell-owned options only. No third-party starter brands.
+        <p className="dp-home__controls-note">
+          v1 Design Controls — Design Proof-owned options only. No third-party starter brands.
         </p>
       ) : null}
 
       {recent.length > 0 ? (
-        <section className="tell-recent" aria-label="Recent sessions">
-          <div className="tell-recent__head">
-            <h2 className="tell-recent__title">Recent diagnoses</h2>
+        <section className="dp-recent" aria-label="Recent sessions">
+          <div className="dp-recent__head">
+            <h2 className="dp-recent__title">Recent diagnoses</h2>
             {recent.length > 6 ? (
               <button
                 type="button"
@@ -163,7 +163,7 @@ export function EntryHome({
               </button>
             ) : null}
           </div>
-          <div className="tell-recent__grid">
+          <div className="dp-recent__grid">
             {visible.map((session) => {
               const thumb =
                 session.thumbDataUrl ||
@@ -177,19 +177,19 @@ export function EntryHome({
               <button
                 key={session.id}
                 type="button"
-                className="tell-recent__card"
+                className="dp-recent__card"
                 onClick={() => onOpenRecent(session)}
               >
-                <div className="tell-recent__thumb" aria-hidden>
+                <div className="dp-recent__thumb" aria-hidden>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumb} alt="" className="tell-recent__thumb-img" />
+                  <img src={thumb} alt="" className="dp-recent__thumb-img" />
                 </div>
-                <span className="tell-recent__meta">
+                <span className="dp-recent__meta">
                   {session.mode}
                   {typeof session.findingCount === "number" ? ` · ${session.findingCount}` : ""}
                   {session.live === true ? " · live" : ""}
                 </span>
-                <span className="tell-recent__name">{session.title}</span>
+                <span className="dp-recent__name">{session.title}</span>
               </button>
               );
             })}

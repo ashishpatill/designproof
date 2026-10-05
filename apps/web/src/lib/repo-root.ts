@@ -3,8 +3,8 @@ import path from "node:path";
 
 /** Monorepo root (directory containing pnpm-workspace.yaml). */
 export function repoRoot(): string {
-  if (process.env.TELL_REPO_ROOT) {
-    return path.resolve(process.env.TELL_REPO_ROOT);
+  if (process.env.DP_REPO_ROOT) {
+    return path.resolve(process.env.DP_REPO_ROOT);
   }
 
   let dir = process.cwd();
@@ -20,5 +20,5 @@ export function repoRoot(): string {
 }
 
 export function isRepoSetupEnabled(): boolean {
-  return process.env.TELL_DISABLE_REPO_SETUP !== "1";
+  return process.env.DP_DISABLE_REPO_SETUP !== "1";
 }

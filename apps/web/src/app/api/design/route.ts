@@ -5,7 +5,7 @@ import {
   designFromFeaturesAuthored,
   getTemplate,
   listTemplates,
-} from "@tell/design-skills";
+} from "@designproof/design-skills";
 import { ZodError } from "zod";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 

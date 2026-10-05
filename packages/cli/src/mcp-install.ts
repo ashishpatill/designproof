@@ -11,7 +11,7 @@ import {
   type McpStdioServerConfig,
   type PlatformCompatEntry,
   type PlatformId,
-} from "@tell/schema";
+} from "@designproof/schema";
 
 export type InstallScope = "project" | "user";
 
@@ -63,7 +63,7 @@ async function backupOnce(target: string) {
   }
 }
 
-function tellStdio(info: InstallInfo): McpStdioServerConfig {
+function dpStdio(info: InstallInfo): McpStdioServerConfig {
   return info.mcp.manual;
 }
 
@@ -121,7 +121,7 @@ async function upsertMcpServersJson(
   const created = !(await pathExists(target));
   const existing = await readJsonObject(target);
   const mcpServers = asRecord(existing.mcpServers);
-  mcpServers.tell = {
+  mcpServers.designproof = {
     command: stdio.command,
     args: stdio.args,
     ...(stdio.env ? { env: stdio.env } : {}),
@@ -137,7 +137,7 @@ async function upsertVscodeServers(
   const created = !(await pathExists(target));
   const existing = await readJsonObject(target);
   const servers = asRecord(existing.servers);
-  servers.tell = {
+  servers.designproof = {
     type: "stdio",
     command: stdio.command,
     args: stdio.args,
@@ -154,7 +154,7 @@ async function upsertZedContextServers(
   const created = !(await pathExists(target));
   const existing = await readJsonObject(target);
   const context_servers = asRecord(existing.context_servers);
-  context_servers.tell = {
+  context_servers.designproof = {
     command: stdio.command,
     args: stdio.args,
     ...(stdio.env ? { env: stdio.env } : {}),
@@ -170,7 +170,7 @@ async function upsertOpencode(
   const created = !(await pathExists(target));
   const existing = await readJsonObject(target);
   const mcp = asRecord(existing.mcp);
-  mcp.tell = {
+  mcp.designproof = {
     type: "local",
     command: [stdio.command, ...stdio.args],
     enabled: true,
@@ -188,7 +188,7 @@ async function upsertOpenclaw(
   const existing = await readJsonObject(target);
   const mcp = asRecord(existing.mcp);
   const servers = asRecord(mcp.servers);
-  servers.tell = {
+  servers.designproof = {
     command: stdio.command,
     args: stdio.args,
     ...(stdio.env ? { env: stdio.env } : {}),
@@ -198,10 +198,10 @@ async function upsertOpenclaw(
   return { created };
 }
 
-/** Upsert `[mcp_servers.tell]` in a TOML file without a TOML dependency. */
+/** Upsert `[mcp_servers.designproof]` in a TOML file without a TOML dependency. */
 function upsertTomlMcpServers(content: string, stdio: McpStdioServerConfig): string {
   const block = [
-    "[mcp_servers.tell]",
+    "[mcp_servers.designproof]",
     `command = ${JSON.stringify(stdio.command)}`,
     `args = ${JSON.stringify(stdio.args)}`,
   ];
@@ -215,7 +215,7 @@ function upsertTomlMcpServers(content: string, stdio: McpStdioServerConfig): str
     );
   }
   const replacement = block.join("\n");
-  const re = /\[mcp_servers\.tell\][\s\S]*?(?=\n\[|\s*$)/;
+  const re = /\[mcp_servers\.designproof\][\s\S]*?(?=\n\[|\s*$)/;
   if (re.test(content)) {
     return content.replace(re, `${replacement}\n`).replace(/\n{3,}/g, "\n\n");
   }
@@ -235,36 +235,36 @@ async function upsertTomlFile(
   return { created };
 }
 
-/** Minimal YAML upsert for Hermes `mcp_servers.tell` only. */
+/** Minimal YAML upsert for Hermes `mcp_servers.designproof` only. */
 function upsertYamlMcpServers(content: string, stdio: McpStdioServerConfig): string {
-  const tellLines = [
-    "  tell:",
+  const dpLines = [
+    "  designproof:",
     `    command: ${JSON.stringify(stdio.command)}`,
     `    args: [${stdio.args.map((a) => JSON.stringify(a)).join(", ")}]`,
   ];
   if (stdio.env && Object.keys(stdio.env).length > 0) {
-    tellLines.push("    env:");
+    dpLines.push("    env:");
     for (const [k, v] of Object.entries(stdio.env)) {
-      tellLines.push(`      ${k}: ${JSON.stringify(v)}`);
+      dpLines.push(`      ${k}: ${JSON.stringify(v)}`);
     }
   }
-  const tellBlock = tellLines.join("\n");
+  const dpBlock = dpLines.join("\n");
 
   if (!content.trim()) {
-    return `mcp_servers:\n${tellBlock}\n`;
+    return `mcp_servers:\n${dpBlock}\n`;
   }
 
   if (/^mcp_servers:\s*$/m.test(content) || /^mcp_servers:\s*\n/m.test(content)) {
     // Replace existing tell entry under mcp_servers when present.
-    const tellRe = /(^mcp_servers:\n)([\s\S]*?)(^  tell:\n(?:    .*\n)*)/m;
-    if (tellRe.test(content)) {
-      return content.replace(tellRe, `$1$2${tellBlock}\n`);
+    const dpRe = /(^mcp_servers:\n)([\s\S]*?)(^  designproof:\n(?:    .*\n)*)/m;
+    if (dpRe.test(content)) {
+      return content.replace(dpRe, `$1$2${dpBlock}\n`);
     }
     // Insert tell as first child of mcp_servers.
-    return content.replace(/^mcp_servers:\s*\n/m, `mcp_servers:\n${tellBlock}\n`);
+    return content.replace(/^mcp_servers:\s*\n/m, `mcp_servers:\n${dpBlock}\n`);
   }
 
-  return `${content.trimEnd()}\n\nmcp_servers:\n${tellBlock}\n`;
+  return `${content.trimEnd()}\n\nmcp_servers:\n${dpBlock}\n`;
 }
 
 async function upsertYamlFile(
@@ -294,7 +294,7 @@ async function installClaudeCli(
     if (!printOnly) {
       const target = path.join(cwd, ".mcp.json");
       const info = buildInstallInfo();
-      const { created } = await upsertMcpServersJson(target, tellStdio(info));
+      const { created } = await upsertMcpServersJson(target, dpStdio(info));
       return {
         ok: true,
         platform: "claude",
@@ -316,13 +316,13 @@ async function installClaudeCli(
   }
 
   const info = buildInstallInfo();
-  const stdio = tellStdio(info);
+  const stdio = dpStdio(info);
   const json = JSON.stringify({
     command: stdio.command,
     args: stdio.args,
     ...(stdio.env ? { env: stdio.env } : {}),
   });
-  const result = spawnSync("claude", ["mcp", "add-json", "--scope", "user", "tell", json], {
+  const result = spawnSync("claude", ["mcp", "add-json", "--scope", "user", "designproof", json], {
     encoding: "utf8",
     timeout: 30_000,
   });
@@ -369,7 +369,7 @@ export async function installPlatformMcp(options: {
 
   const info = buildInstallInfo();
   const entry = findPlatform(info, id);
-  const stdio = tellStdio(info);
+  const stdio = dpStdio(info);
   const printOnly = Boolean(options.printOnly) || entry.strategy === "manual";
 
   if (printOnly || entry.status === "snippet") {
@@ -437,7 +437,7 @@ export async function installPlatformMcp(options: {
     mode: "wrote",
     path: target,
     created,
-    instruction: `Wired Tell into ${entry.label}. Reload MCP / restart the agent, then run tell_diagnose.`,
+    instruction: `Wired Design Proof into ${entry.label}. Reload MCP / restart the agent, then run designproof_diagnose.`,
   };
 }
 
@@ -445,10 +445,10 @@ export function printPlatformCompatibilityMarkdown(info = buildInstallInfo()): s
   const lines = [
     "# Platform Compatibility",
     "",
-    "Tell ships as an MCP server plus CLI. One command wires Tell into each agent’s config:",
+    "Design Proof ships as an MCP server plus CLI. One command wires Design Proof into each agent’s config:",
     "",
     "```bash",
-    "tell mcp install <platform> [--project|--user|--print]",
+    "designproof mcp install <platform> [--project|--user|--print]",
     "```",
     "",
     "| Coding agent / platform | Status | One-line MCP install |",
@@ -460,7 +460,7 @@ export function printPlatformCompatibilityMarkdown(info = buildInstallInfo()): s
   }
   lines.push(
     "",
-    "`tell mcp install <platform> --print` for a dry-run snippet · `tell mcp print-config` for all snippets.",
+    "`designproof mcp install <platform> --print` for a dry-run snippet · `designproof mcp print-config` for all snippets.",
   );
   return lines.join("\n");
 }

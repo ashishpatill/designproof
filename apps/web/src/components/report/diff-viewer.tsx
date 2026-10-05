@@ -1,7 +1,7 @@
 "use client";
 
 import { Clipboard, GitPullRequest, Loader2, ShieldCheck } from "lucide-react";
-import type { RedesignProposal } from "@tell/schema";
+import type { RedesignProposal } from "@designproof/schema";
 import type { DraftState, ProofState, SourceContext } from "@/components/report/types";
 
 export function DiffViewer({
@@ -75,7 +75,7 @@ export function DiffViewer({
       {canProve ? (
         <div className="flex items-center gap-2 border-b border-border bg-ok/5 px-3 py-2 font-mono text-meta text-secondary">
           <ShieldCheck className="h-3.5 w-3.5 text-ok" />
-          Applies only to Tell&apos;s disposable clone · hot reloads · captures again · checks score and focus states
+          Applies only to Design Proof&apos;s disposable clone · hot reloads · captures again · checks score and focus states
         </div>
       ) : (
         <div className="flex items-center gap-2 border-b border-border bg-accent/5 px-3 py-2 font-mono text-meta text-secondary">

@@ -12,25 +12,25 @@
       "@/*": [
         "./src/*"
       ],
-      "@tell/schema": [
+      "@designproof/schema": [
         "../../packages/schema/src"
       ],
-      "@tell/taste": [
+      "@designproof/taste": [
         "../../packages/taste/src"
       ],
-      "@tell/redesign": [
+      "@designproof/redesign": [
         "../../packages/redesign/src"
       ],
-      "@tell/redesign/llm": [
+      "@designproof/redesign/llm": [
         "../../packages/redesign/src/llm-restyle.ts"
       ],
-      "@tell/core": [
+      "@designproof/core": [
         "../../packages/core/src"
       ],
-      "@tell/design-skills": [
+      "@designproof/design-skills": [
         "../../packages/design-skills/src"
       ],
-      "@tell/design-skills/training-data-sink": [
+      "@designproof/design-skills/training-data-sink": [
         "../../packages/design-skills/src/training-data-sink.ts"
       ]
     },

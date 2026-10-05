@@ -1,11 +1,11 @@
-import { getTemplate } from "@tell/design-skills";
+import { getTemplate } from "@designproof/design-skills";
 import { ShowcaseFrame } from "@/components/showcase/ShowcaseFrame";
 
 export const dynamic = "force-static";
 
 const KEY = "lantern";
 
-export default function ShowcaseSpecimenPage() {
+export default function ShowcaseTemplatePage() {
   const template = getTemplate(KEY)!;
   return (
     <ShowcaseFrame

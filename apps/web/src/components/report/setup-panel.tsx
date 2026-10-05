@@ -83,7 +83,7 @@ export function SetupPanel({
       {manual ? (
         <div className="mt-3 rounded-md border border-drift/30 bg-bg/60 p-3">
           <p className="text-sm text-secondary">
-            Tell couldn&apos;t auto-run this repo. Start it yourself, then paste the localhost URL — Tell captures it the same way.
+            Design Proof couldn&apos;t auto-run this repo. Start it yourself, then paste the localhost URL — Design Proof captures it the same way.
           </p>
           {job.detected?.readmeInstructions?.length ? (
             <div className="mt-2">

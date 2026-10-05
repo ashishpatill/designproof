@@ -3,8 +3,8 @@ import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { resetTrainingSinkCache } from "@tell/design-skills/training-data-sink";
-import { TellReport } from "@tell/schema";
+import { resetTrainingSinkCache } from "@designproof/design-skills/training-data-sink";
+import { DesignProofReport } from "@designproof/schema";
 import {
   handleDesignFromFeatures,
   handleDiagnose,
@@ -13,22 +13,22 @@ import {
 } from "./tool-handlers";
 
 describe("MCP training-data sink", () => {
-  const prevRepo = process.env.TELL_DESIGN_DATA_REPO;
-  const prevFlag = process.env.TELL_TRAINING_DATA;
+  const prevRepo = process.env.DP_DESIGN_DATA_REPO;
+  const prevFlag = process.env.DP_TRAINING_DATA;
   const prevVercel = process.env.VERCEL;
-  const prevSync = process.env.TELL_TRAINING_DATA_SYNC;
+  const prevSync = process.env.DP_TRAINING_DATA_SYNC;
   let tmp: string | undefined;
 
   afterEach(async () => {
     resetTrainingSinkCache();
-    if (prevRepo === undefined) delete process.env.TELL_DESIGN_DATA_REPO;
-    else process.env.TELL_DESIGN_DATA_REPO = prevRepo;
-    if (prevFlag === undefined) delete process.env.TELL_TRAINING_DATA;
-    else process.env.TELL_TRAINING_DATA = prevFlag;
+    if (prevRepo === undefined) delete process.env.DP_DESIGN_DATA_REPO;
+    else process.env.DP_DESIGN_DATA_REPO = prevRepo;
+    if (prevFlag === undefined) delete process.env.DP_TRAINING_DATA;
+    else process.env.DP_TRAINING_DATA = prevFlag;
     if (prevVercel === undefined) delete process.env.VERCEL;
     else process.env.VERCEL = prevVercel;
-    if (prevSync === undefined) delete process.env.TELL_TRAINING_DATA_SYNC;
-    else process.env.TELL_TRAINING_DATA_SYNC = prevSync;
+    if (prevSync === undefined) delete process.env.DP_TRAINING_DATA_SYNC;
+    else process.env.DP_TRAINING_DATA_SYNC = prevSync;
     if (tmp) await rm(tmp, { recursive: true, force: true });
   });
 
@@ -36,19 +36,19 @@ describe("MCP training-data sink", () => {
     tmp = await mkdtemp(path.join(tmpdir(), "mcp-tdd-sink-"));
     await writeFile(
       path.join(tmp, "package.json"),
-      JSON.stringify({ name: "tell-design-data" }),
+      JSON.stringify({ name: "dp-design-data" }),
       "utf8",
     );
-    process.env.TELL_DESIGN_DATA_REPO = tmp;
-    process.env.TELL_TRAINING_DATA = "1";
+    process.env.DP_DESIGN_DATA_REPO = tmp;
+    process.env.DP_TRAINING_DATA = "1";
     // Frontend owns harness sync — do not exercise sibling sync from MCP tests.
-    process.env.TELL_TRAINING_DATA_SYNC = "0";
+    process.env.DP_TRAINING_DATA_SYNC = "0";
     delete process.env.VERCEL;
     resetTrainingSinkCache();
     return tmp;
   }
 
-  it("tell_design_from_features writes raw/design dump (same kind as /api/design), not raw/episodes", async () => {
+  it("designproof_design_from_features writes raw/design dump (same kind as /api/design), not raw/episodes", async () => {
     const repo = await seedMockSibling();
 
     const result = await handleDesignFromFeatures(
@@ -87,8 +87,8 @@ describe("MCP training-data sink", () => {
     // Studio /api/design dump shape — kind "design" under raw/design/.
     expect(body.kind).toBe("design");
     expect(body.artifact_kind).toBe("design");
-    expect(body.source).toBe("tell-proof");
-    expect(body.meta.via).toBe("mcp.tell_design_from_features");
+    expect(body.source).toBe("dp-proof");
+    expect(body.meta.via).toBe("mcp.designproof_design_from_features");
     expect(body.payload.productName ?? body.payload.brief?.productName).toBe("Northstar MCP");
     expect(body.payload.htmlPath).toMatch(/raw[/\\]design[/\\].+\.html$/);
 
@@ -100,9 +100,9 @@ describe("MCP training-data sink", () => {
     expect(inbox.some((f) => f.startsWith("design_") && f.endsWith(".json"))).toBe(true);
   });
 
-  it("tell_diagnose writes raw/episodes, not raw/design", async () => {
+  it("designproof_diagnose writes raw/episodes, not raw/design", async () => {
     const repo = await seedMockSibling();
-    const reportById = new Map<string, TellReport>();
+    const reportById = new Map<string, DesignProofReport>();
 
     const report = await handleDiagnose({}, reportById, { awaitSink: true });
     expect(report.findings.length).toBeGreaterThan(0);
@@ -116,15 +116,15 @@ describe("MCP training-data sink", () => {
       meta: { via?: string };
     };
     expect(body.kind).toBe("diagnose");
-    expect(body.meta.via).toBe("mcp.tell_diagnose");
+    expect(body.meta.via).toBe("mcp.designproof_diagnose");
 
     const designDir = path.join(repo, "training-data", "raw", "design");
     expect(existsSync(designDir) ? await readdir(designDir) : []).toEqual([]);
   });
 
-  it("tell_redesign writes raw/redesign, not raw/episodes", async () => {
+  it("designproof_redesign writes raw/redesign, not raw/episodes", async () => {
     const repo = await seedMockSibling();
-    const reportById = new Map<string, TellReport>();
+    const reportById = new Map<string, DesignProofReport>();
 
     const proposal = await handleRedesign(
       { direction: "warmer, editorial, less shadow" },
@@ -145,7 +145,7 @@ describe("MCP training-data sink", () => {
       meta: { via?: string };
     };
     expect(body.kind).toBe("redesign");
-    expect(body.meta.via).toBe("mcp.tell_redesign");
+    expect(body.meta.via).toBe("mcp.designproof_redesign");
 
     const episodesDir = path.join(repo, "training-data", "raw", "episodes");
     expect(existsSync(episodesDir) ? await readdir(episodesDir) : []).toEqual([]);
@@ -153,9 +153,9 @@ describe("MCP training-data sink", () => {
 
   it("missing sibling is an honest no-op (tool still returns a spec)", async () => {
     tmp = await mkdtemp(path.join(tmpdir(), "mcp-tdd-missing-"));
-    process.env.TELL_DESIGN_DATA_REPO = path.join(tmp, "does-not-exist");
-    process.env.TELL_TRAINING_DATA = "1";
-    process.env.TELL_TRAINING_DATA_SYNC = "0";
+    process.env.DP_DESIGN_DATA_REPO = path.join(tmp, "does-not-exist");
+    process.env.DP_TRAINING_DATA = "1";
+    process.env.DP_TRAINING_DATA_SYNC = "0";
     delete process.env.VERCEL;
     resetTrainingSinkCache();
 
@@ -170,19 +170,19 @@ describe("MCP training-data sink", () => {
     expect(existsSync(path.join(tmp, "does-not-exist"))).toBe(false);
   });
 
-  it("tell_apply source never writes the training sink", () => {
+  it("designproof_apply source never writes the training sink", () => {
     const src = readFileSync(path.resolve(__dirname, "index.ts"), "utf8");
-    const start = src.indexOf('server.tool(\n  "tell_apply"');
+    const start = src.indexOf('server.tool(\n  "designproof_apply"');
     expect(start).toBeGreaterThan(-1);
     const next = src.indexOf("server.tool(", start + 10);
     const block = src.slice(start, next === -1 ? undefined : next);
     expect(block).not.toMatch(/recordTrainingEvent|writeTrainingEvent/);
   });
 
-  it("mcp handlers do not import @tell/web", () => {
+  it("mcp handlers do not import @designproof/web", () => {
     const handlers = readFileSync(path.resolve(__dirname, "tool-handlers.ts"), "utf8");
     const index = readFileSync(path.resolve(__dirname, "index.ts"), "utf8");
-    expect(handlers).not.toContain("@tell/web");
-    expect(index).not.toContain("@tell/web");
+    expect(handlers).not.toContain("@designproof/web");
+    expect(index).not.toContain("@designproof/web");
   });
 });

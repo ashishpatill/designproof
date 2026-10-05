@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildFingerprint } from "../fingerprint/build-fingerprint";
 import { detectDesignSystemDrift, parseDesignDoc } from "./design-system-drift";
-import { CapturePayload } from "@tell/schema";
+import { CapturePayload } from "@designproof/schema";
 
 describe("parseDesignDoc", () => {
   it("extracts fonts and colors from DESIGN.md", () => {
@@ -24,7 +24,7 @@ describe("detectDesignSystemDrift", () => {
     viewport: { width: 1440, height: 1100 },
     screenshotBase64: "a",
     styles: [{
-      selector: "button", tellId: "t0", tag: "button", role: "button",
+      selector: "button", dpId: "t0", tag: "button", role: "button",
       fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "400",
       color: "rgb(255,0,0)", backgroundColor: "rgb(0,0,0)", borderRadius: "8px",
       boxShadow: "none", padding: "8px", textAlign: "left", lineHeight: "1.5", backgroundImage: "none",

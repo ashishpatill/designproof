@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { CAPTURE_TOKEN_HEADER } from "@/lib/capture-auth";
 
 export function remoteBackendBaseUrl(): string | null {
-  const raw = process.env.TELL_CAPTURE_API_URL?.trim();
+  const raw = process.env.DP_CAPTURE_API_URL?.trim();
   return raw ? raw.replace(/\/$/, "") : null;
 }
 
@@ -11,19 +11,19 @@ export function hasRemoteBackend(): boolean {
 }
 
 function repoSetupToken(): string | null {
-  const raw = process.env.TELL_REPO_SETUP_TOKEN?.trim();
+  const raw = process.env.DP_REPO_SETUP_TOKEN?.trim();
   return raw || null;
 }
 
 function captureApiToken(): string | null {
-  const raw = process.env.TELL_CAPTURE_API_TOKEN?.trim();
+  const raw = process.env.DP_CAPTURE_API_TOKEN?.trim();
   return raw || null;
 }
 
 export function repoSetupAuthHeaders(headers?: HeadersInit): Headers {
   const out = new Headers(headers);
   const token = repoSetupToken();
-  if (token) out.set("x-tell-repo-setup-token", token);
+  if (token) out.set("x-dp-repo-setup-token", token);
   const captureToken = captureApiToken();
   if (captureToken) {
     out.set(CAPTURE_TOKEN_HEADER, captureToken);
@@ -36,9 +36,9 @@ type RemoteRequestInit = RequestInit & { timeoutMs?: number };
 
 export async function fetchRemoteBackend(pathWithSearch: string, init: RemoteRequestInit = {}): Promise<Response> {
   const base = remoteBackendBaseUrl();
-  if (!base) throw new Error("TELL_CAPTURE_API_URL is not configured");
+  if (!base) throw new Error("DP_CAPTURE_API_URL is not configured");
 
-  const { timeoutMs = Number(process.env.TELL_CAPTURE_TIMEOUT_MS ?? 90_000), ...fetchInit } = init;
+  const { timeoutMs = Number(process.env.DP_CAPTURE_TIMEOUT_MS ?? 90_000), ...fetchInit } = init;
   return fetch(`${base}${pathWithSearch}`, {
     ...fetchInit,
     cache: "no-store",

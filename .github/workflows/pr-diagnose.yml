@@ -9,8 +9,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  tell-proof:
-    if: vars.TELL_PREVIEW_URL != '' || github.event.pull_request.body != ''
+  dp-proof:
+    if: vars.DP_PREVIEW_URL != '' || github.event.pull_request.body != ''
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -29,12 +29,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Chromium
-        run: pnpm -F @tell/core exec playwright install chromium
+        run: pnpm -F @designproof/core exec playwright install chromium
 
       - name: Resolve preview URL
         id: preview
         env:
-          REPO_PREVIEW_URL: ${{ vars.TELL_PREVIEW_URL }}
+          REPO_PREVIEW_URL: ${{ vars.DP_PREVIEW_URL }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           URL="${REPO_PREVIEW_URL}"
@@ -49,7 +49,7 @@ jobs:
             URL="$(printf '%s' "$PR_BODY" | grep -Eo 'https://[a-zA-Z0-9.-]+\.onrender\.com(/[a-zA-Z0-9./?=_%:-]*)?' | head -1 || true)"
           fi
           if [ -z "$URL" ]; then
-            echo "No preview URL configured. Set repo variable TELL_PREVIEW_URL or include a *.vercel.app URL in the PR body."
+            echo "No preview URL configured. Set repo variable DP_PREVIEW_URL or include a *.vercel.app URL in the PR body."
             exit 0
           fi
           if ! printf '%s' "$URL" | grep -Eq '^https?://'; then
@@ -66,16 +66,16 @@ jobs:
       - name: Diagnose preview
         if: steps.preview.outputs.url != ''
         env:
-          TELL_PREVIEW_URL: ${{ steps.preview.outputs.url }}
-          TELL_FAIL_GENERIC_ABOVE: ${{ vars.TELL_FAIL_GENERIC_ABOVE || '6' }}
+          DP_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          DP_FAIL_GENERIC_ABOVE: ${{ vars.DP_FAIL_GENERIC_ABOVE || '6' }}
         run: |
-          pnpm -F @tell/schema build
-          pnpm -F @tell/core build
+          pnpm -F @designproof/schema build
+          pnpm -F @designproof/core build
           pnpm pr:diagnose
 
       - name: Upload diagnosis artifact
         if: steps.preview.outputs.url != ''
         uses: actions/upload-artifact@v4
         with:
-          name: tell-pr-report
-          path: tell-pr-report.json
+          name: dp-pr-report
+          path: dp-pr-report.json

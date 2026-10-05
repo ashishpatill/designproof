@@ -19,14 +19,14 @@ describe("formatCaptureHealth", () => {
     );
   });
 
-  it("surfaces missing TELL_CAPTURE_API_URL and Playwright failures", () => {
+  it("surfaces missing DP_CAPTURE_API_URL and Playwright failures", () => {
     expect(
       formatCaptureHealth({
         ok: false,
         backend: "remote",
-        error: "TELL_CAPTURE_API_URL is not configured",
+        error: "DP_CAPTURE_API_URL is not configured",
       }),
-    ).toBe("Capture unavailable · missing TELL_CAPTURE_API_URL");
+    ).toBe("Capture unavailable · missing DP_CAPTURE_API_URL");
     expect(
       formatCaptureHealth({
         ok: false,

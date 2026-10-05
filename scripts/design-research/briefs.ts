@@ -126,7 +126,7 @@ const RAW_BRIEFS: Array<{ id: string; brief: unknown }> = [
         { id: "s2", name: "Product surfaces", description: "Interfaces composed as chapters of the same system, not a separate UI kit.", priority: "p0" },
         { id: "s3", name: "Launch films", description: "Short motion pieces cut to the same grid the site and product already use.", priority: "p0" },
         { id: "s4", name: "Editorial sites", description: "Marketing pages paced like print — tension, rest, and a real visual event.", priority: "p1" },
-        { id: "s5", name: "Handoff kits", description: "Tokens, specimens, and do-nots packaged so engineering does not invent a second brand.", priority: "p1" },
+        { id: "s5", name: "Handoff kits", description: "Tokens, templates, and do-nots packaged so engineering does not invent a second brand.", priority: "p1" },
         { id: "s6", name: "Critique loops", description: "Structured reviews that name the tell, not a vibe, before the next round of work.", priority: "p2" },
       ],
       constraints: ["selected-work first", "paper-led", "restrained motion", "no pricing theatre"],
@@ -327,7 +327,7 @@ const RAW_BRIEFS: Array<{ id: string; brief: unknown }> = [
       brandAccent: "#2F4538",
       features: [
         { id: "h1", name: "Binomial strip", description: "Kingdom→Species treadles under the press so ranks stay reachable without a left sticky rail.", priority: "p0" },
-        { id: "h2", name: "Pressed plate", description: "A specimen silhouette with pin marks so the voucher reads as collected matter, not stock art.", priority: "p0" },
+        { id: "h2", name: "Pressed plate", description: "A template silhouette with pin marks so the voucher reads as collected matter, not stock art.", priority: "p0" },
         { id: "h3", name: "Photo inset", description: "Copyright-free botanical stock clipped into the voucher window — evidence, not a card collage.", priority: "p0" },
         { id: "h4", name: "Range beads", description: "Distribution notes that travel with the reading — west-to-east ticks stay visible while you decide.", priority: "p1" },
         { id: "h5", name: "Voucher close", description: "Edition and custody stamped so a reused page cannot orphan its provenance.", priority: "p1" },

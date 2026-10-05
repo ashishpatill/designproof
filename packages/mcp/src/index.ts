@@ -7,16 +7,16 @@ import {
   captureUrl,
   captureScenarioMatrix,
   liveScenarioPlan,
-} from "@tell/core";
+} from "@designproof/core";
 import {
   CapturePayload,
-  TellReport,
+  DesignProofReport,
   buildInstallInfo,
   MCP_TOOL_NAMES,
   resolveIntent,
-} from "@tell/schema";
-import { OfflineRedesignGenerator, type SourceFile } from "@tell/redesign";
-import { parseDirectionPlan, parseDirectionWithGemini } from "@tell/taste";
+} from "@designproof/schema";
+import { OfflineRedesignGenerator, type SourceFile } from "@designproof/redesign";
+import { parseDirectionPlan, parseDirectionWithGemini } from "@designproof/taste";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { REGISTERED_MCP_TOOLS } from "./registered-tools";
@@ -30,26 +30,26 @@ import {
 } from "./tool-handlers";
 
 if (REGISTERED_MCP_TOOLS.join("\0") !== MCP_TOOL_NAMES.join("\0")) {
-  throw new Error("MCP registered tools drifted from @tell/schema MCP_TOOL_NAMES");
+  throw new Error("MCP registered tools drifted from @designproof/schema MCP_TOOL_NAMES");
 }
 
 const server = new McpServer({
-  name: "tell",
+  name: "designproof",
   version: "0.1.0",
 });
 
-const reportById = new Map<string, TellReport>();
-let lastReport: TellReport | undefined;
+const reportById = new Map<string, DesignProofReport>();
+let lastReport: DesignProofReport | undefined;
 let lastProposal: Awaited<ReturnType<OfflineRedesignGenerator["propose"]>> | undefined;
 
-function trackReport(report: TellReport): TellReport {
+function trackReport(report: DesignProofReport): DesignProofReport {
   const withId = rememberReport(report, reportById);
   lastReport = withId;
   return withId;
 }
 
 server.tool(
-  "tell_capture",
+  "designproof_capture",
   "Capture a rendered URL with Playwright and return computed UI evidence.",
   { url: z.string().url() },
   async ({ url }) => {
@@ -59,8 +59,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_diagnose",
-  "Diagnose genericness tells and consistency drift from a URL or committed report artifact. Returns a TellReport with id for redesign/apply chaining. When a sibling tell-design-data checkout is present, writes a raw diagnose episode (same sink as /api/diagnose).",
+  "designproof_diagnose",
+  "Diagnose genericness tells and consistency drift from a URL or committed report artifact. Returns a DesignProofReport with id for redesign/apply chaining. When a sibling dp-design-data checkout is present, writes a raw diagnose episode (same sink as /api/diagnose).",
   { url: z.string().url().optional(), reportPath: z.string().optional() },
   async ({ url, reportPath }) => {
     const report = await handleDiagnose({ url, reportPath }, reportById);
@@ -70,8 +70,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_redesign",
-  "Draft a redesign proposal for a finding or whole report. Returns patch text only; never applies it. When a sibling tell-design-data checkout is present, writes a raw redesign episode (same sink as /api/redesign).",
+  "designproof_redesign",
+  "Draft a redesign proposal for a finding or whole report. Returns patch text only; never applies it. When a sibling dp-design-data checkout is present, writes a raw redesign episode (same sink as /api/redesign).",
   {
     direction: z.string(),
     findingId: z.string().optional(),
@@ -91,13 +91,13 @@ server.tool(
 );
 
 server.tool(
-  "tell_apply",
+  "designproof_apply",
   "Return patch instructions for Cursor. When projectRoot points at a workspace with source files (CSS/SCSS/Tailwind config), the patch rewrites the REAL source literals (accent, body font, radius, AI gradients) as genuine unified diffs; otherwise it returns the drop-in override sheet. This tool never writes files automatically.",
   { proposalId: z.string().optional(), projectRoot: z.string().optional() },
   async ({ proposalId, projectRoot }) => {
     if (proposalId && lastProposal?.id && proposalId !== lastProposal.id) {
       return asJson({
-        error: `Unknown proposalId "${proposalId}". Last proposal is "${lastProposal.id}". Run tell_redesign again.`,
+        error: `Unknown proposalId "${proposalId}". Last proposal is "${lastProposal.id}". Run designproof_redesign again.`,
       });
     }
     if (lastReport && lastProposal) {
@@ -117,7 +117,7 @@ server.tool(
       proposalId: lastProposal?.id,
       patches: files.map((file) => file.unifiedDiff),
       files: files.map((file) => ({ file: file.file, summary: file.summary })),
-      instruction: files.some((f) => f.file !== "tell-overrides.css")
+      instruction: files.some((f) => f.file !== "dp-overrides.css")
         ? "Review the unified diffs in Cursor, then apply them to the listed source files (or ask the Agent to apply the patch)."
         : "Review the unified diff in Cursor, then apply it manually or ask the Agent to patch the listed files.",
     });
@@ -125,8 +125,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_capture_matrix",
-  "Live Playwright capture of a route × viewport × theme × interaction (± auth) scenario matrix. Authenticated cells require TELL_AUTH_STORAGE_STATE or the committed fixtures/generic-app/auth-storage.json.",
+  "designproof_capture_matrix",
+  "Live Playwright capture of a route × viewport × theme × interaction (± auth) scenario matrix. Authenticated cells require DP_AUTH_STORAGE_STATE or the committed fixtures/generic-app/auth-storage.json.",
   {
     url: z.string().url(),
     routes: z.array(z.string()).optional(),
@@ -134,7 +134,7 @@ server.tool(
   },
   async ({ url, routes, compare }) => {
     const planRoutes = routes?.length ? routes : ["/", "/pricing", "/account"];
-    const envAuth = process.env.TELL_AUTH_STORAGE_STATE?.trim();
+    const envAuth = process.env.DP_AUTH_STORAGE_STATE?.trim();
     const authCandidates = [
       envAuth,
       resolve(process.cwd(), "fixtures/generic-app/auth-storage.json"),
@@ -182,8 +182,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_proof_verify",
-  "Apply a candidate patch in the project workspace, recapture the live URL, and return an independent pass/review/fail verdict with before/after scores. Failed attempts auto-revert when revertOnFail is true (default). Requires a reachable dev server at url. When a sibling tell-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
+  "designproof_proof_verify",
+  "Apply a candidate patch in the project workspace, recapture the live URL, and return an independent pass/review/fail verdict with before/after scores. Failed attempts auto-revert when revertOnFail is true (default). Requires a reachable dev server at url. When a sibling dp-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
   {
     url: z.string().url(),
     patch: z.string().min(1),
@@ -198,8 +198,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_proof_revert",
-  "Revert the last tell_proof_verify patch in the project workspace using the saved marker patch.",
+  "designproof_proof_revert",
+  "Revert the last designproof_proof_verify patch in the project workspace using the saved marker patch.",
   { projectRoot: z.string().optional(), patch: z.string().optional() },
   async ({ projectRoot, patch }) => {
     return asJson(await handleProofRevert({ projectRoot, patch }));
@@ -207,8 +207,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_design_from_features",
-  "Run the premium-content-custom-web skill graph: analyze features, route sub-skills, build tokens/sections, and return a DesignSpec plus preview HTML. For ordinary saas-marketing/demos briefs, authors CTA/FAQ/proof via Gemini when GEMINI_API_KEY is set; otherwise deterministic copy tables (safe without a key). When a sibling tell-design-data checkout is present, writes a raw design episode (same sink and shape as /api/design).",
+  "designproof_design_from_features",
+  "Run the premium-content-custom-web skill graph: analyze features, route sub-skills, build tokens/sections, and return a DesignSpec plus preview HTML. For ordinary saas-marketing/demos briefs, authors CTA/FAQ/proof via Gemini when GEMINI_API_KEY is set; otherwise deterministic copy tables (safe without a key). When a sibling dp-design-data checkout is present, writes a raw design episode (same sink and shape as /api/design).",
   {
     productName: z.string().min(1),
     tagline: z.string().optional(),
@@ -244,7 +244,7 @@ server.tool(
 );
 
 server.tool(
-  "tell_voice",
+  "designproof_voice",
   "Parse compound voice/text art-direction into action items + artDirection. Uses Gemini when GEMINI_API_KEY is set; otherwise deterministic local parse.",
   {
     transcript: z.string().min(1),
@@ -259,10 +259,10 @@ server.tool(
 );
 
 server.tool(
-  "tell_install_info",
+  "designproof_install_info",
   "Return versioned MCP/CLI install snippets, Cursor deeplink, and demo URLs. Single source of truth for Connect Agent flows.",
   {
-    launch: z.enum(["pnpm", "tell-mcp"]).optional(),
+    launch: z.enum(["pnpm", "dp-mcp"]).optional(),
   },
   async ({ launch }) => {
     return asJson(buildInstallInfo({ launch: launch ?? "pnpm" }));
@@ -270,8 +270,8 @@ server.tool(
 );
 
 server.tool(
-  "tell_resolve_intent",
-  "Map free-text input to a Tell scenario with defaults (deterministic heuristics, no LLM). Use before capture, voice, matrix, or MCP setup.",
+  "designproof_resolve_intent",
+  "Map free-text input to a Design Proof scenario with defaults (deterministic heuristics, no LLM). Use before capture, voice, matrix, or MCP setup.",
   {
     text: z.string(),
     fixtureUrl: z.string().url().optional(),
@@ -281,7 +281,7 @@ server.tool(
   },
 );
 
-// ── Local source reader for the tell_apply hero path (Cursor workspace) ──
+// ── Local source reader for the designproof_apply hero path (Cursor workspace) ──
 const SKIP_DIRS = new Set(["node_modules", ".next", ".git", "dist", "build", "out", ".turbo", "coverage"]);
 const MAX_SOURCE_FILES = 60;
 const MAX_SOURCE_BYTES = 200_000;

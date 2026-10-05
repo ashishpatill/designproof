@@ -1,3 +1,3 @@
-/** Back-compat re-export — prefer SpecimenPreview. */
-export { SpecimenPreview as ScaledPreview, SpecimenPreview } from "./SpecimenPreview";
-export type { PreviewMode } from "./SpecimenPreview";
+/** Back-compat re-export — prefer TemplatePreview. */
+export { TemplatePreview as ScaledPreview, TemplatePreview } from "./TemplatePreview";
+export type { PreviewMode } from "./TemplatePreview";

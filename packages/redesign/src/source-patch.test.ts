@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { buildSourcePatch } from "./source-patch";
 import { resolveDirection } from "./scales";
 import { buildRestylePlan } from "./restyle";
@@ -10,8 +10,8 @@ import { OfflineRedesignGenerator } from "./index";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../..");
-const report = TellReport.parse(
-  JSON.parse(readFileSync(path.join(repoRoot, "fixtures/reports/tell-report.json"), "utf8")),
+const report = DesignProofReport.parse(
+  JSON.parse(readFileSync(path.join(repoRoot, "fixtures/reports/dp-report.json"), "utf8")),
 );
 const stylesPath = "app/styles.css";
 const stylesCss = readFileSync(path.join(repoRoot, "fixtures/generic-app/app/styles.css"), "utf8");
@@ -104,13 +104,13 @@ describe("propose() fallback", () => {
   it("falls back to the legacy override sheet when no sources are given", async () => {
     const proposal = await gen.propose(report, direction);
     expect(proposal.files).toHaveLength(1);
-    expect(proposal.files[0]!.file).toBe("tell-overrides.css");
+    expect(proposal.files[0]!.file).toBe("dp-overrides.css");
   });
 
   it("falls back when sources contain nothing to rewrite", async () => {
     const proposal = await gen.propose(report, direction, undefined, undefined, [
       { path: "readme.md", contents: "# hello\nno tokens here\n" },
     ]);
-    expect(proposal.files[0]!.file).toBe("tell-overrides.css");
+    expect(proposal.files[0]!.file).toBe("dp-overrides.css");
   });
 });

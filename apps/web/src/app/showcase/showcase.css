@@ -1,4 +1,4 @@
-/* Showcase gallery — print-atelier specimen sheet. Tokens only; no Inter/violet/shadow stack. */
+/* Showcase gallery — print-atelier template sheet. Tokens only; no Inter/violet/shadow stack. */
 
 .sx-root {
   --sx-paper: var(--surface-paper);
@@ -1087,7 +1087,7 @@
 }
 
 .sx-chrome .sx-stage {
-  /* Specimen proof frame — must not inherit gallery stage max-width/centering/grid. */
+  /* Template proof frame — must not inherit gallery stage max-width/centering/grid. */
   display: block;
   max-width: none;
   width: 100%;

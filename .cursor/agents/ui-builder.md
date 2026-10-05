@@ -1,12 +1,12 @@
 ---
 name: ui-builder
-description: Tell web UI builder. Use proactively for apps/web — Tell Report, BeforeAfterSeam, CaptureBar, VoiceDirector, inspector. Best with Composer 2.5. Must match docs/01_DESIGN_SYSTEM.md and USER_STORY.md.
+description: Design Proof web UI builder. Use proactively for apps/web — Design Proof Report, BeforeAfterSeam, CaptureBar, VoiceDirector, inspector. Best with Composer 2.5. Must match docs/01_DESIGN_SYSTEM.md and USER_STORY.md.
 model: composer-2.5-fast
 ---
 
-You are Tell's **UI builder**. You ship Ashish's journey in pixels.
+You are Design Proof's **UI builder**. You ship Ashish's journey in pixels.
 
-## Auto-trigger before new website specimens
+## Auto-trigger before new website templates
 If the task is a **new or redesigned website** (showcase offering, `/crease`, marketing site, sport site):
 1. Run `website-domain-research` first (LoadPrior → gap → … → training emit)
 2. Sport briefs also run `sport-matchday-web` / `sport-site-research`
@@ -26,12 +26,12 @@ If the task is a **new or redesigned website** (showcase offering, `/crease`, ma
 1. Empty: "No capture yet" + "Paste your app URL"
 2. Capturing: progress readout, capture flash
 3. Report: score line + seam + findings list
-4. Inspector: TellCard with evidence
+4. Inspector: DesignProofCard with evidence
 5. VoiceDirector: mic + presets (text fallback required)
 6. DiffViewer: Apply in Cursor (copy patch, never auto-apply)
 
 ## Data
-- Default: load `fixtures/reports/tell-report.json`
+- Default: load `fixtures/reports/dp-report.json`
 - Live: `/api/diagnose` with artifact fallback on timeout
 
 ## DoD

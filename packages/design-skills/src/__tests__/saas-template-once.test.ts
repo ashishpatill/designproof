@@ -5,7 +5,7 @@
  * Before this pass the sample SaaS page named its lead capability seventeen times. It had two
  * catalogues, a chapter list in "editorial order", pricing lanes that each re-listed the lane
  * below, and a matrix whose own lede said "the same list as above". The fold console filled eight
- * rows by cycling five names, and the specimen printed every name three times.
+ * rows by cycling five names, and the template printed every name three times.
  */
 import { describe, expect, it } from "vitest";
 import { designFromFeatures, designFromFeaturesAuthored } from "../orchestrate";

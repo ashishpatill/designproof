@@ -4,7 +4,7 @@ Back: [`../FEATURE-MAP.md`](../FEATURE-MAP.md) · Entry: [`../../AGENTS.md`](../
 
 ## Goal
 
-Public specimens must read as **distinct offerings** (stacked images, motion, artistic, unique) — including **Tiller**, the agent-harness session helm (turn tape, permit plate, finish pin). GitHub README and `/showcase` should present Tiller as first-class, not a buried template.
+Public templates must read as **distinct offerings** (stacked images, motion, artistic, unique) — including **Tiller**, the agent-harness session helm (turn tape, permit plate, finish pin). GitHub README and `/showcase` should present Tiller as first-class, not a buried template.
 
 **Tiller** = product name on the `harness` engine template (`siteKind: agent-harness`). Label in the filmstrip is “Agent harness”.
 
@@ -29,10 +29,10 @@ In-repo page + one still exist. The public gap (name on the fold, filmstrip prom
 
 ## Skills to load first
 
-`tell-recursive-improve` · `tell-template-craft` · `tell-dogfood-audit`
+`dp-recursive-improve` · `dp-template-craft` · `dp-dogfood-audit`
 
 No extra MCP. Do not add a plugin to “fix” a still.
 
 ## Related
 
-[`README.md`](../../README.md) Specimens · [design-dogfood-loop.md](./design-dogfood-loop.md) · [`PLAN.md`](../../PLAN.md) Phase 9
+[`README.md`](../../README.md) Templates · [design-dogfood-loop.md](./design-dogfood-loop.md) · [`PLAN.md`](../../PLAN.md) Phase 9

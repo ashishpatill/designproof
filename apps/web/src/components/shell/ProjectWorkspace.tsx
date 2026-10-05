@@ -39,7 +39,7 @@ export function ProjectWorkspace({
 
   return (
     <>
-      <div className="tell-mobile-switch" role="tablist" aria-label="Project panes">
+      <div className="dp-mobile-switch" role="tablist" aria-label="Project panes">
         <button
           type="button"
           data-active={mobilePane === "critic" ? "true" : "false"}
@@ -57,7 +57,7 @@ export function ProjectWorkspace({
       </div>
       <div
         ref={splitRef}
-        className="tell-split"
+        className="dp-split"
         data-focus={focusCanvas ? "canvas" : "split"}
         data-mobile-pane={mobilePane}
         style={
@@ -66,19 +66,19 @@ export function ProjectWorkspace({
             : ({ ["--shell-split-critic" as string]: `${criticPct}%` } as CSSProperties)
         }
       >
-        <aside className="tell-split__critic" aria-label="Critic pane">
+        <aside className="dp-split__critic" aria-label="Critic pane">
           {critic}
         </aside>
         <button
           type="button"
-          className="tell-split__handle"
+          className="dp-split__handle"
           aria-label="Resize panes"
           onPointerDown={(e) => {
             e.preventDefault();
             dragging.current = true;
           }}
         />
-        <section className="tell-split__canvas" aria-label="Proof canvas">
+        <section className="dp-split__canvas" aria-label="Proof canvas">
           {canvas}
         </section>
       </div>

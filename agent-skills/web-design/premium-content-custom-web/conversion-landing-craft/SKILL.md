@@ -15,7 +15,7 @@ A landing page is not a homepage. Win **one intent**: one offer → one audience
 4. **Proof** — only declared logos/metrics/features; omit inventing any
 5. **Risk reversal** — trial, cancel anytime, or talk-to-human (pick one honest option)
 
-## Structure (Tell engine maps these)
+## Structure (Design Proof engine maps these)
 
 | Band | Job |
 |---|---|
@@ -45,8 +45,8 @@ A landing page is not a homepage. Win **one intent**: one offer → one audience
 
 - Mobile readable; focus-visible; reduced motion safe
 - No competing CTAs in the fold
-- Tell diagnose when available — generic SaaS tells should drop
+- Design Proof diagnose when available — generic SaaS tells should drop
 
 ## Runtime
 
-Routed for `saas-marketing`. FAQ + CTA risk notes emit from `@tell/design-skills` copy helpers.
+Routed for `saas-marketing`. FAQ + CTA risk notes emit from `@designproof/design-skills` copy helpers.

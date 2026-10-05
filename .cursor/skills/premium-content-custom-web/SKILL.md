@@ -38,20 +38,20 @@ Entry skill for multi-million-dollar-quality marketing sites, corporate stories,
 5. **Foundation** — run `design-system-foundation` before section work
 6. **Generate** — IA, tokens, section specs, preview/code
 7. **Taste Controls** — offer density / motion / lean / color / type / rounding options
-8. **Verify** — if Tell is available, capture → diagnose → optional redesign with `tellDirectionId`
+8. **Verify** — if Design Proof is available, capture → diagnose → optional redesign with `dpDirectionId`
 
 ## Runtime engine
 
-Prefer the deterministic package `@tell/design-skills`:
+Prefer the deterministic package `@designproof/design-skills`:
 
 ```ts
-import { designFromFeatures } from "@tell/design-skills";
+import { designFromFeatures } from "@designproof/design-skills";
 const { spec, previewHtml } = designFromFeatures(brief);
 ```
 
-Studio UI: `/studio` · Specimen gallery: `/showcase` · Offerings: `/showcase/{saas|dashboard|corporate|educational|fintech|studio|consumer}`
+Studio UI: `/studio` · Template gallery: `/showcase` · Offerings: `/showcase/{saas|dashboard|corporate|educational|fintech|studio|consumer}`
 
-**Offerings vs plumbing:** Use `tell-template-craft` for every new/fixed template — Phase A peer plumbing checkout, Phase B measured designer corridors (`design-research-loop`). Do not invent aesthetics from peer theme packs; do not name third parties in commits. See `docs/11`–`docs/13` for platform/MCP adaptations from the same study.
+**Offerings vs plumbing:** Use `dp-template-craft` for every new/fixed template — Phase A peer plumbing checkout, Phase B measured designer corridors (`design-research-loop`). Do not invent aesthetics from peer theme packs; do not name third parties in commits. See `docs/11`–`docs/13` for platform/MCP adaptations from the same study.
 
 ## Taste Controls (always offer)
 

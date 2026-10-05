@@ -12,7 +12,7 @@ export default function ShowcaseLoading() {
         fontFamily: "var(--font-sans), system-ui, sans-serif",
       }}
     >
-      <p style={{ margin: 0, letterSpacing: "0.04em", fontSize: "0.95rem" }}>Loading specimens…</p>
+      <p style={{ margin: 0, letterSpacing: "0.04em", fontSize: "0.95rem" }}>Loading templates…</p>
     </div>
   );
 }

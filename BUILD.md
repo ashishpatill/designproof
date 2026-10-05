@@ -1,8 +1,8 @@
-# Tell — Cursor Build Instructions
+# Design Proof — Cursor Build Instructions
 
 > Drop the relevant parts of this file into `.cursor/rules/` (as `.mdc`) and keep the whole
 > file as `BUILD.md` at the repo root. It is the single source of truth for *how* Cursor should
-> build Tell. Read `01_DESIGN_SYSTEM.md` for the visual contract and `04_CLAUDE_PROJECT.md`
+> build Design Proof. Read `01_DESIGN_SYSTEM.md` for the visual contract and `04_CLAUDE_PROJECT.md`
 > for vision, scope, and tracking.
 
 Target: win the **Cursor track** of a focused 2-day build. Solo/remote-eligible.
@@ -11,7 +11,7 @@ Target: win the **Cursor track** of a focused 2-day build. Solo/remote-eligible.
 
 ## 0. Mission (read before any file)
 
-Tell is an AI **taste critic** for rendered UI. It captures a product's *real* visual surface
+Design Proof is an AI **taste critic** for rendered UI. It captures a product's *real* visual surface
 (Playwright/CDP), builds a deterministic design fingerprint, detects **genericness tells** (what
 makes it read as AI-built) and **consistency drift** (where the surface fractures), reasons **with
 taste** about whether each finding is generic, drift, or intentional, accepts **voice art-direction**
@@ -33,13 +33,13 @@ codebase-viz space is crowded. We own the **rendered-surface taste critic** nobo
 2. **Capture the rendered truth.** Input is what users *see* (computed styles + screenshot), not
    just source files. Source parsing (`ts-morph`) is only for generating apply-in-Cursor diffs.
 3. **Everything is a token.** No raw hex/px in `apps/web` component classNames. Go through the
-   design-system tokens. Tell's own `TokenBypass` detector enforces this on scanned repos; obey it
-   in Tell's repo.
-4. **Never auto-apply fixes.** `tell_apply` returns a diff. A human applies it in Cursor.
+   design-system tokens. Design Proof's own `TokenBypass` detector enforces this on scanned repos; obey it
+   in Design Proof's repo.
+4. **Never auto-apply fixes.** `designproof_apply` returns a diff. A human applies it in Cursor.
 5. **Schemas are contracts.** All cross-package data uses the zod schemas in `packages/schema`.
    Parse at every boundary; never pass loose objects.
 6. **Reconciliation must improve measured facts.** Any "after" CSS must preserve or improve readable
-   foreground/background pairings. Do not force global text colors unless Tell also owns the surface.
+   foreground/background pairings. Do not force global text colors unless Design Proof also owns the surface.
 7. **Ship the spine before the polish.** Order in §8 is not negotiable under time pressure.
 8. **Fixtures are the demo.** The seeded generic app is a first-class deliverable; its tells are
    hand-chosen to land in the demo (§7).
@@ -73,14 +73,14 @@ React+Tailwind diff output, or let fingerprint/detection jitter nondeterministic
 ## 3. Monorepo layout
 
 ```
-tell/
+designproof/
   package.json                 # pnpm workspace root
   pnpm-workspace.yaml
   BUILD.md                     # this file
   CONTRIBUTIONS.md             # what we built vs. the seeded generic fixture
   .cursor/
     rules/                     # .mdc rule files distilled from §1, §5–§7
-    mcp.json                   # registers the Tell MCP server for Cursor
+    mcp.json                   # registers the Design Proof MCP server for Cursor
   packages/
     schema/                    # zod schemas + inferred TS types (the contracts)
     core/                      # capture + fingerprint + detectors (pure, no LLM, no network*)
@@ -88,7 +88,7 @@ tell/
     redesign/                  # contrast-grounded reconciliation + diff generation
     mcp/                       # MCP server exposing capture/diagnose/redesign/apply
   apps/
-    web/                       # Next.js UI: Tell Report, seam, inspector, voice director
+    web/                       # Next.js UI: Design Proof Report, seam, inspector, voice director
   fixtures/
     generic-app/               # deliberately bland demo app (the "before")
     reports/                   # committed scan artifacts (JSON) for offline demo
@@ -176,7 +176,7 @@ export const DesignFingerprint = z.object({
 
 export const Verdict = z.enum(["generic", "drift", "intentional", "uncertain"]);
 
-export const TellDetector = z.enum([
+export const DesignProofDetector = z.enum([
   "SystemFontTell",
   "GradientCrutchTell",
   "ShadowEverywhereTell",
@@ -207,7 +207,7 @@ export const Evidence = z.object({
 export const Finding = z.object({
   id: z.string(),
   family: z.enum(["tell", "drift"]),
-  detector: z.union([TellDetector, DriftDetector]),
+  detector: z.union([DesignProofDetector, DriftDetector]),
   verdictHint: Verdict,           // mechanical guess; taste may override
   facts: z.record(z.any()),       // deterministic grounding for taste engine
   evidence: z.array(Evidence),
@@ -240,7 +240,7 @@ export const RedesignProposal = z.object({
   })),
 });
 
-export const TellReport = z.object({
+export const DesignProofReport = z.object({
   capture: CapturePayload,
   fingerprint: DesignFingerprint,
   findings: z.array(Finding),
@@ -293,7 +293,7 @@ Deterministic aggregation of `CapturePayload` → `DesignFingerprint`:
 
 No network. Snapshot-tested against committed capture JSON.
 
-### 5.3 Tell detectors `(fingerprint, capture) => Finding[]`
+### 5.3 Design Proof detectors `(fingerprint, capture) => Finding[]`
 
 Each emits `family: "tell"`, deterministic `facts`, and `evidence`.
 
@@ -355,7 +355,7 @@ For each `Finding`, build a grounded request and get a `TasteVerdict`.
 - Re-run is cheap: direction updates the live reconciliation and the before/after preview injects the
   exact CSS generated by `packages/redesign`.
 
-**Prompt contract (system):** "You are Tell's taste engine. You classify rendered-UI findings.
+**Prompt contract (system):** "You are Design Proof's taste engine. You classify rendered-UI findings.
 You are given deterministic facts you must not contradict. Decide: generic / drift / intentional /
 uncertain. Intentional means the pattern is a defensible design choice (state the choice). Respond
 ONLY with JSON matching the schema. Rationale ≤ 3 sentences, critic voice, no apology." Pass `facts`
@@ -392,7 +392,7 @@ A small Next.js app deliberately built to trigger every tell and drift detector.
 
 Commit:
 - `fixtures/reports/capture.json` — raw capture payload.
-- `fixtures/reports/tell-report.json` — full `TellReport` for offline demo.
+- `fixtures/reports/dp-report.json` — full `DesignProofReport` for offline demo.
 
 **Label clearly** in `CONTRIBUTIONS.md`: the generic-app is demo input, hand-built to be bland.
 
@@ -411,29 +411,29 @@ Follow exactly. Each milestone has a DoD; do not advance until met.
   `findings.json` snapshot passes.*
 - **M4 · taste v1** — Gemini verdicts + reflection + zod validation + mechanical fallback. *DoD: all
   findings get a verdict; brutalist section returns `intentional`; run reproducible enough to demo.*
-- **M5 · MCP diagnose** — `tell_capture` + `tell_diagnose` over stdio; `.cursor/mcp.json` set.
-  *DoD: from Cursor, diagnose returns `TellReport` JSON.*
+- **M5 · MCP diagnose** — `designproof_capture` + `designproof_diagnose` over stdio; `.cursor/mcp.json` set.
+  *DoD: from Cursor, diagnose returns `DesignProofReport` JSON.*
 
 **Day 2 — the wow + the loop**
-- **M6 · Tell Report + seam** — Next.js route renders report from `tell-report.json`; BeforeAfterSeam
+- **M6 · Design Proof Report + seam** — Next.js route renders report from `dp-report.json`; BeforeAfterSeam
   draggable; score line; findings list. *DoD: seam drag works; keyboard ←/→; reduced-motion jump.*
-- **M7 · inspector + verdict cards** — TellCard/DriftCard with evidence pins, rationale, confidence.
+- **M7 · inspector + verdict cards** — DesignProofCard/DriftCard with evidence pins, rationale, confidence.
   *DoD: all findings inspectable; verdict dual-encoded.*
-- **M8 · voice + redesign** — VoiceDirector + presets; `tell_redesign` returns `RedesignProposal`;
+- **M8 · voice + redesign** — VoiceDirector + presets; `designproof_redesign` returns `RedesignProposal`;
   DiffViewer renders diff; `Apply in Cursor` copies patch. *DoD: preset "editorial" changes
   activeDirection; ≥1 diff reviewable.*
 - **M9 · demo hardening** — offline artifact fallback, empty/loading/error states, capture flash
   motion, backup demo video recorded.
-- **M10 · dogfood** — run Tell on `apps/web`; fix real findings; land "Tell runs on itself: 0 tells."
+- **M10 · dogfood** — run Design Proof on `apps/web`; fix real findings; land "Design Proof runs on itself: 0 tells."
 
-**Cut line (if behind):** fall back to the committed `fixtures/reports/tell-report.json` artifact and the seeded fixture. Live URL capture, GitHub setup, and token reconciliation are shipped — do not rip them out under demo pressure; use the offline artifact as backup only.
+**Cut line (if behind):** fall back to the committed `fixtures/reports/dp-report.json` artifact and the seeded fixture. Live URL capture, GitHub setup, and token reconciliation are shipped — do not rip them out under demo pressure; use the offline artifact as backup only.
 
 ---
 
 ## 9. Frontend notes (`apps/web`)
 
 - `/api/diagnose` runs the full pipeline via `packages/core/src/scripts/diagnose-url.ts` (Playwright
-  subprocess). On failure, returns the committed `fixtures/reports/tell-report.json` artifact with
+  subprocess). On failure, returns the committed `fixtures/reports/dp-report.json` artifact with
   `meta.live: false`.
 - `/api/setup/start|status|stop` — local-only GitHub repo runner (`repo-runner.ts`). Clones to a temp
   dir, parses README + `package.json`, installs, spawns the dev server on a free port, and only marks
@@ -446,7 +446,7 @@ Follow exactly. Each milestone has a DoD; do not advance until met.
   manually and scan all (up to 8).
 - ReconciliationTable shows token before/after rows grounded in captured CSS variables, including
   contrast ratios for text and controls.
-- Draft fix calls `buildOverridesPatch(reconciliation)` client-side — emits `tell-overrides.css` diff.
+- Draft fix calls `buildOverridesPatch(reconciliation)` client-side — emits `dp-overrides.css` diff.
 - Evidence pins: absolute-positioned proof-mark SVGs over screenshot using `evidence.region` coords.
 - All colors/spacing/fonts via tokens from `01_DESIGN_SYSTEM.md`. No Inter. No violet gradient.
 - Accessibility floor from design system §9 is a merge gate.
@@ -468,29 +468,29 @@ Follow exactly. Each milestone has a DoD; do not advance until met.
 ```json
 {
   "mcpServers": {
-    "tell": { "command": "pnpm", "args": ["-F", "@tell/mcp", "start"] }
+    "designproof": { "command": "pnpm", "args": ["-F", "@designproof/mcp", "start"] }
   }
 }
 ```
 
-MCP tools to expose (must match `@tell/schema` `MCP_TOOL_NAMES` / `REGISTERED_MCP_TOOLS` — eleven tools; local stdio only via `.cursor/mcp.json` → `pnpm -F @tell/mcp start` or `tell mcp install cursor --project`):
+MCP tools to expose (must match `@designproof/schema` `MCP_TOOL_NAMES` / `REGISTERED_MCP_TOOLS` — eleven tools; local stdio only via `.cursor/mcp.json` → `pnpm -F @designproof/mcp start` or `designproof mcp install cursor --project`):
 
 | Tool | Args | Returns |
 |---|---|---|
-| `tell_capture` | `{ url: string }` | `CapturePayload` |
-| `tell_diagnose` | `{ url?: string, reportPath?: string }` | `TellReport` (no args → committed fixture report, not live) |
-| `tell_redesign` | `{ direction: string, findingId?: string, reportId?: string }` | `RedesignProposal` |
-| `tell_apply` | `{ proposalId?: string, projectRoot?: string }` | `{ patches: string[], instruction: string }` — **never writes files** |
-| `tell_capture_matrix` | `{ url: string, routes?: string[], compare?: boolean }` | matrix (+ meta; capture-only without baseline) |
-| `tell_proof_verify` | `{ url, patch, projectRoot?, waitMs?, revertOnFail? }` | proof verdict (Report prove) |
-| `tell_proof_revert` | `{ projectRoot?: string, patch?: string }` | `{ reverted, instruction }` |
-| `tell_design_from_features` | product brief + optional taste | `DesignSpec` (+ preview HTML) — Studio author |
-| `tell_voice` | `{ transcript: string }` | direction plan + `source` |
-| `tell_install_info` | `{ launch?: "pnpm" \| "tell-mcp" }` | `InstallInfo` |
-| `tell_resolve_intent` | `{ text: string, fixtureUrl?: string }` | `ResolvedIntent` |
+| `designproof_capture` | `{ url: string }` | `CapturePayload` |
+| `designproof_diagnose` | `{ url?: string, reportPath?: string }` | `DesignProofReport` (no args → committed fixture report, not live) |
+| `designproof_redesign` | `{ direction: string, findingId?: string, reportId?: string }` | `RedesignProposal` |
+| `designproof_apply` | `{ proposalId?: string, projectRoot?: string }` | `{ patches: string[], instruction: string }` — **never writes files** |
+| `designproof_capture_matrix` | `{ url: string, routes?: string[], compare?: boolean }` | matrix (+ meta; capture-only without baseline) |
+| `designproof_proof_verify` | `{ url, patch, projectRoot?, waitMs?, revertOnFail? }` | proof verdict (Report prove) |
+| `designproof_proof_revert` | `{ projectRoot?: string, patch?: string }` | `{ reverted, instruction }` |
+| `designproof_design_from_features` | product brief + optional taste | `DesignSpec` (+ preview HTML) — Studio author |
+| `designproof_voice` | `{ transcript: string }` | direction plan + `source` |
+| `designproof_install_info` | `{ launch?: "pnpm" \| "dp-mcp" }` | `InstallInfo` |
+| `designproof_resolve_intent` | `{ text: string, fixtureUrl?: string }` | `ResolvedIntent` |
 
 Each returns schema-validated JSON. Keep tool descriptions crisp so the Cursor agent calls them
-correctly. `tell_apply` never writes files — it returns the patch for the human/agent to apply.
+correctly. `designproof_apply` never writes files — it returns the patch for the human/agent to apply.
 
 ---
 
@@ -514,22 +514,22 @@ probe) → `ready` | `needs-manual` (user pastes localhost URL) | `error`.
 
 **`reconcile.ts`** — deterministic token reconciliation from captured CSS variables + findings. Powers
 the live before/after seam and `ReconciliationTable`. No LLM. It computes text/control contrast
-ratios and only forces foreground colors inside surfaces Tell also controls. Direction presets:
+ratios and only forces foreground colors inside surfaces Design Proof also controls. Direction presets:
 editorial, precision, warm-minimal, bold-contrast, luxury, brutalist, explainer.
 
-**`buildOverridesPatch`** — emits a site-wide `tell-overrides.css` with CSS custom properties derived
+**`buildOverridesPatch`** — emits a site-wide `dp-overrides.css` with CSS custom properties derived
 from the reconciliation. One apply covers every page in the Pages strip.
 
 Priority order for generating diffs:
 1. If repo path known: emit token changes in `tailwind.config.ts` + CSS variables in `globals.css`.
-2. If only URL (default web flow): emit standalone `tell-overrides.css` with CSS custom properties.
+2. If only URL (default web flow): emit standalone `dp-overrides.css` with CSS custom properties.
 3. Per-finding fix: minimal diff targeting the specific tell (e.g. add display font import + apply
    to `h1–h3`).
 
 Interface:
 ```ts
 export interface RedesignGenerator {
-  propose(report: TellReport, direction: ArtDirection, findingId?: string): Promise<RedesignProposal>;
+  propose(report: DesignProofReport, direction: ArtDirection, findingId?: string): Promise<RedesignProposal>;
 }
 ```
 

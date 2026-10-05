@@ -21,16 +21,16 @@ echo "→ Pulling Vercel project metadata (if linked)…"
 npx --yes vercel@latest pull --yes --environment=production --token "$VERCEL_TOKEN" || true
 
 echo "→ Deploying production…"
-npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN" | tee /tmp/tell-vercel-deploy.log
-URL="$(tail -n 1 /tmp/tell-vercel-deploy.log)"
+npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN" | tee /tmp/dp-vercel-deploy.log
+URL="$(tail -n 1 /tmp/dp-vercel-deploy.log)"
 
 # Prefer the Production alias line when present (portable: no ripgrep required)
-PROD_URL="$(grep -Eo 'https://[a-zA-Z0-9.-]+\.vercel\.app' /tmp/tell-vercel-deploy.log | tail -n 1 || true)"
+PROD_URL="$(grep -Eo 'https://[a-zA-Z0-9.-]+\.vercel\.app' /tmp/dp-vercel-deploy.log | tail -n 1 || true)"
 FINAL_URL="${PROD_URL:-$URL}"
 
 if [[ -z "$FINAL_URL" || "$FINAL_URL" != https://* ]]; then
   echo "Deploy finished but no https://*.vercel.app URL was parsed."
-  echo "Full log: /tmp/tell-vercel-deploy.log"
+  echo "Full log: /tmp/dp-vercel-deploy.log"
   exit 1
 fi
 
@@ -39,5 +39,5 @@ echo "Production URL: $FINAL_URL"
 echo ""
 echo "Next:"
 echo "  1. Vercel → Storage → Create Database → Neon  (or paste DATABASE_URL)"
-echo "  2. GitHub → Settings → Actions → Variables → TELL_PREVIEW_URL = $FINAL_URL"
+echo "  2. GitHub → Settings → Actions → Variables → DP_PREVIEW_URL = $FINAL_URL"
 echo "  3. Redeploy after DATABASE_URL is set so share links persist"

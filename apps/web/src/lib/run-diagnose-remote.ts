@@ -1,4 +1,4 @@
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import { fetchRemoteBackend, hasRemoteBackend, remoteBackendBaseUrl } from "./remote-api";
 
 /** When set (e.g. on Vercel), proxy capture to a remote Docker backend. */
@@ -6,10 +6,10 @@ export function hasRemoteCaptureBackend(): boolean {
   return hasRemoteBackend();
 }
 
-export async function runDiagnoseRemote(url: string): Promise<TellReport> {
+export async function runDiagnoseRemote(url: string): Promise<DesignProofReport> {
   const base = remoteBackendBaseUrl();
   if (!base) {
-    throw new Error("TELL_CAPTURE_API_URL is not configured");
+    throw new Error("DP_CAPTURE_API_URL is not configured");
   }
 
   const res = await fetchRemoteBackend("/api/diagnose", {
@@ -31,5 +31,5 @@ export async function runDiagnoseRemote(url: string): Promise<TellReport> {
     throw new Error("Capture backend fell back to offline demo");
   }
 
-  return TellReport.parse(payload.report);
+  return DesignProofReport.parse(payload.report);
 }

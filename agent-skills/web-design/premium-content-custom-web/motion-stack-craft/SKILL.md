@@ -3,7 +3,7 @@ name: motion-stack-craft
 description: >-
   Learn and apply Three.js, D3.js, GSAP-class timelines, free OSS motion templates,
   and native CSS/WAAPI motion — customized to each project's features and siteKind.
-  Wired in @tell/design-skills as SkillNodeId motion-stack-craft.
+  Wired in @designproof/design-skills as SkillNodeId motion-stack-craft.
 ---
 
 # motion-stack-craft
@@ -12,7 +12,7 @@ description: >-
 > templates as craft sources — then re-author beats from the product brief.
 > Never ship a kit, CodePen, or award clone unchanged.
 
-## Non-negotiables (Tell)
+## Non-negotiables (Design Proof)
 
 1. **Narrative role or delete** — every beat guides eye, confirms input, or chapters a story.
 2. **Restraint band** — ~2–15% transition coverage; micro ~150–300ms; entrances ≤~800ms.
@@ -24,7 +24,7 @@ description: >-
 
 ## When this skill routes
 
-- Engine: `@tell/design-skills` adds `motion-stack-craft` whenever Taste `motion` is not `none`.
+- Engine: `@designproof/design-skills` adds `motion-stack-craft` whenever Taste `motion` is not `none`.
 - Agents: invoke for any template polish, agency Phase `3c-motion`, immersive briefs, data-viz pages, or when cloning OSS motion demos into a client project.
 
 ## Stack decision tree (learn → choose → customize)
@@ -46,7 +46,7 @@ description: >-
 
 **Use when:** the *product metaphor* is spatial (path field, instrument desk depth, lantern atlas) and dwell time rewards cost.
 
-**Tell shipping defaults:**
+**Design Proof shipping defaults:**
 
 - Marketing HTML: **no Three CDN by default**. Prefer canvas2d / SVG approximation (`data-motion-instrument="field"`) behind `immersive`.
 - Mount real Three/R3F only when brief sets immersive + explicit 3D flag; always ship a still poster / first-frame SVG.
@@ -59,7 +59,7 @@ description: >-
 
 **Use when:** the page argues with *data* (series, lattice amplitudes, ledger cutoffs, calibration tolerances).
 
-**Tell shipping defaults:**
+**Design Proof shipping defaults:**
 
 - Templates: **vanilla SVG** with D3 *patterns* — `pathLength` stroke-draw (`.ds-draw`), scaleY bar enter (`.ds-lattice-bar`), scrubbed nodes — no D3 bundle in marketing HTML.
 - Full D3 allowed in product apps / research tools when joins and scales earn the dependency.
@@ -73,7 +73,7 @@ Treat open demos as **technique schools**, not drop-ins:
 
 1. Name the *job* of the demo (mask wipe, path draw, stagger grid, scroll chapter).
 2. Strip brand chrome, fonts, and purple/glow defaults.
-3. Re-time into Tell restraint band; kill loops unless the reader controls them.
+3. Re-time into Design Proof restraint band; kill loops unless the reader controls them.
 4. Bind content to **this** product’s features / siteKind instrument (flow, scrub, lattice, loom, press snap…).
 5. Verify reduced-motion + no-JS finals.
 
@@ -117,7 +117,7 @@ Customize the *instrument*, not a shared fade:
 4. If studying an OSS template: extract job only; rebuild with tokens + content.
 5. If Three or D3: justify metaphor/data; ship static fallback.
 6. Verify: no-JS complete, reduced-motion finals, restraint band, missable beats ≥2.
-7. Do not paste kit CSS/JS into the engine without Tell-shaped rewrite.
+7. Do not paste kit CSS/JS into the engine without Design Proof-shaped rewrite.
 
 ## Avoid
 

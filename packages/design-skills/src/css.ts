@@ -28,9 +28,21 @@ function spaceVars(tokens: DesignTokens): string {
   return tokens.space.map((s) => `--s-${s.name}:${s.px}px`).join(";");
 }
 
+/**
+ * camelCase token keys must be emitted kebab-case.
+ *
+ * The stylesheet asks for `--m-ease-out` thirty-odd times; `motionScale()` returns the key
+ * `easeOut`. Emitting it verbatim produced `--m-easeOut`, which nothing ever read — so every
+ * reveal `transition`/`animation` using the short form (12 of them, with no fallback) carried an
+ * invalid shorthand and silently resolved to unset. The declared 0.16/1/0.3/1 curve never ran.
+ */
+function kebab(key: string): string {
+  return key.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
 function mapVars(prefix: string, map: Record<string, string>): string {
   return Object.entries(map)
-    .map(([k, v]) => `--${prefix}-${k}:${v}`)
+    .map(([k, v]) => `--${prefix}-${kebab(k)}:${v}`)
     .join(";");
 }
 
@@ -38,11 +50,27 @@ function mapVars(prefix: string, map: Record<string, string>): string {
  * Component-level aliases. Real systems put a semantic layer between raw scales and components so
  * a control can be re-tuned without hunting through rules — and so a developer editing one line
  * changes every button rather than one button.
+ *
+ * Every alias here must actually be declared. Three were not, and each was silently breaking
+ * something a reader sees:
+ *
+ *   --nav-h        17 sticky rails asked for it and fell back to 4.5rem under a 4rem nav.
+ *   --content-wide the paper frame asked for it and froze at the 72rem fallback, so every page
+ *                  rendered as a 1216px document on a 1440px screen with a dark band down each side.
+ *   --t-small-size 11 rules asked for it with three different fallbacks, producing three caption
+ *                  sizes for one ladder step.
  */
-function semanticVars(): string {
+function semanticVars(tokens: DesignTokens): string {
+  const navPx = tokens.space.find((s) => s.name === "2xl")?.px ?? 64;
+  const bodySmall = tokens.type.find((s) => s.name === "bodySmall");
   return [
     "--nav-height:var(--s-2xl)",
-    "--nav-blur:12px",
+    /* Sticky rails pin below the real nav. One number, computed from the ladder. */
+    "--nav-h:" + navPx + "px",
+    /* The paper frame's inner width — the wide container, not a magic 72rem. */
+    "--content-wide:" + tokens.contentWide,
+    /* Named alias for the bodySmall ladder step so `--t-small-size` resolves once, not three ways. */
+    "--t-small-size:" + (bodySmall ? bodySmall.css : "0.9rem"),
     "--btn-height:2.75rem",
     "--btn-radius:var(--r-md)",
     "--btn-padding:var(--s-md)",
@@ -654,17 +682,17 @@ function siteKindCss(): string {
 [data-sitekind="agent-harness"] .ds-hero-helm .ds-cta-note,
 [data-sitekind="agent-harness"] .ds-hero-helm .ds-actions{display:none}
 
-/* Fintech: inverse specimen is a stage; product drawing sits on a lit paper plate (readable contrast). */
-[data-sitekind="fintech-marketing"] .ds-specimen{padding-block:var(--s-xl) var(--s-2xl)}
-[data-sitekind="fintech-marketing"] .ds-specimen-head .ds-heading{color:var(--surface-ink)}
-[data-sitekind="fintech-marketing"] .ds-specimen .ds-plate{
+/* Fintech: inverse template is a stage; product drawing sits on a lit paper plate (readable contrast). */
+[data-sitekind="fintech-marketing"] .ds-template{padding-block:var(--s-xl) var(--s-2xl)}
+[data-sitekind="fintech-marketing"] .ds-template-head .ds-heading{color:var(--surface-ink)}
+[data-sitekind="fintech-marketing"] .ds-template .ds-plate{
   padding:var(--s-sm);border:1px solid var(--c-border);border-radius:var(--r-xl);
   background:var(--c-paper);color:var(--c-ink);
   box-shadow:0 28px 64px color-mix(in srgb,#000 48%,transparent);
   --surface-bg:var(--c-paper);--surface-ink:var(--c-ink);--surface-body:var(--c-ink-body);
   --surface-muted:var(--c-ink-secondary);--surface-quiet:var(--c-ink-tertiary);--surface-border:var(--c-border);
 }
-[data-sitekind="fintech-marketing"] .ds-specimen .ds-plate-bleed .ds-fig{border-radius:var(--r-lg);min-height:min(68vh,700px)}
+[data-sitekind="fintech-marketing"] .ds-template .ds-plate-bleed .ds-fig{border-radius:var(--r-lg);min-height:min(68vh,700px)}
 [data-sitekind="fintech-marketing"] .ds-metrics-band{box-shadow:inset 0 3px 0 var(--c-accent)}
 [data-sitekind="fintech-marketing"] .ds-metric{min-height:10.5rem}
 [data-sitekind="fintech-marketing"] .ds-proof{padding-block:var(--s-2xl) calc(var(--section-y) * 0.85)}
@@ -714,7 +742,7 @@ function siteKindCss(): string {
 [data-sitekind="art-directed-studio"] .ds-hero-stackfold .ds-actions .ds-btn-ghost{display:none}
 [data-sitekind="art-directed-studio"] .ds-brand-mark{font-size:var(--t-heading-size);line-height:1.15;letter-spacing:var(--t-caption-tracking)}
 [data-sitekind="art-directed-studio"] .ds-metrics-band{padding-block:var(--section-y-tight)}
-[data-sitekind="art-directed-studio"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="art-directed-studio"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
 [data-sitekind="art-directed-studio"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="art-directed-studio"] .ds-chapter-index{opacity:.7}
 body[data-sitekind="art-directed-studio"]{
@@ -730,9 +758,9 @@ body[data-sitekind="art-directed-studio"]{
 [data-sitekind="consumer-craft"] .ds-alt-figure .ds-fig{min-height:min(52vh,520px)}
 [data-sitekind="consumer-craft"] .ds-alt-mark{width:12rem}
 [data-sitekind="consumer-craft"] .ds-index-mark{width:11rem}
-[data-sitekind="consumer-craft"] .ds-specimen{padding-block:var(--s-xl) var(--s-2xl)}
-[data-sitekind="consumer-craft"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:12ch}
-[data-sitekind="consumer-craft"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(78vh,800px)}
+[data-sitekind="consumer-craft"] .ds-template{padding-block:var(--s-xl) var(--s-2xl)}
+[data-sitekind="consumer-craft"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:12ch}
+[data-sitekind="consumer-craft"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(78vh,800px)}
 [data-sitekind="consumer-craft"] .ds-metrics-band{padding-block:var(--section-y-tight)}
 [data-sitekind="consumer-craft"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 /* Fewer structural rules — consumer refs sit under ~2 rules/screen. */
@@ -815,8 +843,8 @@ body[data-sitekind="editorial-foundry"]{
   grid-template-columns:minmax(20rem,5fr) minmax(0,7fr) !important;
 }
 [data-sitekind="editorial-foundry"] .ds-split > div .ds-section-head-main .ds-lede{max-width:36ch}
-[data-sitekind="editorial-foundry"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="editorial-foundry"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="editorial-foundry"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="editorial-foundry"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="editorial-foundry"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="editorial-foundry"] .ds-index-row{border-color:color-mix(in srgb,var(--surface-border) 70%,transparent)}
 [data-sitekind="editorial-foundry"] .ds-section-head,
@@ -830,12 +858,12 @@ body[data-sitekind="editorial-foundry"]{
 [data-sitekind="editorial-foundry"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
 /* Deliberate overlaps across band boundaries — layeredElements corridor floor is 11.
  * Never pull story marks under Note 0N labels (note + mark stay in normal stack). */
-[data-sitekind="editorial-foundry"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="editorial-foundry"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="editorial-foundry"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="editorial-foundry"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="editorial-foundry"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="editorial-foundry"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-/* Quiet the sunken specimen a notch so ink-variation stays inside corridor (seam is already dense). */
-[data-sitekind="editorial-foundry"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(62vh,640px)}
+/* Quiet the sunken template a notch so ink-variation stays inside corridor (seam is already dense). */
+[data-sitekind="editorial-foundry"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(62vh,640px)}
 [data-sitekind="editorial-foundry"] .ds-alt-figure .ds-fig{min-height:min(48vh,480px)}
 /* Research dossier — folio masthead, chapter rail, dossier plate, verso/recto, imprint. */
 [data-sitekind="research-dossier"]{
@@ -871,8 +899,8 @@ body[data-sitekind="research-dossier"]{
 /* Hide the fold reassurance note — it steals fold height from the plate. */
 [data-sitekind="research-dossier"] .ds-hero-folio .ds-cta-note{display:none}
 [data-sitekind="research-dossier"] .ds-fn-ref{font-size:11px;line-height:1}
-[data-sitekind="research-dossier"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="research-dossier"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="research-dossier"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="research-dossier"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="research-dossier"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="research-dossier"] .ds-section-head,
 [data-sitekind="research-dossier"] .ds-index-row,
@@ -884,11 +912,11 @@ body[data-sitekind="research-dossier"]{
 }
 [data-sitekind="research-dossier"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="research-dossier"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="research-dossier"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="research-dossier"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="research-dossier"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="research-dossier"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="research-dossier"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="research-dossier"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="research-dossier"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(70vh,720px)}
+[data-sitekind="research-dossier"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(70vh,720px)}
 [data-sitekind="research-dossier"] .ds-index-row{border-color:color-mix(in srgb,var(--surface-border) 70%,transparent)}
 /* Signal observatory — chronometer, scrub rail, signal lattice, chrono essay, calibration. */
 [data-sitekind="signal-observatory"]{
@@ -928,8 +956,8 @@ body[data-sitekind="signal-observatory"]{
 [data-sitekind="signal-observatory"] .ds-hero-chrono .ds-cta-note{display:none}
 /* Keep secondary CTA off the fold so the lattice enters the first viewport. */
 [data-sitekind="signal-observatory"] .ds-hero-chrono .ds-actions .ds-btn-ghost{display:none}
-[data-sitekind="signal-observatory"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="signal-observatory"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="signal-observatory"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="signal-observatory"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="signal-observatory"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="signal-observatory"] .ds-section-head,
 [data-sitekind="signal-observatory"] .ds-index-row,
@@ -940,11 +968,11 @@ body[data-sitekind="signal-observatory"]{
 }
 [data-sitekind="signal-observatory"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="signal-observatory"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="signal-observatory"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="signal-observatory"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="signal-observatory"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="signal-observatory"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="signal-observatory"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="signal-observatory"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="signal-observatory"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(74vh,760px)}
+[data-sitekind="signal-observatory"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(74vh,760px)}
 [data-sitekind="signal-observatory"] .ds-index-row{border-color:color-mix(in srgb,var(--surface-border) 70%,transparent)}
 /* Observatory bleed seal stays hairline — thick accent bars tank the hairline ratio. */
 [data-sitekind="signal-observatory"] .ds-bleed-rule{height:1px;background:var(--c-accent)}
@@ -1097,8 +1125,8 @@ body[data-sitekind="archive-index"]{
 [data-sitekind="archive-index"] .ds-stamp-seal{box-shadow:none}
 [data-sitekind="archive-index"] .ds-hero-register .ds-cta-note{display:none}
 [data-sitekind="archive-index"] .ds-hero-register .ds-actions .ds-btn-ghost{display:none}
-[data-sitekind="archive-index"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="archive-index"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="archive-index"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="archive-index"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="archive-index"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="archive-index"] .ds-section-head,
 [data-sitekind="archive-index"] .ds-index-row,
@@ -1109,11 +1137,11 @@ body[data-sitekind="archive-index"]{
 }
 [data-sitekind="archive-index"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="archive-index"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="archive-index"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="archive-index"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="archive-index"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="archive-index"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="archive-index"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="archive-index"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="archive-index"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
+[data-sitekind="archive-index"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
 
 /* Commerce loom — drawloom fold: claim-as-weft, cloth below, treadles. Not soft purple glass. */
 [data-sitekind="commerce-loom"]{
@@ -1147,18 +1175,18 @@ body[data-sitekind="commerce-loom"]{
 [data-sitekind="commerce-loom"] text.ds-fig-mono{font-size:11px!important}
 [data-sitekind="commerce-loom"] .ds-loom-plate .ds-fig{min-height:min(56vh,560px)}
 [data-sitekind="commerce-loom"] .ds-hero-loom{min-height:min(100vh,960px);padding-bottom:var(--treadle-h)}
-[data-sitekind="commerce-loom"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="commerce-loom"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="commerce-loom"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="commerce-loom"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="commerce-loom"] .ds-closing-colophon{
   border-top:1px solid var(--c-border);padding-top:var(--s-xl);
 }
 [data-sitekind="commerce-loom"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="commerce-loom"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="commerce-loom"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="commerce-loom"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="commerce-loom"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="commerce-loom"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="commerce-loom"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="commerce-loom"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="commerce-loom"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
+[data-sitekind="commerce-loom"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
 [data-sitekind="commerce-loom"] .ds-bleed-rule{height:1px;background:var(--c-accent)}
 
 /* Field guide — glassine press fold: plate under sheet, museum label, binomial strip. */
@@ -1195,18 +1223,18 @@ body[data-sitekind="field-guide"]{
 [data-sitekind="field-guide"] text.ds-fig-mono{font-size:11px!important}
 [data-sitekind="field-guide"] .ds-voucher-plate .ds-fig{min-height:min(64vh,660px)}
 [data-sitekind="field-guide"] .ds-hero-voucher{min-height:min(100vh,960px);padding-bottom:var(--binomial-h)}
-[data-sitekind="field-guide"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="field-guide"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="field-guide"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="field-guide"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="field-guide"] .ds-closing-colophon{
   border-top:1px solid var(--c-border);padding-top:var(--s-xl);
 }
 [data-sitekind="field-guide"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="field-guide"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="field-guide"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="field-guide"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="field-guide"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="field-guide"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="field-guide"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="field-guide"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="field-guide"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
+[data-sitekind="field-guide"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
 [data-sitekind="field-guide"] .ds-bleed-rule{height:1px;background:var(--c-accent)}
 /*
  * ruleDensity = wide CSS top/bottom borders ÷ screens (SVG strokes do not count).
@@ -1286,8 +1314,8 @@ body[data-sitekind="press-atelier"]{
   padding-bottom:var(--s-xs,0.35rem);
   color:var(--c-ink-tertiary);
 }
-[data-sitekind="press-atelier"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="press-atelier"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="press-atelier"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="press-atelier"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="press-atelier"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="press-atelier"] .ds-section-head,
 [data-sitekind="press-atelier"] .ds-index-row,
@@ -1299,8 +1327,8 @@ body[data-sitekind="press-atelier"]{
 }
 [data-sitekind="press-atelier"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="press-atelier"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="press-atelier"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="press-atelier"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="press-atelier"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="press-atelier"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="press-atelier"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 /* Lantern path — chapter waypoints, path atlas fold, silhouette near-plane, ember essay, Ember. */
 [data-sitekind="lantern-path"]{
@@ -1395,8 +1423,8 @@ body[data-sitekind="lantern-path"]{
 [data-sitekind="lantern-path"] .ds-split > div .ds-section-head-main .ds-lede{
   max-width:28ch;
 }
-[data-sitekind="lantern-path"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="lantern-path"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="lantern-path"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="lantern-path"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="lantern-path"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="lantern-path"] .ds-section-head,
 [data-sitekind="lantern-path"] .ds-index-row,
@@ -1407,8 +1435,8 @@ body[data-sitekind="lantern-path"]{
 }
 [data-sitekind="lantern-path"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="lantern-path"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="lantern-path"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="lantern-path"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="lantern-path"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="lantern-path"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="lantern-path"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="lantern-path"] .ds-proof-figure,
 [data-sitekind="lantern-path"] .ds-plate-fold,
@@ -1534,8 +1562,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
   }
   [data-sitekind="care-pathway"] .ds-care-edition{display:none}
 }
-[data-sitekind="care-pathway"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="care-pathway"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="care-pathway"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="care-pathway"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="care-pathway"] .ds-proof{padding-block:var(--s-2xl) var(--section-y)}
 [data-sitekind="care-pathway"] .ds-section-head,
 [data-sitekind="care-pathway"] .ds-handoff-strip,
@@ -1552,8 +1580,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
 }
 [data-sitekind="care-pathway"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="care-pathway"] .ds-closing-colophon .ds-eyebrow{letter-spacing:0.14em}
-[data-sitekind="care-pathway"] .ds-specimen{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="care-pathway"] .ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
+[data-sitekind="care-pathway"] .ds-template{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
+[data-sitekind="care-pathway"] .ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-lg))}
 [data-sitekind="care-pathway"] .ds-proof-figure{margin-top:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
 [data-sitekind="care-pathway"] .ds-proof-figure,
 [data-sitekind="care-pathway"] .ds-plate-fold,
@@ -1674,8 +1702,8 @@ body[data-sitekind="agent-harness"]{
 [data-sitekind="agent-harness"] .ds-helm-field{margin-top:0}
 [data-sitekind="agent-harness"] .ds-permit-plate .ds-fig{min-height:min(58vh,640px)}
 [data-sitekind="agent-harness"] .ds-hero-helm{min-height:min(100vh,900px)}
-[data-sitekind="agent-harness"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="agent-harness"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
+[data-sitekind="agent-harness"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="agent-harness"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="agent-harness"] .ds-closing-colophon .ds-title{font-family:var(--f-display);max-width:18ch}
 [data-sitekind="agent-harness"] .ds-btn,
 [data-sitekind="agent-harness"] .ds-nav{box-shadow:none!important}
@@ -1692,7 +1720,7 @@ body[data-sitekind="agent-harness"]{
 }
 
 [data-sitekind="press-atelier"] .ds-closing-mark{margin-top:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised)}
-[data-sitekind="press-atelier"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
+[data-sitekind="press-atelier"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(72vh,740px)}
 [data-sitekind="press-atelier"] .ds-index-row{border-color:color-mix(in srgb,var(--surface-border) 70%,transparent)}
 [data-sitekind="press-atelier"] .ds-bleed-rule{height:1px;background:var(--c-accent)}
 [data-sitekind="press-atelier"] .ds-press-plates .ds-cal-tol{letter-spacing:0.12em}
@@ -1804,7 +1832,7 @@ ${spaceVars(t)};
 ${mapVars("r", t.radius)};
 ${mapVars("sh", t.shadow)};
 ${mapVars("m", t.motion)};
-${semanticVars()};
+${semanticVars(t)};
 --f-display:"${t.fontDisplay}", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 --f-body:"${t.fontBody}", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 --f-mono:"${t.fontMono}", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -1960,9 +1988,9 @@ ${surfaceRules()}
   border-radius:var(--r-lg);background:var(--c-paper);
 }
 [data-sitekind="docs-educational"] .ds-scrub{display:grid;gap:var(--s-2xs);margin-top:var(--s-sm)}
-[data-sitekind="docs-educational"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:10ch;line-height:1.15}
-[data-sitekind="docs-educational"] .ds-specimen .ds-plate-bleed .ds-fig{min-height:min(42vh,420px);opacity:.88}
-[data-sitekind="docs-educational"] .ds-specimen{padding-block:var(--s-lg) var(--s-xl)}
+[data-sitekind="docs-educational"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:10ch;line-height:1.15}
+[data-sitekind="docs-educational"] .ds-template .ds-plate-bleed .ds-fig{min-height:min(42vh,420px);opacity:.88}
+[data-sitekind="docs-educational"] .ds-template{padding-block:var(--s-lg) var(--s-xl)}
 [data-sitekind="docs-educational"] .ds-chapters{margin-top:var(--s-sm);border-top-color:transparent}
 [data-sitekind="docs-educational"] .ds-chapter-mark{width:10.5rem}
 [data-sitekind="docs-educational"] .ds-matrix{font-size:var(--t-bodySmall-size)}
@@ -2017,10 +2045,10 @@ ${surfaceRules()}
   margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised);
 }
 [data-sitekind="docs-educational"] [data-section="figure"] + .ds-section{padding-top:var(--section-y)}
-[data-sitekind="docs-educational"] .ds-specimen{
+[data-sitekind="docs-educational"] .ds-template{
   margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised);
 }
-[data-sitekind="docs-educational"] .ds-specimen + .ds-section{padding-top:var(--section-y)}
+[data-sitekind="docs-educational"] .ds-template + .ds-section{padding-top:var(--section-y)}
 [data-sitekind="docs-educational"] [data-section="features"]{
   margin-bottom:calc(var(--s-lg) * -1);position:relative;z-index:var(--z-raised);
 }
@@ -2084,6 +2112,20 @@ ${surfaceRules()}
 .ds-nav-links{display:flex;gap:var(--s-md);margin-left:auto;font-size:var(--t-bodySmall-size);color:var(--c-ink-secondary)}
 .ds-nav-links a:hover{color:var(--c-ink)}
 .ds-nav .ds-btn{margin-left:var(--s-md)}
+/*
+ * Narrow viewport: the links stay, they scroll.
+ *
+ * Every offering used to hide the whole nav under 820px with nothing in its place, so a phone got a
+ * wordmark and a button and no navigation at all. Scrolling rather than wrapping keeps the bar one
+ * line tall — the nav is the one place a horizontal overflow reads as deliberate.
+ */
+@media (max-width:820px){
+  .ds-nav-inner{flex-wrap:wrap;row-gap:var(--s-2xs);padding-block:var(--s-2xs)}
+  .ds-nav-links{margin-left:0;flex:1 1 100%;order:3;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;scrollbar-width:none}
+  .ds-nav-links::-webkit-scrollbar{display:none}
+  .ds-nav-links a{white-space:nowrap}
+  .ds-nav .ds-btn{margin-left:auto}
+}
 
 /* Buttons */
 .ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2xs);min-height:2.75rem;padding:0 var(--s-md);border-radius:var(--r-md);border:1px solid transparent;font-family:var(--f-body);font-size:var(--t-bodySmall-size);font-weight:600;letter-spacing:0;cursor:pointer}
@@ -2198,9 +2240,9 @@ ${surfaceRules()}
  * composition scrolling past rather than a stack of framed rectangles. The pull has to live on the
  * section (or on a child whose negative margin collapses the section's bottom), or the next band
  * never moves up to meet it. */
-.ds-specimen{margin-bottom:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
-.ds-specimen + .ds-section{padding-top:calc(var(--section-y) + var(--s-sm))}
-.ds-specimen + .ds-proof{margin-top:calc(var(--s-xl) * -1);padding-top:var(--s-2xl)}
+.ds-template{margin-bottom:calc(var(--s-md) * -1);position:relative;z-index:var(--z-raised)}
+.ds-template + .ds-section{padding-top:calc(var(--section-y) + var(--s-sm))}
+.ds-template + .ds-proof{margin-top:calc(var(--s-xl) * -1);padding-top:var(--s-2xl)}
 .ds-metrics-band{margin-bottom:calc(var(--s-xl) * -1);position:relative;z-index:var(--z-raised)}
 .ds-metrics-band + .ds-section{padding-top:calc(var(--section-y) + var(--s-md))}
 /* Overlap the fold hang into metrics so layeredElements and bleed count match dense reference folds. */
@@ -2328,10 +2370,10 @@ ${surfaceRules()}
 .ds-principle-spine ol{list-style:none;margin:0;padding:0;display:flex;gap:var(--s-md)}
 .ds-principle-spine li{font-family:var(--f-mono);font-size:11px;letter-spacing:0.12em;color:var(--c-ink-tertiary);display:flex;gap:0.35rem;align-items:center}
 .ds-principle-spine li.is-live{color:var(--c-accent)}
-.ds-principle-spine b{font-weight:500;font-family:var(--f-sans)}
+.ds-principle-spine b{font-weight:500;font-family:var(--f-body)}
 .ds-diligence-fold{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,5.5fr) minmax(0,6.5fr);gap:clamp(1rem,2.2vw,1.75rem);align-items:stretch;padding:var(--s-md) 0 var(--s-xl);padding-left:clamp(3.25rem,5vw,4.5rem);min-height:0}
 .ds-diligence-claim{padding:var(--s-sm) 0 0;display:flex;flex-direction:column;justify-content:flex-start;gap:var(--s-sm)}
-.ds-diligence-claim .ds-display{max-width:18ch;font-family:var(--f-serif);font-size:clamp(2rem,3.6vw,3.25rem);line-height:1.08}
+.ds-diligence-claim .ds-display{max-width:18ch;font-family:var(--f-display);font-size:clamp(2rem,3.6vw,3.25rem);line-height:1.08}
 .ds-diligence-claim .ds-lede{max-width:38ch}
 .ds-measure-rule{height:1px;background:var(--c-border);margin:0 var(--gutter)}
 .ds-diligence-field{align-self:start;display:flex;min-height:0;width:100%}
@@ -2772,6 +2814,8 @@ ${surfaceRules()}
   position:relative;z-index:3;padding:var(--s-xs) 0 0;
   max-width:42rem;
 }
+/* Weft picks are separate rows of cloth, but each must carry its own trailing space so the DOM and
+ * the rendered line agree. display:block alone left the sibling spans glued ("everySKU"). */
 .ds-weft-pick{
   position:relative;display:block;
   padding:0.1rem 0;
@@ -2932,7 +2976,7 @@ ${surfaceRules()}
   .ds-hang-stack{min-height:0;padding-bottom:0}
 }
 
-/* Dissecting-tray glassine — hinged lid, entomology pins, specimen tag, vernier, binomial. */
+/* Dissecting-tray glassine — hinged lid, entomology pins, template tag, vernier, binomial. */
 .ds-hero-voucher{
   position:relative;isolation:isolate;padding:0;min-height:min(100vh,960px);
   display:flex;flex-direction:column;
@@ -3026,7 +3070,7 @@ ${surfaceRules()}
   position:absolute;z-index:4;left:calc(48% - 1rem);top:22%;width:7.5rem;height:5rem;
   color:var(--c-border);pointer-events:none;
 }
-.ds-press-label,.ds-specimen-tag{
+.ds-press-label,.ds-template-tag{
   position:absolute;z-index:5;left:calc(var(--gutter) * 0.15 + 1.1rem);top:calc(var(--s-md) + 0.35rem);
   max-width:min(24rem,40%);
   padding:var(--s-sm) var(--s-md);
@@ -3042,9 +3086,9 @@ ${surfaceRules()}
 .ds-tag-pinmeta{
   margin:0 0 0.25rem;font-family:var(--f-mono);font-size:11px;letter-spacing:0.1em;color:var(--c-accent);
 }
-.ds-press-label .ds-display,.ds-specimen-tag .ds-display{margin:0}
+.ds-press-label .ds-display,.ds-template-tag .ds-display{margin:0}
 @media (prefers-reduced-motion:reduce){
-  .ds-glassine-lid,.ds-lid-peel,.ds-specimen-tag{animation:none}
+  .ds-glassine-lid,.ds-lid-peel,.ds-template-tag{animation:none}
 }
 /* Binomial strip — dichotomous key as bottom instrument. */
 .ds-binomial-strip.ds-taxon-rail{
@@ -3072,7 +3116,7 @@ ${surfaceRules()}
 }
 .ds-binomial-strip .ds-taxon-chip.is-active .ds-taxon-meta{text-decoration:underline}
 @media (max-width:800px){
-  .ds-specimen-tag{max-width:calc(100% - 2rem);left:0.75rem;right:0.75rem;transform:none;top:0.85rem}
+  .ds-template-tag{max-width:calc(100% - 2rem);left:0.75rem;right:0.75rem;transform:none;top:0.85rem}
   .ds-tag-string,.ds-vernier{display:none}
   .ds-glassine-lid{clip-path:none;animation:none}
   .ds-lid-peel{display:none}
@@ -3619,15 +3663,15 @@ ${surfaceRules()}
 [data-sitekind="dashboard-webapp"] .ds-app-main .ds-lede{max-width:min(68ch,var(--w-prose));width:min(68ch,100%);font-size:var(--t-body-size);line-height:var(--t-body-leading)}
 /*
  * Dashboard rhythm — honest band-variation without empty voids.
- * Compact metric register → sunken type-led specimen (ink, few chars) → dense shell peak.
+ * Compact metric register → sunken type-led template (ink, few chars) → dense shell peak.
  * Pack the app into one measured screen so shell density does not smear across quiet neighbours.
  */
 [data-sitekind="dashboard-webapp"] .ds-metrics-band{padding-block:var(--section-y-tight)}
 [data-sitekind="dashboard-webapp"] .ds-metrics-band .ds-metric{min-height:8.25rem;padding:var(--s-md) var(--s-sm) var(--s-sm)}
-[data-sitekind="dashboard-webapp"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
-[data-sitekind="dashboard-webapp"] .ds-specimen-head{gap:0}
-[data-sitekind="dashboard-webapp"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:10ch;line-height:1.15}
-[data-sitekind="dashboard-webapp"] .ds-specimen .ds-plate{
+[data-sitekind="dashboard-webapp"] .ds-template{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
+[data-sitekind="dashboard-webapp"] .ds-template-head{gap:0}
+[data-sitekind="dashboard-webapp"] .ds-template-head .ds-heading{font-size:var(--t-title-size);max-width:10ch;line-height:1.15}
+[data-sitekind="dashboard-webapp"] .ds-template .ds-plate{
   padding:var(--s-xs);border:1px solid var(--c-border);border-radius:var(--r-xl);
   background:var(--c-paper);color:var(--c-ink);
   box-shadow:0 18px 48px color-mix(in srgb,#000 18%,transparent);
@@ -3635,10 +3679,10 @@ ${surfaceRules()}
   --surface-muted:var(--c-ink-secondary);--surface-quiet:var(--c-ink-tertiary);--surface-border:var(--c-border);
 }
 /*
- * Stretch the drawn horizon so the specimen owns ~1.5 measured strips and the dense shell
+ * Stretch the drawn horizon so the template owns ~1.5 measured strips and the dense shell
  * that follows lands inside a single band. Ink fills the plate — not an empty 140vh void.
  */
-[data-sitekind="dashboard-webapp"] .ds-specimen .ds-plate-bleed .ds-fig{border-radius:var(--r-lg);min-height:min(118vh,1180px)}
+[data-sitekind="dashboard-webapp"] .ds-template .ds-plate-bleed .ds-fig{border-radius:var(--r-lg);min-height:min(118vh,1180px)}
 [data-sitekind="dashboard-webapp"] .ds-app-claim{display:grid;gap:var(--s-3xs);margin-bottom:var(--s-md)}
 [data-sitekind="dashboard-webapp"] .ds-app-claim .ds-heading{font-size:var(--t-title-size);max-width:18ch;line-height:1.15}
 [data-sitekind="dashboard-webapp"] .ds-app-band{padding-block:var(--section-y-tight) var(--section-y)}
@@ -3664,7 +3708,7 @@ ${surfaceRules()}
 .ds-field .ds-fig{width:100%;height:100%}
 .ds-app-plot{padding:var(--s-sm);border:1px solid var(--surface-border);border-radius:var(--r-lg);background:var(--surface-bg)}
 
-/* Specimen band — one drawing, a screen to itself, a heading and nothing else.
+/* Template band — one drawing, a screen to itself, a heading and nothing else.
  *
  * A quiet screen is one with almost no text on it, and that is not the same thing as one with
  * almost nothing on it. Reserving a viewport here and letting a 560px drawing sit centred in it
@@ -3675,10 +3719,10 @@ ${surfaceRules()}
  * So the band is as tall as its drawing, and the drawing is drawn to fill a screen. The silence is
  * bought with ink instead of with height.
  */
-.ds-specimen{display:grid;gap:var(--s-md)}
-.ds-specimen-head{display:grid;gap:var(--s-3xs);justify-items:start;text-align:start;width:min(100% - (var(--gutter) * 2),var(--w-wide));margin-inline:auto}
-.ds-specimen-head .ds-heading{max-width:22ch}
-.ds-specimen .ds-plate-bleed .ds-fig{min-height:min(70vh,720px)}
+.ds-template{display:grid;gap:var(--s-md)}
+.ds-template-head{display:grid;gap:var(--s-3xs);justify-items:start;text-align:start;width:min(100% - (var(--gutter) * 2),var(--w-wide));margin-inline:auto}
+.ds-template-head .ds-heading{max-width:22ch}
+.ds-template .ds-plate-bleed .ds-fig{min-height:min(70vh,720px)}
 /* Soft-brand lead cells: rail only — avoid page-scale accent fills. */
 body[data-mood="soft-brand-accent"] .ds-chapter:first-child,
 body[data-mood="soft-brand-accent"] .ds-proof-cell.is-lead,
@@ -4018,9 +4062,9 @@ body[data-frame="paper-technical"] #main{margin:0 auto;max-width:min(100%,calc(v
 [data-depth="soft-elevation"] .ds-workflow-panel,
 [data-depth="soft-elevation"] .ds-proof-figure{box-shadow:var(--sh-raised)}
 [data-depth="soft-elevation"] .ds-btn{box-shadow:var(--sh-sm)}
-/* Wireframe annotation craft — sparse mono callouts on specimen stages. */
-.ds-specimen-stage{position:relative}
-.ds-specimen-annotated .ds-plate-bleed{opacity:0.92}
+/* Wireframe annotation craft — sparse mono callouts on template stages. */
+.ds-template-stage{position:relative}
+.ds-template-annotated .ds-plate-bleed{opacity:0.92}
 .ds-anno-rail{list-style:none;margin:0;padding:0;position:absolute;inset:var(--s-md) var(--s-md) auto auto;display:grid;gap:var(--s-xs);max-width:14rem;z-index:2}
 .ds-anno{display:flex;align-items:center;gap:var(--s-2xs);font-family:var(--f-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--surface-quiet);background:color-mix(in srgb,var(--c-paper) 88%,transparent);border:1px solid var(--surface-border);padding:0.35rem 0.55rem;border-radius:var(--r-sm);max-width:100%;min-width:0}
 .ds-anno-tick{width:8px;height:1px;background:var(--c-accent);flex:0 0 auto}
@@ -4251,7 +4295,7 @@ ${spec.routedSkills.includes("motion-stack-craft") ? productInstrumentCss() : ""
   .ds-index-row{grid-template-columns:2rem 1fr;row-gap:var(--s-2xs)}
   .ds-index-row p{grid-column:2}
   .ds-index-mark{display:none}
-  .ds-nav-links{display:none}
+  /* Nav links are handled by the earlier 820px block — they scroll rather than disappear. */
   .ds-app-grid{grid-template-columns:1fr!important}
   .ds-app-side{border-right:0;border-bottom:1px solid var(--c-border)}
   .ds-app-nav{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto}

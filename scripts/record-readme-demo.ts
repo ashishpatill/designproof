@@ -1,6 +1,6 @@
 /**
  * Playwright-driven product demo for README media.
- * Follows USER_STORY.md / tell-demo-script 5 beats, then a short Studio + Showcase coda.
+ * Follows USER_STORY.md / dp-demo-script 5 beats, then a short Studio + Showcase coda.
  *
  * Usage (servers already up, from repo root):
  *   pnpm exec tsx scripts/record-readme-demo.ts
@@ -13,10 +13,10 @@ import { spawnSync } from "node:child_process";
 
 /** Always resolve from this file so cwd (e.g. package exec) cannot misplace media. */
 const REPO_ROOT = path.resolve(__dirname, "..");
-const BASE = process.env.TELL_E2E_BASE ?? "http://127.0.0.1:3000";
-const FIXTURE = process.env.TELL_FIXTURE_URL ?? "http://127.0.0.1:3001";
+const BASE = process.env.DP_E2E_BASE ?? "http://127.0.0.1:3000";
+const FIXTURE = process.env.DP_FIXTURE_URL ?? "http://127.0.0.1:3001";
 const OUT_DIR = path.join(REPO_ROOT, "docs/media");
-const TMP_DIR = "/tmp/tell-readme-demo";
+const TMP_DIR = "/tmp/dp-readme-demo";
 const ARTIFACTS_DIR = "/opt/cursor/artifacts";
 
 async function pause(page: Page, ms = 1600) {
@@ -25,11 +25,11 @@ async function pause(page: Page, ms = 1600) {
 
 async function injectDemoChrome(page: Page) {
   await page.evaluate(() => {
-    if (document.getElementById("tell-demo-chrome")) return;
+    if (document.getElementById("dp-demo-chrome")) return;
     const style = document.createElement("style");
-    style.id = "tell-demo-chrome";
+    style.id = "dp-demo-chrome";
     style.textContent = `
-      #tell-demo-caption {
+      #dp-demo-caption {
         position: fixed;
         left: 28px;
         right: 28px;
@@ -47,20 +47,20 @@ async function injectDemoChrome(page: Page) {
         font-family: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
         box-shadow: 0 12px 40px rgba(24, 22, 20, 0.35);
       }
-      #tell-demo-caption .beat {
+      #dp-demo-caption .beat {
         font-family: ui-monospace, "IBM Plex Mono", monospace;
         font-size: 11px;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: #e8926f;
       }
-      #tell-demo-caption .line {
+      #dp-demo-caption .line {
         font-family: "Instrument Serif", "Iowan Old Style", Georgia, serif;
         font-size: 22px;
         line-height: 1.25;
         color: #faf7f2;
       }
-      #tell-demo-title {
+      #dp-demo-title {
         position: fixed;
         inset: 0;
         z-index: 2147483647;
@@ -72,11 +72,11 @@ async function injectDemoChrome(page: Page) {
         padding: 48px;
         pointer-events: auto;
       }
-      #tell-demo-title[hidden] {
+      #dp-demo-title[hidden] {
         display: none !important;
         pointer-events: none !important;
       }
-      #tell-demo-title .kicker {
+      #dp-demo-title .kicker {
         font-family: ui-monospace, "IBM Plex Mono", monospace;
         font-size: 12px;
         letter-spacing: 0.22em;
@@ -84,14 +84,14 @@ async function injectDemoChrome(page: Page) {
         color: #e8926f;
         margin-bottom: 18px;
       }
-      #tell-demo-title h1 {
+      #dp-demo-title h1 {
         font-family: "Instrument Serif", "Iowan Old Style", Georgia, serif;
         font-size: 52px;
         font-weight: 400;
         line-height: 1.1;
         margin: 0;
       }
-      #tell-demo-title .sub {
+      #dp-demo-title .sub {
         margin-top: 18px;
         font-family: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
         font-size: 18px;
@@ -103,7 +103,7 @@ async function injectDemoChrome(page: Page) {
     `;
     document.documentElement.appendChild(style);
     const caption = document.createElement("div");
-    caption.id = "tell-demo-caption";
+    caption.id = "dp-demo-caption";
     caption.innerHTML = `<div class="beat"></div><div class="line"></div>`;
     caption.hidden = true;
     document.documentElement.appendChild(caption);
@@ -114,7 +114,7 @@ async function setCaption(page: Page, beat: string, line: string) {
   await injectDemoChrome(page);
   await page.evaluate(
     ({ beat, line }) => {
-      const el = document.getElementById("tell-demo-caption");
+      const el = document.getElementById("dp-demo-caption");
       if (!el) return;
       el.hidden = false;
       const beatEl = el.querySelector(".beat");
@@ -128,7 +128,7 @@ async function setCaption(page: Page, beat: string, line: string) {
 
 async function hideCaption(page: Page) {
   await page.evaluate(() => {
-    const el = document.getElementById("tell-demo-caption");
+    const el = document.getElementById("dp-demo-caption");
     if (el) el.hidden = true;
   });
 }
@@ -137,10 +137,10 @@ async function showTitle(page: Page, kicker: string, title: string, sub: string)
   await injectDemoChrome(page);
   await page.evaluate(
     ({ kicker, title, sub }) => {
-      let el = document.getElementById("tell-demo-title");
+      let el = document.getElementById("dp-demo-title");
       if (!el) {
         el = document.createElement("div");
-        el.id = "tell-demo-title";
+        el.id = "dp-demo-title";
         document.documentElement.appendChild(el);
       }
       el.innerHTML = `<div class="kicker"></div><h1></h1><p class="sub"></p>`;
@@ -155,7 +155,7 @@ async function showTitle(page: Page, kicker: string, title: string, sub: string)
 
 async function hideTitle(page: Page) {
   await page.evaluate(() => {
-    document.getElementById("tell-demo-title")?.remove();
+    document.getElementById("dp-demo-title")?.remove();
   });
 }
 
@@ -185,15 +185,15 @@ async function loadReport(page: Page) {
     }
   }
 
-  const composer = page.locator("textarea.tell-composer__input, [data-testid='capture-url']").first();
+  const composer = page.locator("textarea.dp-composer__input, [data-testid='capture-url']").first();
   await composer.click({ clickCount: 3 });
   await composer.fill("");
   await composer.pressSequentially(FIXTURE, { delay: 28 });
   await pause(page, 700);
 
-  await setCaption(page, "2 · Capture", "Tell reads the rendered page - not the repo.");
+  await setCaption(page, "2 · Capture", "Design Proof reads the rendered page - not the repo.");
   const captureBtn = page
-    .locator(".tell-composer__submit, [data-testid='capture-submit']")
+    .locator(".dp-composer__submit, [data-testid='capture-submit']")
     .or(page.getByRole("button", { name: /capture|set up|diagnose|start/i }))
     .first();
   await captureBtn.click();
@@ -306,7 +306,7 @@ async function studioCoda(page: Page) {
 async function showcaseCoda(page: Page) {
   await page.goto(`${BASE}/showcase`, { waitUntil: "domcontentloaded" });
   await injectDemoChrome(page);
-  await setCaption(page, "Specimens", "Nineteen offerings. Distinct fold grammar - not one restyled kit.");
+  await setCaption(page, "Templates", "Nineteen offerings. Distinct fold grammar - not one restyled kit.");
   await page
     .locator('[data-testid="showcase-featured-preview"][data-ready="true"]')
     .waitFor({ timeout: 45_000 })
@@ -319,14 +319,14 @@ async function showcaseCoda(page: Page) {
   }
   await page.goto(`${BASE}/showcase/lantern`, { waitUntil: "domcontentloaded" });
   await injectDemoChrome(page);
-  await setCaption(page, "Close", "Tell runs on itself: zero tells.");
+  await setCaption(page, "Close", "Design Proof runs on itself: zero tells.");
   await page.getByTestId("showcase-frame").waitFor({ timeout: 20_000 }).catch(() => {});
   await pause(page, 2200);
 }
 
 async function encodeOutputs(raw: string) {
-  const mp4Out = path.join(OUT_DIR, "tell-proof-demo.mp4");
-  const posterOut = path.join(OUT_DIR, "tell-proof-demo-poster.webp");
+  const mp4Out = path.join(OUT_DIR, "dp-proof-demo.mp4");
+  const posterOut = path.join(OUT_DIR, "dp-proof-demo-poster.webp");
 
   const mp4 = spawnSync(
     "ffmpeg",
@@ -382,9 +382,9 @@ async function encodeOutputs(raw: string) {
   }
 
   await mkdir(ARTIFACTS_DIR, { recursive: true });
-  spawnSync("cp", ["-f", mp4Out, path.join(ARTIFACTS_DIR, "tell-product-demo.mp4")]);
-  spawnSync("cp", ["-f", mp4Out, path.join(ARTIFACTS_DIR, "tell-proof-demo.mp4")]);
-  spawnSync("cp", ["-f", posterOut, path.join(ARTIFACTS_DIR, "tell-proof-demo-poster.webp")]);
+  spawnSync("cp", ["-f", mp4Out, path.join(ARTIFACTS_DIR, "dp-product-demo.mp4")]);
+  spawnSync("cp", ["-f", mp4Out, path.join(ARTIFACTS_DIR, "dp-proof-demo.mp4")]);
+  spawnSync("cp", ["-f", posterOut, path.join(ARTIFACTS_DIR, "dp-proof-demo-poster.webp")]);
 
   console.log("Wrote", mp4Out);
   console.log("Wrote", posterOut);
@@ -407,7 +407,7 @@ async function main() {
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
     await showTitle(
       page,
-      "Tell Proof",
+      "Design Proof",
       "Every AI-built UI has a tell.",
       "Capture the rendered page. Name what is generic. Art-direct a direction. Apply the fix in Cursor.",
     );
@@ -423,7 +423,7 @@ async function main() {
       page,
       "Ashish's loop",
       "Capture → name → seam → voice → Cursor.",
-      "Tell runs on itself: zero tells.",
+      "Design Proof runs on itself: zero tells.",
     );
     await pause(page, 2600);
     await hideTitle(page);

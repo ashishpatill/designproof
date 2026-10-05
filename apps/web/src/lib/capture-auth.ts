@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
-export const CAPTURE_TOKEN_HEADER = "x-tell-capture-token";
+export const CAPTURE_TOKEN_HEADER = "x-dp-capture-token";
 
 export function captureApiToken(): string | null {
-  const raw = process.env.TELL_CAPTURE_API_TOKEN?.trim();
+  const raw = process.env.DP_CAPTURE_API_TOKEN?.trim();
   return raw || null;
 }
 
-/** When TELL_CAPTURE_API_TOKEN is set, require Bearer or x-tell-capture-token. */
+/** When DP_CAPTURE_API_TOKEN is set, require Bearer or x-dp-capture-token. */
 export function assertCaptureApiAuthorized(request: Request): NextResponse | null {
   const expected = captureApiToken();
   if (!expected) return null;
@@ -20,7 +20,7 @@ export function assertCaptureApiAuthorized(request: Request): NextResponse | nul
 
   return NextResponse.json(
     {
-      error: "Capture host refused the request — check TELL_CAPTURE_API_TOKEN on web and capture.",
+      error: "Capture host refused the request — check DP_CAPTURE_API_TOKEN on web and capture.",
     },
     { status: 401 },
   );

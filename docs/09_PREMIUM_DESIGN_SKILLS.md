@@ -1,4 +1,4 @@
-# Tell — Premium Content-Custom Design Skills
+# Design Proof — Premium Content-Custom Design Skills
 
 > Skill graph for designing / redesigning websites and webapps that feel expensive,
 > trustworthy, and customized to product features — with restrained motion.
@@ -28,12 +28,12 @@
 | `packages/design-skills/src/templates.ts` | Research-backed offerings (depth-first catalog across measured gaps) |
 | `packages/design-skills/src/basics-checklist.ts` | Implementation floor only (not taste) |
 | `/studio` | Live canvas + Taste Controls + magic edit + viewport + copy HTML |
-| `/showcase` | Specimen gallery (print-atelier index of all offerings) |
+| `/showcase` | Template gallery (print-atelier index of all offerings) |
 | `/showcase/*` | Full proof sheets: saas, dashboard, corporate, educational, fintech, studio, consumer, foundry, dossier, observatory, archive, loom, herbarium, press, lantern, clinic |
-| `/crease` | Cricket match-theater specimen (sport vernacular reference) |
+| `/crease` | Cricket match-theater template (sport vernacular reference) |
 | `POST /api/design` | Brief → spec + preview HTML (`redesignFrom` optional) |
 | `GET /api/design?templates=1` | Offering catalog metadata |
-| MCP `tell_design_from_features` | MCP tool |
+| MCP `designproof_design_from_features` | MCP tool |
 
 ## Two sources of learning (do not mix)
 
@@ -60,7 +60,7 @@ One template per `siteKind` (saas, dashboard, corporate, educational, fintech, s
 | `observatory` | Signal observatory — chronometer fold, scrub rail, signal lattice, chrono essay, calibration |
 | `archive` | Archive index — quiet register, A–Z alpha rail, index ledger, entry essay, Registry close |
 | `loom` | Commerce loom — size-tape rail, warp/weft SKU loom with free textile photos, hangtag essay, Care label |
-| `herbarium` | Field guide — taxon rail, specimen plate with free botanical photos, range essay, Voucher close |
+| `herbarium` | Field guide — taxon rail, template plate with free botanical photos, range essay, Voucher close |
 | `press` | Press atelier — registration fold, signature rail, press sheet, gather essay, Pressroom close |
 | `lantern` | Lantern path — chapter waypoints, path cartograph fold, night trail, Ember close |
 | `clinic` | Care pathway — stage rail, care-plate spine, rounds ladder, Chart close |
@@ -75,10 +75,10 @@ Preview HTML must clear this craft floor — routing alone is not enough:
 4. **One dashboard shell** — aside + main in a single `.ds-dash-grid`
 5. **No filler** — pricing lanes and proof lines derive from declared features (never invented Starter/Growth tiers)
 6. **Educational figure** — scrub instrument + `<figcaption>` when site kind is docs-educational
-7. **Product-proof (SaaS)** — a filled feature-evidence board (`data-proof-board`) by default. Use `workflow-proof` (labeled stages, human gate, HTMX panel swaps) only when the brief's own language describes a draft/review/approve product (`hasApprovalWorkflowSignal` on tagline + feature names/descriptions). Never require the Tell-shaped approve stage on a brief that does not mention drafts, review, or approval.
+7. **Product-proof (SaaS)** — a filled feature-evidence board (`data-proof-board`) by default. Use `workflow-proof` (labeled stages, human gate, HTMX panel swaps) only when the brief's own language describes a draft/review/approve product (`hasApprovalWorkflowSignal` on tagline + feature names/descriptions). Never require the Design Proof-shaped approve stage on a brief that does not mention drafts, review, or approval.
 8. **A11y / mobile** — `:focus-visible`, 44px controls, stacked layout under 800px, reduced-motion safe
 9. **Authored connective tissue** — CTA (`ctaFor` primary/secondary/note + `riskReversal`), FAQ (`questions` title + body), and proof sentences (workflow stage labels + gate copy, or marquee `ds-proof-claim` / `data-proof-board` items) must share vocabulary with the brief. A sentence that would read the same for a different product does not ship. Nav/footer chrome, section eyebrows, and `headline`/`heroLede` are out of this bar this pass.
-   - **Phase 1 path** (`packages/design-skills/src/author.ts`): for ordinary `saas-marketing` + `demos` briefs only, optional Gemini authors those nodes (facts → judgment → validate against brief tokens → fall back to `copy.ts`). Gate is `GEMINI_API_KEY` (same as taste / `tell_voice`). CI / no-key stays on deterministic tables. Does not rewrite headline, heroLede, eyebrows, palette, tokens; does not touch `css.ts` or Method B.
+   - **Phase 1 path** (`packages/design-skills/src/author.ts`): for ordinary `saas-marketing` + `demos` briefs only, optional Gemini authors those nodes (facts → judgment → validate against brief tokens → fall back to `copy.ts`). Gate is `GEMINI_API_KEY` (same as taste / `designproof_voice`). CI / no-key stays on deterministic tables. Does not rewrite headline, heroLede, eyebrows, palette, tokens; does not touch `css.ts` or Method B.
 
 ## Workflow
 
@@ -87,7 +87,7 @@ Preview HTML must clear this craft floor — routing alone is not enough:
 3. Build design-system tokens  
 4. Generate sections customized to features  
 5. Offer Taste Controls  
-6. Optional: Tell diagnose / redesign using `spec.tellDirectionId`
+6. Optional: Design Proof diagnose / redesign using `spec.dpDirectionId`
 
 For **full marketing sites** that need agency polish (reference board + axis-isolated type/spacing/motion/mobile), use `agency-quality-site` and `pnpm agency:pipeline` — do not collapse polish axes into one pass. Load `DESIGN_RIGOR.md` before Phase 2 (one compositional lane + 1–2 craft nodes). Motion ladder and stack policy: `docs/15_MOTION_ANIMATION_PLAN.md` (experts/stacks survey: `research/MOTION_ANIMATION_SURVEY.md`).
 
@@ -115,6 +115,6 @@ Or open `/studio` and generate interactively.
 ## E2E
 
 ```bash
-pnpm -F @tell/web dev   # port 3000
+pnpm -F @designproof/web dev   # port 3000
 pnpm e2e:studio
 ```

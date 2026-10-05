@@ -1,6 +1,6 @@
 /**
  * Harsh eye capture — desktop + mobile for every offering + showcase.
- * Usage: pnpm -F @tell/core exec tsx ../../scripts/eye-templates.ts
+ * Usage: pnpm -F @designproof/core exec tsx ../../scripts/eye-templates.ts
  */
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
@@ -8,7 +8,7 @@ import { chromium } from "playwright";
 import { designFromFeatures, getTemplate, listTemplates } from "../packages/design-skills/src/index";
 
 const OUT = "/opt/cursor/artifacts/screenshots";
-const BASE = process.env.TELL_WEB_URL ?? "http://127.0.0.1:3000";
+const BASE = process.env.DP_WEB_URL ?? "http://127.0.0.1:3000";
 
 async function main() {
   mkdirSync(OUT, { recursive: true });

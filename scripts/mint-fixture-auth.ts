@@ -6,8 +6,8 @@
  *   pnpm auth:fixture
  *
  * Env:
- *   TELL_FIXTURE_URL          base URL (default http://localhost:3001)
- *   TELL_AUTH_STORAGE_STATE   output path (default fixtures/generic-app/auth-storage.json)
+ *   DP_FIXTURE_URL          base URL (default http://localhost:3001)
+ *   DP_AUTH_STORAGE_STATE   output path (default fixtures/generic-app/auth-storage.json)
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -18,9 +18,9 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "..");
 
 async function main(): Promise<void> {
-  const baseUrl = (process.env.TELL_FIXTURE_URL ?? "http://localhost:3001").replace(/\/+$/, "");
+  const baseUrl = (process.env.DP_FIXTURE_URL ?? "http://localhost:3001").replace(/\/+$/, "");
   const outPath = resolve(
-    process.env.TELL_AUTH_STORAGE_STATE ?? resolve(repoRoot, "fixtures/generic-app/auth-storage.json"),
+    process.env.DP_AUTH_STORAGE_STATE ?? resolve(repoRoot, "fixtures/generic-app/auth-storage.json"),
   );
 
   const browser = await chromium.launch({ headless: true });
@@ -28,7 +28,7 @@ async function main(): Promise<void> {
     const context = await browser.newContext();
     await context.addCookies([
       {
-        name: "tell_session",
+        name: "designproof_session",
         value: "authenticated",
         url: baseUrl,
         sameSite: "Lax",
@@ -36,9 +36,9 @@ async function main(): Promise<void> {
     ]);
     const page = await context.newPage();
     await page.goto(`${baseUrl}/account`, { waitUntil: "domcontentloaded", timeout: 20_000 });
-    await page.waitForSelector('[data-tell-auth="authenticated"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-dp-auth="authenticated"]', { timeout: 8_000 });
     await page.evaluate(() => {
-      localStorage.setItem("tell_demo_user", "ashish");
+      localStorage.setItem("designproof_demo_user", "ashish");
     });
     mkdirSync(dirname(outPath), { recursive: true });
     const state = await context.storageState();

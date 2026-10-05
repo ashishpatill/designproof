@@ -60,7 +60,7 @@ describe("composer brand denylist", () => {
     }
   });
 
-  it("keeps DesignControls option labels Tell-owned (no competitor brands)", () => {
+  it("keeps DesignControls option labels Design Proof-owned (no competitor brands)", () => {
     for (const label of allDesignControlLabels()) {
       expect(findDeniedComposerBrands(label), label).toEqual([]);
     }
@@ -98,7 +98,7 @@ describe("design-controls catalog", () => {
     expect(fields.lockSiteKind).toBe(true);
   });
 
-  it("defaults Surface compact catalog to Care pathway Roundspool specimen", () => {
+  it("defaults Surface compact catalog to Care pathway Roundspool template", () => {
     const care = SURFACE_OPTIONS_COMPACT.find((o) => o.value === "care-pathway");
     expect(care?.label).toBe("Care pathway");
     expect(care?.hint?.toLowerCase()).toContain("roundspool");

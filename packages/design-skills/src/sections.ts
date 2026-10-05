@@ -79,7 +79,7 @@ function skillFor(kind: SectionPlan["kind"], layout?: SectionPlan["layout"]): Sk
       return "pricing-or-plans";
     case "story":
     case "figure":
-    case "specimen":
+    case "template":
       return "content-storytelling-pages";
     case "app":
       return "dashboard-or-webapp-ui";
@@ -699,7 +699,7 @@ export function buildSections(
         break;
       }
 
-      case "specimen": {
+      case "template": {
         /*
          * One short heading. This band exists to be looked at — eyebrow + lede here steal characters
          * from the quiet beat the denser screens are measured against.
@@ -707,7 +707,7 @@ export function buildSections(
         sections.push(
           SectionSpec.parse({
             ...base,
-            // Consumer specimen is a drawn beat — keep the title to a short brand mark.
+            // Consumer template is a drawn beat — keep the title to a short brand mark.
             title:
               brief.siteKind === "consumer-craft"
                 ? brief.productName.split(/\s+/)[0] ?? brief.productName
@@ -722,7 +722,7 @@ export function buildSections(
                 : brief.siteKind === "commerce-loom"
                   ? sentence(`${brief.productName} loom field`)
                 : brief.siteKind === "field-guide"
-                  ? sentence(`${brief.productName} specimen field`)
+                  ? sentence(`${brief.productName} template field`)
                 : brief.siteKind === "press-atelier"
                   ? sentence(`${brief.productName} forme field`)
                 : brief.siteKind === "lantern-path"
@@ -731,7 +731,7 @@ export function buildSections(
                   ? sentence(`${brief.productName} chart field`)
                 : brief.siteKind === "agent-harness"
                   ? sentence(`${brief.productName} permit field`)
-                // Dashboard specimen is the quiet valley before the shell — short mark, not a claim.
+                // Dashboard template is the quiet valley before the shell — short mark, not a claim.
                 : brief.siteKind === "dashboard-webapp"
                   ? brief.productName.split(/\s+/)[0] ?? brief.productName
                 : sentence(brief.productName),
@@ -1160,7 +1160,7 @@ export function buildSections(
                       : brief.siteKind === "consumer-craft"
                         ? sentence(`Why ${brief.productName} earns a place on the shelf`)
                         : brief.siteKind === "editorial-foundry"
-                          ? sentence(`Why setters keep a ${brief.productName} specimen`)
+                          ? sentence(`Why setters keep a ${brief.productName} template`)
                           : brief.siteKind === "research-dossier"
                             ? sentence(`Why ${brief.productName} clears the briefing`)
                             : brief.siteKind === "signal-observatory"
@@ -1361,7 +1361,7 @@ export function buildSections(
                   : eyebrow.cta,
             title: sentence(
               brief.siteKind === "editorial-foundry"
-                ? `Request a specimen of ${brief.productName}`
+                ? `Request a template of ${brief.productName}`
                 : brief.siteKind === "research-dossier"
                   ? `Request the next ${brief.productName} folio`
                   : brief.siteKind === "signal-observatory"

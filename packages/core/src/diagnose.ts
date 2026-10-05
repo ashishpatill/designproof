@@ -1,9 +1,9 @@
-import { BrandDNA, CapturePayload, TellReport } from "@tell/schema";
-import { computeMeasures } from "@tell/redesign";
+import { BrandDNA, CapturePayload, DesignProofReport } from "@designproof/schema";
+import { computeMeasures } from "@designproof/redesign";
 import { buildFingerprint } from "./fingerprint/build-fingerprint";
 import { detectFindings } from "./detectors";
 
-export function diagnoseCapture(capture: CapturePayload, dna?: BrandDNA, designDoc?: string): TellReport {
+export function diagnoseCapture(capture: CapturePayload, dna?: BrandDNA, designDoc?: string): DesignProofReport {
   const fingerprint = buildFingerprint(capture);
   const findings = detectFindings(fingerprint, capture, { designDoc });
   const measures = computeMeasures(capture, fingerprint, dna);
@@ -13,7 +13,7 @@ export function diagnoseCapture(capture: CapturePayload, dna?: BrandDNA, designD
     confidence: 0.72,
     rationale: fallbackRationale(finding.detector, finding.verdictHint),
   }));
-  return TellReport.parse({
+  return DesignProofReport.parse({
     capture,
     fingerprint,
     findings,
@@ -33,7 +33,7 @@ function fallbackRationale(detector: string, verdict: string): string {
   if (detector === "StateGap") {
     return "StateGap: interactive controls lack hover or focus-visible feedback. Fix the control state matrix — do not recolor the page.";
   }
-  if (verdict === "generic") return `${detector} matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction.`;
+  if (verdict === "generic") return `${detector} matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction.`;
   if (verdict === "drift") return `${detector} found inconsistent rendered values. Pick one semantic treatment before the surface keeps splitting.`;
   return `${detector} may be intentional. Keep it only if it supports the product's chosen direction.`;
 }

@@ -1,6 +1,6 @@
 ---
 name: dither-field-craft
-description: Ordered dither / Bayer-style atmospheric field craft — canvas behind content, pointer-events none, monochrome waves, vignette, pause when hidden. Full script duties retained; Tell uses sparse static dither CSS by default.
+description: Ordered dither / Bayer-style atmospheric field craft — canvas behind content, pointer-events none, monochrome waves, vignette, pause when hidden. Full script duties retained; Design Proof uses sparse static dither CSS by default.
 ---
 
 # dither-field-craft
@@ -17,6 +17,6 @@ Fixed/absolute canvas `z-index: 0`, `pointer-events: none`; page content `z-inde
 
 Resize + DPR cap; pause when `document.hidden` or not intersecting; teardown on unmount; reduced motion → static frame or CSS fallback.
 
-## Tell
+## Design Proof
 
 Engine may emit a quiet CSS dither/grain under dark-premium. Full canvas dither when briefly requested for observatory/dashboard atmospheres.

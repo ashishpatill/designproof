@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { trace, SpanStatusCode, type Span } from "@opentelemetry/api";
-import { BrandDNA, TellReport } from "@tell/schema";
-import { parseDirection, type DirectionPlan } from "@tell/taste";
+import { BrandDNA, DesignProofReport } from "@designproof/schema";
+import { parseDirection, type DirectionPlan } from "@designproof/taste";
 import { proposeWithCursorAgent } from "@/lib/cursor-redesign";
 import { collectProjectSources, rankSourcesForReport } from "@/lib/source-worktree";
 import { fetchRemoteBackend, hasRemoteBackend } from "@/lib/remote-api";
@@ -9,7 +9,7 @@ import { assertRepoSetupEnabled } from "@/lib/setup-guard";
 import { resolveCursorKey } from "@/lib/byok";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
-const tracer = trace.getTracer("tell.redesign");
+const tracer = trace.getTracer("designproof.redesign");
 
 export const runtime = "nodejs";
 
@@ -41,11 +41,11 @@ export async function POST(request: Request) {
     const blocked = assertRepoSetupEnabled(request);
     if (blocked) return blocked;
   }
-  const parsedReport = TellReport.safeParse(body.report);
+  const parsedReport = DesignProofReport.safeParse(body.report);
   if (!parsedReport.success) {
     return NextResponse.json(
       {
-        error: "Invalid or missing Tell report. Capture a page first, then draft a fix.",
+        error: "Invalid or missing Design Proof report. Capture a page first, then draft a fix.",
         details: parsedReport.error.flatten(),
       },
       { status: 400 },
@@ -58,11 +58,11 @@ export async function POST(request: Request) {
   const parsedDna = BrandDNA.safeParse(body.dna);
   const dna = parsedDna.success ? parsedDna.data : undefined;
 
-  return tracer.startActiveSpan("tell.redesign", async (span: Span) => {
+  return tracer.startActiveSpan("designproof.redesign", async (span: Span) => {
     span.setAttributes({
-      "tell.direction": directionText,
-      "tell.finding_id": findingId ?? "(all)",
-      "tell.has_dna": dna !== undefined,
+      "designproof.direction": directionText,
+      "designproof.finding_id": findingId ?? "(all)",
+      "designproof.has_dna": dna !== undefined,
     });
 
     try {
@@ -82,9 +82,9 @@ export async function POST(request: Request) {
         resolveCursorKey(request),
       );
       span.setAttributes({
-        "tell.source_files": sourceContext?.files.length ?? 0,
-        "tell.source_bytes": sourceContext?.totalBytes ?? 0,
-        "tell.patch_source": patchSource,
+        "designproof.source_files": sourceContext?.files.length ?? 0,
+        "designproof.source_bytes": sourceContext?.totalBytes ?? 0,
+        "designproof.patch_source": patchSource,
       });
       span.setStatus({ code: SpanStatusCode.OK });
       span.end();

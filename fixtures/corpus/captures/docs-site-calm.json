@@ -6,7 +6,7 @@
     "height": 1100
   },
   "screenshotBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "snapshotHtml": "<html><body data-tell-corpus=\"1\"><p>docs</p></body></html>",
+  "snapshotHtml": "<html><body data-dp-corpus=\"1\"><p>docs</p></body></html>",
   "cssVariables": [
     {
       "name": "--ink",
@@ -20,7 +20,7 @@
   "styles": [
     {
       "selector": "body",
-      "tellId": "body",
+      "dpId": "body",
       "tag": "body",
       "role": "surface",
       "rect": {
@@ -43,7 +43,7 @@
     },
     {
       "selector": "h1",
-      "tellId": "h1",
+      "dpId": "h1",
       "tag": "h1",
       "role": "display",
       "rect": {
@@ -66,7 +66,7 @@
     },
     {
       "selector": "h2",
-      "tellId": "h2",
+      "dpId": "h2",
       "tag": "h2",
       "role": "heading",
       "rect": {
@@ -89,7 +89,7 @@
     },
     {
       "selector": "p",
-      "tellId": "p",
+      "dpId": "p",
       "tag": "p",
       "role": "body",
       "rect": {
@@ -112,7 +112,7 @@
     },
     {
       "selector": "code",
-      "tellId": "code",
+      "dpId": "code",
       "tag": "code",
       "role": "body",
       "rect": {
@@ -135,7 +135,7 @@
     },
     {
       "selector": "button.primary",
-      "tellId": "buttonprimar",
+      "dpId": "buttonprimar",
       "tag": "button",
       "role": "button",
       "rect": {
@@ -158,7 +158,7 @@
     },
     {
       "selector": "nav",
-      "tellId": "nav",
+      "dpId": "nav",
       "tag": "nav",
       "role": "nav",
       "rect": {
@@ -181,7 +181,7 @@
     },
     {
       "selector": "a",
-      "tellId": "a",
+      "dpId": "a",
       "tag": "a",
       "role": "link",
       "rect": {
@@ -204,7 +204,7 @@
     },
     {
       "selector": "aside",
-      "tellId": "aside",
+      "dpId": "aside",
       "tag": "aside",
       "role": "surface",
       "rect": {
@@ -227,7 +227,7 @@
     },
     {
       "selector": "article",
-      "tellId": "article",
+      "dpId": "article",
       "tag": "article",
       "role": "surface",
       "rect": {

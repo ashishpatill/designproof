@@ -1,5 +1,5 @@
 /**
- * Shared DesignControls catalogs — Tell-owned SiteKind + taste codes only.
+ * Shared DesignControls catalogs — Design Proof-owned SiteKind + taste codes only.
  * Maps friendly UI labels ↔ DesignBrief / TasteControls fields.
  * Never list third-party product brands as options.
  */
@@ -11,14 +11,14 @@ import type {
   RoundingDepth,
   SiteKind,
   TypeWeight,
-} from "@tell/design-skills";
+} from "@designproof/design-skills";
 
 export type BusinessGoal = "leads" | "demos" | "trust" | "sales" | "activation";
 
 /** UI fidelity ladder — composer/session field; applied when building a brief. */
 export type DesignFidelity = "wire" | "craft" | "proof";
 
-/** Tell palette accent tokens (hex only — matches DesignBrief.brandAccent). */
+/** Design Proof palette accent tokens (hex only — matches DesignBrief.brandAccent). */
 export type AccentToken = "terracotta" | "ink" | "forest" | "ocean";
 
 export type DesignControlOption<T extends string = string> = {
@@ -47,10 +47,10 @@ export const ACCENT_HEX: Record<AccentToken, string> = {
   ocean: "#1F4B6E",
 };
 
-/** Curated Surfaces for home chip bar (Tell specimens / SiteKind only). */
+/** Curated Surfaces for home chip bar (Design templates / SiteKind only). */
 export const SURFACE_OPTIONS_COMPACT: readonly DesignControlOption<SiteKind>[] = [
-  { value: "agent-harness", label: "Agent harness", hint: "harness · Tiller specimen" },
-  { value: "care-pathway", label: "Care pathway", hint: "clinic · Roundspool specimen" },
+  { value: "agent-harness", label: "Agent harness", hint: "harness · Tiller template" },
+  { value: "care-pathway", label: "Care pathway", hint: "clinic · Roundspool template" },
   { value: "saas-marketing", label: "Marketing landing", hint: "story · conversion" },
   { value: "docs-educational", label: "Product docs", hint: "clarity · dense type" },
   { value: "dashboard-webapp", label: "Ops dashboard", hint: "density · scan" },
@@ -74,7 +74,7 @@ export const SURFACE_OPTIONS_FULL: readonly DesignControlOption<SiteKind>[] = [
   { value: "signal-observatory", label: "Signal observatory", hint: "telemetry" },
   { value: "archive-index", label: "Archive index", hint: "A–Z register" },
   { value: "commerce-loom", label: "Booking / commerce", hint: "merch press" },
-  { value: "field-guide", label: "Field guide", hint: "specimen" },
+  { value: "field-guide", label: "Field guide", hint: "template" },
   { value: "press-atelier", label: "Press atelier", hint: "imposition" },
   { value: "lantern-path", label: "Lantern path", hint: "night walk" },
 ] as const;

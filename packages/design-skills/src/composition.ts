@@ -22,7 +22,7 @@ export interface SectionPlan {
     | "hero"
     | "metrics"
     | "features"
-    | "specimen"
+    | "template"
     | "figure"
     | "story"
     | "proof"
@@ -243,7 +243,7 @@ function featureLayouts(count: number, p0: number, lean: AestheticLean, siteKind
   if (lean === "minimal-clean") return count >= 6 ? ["feature-index", "feature-rows"] : ["feature-rows"];
   if (lean === "refined-story") return ["feature-alternating", "feature-index"];
   // Trailing bento left a sparse two-card airway before proof. Index/rows stay dense so the
-  // specimen and proof stage can meet the reader without a light empty band above them.
+  // template and proof stage can meet the reader without a light empty band above them.
   if (p0 >= 2 && count >= 4) return ["feature-alternating", "feature-index"];
   return count >= 5 ? ["feature-index", "feature-rows"] : ["feature-index"];
 }
@@ -263,12 +263,12 @@ export function planSections(input: CompositionInput): SectionPlan[] {
      * in under five viewports. The interface is the proof, so it arrives after a quiet drawn beat.
      *
      * Band-variation lesson (Loop 6 + ledger): do not buy rhythm with empty 140vh voids. Insert a
-     * sunken type-led specimen between the metric register and the dense shell so one measured
+     * sunken type-led template between the metric register and the dense shell so one measured
      * strip is ink-heavy and character-light — then pack shell + index + proof as density peaks.
      */
     plans.push({ id: "hero", kind: "hero", layout: "hero-queue", surface: "paper", columns: split.hero });
     // Quiet sunken valley after the queue fold — not a metric row reprinting the same priorities.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({ id: "app", kind: "app", layout: "app-shell", surface: "paper", columns: "260px 1fr" });
     // Index bonded to the shell — legend for the board above (density peak).
     plans.push({ id: "features", kind: "features", layout: "feature-index", surface: "paper", bond: true });
@@ -290,7 +290,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    *
    * Measured fintech-product pages sit at invertedShare ~0.7 and bleedBands ~13 (medians). A SaaS
    * plan with one inverse proof band cannot make that rhythm. This offering stacks inverse metrics,
-   * an inverse specimen stage, inverse proof, and inverse close around paper catalogues — tone
+   * an inverse template stage, inverse proof, and inverse close around paper catalogues — tone
    * moves down the scroll the way money-product sites do.
    */
   if (siteKind === "fintech-marketing") {
@@ -302,7 +302,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.feature,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "inverse" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "inverse" });
     /*
      * One catalogue, no proof board, no send-path chapters, and no table under the lanes. The
      * "also included" band re-listed the catalogue's tail as bare names; the proof board printed
@@ -325,7 +325,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    *
    * Measured art-directed-studio pages sit at foldFigure ~1.0, figureArea ~0.57, invertedShare ~0,
    * and large display type. A SaaS plan (inverse metrics → pricing → inverse CTA) is the wrong
-   * skeleton: selected work, method, and a quiet specimen beat replace the conversion ladder.
+   * skeleton: selected work, method, and a quiet template beat replace the conversion ladder.
    */
   if (siteKind === "art-directed-studio") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-statement", surface: "paper", columns: split.hero });
@@ -339,7 +339,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.feature,
     });
     // Quiet type-led valley — honest weight variation without empty height.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -385,7 +385,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.feature,
     });
     // Quiet drawn valley — honest weight variation against the dense product registers.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "figure",
       kind: "figure",
@@ -437,7 +437,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     // Quiet sunken valley — honest weight variation without empty height.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     // Marginalia essay — annotations hang in the outer column (editorial-longform craft).
     plans.push({
       id: "story",
@@ -485,7 +485,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     // Quiet sunken valley — third surface + honest weight variation.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     // Verso/recto spread with footnote register (dossier signature essay).
     plans.push({
       id: "story",
@@ -530,7 +530,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     // Event waterfall — instrument-time spans (observatory signature; not essay+aside).
     plans.push({
       id: "story",
@@ -574,7 +574,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -616,7 +616,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -637,14 +637,14 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    *
    * Generic path stacked medium-density bands (metrics + features + chapters + compare) so
    * section-weight variation collapsed (~0.34). Dedicated plan: stackfold figure, scrub instrument,
-   * catalogue, quiet sunken specimen, dense chapter register, dense compare, inverse close.
+   * catalogue, quiet sunken template, dense chapter register, dense compare, inverse close.
    * No metric theatre — the scrub owns the stakes.
    */
   if (siteKind === "docs-educational") {
     // Scrub owns the fold — do not bury the instrument under a second stackfold hero.
     plans.push({ id: "hero", kind: "hero", layout: "hero-mechanism", surface: "paper", columns: split.hero });
-    // Quiet valley after the scrub peak — titles-only horizon (see renderSpecimen).
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Quiet valley after the scrub peak — titles-only horizon (see renderTemplate).
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "features",
       kind: "features",
@@ -661,7 +661,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised", bond: true });
-    // Inverse close is the dense peak against the sunken specimen valley.
+    // Inverse close is the dense peak against the sunken template valley.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
@@ -694,7 +694,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -733,7 +733,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -772,7 +772,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -810,7 +810,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -829,7 +829,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    *
    * Personal-craft + brand-agency corridors favour figure-dense paper surfaces and quiet display.
    * Soft theme packs answer with floating glass card collages. This offering invents unreplicable
-   * voucher grammar: taxon rail, specimen plate (pressed silhouette + free botanical photo),
+   * voucher grammar: taxon rail, template plate (pressed silhouette + free botanical photo),
    * dichotomous voucher key (ladder + stacked sheets), Voucher close.
    */
   if (siteKind === "field-guide") {
@@ -848,7 +848,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "raised",
       columns: split.wide,
     });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -900,11 +900,11 @@ export function planSections(input: CompositionInput): SectionPlan[] {
      * and lost on.
      */
     if (i === 0) {
-      plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+      plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     }
   });
 
-  // Proof follows the second top-priority capability and is bonded to the specimen above
+  // Proof follows the second top-priority capability and is bonded to the template above
   // so a light airway cannot open between the drawn product and the proof.
   // It must not reuse the fold's shape. A sequence is a stage-by-stage proof, not a quote strip.
   plans.push({
@@ -984,7 +984,7 @@ export function displaySizeFor(siteKind: SiteKind, lean: AestheticLean, density:
   if (siteKind === "archive-index") px = 48;
   // Commerce loom: quiet-moderate display — weave owns the fold, not a shout.
   if (siteKind === "commerce-loom") px = 50;
-  // Field guide: quiet display — specimen plate owns the fold.
+  // Field guide: quiet display — template plate owns the fold.
   if (siteKind === "field-guide") px = 50;
   // Press atelier: quiet-moderate display — brand-agency corridor; press sheet owns the fold.
   if (siteKind === "press-atelier") px = 50;

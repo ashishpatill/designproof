@@ -8,7 +8,7 @@
  * Reads a completed (or failed) board run → extracts signals → updates
  * research/agency-engine-memory.json + research/LEARNINGS.md → writes LEARN.md
  * on the board. Safe improvements feed the next agency:run via memory.
- * When research/design-data.local.json (or TELL_DESIGN_DATA) is set, memory is
+ * When research/design-data.local.json (or DP_DESIGN_DATA) is set, memory is
  * also write-backed to the personal design-data checkout.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
@@ -284,7 +284,7 @@ function appendLearnings(rootDir: string, signals: RunSignal[], memory: EngineMe
   if (!existsSync(path)) {
     writeFileSync(
       path,
-      "# Tell learnings (recursive improve)\n\nPersistent lessons across sessions.\n\n---\n",
+      "# Design Proof learnings (recursive improve)\n\nPersistent lessons across sessions.\n\n---\n",
       "utf8",
     );
   }

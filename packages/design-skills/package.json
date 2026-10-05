@@ -1,5 +1,5 @@
 {
-  "name": "@tell/design-skills",
+  "name": "@designproof/design-skills",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -25,7 +25,7 @@
     "test": "cd ../.. && vitest run packages/design-skills/src/__tests__ packages/design-skills/src/training-data-sink.test.ts"
   },
   "dependencies": {
-    "@tell/schema": "workspace:*",
+    "@designproof/schema": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

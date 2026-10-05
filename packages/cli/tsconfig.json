@@ -5,10 +5,10 @@
     "noEmit": true,
     "types": ["node"],
     "paths": {
-      "@tell/schema": ["../schema/src"],
-      "@tell/core": ["../core/src"],
-      "@tell/taste": ["../taste/src"],
-      "@tell/redesign": ["../redesign/src"]
+      "@designproof/schema": ["../schema/src"],
+      "@designproof/core": ["../core/src"],
+      "@designproof/taste": ["../taste/src"],
+      "@designproof/redesign": ["../redesign/src"]
     }
   },
   "include": ["src"]

@@ -1,9 +1,9 @@
 # Web-design skill coverage
 
-Every reference web-design skill is **learned**. Tell ships constrained defaults;
+Every reference web-design skill is **learned**. Design Proof ships constrained defaults;
 full script duties (pause, cleanup, brand accent, reduced motion) live in the mapped craft.
 
-| Reference pattern (anonymised folder) | Tell craft |
+| Reference pattern (anonymised folder) | Design Proof craft |
 |---|---|
 | `add-shader-cursor-trail` | pointer-field-craft |
 | `agency-grid-layout-minimal` | agency-minimal-grid |

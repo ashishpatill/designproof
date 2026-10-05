@@ -11,10 +11,10 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="tell-shell">
+    <div className="dp-shell">
       {rail}
-      <div className="tell-shell__main">
-        <div className="tell-shell__body">{children}</div>
+      <div className="dp-shell__main">
+        <div className="dp-shell__body">{children}</div>
       </div>
     </div>
   );

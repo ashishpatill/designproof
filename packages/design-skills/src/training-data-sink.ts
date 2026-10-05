@@ -6,15 +6,15 @@ import path from "node:path";
 
 /**
  * Local-only training-data sink (shared by Studio `/api/design*` and Cursor MCP tools).
- * Writes Tell session + design artifacts into a sibling `tell-design-data` checkout,
+ * Writes Design Proof session + design artifacts into a sibling `dp-design-data` checkout,
  * then triggers that repo's `sync` (inbox ingest + curated JSONL convert).
  * Does not invent a host or clone the sibling repo — missing sink ⇒ no-op / status reason.
  */
 
 /** Monorepo root (directory containing pnpm-workspace.yaml). */
 function repoRoot(): string {
-  if (process.env.TELL_REPO_ROOT) {
-    return path.resolve(process.env.TELL_REPO_ROOT);
+  if (process.env.DP_REPO_ROOT) {
+    return path.resolve(process.env.DP_REPO_ROOT);
   }
 
   let dir = process.cwd();
@@ -62,13 +62,13 @@ let harnessTimer: ReturnType<typeof setTimeout> | null = null;
 let harnessRunning = false;
 
 function disabledExplicitly(): boolean {
-  const flag = process.env.TELL_TRAINING_DATA?.trim().toLowerCase();
+  const flag = process.env.DP_TRAINING_DATA?.trim().toLowerCase();
   if (flag === "0" || flag === "false" || flag === "off") return true;
   return false;
 }
 
 function forcedOn(): boolean {
-  const flag = process.env.TELL_TRAINING_DATA?.trim().toLowerCase();
+  const flag = process.env.DP_TRAINING_DATA?.trim().toLowerCase();
   return flag === "1" || flag === "true" || flag === "on";
 }
 
@@ -78,7 +78,7 @@ function looksLikeDesignDataRepo(dir: string): boolean {
   if (existsSync(pkg)) {
     try {
       const raw = JSON.parse(readFileSync(pkg, "utf8")) as { name?: string };
-      if (raw.name === "tell-design-data") return true;
+      if (raw.name === "dp-design-data") return true;
     } catch {
       /* fall through */
     }
@@ -90,9 +90,9 @@ function looksLikeDesignDataRepo(dir: string): boolean {
   );
 }
 
-/** Resolve tell-design-data checkout. */
+/** Resolve dp-design-data checkout. */
 export function resolveDesignDataRepo(): string | null {
-  const fromEnv = process.env.TELL_DESIGN_DATA_REPO?.trim();
+  const fromEnv = process.env.DP_DESIGN_DATA_REPO?.trim();
   if (fromEnv) {
     const resolved = path.resolve(fromEnv);
     return existsSync(resolved) ? resolved : null;
@@ -100,12 +100,12 @@ export function resolveDesignDataRepo(): string | null {
 
   const root = repoRoot();
   const candidates = [
-    path.resolve(root, "..", "tell-design-data"),
-    path.resolve("/volumes/developer/workspace/tell-design-data"),
-    path.resolve(root, "tell-design-data"),
-    path.resolve(process.cwd(), "..", "tell-design-data"),
-    path.resolve(process.cwd(), "..", "..", "tell-design-data"),
-    path.resolve(process.cwd(), "..", "..", "..", "tell-design-data"),
+    path.resolve(root, "..", "dp-design-data"),
+    path.resolve("/volumes/developer/workspace/dp-design-data"),
+    path.resolve(root, "dp-design-data"),
+    path.resolve(process.cwd(), "..", "dp-design-data"),
+    path.resolve(process.cwd(), "..", "..", "dp-design-data"),
+    path.resolve(process.cwd(), "..", "..", "..", "dp-design-data"),
   ];
   for (const c of candidates) {
     if (looksLikeDesignDataRepo(c)) return c;
@@ -165,7 +165,7 @@ export function trainingSinkStatus(): {
   reason: string;
 } {
   if (disabledExplicitly()) {
-    return { enabled: false, repo: null, root: null, reason: "TELL_TRAINING_DATA=0" };
+    return { enabled: false, repo: null, root: null, reason: "DP_TRAINING_DATA=0" };
   }
   if (process.env.VERCEL && !forcedOn()) {
     return { enabled: false, repo: null, root: null, reason: "vercel_default_off" };
@@ -176,7 +176,7 @@ export function trainingSinkStatus(): {
       enabled: false,
       repo: null,
       root: null,
-      reason: "tell-design-data_not_found",
+      reason: "dp-design-data_not_found",
     };
   }
   return {
@@ -267,12 +267,12 @@ async function mirrorByDay(
 }
 
 /**
- * Debounced spawn of `tell-design-data sync` so inbox → curated JSONL stays fresh
- * whenever Tell creates designs or session artifacts.
+ * Debounced spawn of `dp-design-data sync` so inbox → curated JSONL stays fresh
+ * whenever Design Proof creates designs or session artifacts.
  */
 export function scheduleDesignDataHarness(sink: SinkPaths = resolveTrainingSink()!): void {
   if (!sink) return;
-  if (process.env.TELL_TRAINING_DATA_SYNC === "0") return;
+  if (process.env.DP_TRAINING_DATA_SYNC === "0") return;
 
   if (harnessTimer) clearTimeout(harnessTimer);
   harnessTimer = setTimeout(() => {
@@ -310,18 +310,18 @@ export function runDesignDataHarness(sink: SinkPaths): Promise<void> {
     return Promise.resolve();
   }
 
-  // Nested tell-design-data needs its own install; skip sync when deps are missing.
+  // Nested dp-design-data needs its own install; skip sync when deps are missing.
   const chokidarPath = path.join(sink.repo, "node_modules", "chokidar");
   if (!existsSync(chokidarPath)) {
     console.warn(
-      "[training-data-sink] tell-design-data deps missing (chokidar); raw episode written, sync skipped. Run pnpm install in the design-data repo.",
+      "[training-data-sink] dp-design-data deps missing (chokidar); raw episode written, sync skipped. Run pnpm install in the design-data repo.",
     );
     return Promise.resolve();
   }
 
   const launch = resolveHarnessCommand(sink.repo);
   if (!launch) {
-    console.warn("[training-data-sink] tell-design-data CLI not found; raw files written only");
+    console.warn("[training-data-sink] dp-design-data CLI not found; raw files written only");
     return Promise.resolve();
   }
 
@@ -331,7 +331,7 @@ export function runDesignDataHarness(sink: SinkPaths): Promise<void> {
       cwd: launch.cwd,
       env: {
         ...process.env,
-        TELL_DESIGN_DATA_HOME: sink.root,
+        DP_DESIGN_DATA_HOME: sink.root,
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -347,10 +347,10 @@ export function runDesignDataHarness(sink: SinkPaths): Promise<void> {
     child.on("close", (code) => {
       harnessRunning = false;
       if (code === 0) {
-        console.info("[training-data-sink] tell-design-data sync ok");
+        console.info("[training-data-sink] dp-design-data sync ok");
       } else {
         console.warn(
-          `[training-data-sink] tell-design-data sync exit ${code}${stderr ? `: ${stderr.slice(0, 400)}` : ""}`,
+          `[training-data-sink] dp-design-data sync exit ${code}${stderr ? `: ${stderr.slice(0, 400)}` : ""}`,
         );
       }
       resolve();
@@ -404,7 +404,7 @@ export async function writeTrainingEvent(
       session_id: sessionId,
       kind,
       created_at: new Date().toISOString(),
-      source: "tell-proof",
+      source: "dp-proof",
       url: (report.capture as { url?: string } | undefined)?.url ?? meta.url ?? "",
       meta: { ...meta, shotPath: shotPath ? path.relative(sink.root, shotPath) : undefined },
       report,
@@ -448,7 +448,7 @@ export async function writeTrainingEvent(
       kind: "design" as const,
       artifact_kind: "design" as const,
       created_at: new Date().toISOString(),
-      source: "tell-proof",
+      source: "dp-proof",
       meta: {
         ...meta,
         artifact_kind: "design",
@@ -519,14 +519,14 @@ export async function writeTrainingEvent(
     session_id: sessionId,
     kind,
     created_at: new Date().toISOString(),
-    source: "tell-proof",
+    source: "dp-proof",
     meta,
     payload: slimPayload,
   };
   await writeFile(outPath, JSON.stringify(body, null, 2), "utf8");
   await writeFile(path.join(sessionDir, `${kind}.json`), JSON.stringify(body, null, 2), "utf8");
   await mirrorByDay(sink, kind, id, body);
-  // Inbox is only for harness ingest (TellReport envelopes + design artifacts).
+  // Inbox is only for harness ingest (DesignProofReport envelopes + design artifacts).
   await appendLedger(sink, {
     kind,
     session_id: sessionId,

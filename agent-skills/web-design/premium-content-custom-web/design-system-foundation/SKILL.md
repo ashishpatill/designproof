@@ -11,4 +11,4 @@ Build tokens before sections: paper, ink, accent, radius, shadow, type, content 
 - Tokens must reflect Taste Controls
 - One accent only
 - No rainbow legends
-- Map lean → Tell direction id when redesigning existing UI (`tellDirectionForLean`)
+- Map lean → Design Proof direction id when redesigning existing UI (`dpDirectionForLean`)

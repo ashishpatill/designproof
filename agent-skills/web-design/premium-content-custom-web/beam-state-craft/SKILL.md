@@ -26,7 +26,7 @@ Use a beam as a **decorative state accent**. State must remain understandable th
 
 Keep the effect mounted and toggle `active` so fade-out can run.
 
-## Tell constraints
+## Design Proof constraints
 
 - Prefer CSS `box-shadow` / `outline` tokens before third-party beam packages in generated HTML
 - Color from `--c-accent` (mono by default)

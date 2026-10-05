@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { specimenHtmlSrc } from "./specimenSrc";
+import { templateHtmlSrc } from "./templateSrc";
 import "../../app/showcase/showcase.css";
 
 type ShowcaseFrameProps = {
@@ -16,11 +16,11 @@ export function ShowcaseFrame({ offeringKey, title, marketJob, testId }: Showcas
       <header className="sx-chrome-bar">
         <div className="sx-chrome-title">
           <strong>{title}</strong>
-          <span>Specimen {offeringKey} · proof sheet</span>
+          <span>Template {offeringKey} · proof sheet</span>
         </div>
-        <nav className="sx-chrome-actions" aria-label="Specimen chrome">
+        <nav className="sx-chrome-actions" aria-label="Template chrome">
           <Link href="/showcase" prefetch={false}>
-            All specimens
+            All templates
           </Link>
           <a className="sx-nav-cta" href="#proof">
             View proof
@@ -32,7 +32,7 @@ export function ShowcaseFrame({ offeringKey, title, marketJob, testId }: Showcas
         <div className="sx-stage-inner">
           <iframe
             title={title}
-            src={specimenHtmlSrc(offeringKey)}
+            src={templateHtmlSrc(offeringKey)}
             data-testid="showcase-frame"
             loading="eager"
           />

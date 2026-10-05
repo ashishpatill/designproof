@@ -125,7 +125,7 @@ export function CreaseShell({ children }: { children: ReactNode }) {
               Home
             </Link>
             <Link href="/showcase" prefetch>
-              Tell Specimens
+              Design Templates
             </Link>
           </div>
         </nav>

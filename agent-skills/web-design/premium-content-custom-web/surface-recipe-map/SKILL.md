@@ -1,17 +1,17 @@
 ---
 name: surface-recipe-map
-description: Maps every external aesthetic/technique pattern to a Tell craft skill that learned the full script. Constrains defaults for detectors — does not discard engineering (pause, cleanup, brand accent, reduced motion).
+description: Maps every external aesthetic/technique pattern to a Design Proof craft skill that learned the full script. Constrains defaults for detectors — does not discard engineering (pause, cleanup, brand accent, reduced motion).
 ---
 
 # surface-recipe-map
 
-**Policy:** Learn every part of every script. Ship Tell-safe defaults. Never leave a technique unmapped.
+**Policy:** Learn every part of every script. Ship Design Proof-safe defaults. Never leave a technique unmapped.
 
 Full 82/82 table: `agent-skills/web-design/COVERAGE.md`
 
 ## Formerly avoided — now full crafts
 
-| Vibe / technique | Tell craft (full duties retained) | Default in engine |
+| Vibe / technique | Design Proof craft (full duties retained) | Default in engine |
 |---|---|---|
 | Section particles / leaves / sparks | `ambient-atmosphere-craft` | Static sparse motes on dark-premium |
 | WebGL / corner lasers | `signal-beam-craft` | CSS accent beam vignette |
@@ -24,7 +24,7 @@ Full 82/82 table: `agent-skills/web-design/COVERAGE.md`
 
 ## Remap quick table
 
-| Requested vibe | Tell remap |
+| Requested vibe | Design Proof remap |
 |---|---|
 | Warm paper light | `paper-technical-frame` + `light-airy` |
 | Orange paper SaaS | `conversion-landing-craft` + `soft-brand-accent` |

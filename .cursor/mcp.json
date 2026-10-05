@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "tell": {
+    "designproof": {
       "command": "pnpm",
-      "args": ["-F", "@tell/mcp", "start"]
+      "args": ["-F", "@designproof/mcp", "start"]
     }
   }
 }

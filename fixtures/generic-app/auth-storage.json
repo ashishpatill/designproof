@@ -1,7 +1,7 @@
 {
   "cookies": [
     {
-      "name": "tell_session",
+      "name": "designproof_session",
       "value": "authenticated",
       "domain": "localhost",
       "path": "/",
@@ -16,7 +16,7 @@
       "origin": "http://localhost:3001",
       "localStorage": [
         {
-          "name": "tell_demo_user",
+          "name": "designproof_demo_user",
           "value": "ashish"
         }
       ]

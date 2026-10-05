@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { SourceFile } from "@tell/redesign";
-import type { TellReport } from "@tell/schema";
+import type { SourceFile } from "@designproof/redesign";
+import type { DesignProofReport } from "@designproof/schema";
 import { getJob, getJobWorkspace } from "./repo-runner";
 
 const SOURCE_EXTENSIONS = new Set([
@@ -14,7 +14,7 @@ const SKIP_DIRS = new Set([".git", ".next", ".nuxt", ".output", "node_modules", 
 const MAX_FILES = 180;
 const MAX_FILE_BYTES = 140_000;
 const MAX_TOTAL_BYTES = 1_400_000;
-const PROOF_PATCH_MARKER = "tell-proof.patch";
+const PROOF_PATCH_MARKER = "dp-proof.patch";
 
 type AppliedPatch = {
   patch: string;
@@ -26,8 +26,8 @@ interface ProofRegistry {
   applied: Map<string, AppliedPatch>;
 }
 
-const g = globalThis as unknown as { __tellProofRegistry?: ProofRegistry };
-const registry = g.__tellProofRegistry ?? (g.__tellProofRegistry = { applied: new Map() });
+const g = globalThis as unknown as { __designproofProofRegistry?: ProofRegistry };
+const registry = g.__designproofProofRegistry ?? (g.__designproofProofRegistry = { applied: new Map() });
 
 function sourcePriority(file: string): number {
   const name = file.toLowerCase();
@@ -86,7 +86,7 @@ export async function collectProjectSources(jobId: string): Promise<{
 }
 
 /** Rank source by literal evidence observed in the rendered page, then by likely UI ownership. */
-export function rankSourcesForReport(files: SourceFile[], report: TellReport): {
+export function rankSourcesForReport(files: SourceFile[], report: DesignProofReport): {
   files: SourceFile[];
   matchedFiles: number;
 } {
@@ -157,7 +157,7 @@ function gitApply(cwd: string, patch: string, args: string[]): Promise<void> {
 export async function applyPatchToWorkspace(jobId: string, patch: string): Promise<AppliedPatch> {
   const workspace = getJobWorkspace(jobId);
   const job = getJob(jobId);
-  if (!workspace || !job || !job.url) throw new Error("The repo must be running before Tell can prove a patch.");
+  if (!workspace || !job || !job.url) throw new Error("The repo must be running before Design Proof can prove a patch.");
   if (!patch.trim() || Buffer.byteLength(patch) > 1_000_000) throw new Error("The patch is empty or too large to apply safely.");
   if (registry.applied.has(jobId)) throw new Error("A proof patch is already applied. Keep it or revert it before trying another.");
 

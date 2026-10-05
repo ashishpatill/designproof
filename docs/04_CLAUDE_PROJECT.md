@@ -1,11 +1,11 @@
-# Tell — Claude Project Master Document
+# Design Proof — Claude Project Master Document
 
 > This is the brain of the build. It goes into a **Claude Project** as knowledge, alongside the
 > other three documents. It carries the vision, the requirements, the scope, the plan, the demo,
 > the risks, the rules-compliance checklist, and a live tracker. §14 is a copy-paste block for the
 > Project's **Custom Instructions**.
 
-Project: **Tell** · Track: **Cursor** · Format: 2-day build sprint · Repo: _public, TBD_
+Project: **Design Proof** · Track: **Cursor** · Format: 2-day build sprint · Repo: _public, TBD_
 
 ---
 
@@ -28,7 +28,7 @@ status and ask for the next move.
 
 ## 2. One-line pitch
 
-**Every AI-built UI has a tell.** Tell captures your product's *real rendered* UI, names the tells
+**Every AI-built UI has a tell.** Design Proof captures your product's *real rendered* UI, names the tells
 that make it read as AI-generated, catches consistency drift across its surface, and — steered by
 your voice — proposes a distinctive art direction, drafting the redesign as a diff you apply in
 Cursor.
@@ -41,7 +41,7 @@ everything. The result isn't ugly; it's *forgettable*. Worse, as teams and agent
 surface drifts: six near-identical grays, focus rings half the library relies on the browser for,
 empty states someone forgot. The old Cursor track asked for a system with "enough taste to know when
 something is wrong" across a product's visual *and interactive* surface. The updated track asks for
-a real human problem solved through exceptional design, art, interactivity, and voice. Tell is both:
+a real human problem solved through exceptional design, art, interactivity, and voice. Design Proof is both:
 a taste critic that reads the *rendered* truth of your UI, distinguishes a generic tell from a
 defensible choice, and closes the loop to a distinctive redesign — inside Cursor.
 
@@ -58,12 +58,12 @@ fix.
   checker). Nobody guards the *rendered* surface — what users actually see — nor assesses whether
   divergence is generic vs intentional.
 - **Codebase-viz + voice onboarding is crowded** (CodeMap, Codelore, Understand-Anything, Nexo,
-  GENIE). We do not compete there. Tell reads *design*, not architecture.
+  GENIE). We do not compete there. Design Proof reads *design*, not architecture.
 - **"Taste" is the named missing layer** in the original Cursor statement. Models wire up UI and
   still make bland, inconsistent choices. The hard part is knowing when something is *wrong* — and
   showing a better direction. That is precisely what wins the track.
 - **The updated statement rewards the journey.** Voice art-direction, a before/after reveal, and a
-  product that visibly practices what it preaches (Tell's own UI passes its own audit) score on
+  product that visibly practices what it preaches (Design Proof's own UI passes its own audit) score on
   design, art, and interactivity — not just engineering depth.
 
 ## 5. Problem statement (the wedge — both statements)
@@ -77,8 +77,8 @@ aligned. The question is whether the system has enough *taste* to know when some
 experience — thoughtful user journey, design, art, interactivity (video, voice). Thought starters
 include "the redesign your product has needed for a year."
 
-**Tell's wedge:** Most teams will diff Figma tokens (crowded) or build another codebase mind-map
-(crowded). Tell takes the intersection nobody owns: **capture the real rendered UI → name the
+**Design Proof's wedge:** Most teams will diff Figma tokens (crowded) or build another codebase mind-map
+(crowded). Design Proof takes the intersection nobody owns: **capture the real rendered UI → name the
 genericness tells → catch consistency drift → reason with taste (bug vs choice) → voice art-direct
 a distinctive direction → draft the redesign in Cursor.** The felt problem is universal: "My product
 looks like every other AI-built thing, and I don't know how to fix it without a designer for a
@@ -94,7 +94,7 @@ month."
 - The **before/after seam reveal** lands — the "aha" is visual, not a spreadsheet.
 - Voice art-direction changes the proposed direction and re-renders (with text fallback for safety).
 - The after-state explains measurable improvements: contrast floor, focus coverage, radius/depth consistency, and accent harmonization.
-- The dogfood beat: **Tell runs on itself: 0 tells.**
+- The dogfood beat: **Design Proof runs on itself: 0 tells.**
 
 **Measurable demo outcomes:** 8+ planted findings on the seeded generic fixture (4 tells + 4 drifts),
 ≥6 correct verdicts, ≥1 correctly marked `intentional`, ≥1 voice-driven direction change, ≥1
@@ -117,8 +117,8 @@ reproducible across runs.
 - FR6 Accept voice (or text preset) art-direction, split compound direction into action items, and re-propose a redesign direction + token/CSS diff.
 - FR7 Draft a reconciliation diff for a chosen finding or full redesign; never auto-apply; preserve readable foreground/background pairings.
 - FR8 Expose capture/diagnose/redesign/apply as MCP tools callable from Cursor.
-- FR9 Render a Tell Report (findings list + before/after seam + diff viewer + voice director).
-- FR10 Produce a scannable report artifact (the Tell score).
+- FR9 Render a Design Proof Report (findings list + before/after seam + diff viewer + voice director).
+- FR10 Produce a scannable report artifact (the Design Proof score).
 - FR11 Paste a public GitHub repo, run it locally when trusted, verify a reachable localhost URL, and auto-capture it with visible setup/failure states.
 
 **Non-functional**
@@ -129,13 +129,13 @@ reproducible across runs.
 - NFR4 Accessibility floor met by the app itself and by proposed after-states (WCAG AA contrast targets,
   focus-visible, non-color verdict encoding, reduced-motion).
 - NFR5 Public repo, legible original-work attribution.
-- NFR6 Tell's own UI must pass its own audit (dogfood contract).
+- NFR6 Design Proof's own UI must pass its own audit (dogfood contract).
 
 ## 8. Architecture (summary; details in `02_*`)
 
 Monorepo: `schema` (contracts) → `core` (capture + fingerprint + detectors, pure) → `taste`
 (Gemini reasoning + deterministic/Gemini direction parsing) → `redesign` (contrast-grounded reconciliation + diff gen) → `mcp`
-(Cursor-facing tools) → `apps/web` (Next.js + Tell Report + before/after seam + voice director).
+(Cursor-facing tools) → `apps/web` (Next.js + Design Proof Report + before/after seam + voice director).
 `fixtures/generic-app` is the deliberately bland demo target; `fixtures/reports` holds the committed
 offline artifact.
 
@@ -151,7 +151,7 @@ flowchart LR
     tells --> taste["Taste engine"]
     drift --> taste
     voice["Voice art-direction"] --> taste
-    taste --> report["Tell Report + before/after seam"]
+    taste --> report["Design Proof Report + before/after seam"]
     report --> contrast["Contrast floor + setup/failure feedback"]
     taste --> diff["Redesign diff"]
     diff --> cursor["Apply in Cursor via MCP"]
@@ -170,12 +170,12 @@ flowchart LR
 - **Design-context-for-agents** (skills, DESIGN.md): feeds rules *to* agents; does not *detect*
   rendered genericness or reviewer drift on the live surface.
 
-Tell's defensible slice: **rendered-surface genericness detection + consistency drift + taste verdicts
+Design Proof's defensible slice: **rendered-surface genericness detection + consistency drift + taste verdicts
 + voice art-direction + measurable reconciliation, in Cursor.** No shipped product occupies it.
 
 ## 10. Scope
 
-**MVP spine (must ship):** FR1–FR5, FR8 (capture+diagnose), FR9 (Tell Report + before/after seam +
+**MVP spine (must ship):** FR1–FR5, FR8 (capture+diagnose), FR9 (Design Proof Report + before/after seam +
 inspector), FR10 (score artifact).
 
 **Stretch now shipped:** FR6–FR7 (voice/text art-direction + full reconciliation diff + Apply in
@@ -187,7 +187,7 @@ scanning.
 **Remaining (see root `PLAN.md`):** Phase 6 closed (live Playwright matrix + auth `storageState` harness). No open PLAN blockers.
 
 **Explicit cut line:** if live repo setup breaks at demo time, keep the committed fixture artifact and
-seeded fixture path. Do not show a broken or unreachable localhost state as success; Tell must either
+seeded fixture path. Do not show a broken or unreachable localhost state as success; Design Proof must either
 capture live, show a manual URL fallback, or clearly explain the failure.
 
 **Out of scope:** databases, auth, multi-framework source parsing, Figma integration, team settings,
@@ -197,7 +197,7 @@ mobile native app (web + MCP is the surface).
 
 Milestones M1–M10 with Definition of Done are specified in `02_CURSOR_BUILD_INSTRUCTIONS.md §8`.
 Day 1 = spine (schema, capture, fingerprint, detectors, taste, MCP diagnose). Day 2 = wow + loop
-(Tell Report, before/after seam, voice director, redesign diff, hardening, dogfood). Keep the tracker
+(Design Proof Report, before/after seam, voice director, redesign diff, hardening, dogfood). Keep the tracker
 (§12) in lockstep with those milestones.
 
 ## 12. Live tracker (update this in the Project)
@@ -211,8 +211,8 @@ Day 1 = spine (schema, capture, fingerprint, detectors, taste, MCP diagnose). Da
 | M3 | 14 detectors → planted findings on generic fixture | ✅ | | yes | golden findings on fixture |
 | M4 | taste engine + reflection + fallback | ✅ | | yes | Gemini + deterministic fallback |
 | M5 | MCP capture + diagnose (Cursor) | ✅ | | yes | + proof verify/revert tools |
-| M6 | Tell Report + before/after seam | ✅ | | yes | live reconcile CSS |
-| M7 | Tell/Drift inspector + verdict cards | ✅ | | yes | |
+| M6 | Design Proof Report + before/after seam | ✅ | | yes | live reconcile CSS |
+| M7 | Design Proof/Drift inspector + verdict cards | ✅ | | yes | |
 | M8 | voice director + redesign diff (stretch) | ✅ | | yes | redesign v2 recipes + LLM path |
 | M9 | demo hardening + backup video | ✅ | | yes | offline artifact + demo gif |
 | M10 | dogfood: 0 tells on own repo | ✅ | | yes | `pnpm dogfood:web` |
@@ -243,17 +243,17 @@ Day 1 = spine (schema, capture, fingerprint, detectors, taste, MCP diagnose). Da
 - **"It's just a dashboard" objection.** → The feature is the capture→diagnose→art-direct→reconcile
   loop; the report explains the agent. Lead the demo with the loop and the before/after seam, not a
   grid of KPI cards.
-- **Tell's own UI triggers its detectors.** → Design to the dogfood contract in `01_*`; run Tell on
+- **Design Proof's own UI triggers its detectors.** → Design to the dogfood contract in `01_*`; run Design Proof on
   itself before demo; fix any real findings.
 
 ## 14. Custom Instructions for this Claude Project (paste into the Project settings)
 
 ```
-You are the build partner for Tell, an AI taste critic for the Cursor-native product track. Your job is
+You are the build partner for Design Proof, an AI taste critic for the Cursor-native product track. Your job is
 to help ship a winning 2-day build.
 
 Context you always assume:
-- Tell captures a product's REAL RENDERED UI (Playwright/CDP), builds a deterministic design
+- Design Proof captures a product's REAL RENDERED UI (Playwright/CDP), builds a deterministic design
   fingerprint, detects genericness tells + consistency drift, reasons WITH TASTE about generic vs
   drift vs intentional, accepts voice art-direction, and drafts measurable redesign diffs callable
   from Cursor via MCP.
@@ -271,7 +271,7 @@ How to help:
   LLM/network calls. LLM/agent calls are only for taste verdicts, optional voice refinement, and
   optional patch enhancement with deterministic fallback.
 - Enforce the build order and Definition of Done from the Cursor doc §8. Protect the cut line.
-- Tell's own UI must pass its own audit — editorial/print-atelier aesthetic, no Inter-only, no
+- Design Proof's own UI must pass its own audit — editorial/print-atelier aesthetic, no Inter-only, no
   violet gradient hero, no shadow-on-everything. Dogfood the product.
 - Default to concrete deliverables: zod schemas, detector logic, prompt contracts, copy in the
   critic voice (precise, direct, sentence case, no apology, no emoji).
@@ -285,17 +285,17 @@ How to help:
 ## 15. Demo script (5 beats, ~3 minutes)
 
 1. **Setup (20s).** Open the seeded generic app. "Shipped in a day with AI. Looks… familiar."
-2. **Capture + diagnose (30s).** Paste URL / hit Capture in Tell (or invoke `tell_diagnose` MCP).
+2. **Capture + diagnose (30s).** Paste URL / hit Capture in Design Proof (or invoke `designproof_diagnose` MCP).
    Report loads: `8 findings · 5 generic · 2 drift · 1 intentional`.
 3. **Taste (50s).** Click `SystemFontTell` → verdict + rationale: Inter on every text role, no
    display face — generic. Then click a finding on a deliberately mono-everything section → verdict
    `intentional`: "Single-family type is a documented brutalist choice." "It knows generic from
    intentional."
-4. **Before/after (40s).** Drag the reveal seam. Left: the bland fixture. Right: Tell's proposed
+4. **Before/after (40s).** Drag the reveal seam. Left: the bland fixture. Right: Design Proof's proposed
    editorial direction with contrast floor and token rows visible. "This is a direction you can
    defend, not a random reskin."
 5. **Voice + reconcile (40s).** Hold mic: "Warmer, more editorial, less shadow." Action items appear;
-   direction updates; diff appears → `Apply in Cursor`. Close: "Tell runs on itself: zero tells."
+   direction updates; diff appears → `Apply in Cursor`. Close: "Design Proof runs on itself: zero tells."
 
 Have a recorded backup of the exact run in case of live failure.
 
@@ -307,7 +307,7 @@ Have a recorded backup of the exact run in case of live failure.
       seeded generic fixture.
 - [ ] No presenting prior work as new; the fixture is clearly labeled as demo input, not our
       contribution.
-- [ ] Not a banned project type: not a basic RAG app, not an image analyzer, and the Tell Report is
+- [ ] Not a banned project type: not a basic RAG app, not an image analyzer, and the Design Proof Report is
       not a dashboard — the capture→diagnose→art-direct→reconcile loop is the product.
 - [ ] Uses only assets/code we have rights to (fixture is appropriately licensed and attributed).
 - [ ] Builds in the Cursor track — both the original taste/consistency statement and the updated
@@ -316,11 +316,11 @@ Have a recorded backup of the exact run in case of live failure.
 ## 17. Glossary
 
 - **Fingerprint** — deterministic snapshot of a rendered UI's computed design properties.
-- **Tell** — a detected genericness pattern (e.g. Inter everywhere, violet gradient crutch).
+- **Design Proof** — a detected genericness pattern (e.g. Inter everywhere, violet gradient crutch).
 - **Drift** — a consistency fracture across the rendered surface (e.g. six near-identical grays).
 - **Verdict** — the taste engine's classification: generic / drift / intentional.
 - **Reveal seam** — the signature visual: a diagonal wipe from "before" to "after."
-- **Dogfood** — running Tell on Tell's own UI; target is zero tells.
+- **Dogfood** — running Design Proof on Design Proof's own UI; target is zero tells.
 - **Art direction** — the voice- or preset-driven target aesthetic for the redesign proposal.
 
 ## 18. How the four documents relate

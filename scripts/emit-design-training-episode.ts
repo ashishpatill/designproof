@@ -2,7 +2,7 @@
 /**
  * Emit an anonymised design/research training episode.
  *
- * Prefer sibling tell-design-data checkout when present; otherwise write a
+ * Prefer sibling dp-design-data checkout when present; otherwise write a
  * stub under research/training.local/ (gitignored). Never commit JSONL hosts.
  *
  * Usage:
@@ -28,7 +28,7 @@ function looksLikeDesignDataRepo(dir: string): boolean {
   if (existsSync(pkg)) {
     try {
       const raw = JSON.parse(readFileSync(pkg, "utf8")) as { name?: string };
-      if (raw.name === "tell-design-data") return true;
+      if (raw.name === "dp-design-data") return true;
     } catch {
       /* fall through */
     }
@@ -37,11 +37,11 @@ function looksLikeDesignDataRepo(dir: string): boolean {
 }
 
 function resolveDesignDataRepo(): string | null {
-  const fromEnv = process.env.TELL_DESIGN_DATA_REPO?.trim();
+  const fromEnv = process.env.DP_DESIGN_DATA_REPO?.trim();
   if (fromEnv && existsSync(fromEnv)) return resolve(fromEnv);
   const candidates = [
-    resolve(repoRoot, "..", "tell-design-data"),
-    resolve(repoRoot, "tell-design-data"),
+    resolve(repoRoot, "..", "dp-design-data"),
+    resolve(repoRoot, "dp-design-data"),
   ];
   for (const c of candidates) {
     if (looksLikeDesignDataRepo(c)) return c;
@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     domain,
     note,
     createdAt: new Date().toISOString(),
-    schema: "tell.design-training.episode.v1",
+    schema: "designproof.design-training.episode.v1",
     anonymised: true,
     researchNodes: [
       "load-prior-domain",
@@ -133,7 +133,7 @@ async function main(): Promise<void> {
         kind,
         domain,
         hash,
-        dest: designData ? "[tell-design-data]" : "[research/training.local]",
+        dest: designData ? "[dp-design-data]" : "[research/training.local]",
         emittedAt: episode.createdAt,
         note,
       },

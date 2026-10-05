@@ -1,8 +1,8 @@
 # The Genericness Audit — Methodology
 
-> The rubric Tell encodes. Every threshold here maps to an `if` in `packages/redesign/src/measures.ts`
+> The rubric Design Proof encodes. Every threshold here maps to an `if` in `packages/redesign/src/measures.ts`
 > and a transform in `packages/redesign/src/restyle.ts`. This is the "research and methodology
-> behind the change" — nothing in Tell's redesign is arbitrary; each move cites a rule below.
+> behind the change" — nothing in Design Proof's redesign is arbitrary; each move cites a rule below.
 
 All thresholds are CSS px and sRGB HSL unless noted. "Usage-weighted" = weighted by element count
 (or rendered area where stated), not by count of distinct values.
@@ -16,7 +16,7 @@ corpus, and Inter is the highest-probability "safe" font. Adam Wathan (Tailwind'
 apologized in Aug 2025 for "every AI generated UI on earth… being indigo." The catalogued slop
 palette: `#6366F1` (indigo-500, H 239°), `#8B5CF6` (violet-500, H 258°), `#A855F7` (purple-500, H 271°).
 
-| # | Tell | Signature | Flip threshold |
+| # | Design Proof | Signature | Flip threshold |
 |---|------|-----------|----------------|
 | T1 | Default-font monoculture | distinct primary `font-family` after resolving stacks | `familyCount === 1 && family ∈ DEFAULT_SET` (Inter, Roboto, Open Sans, Arial, Helvetica[ Neue], system-ui, -apple-system, Segoe UI). Space Grotesk alone = soft tell (0.5). |
 | T2 | Violet→pink hero gradient | gradient with two dominant stops both `S ≥ 60%`, hues in `[230°,340°]`, span `≥ 15°` | ≥1 covering ≥20% of first viewport, or ≥2 anywhere. Gradient-clip text on h1 = auto-flag. |
@@ -31,7 +31,7 @@ palette: `#6366F1` (indigo-500, H 239°), `#8B5CF6` (violet-500, H 258°), `#A85
 | T11 | Glassmorphism sprinkle | `backdrop-filter: blur()` count | `> 2` outside one overlay/nav context. |
 | T12 | Border + shadow double-hedge | els with both `1px solid` border and multi-px shadow | `> 50%` of cards. |
 
-`tellScore = clamp(Σ flag·w / 8, 0, 1)` (hard=1, soft=0.5, w=1).
+`dpScore = clamp(Σ flag·w / 8, 0, 1)` (hard=1, soft=0.5, w=1).
 
 ---
 
@@ -160,7 +160,7 @@ Curated Google-Fonts pairings:
 
 ```
 genericness = 100 · Σ weight·(1 − axisScore)
-genericness = min(100, genericness + 12·tellScore)
+genericness = min(100, genericness + 12·dpScore)
 ```
 
 Bands: ≤25 distinctive · 26–45 competent-but-conservative · 46–65 template-grade · >65 AI-slop.

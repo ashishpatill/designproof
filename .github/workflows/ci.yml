@@ -36,7 +36,7 @@ jobs:
         run: pnpm test
 
       - name: Build schema
-        run: pnpm -F @tell/schema build
+        run: pnpm -F @designproof/schema build
 
       - name: Build core
-        run: pnpm -F @tell/core build
+        run: pnpm -F @designproof/core build

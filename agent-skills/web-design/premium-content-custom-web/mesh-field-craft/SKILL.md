@@ -17,7 +17,7 @@ description: Procedural mesh-gradient atmosphere inside a framed hero shell — 
 8. CTAs: one solid + one ghost
 9. Motion: slow mesh drift; pause offscreen; static under reduced motion
 
-## Tell
+## Design Proof
 
 - Prefer `dark-premium` + `container-tech-shell` + static CSS mesh approximation in engine
 - Full procedural mesh only when site kind / brief asks for infrastructural depth

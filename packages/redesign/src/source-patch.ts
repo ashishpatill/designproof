@@ -6,9 +6,9 @@
 // `after` values — emitting genuine unified diffs with true surrounding context.
 //
 // Matching on VALUES (not structure) covers plain-CSS, CSS-vars, and Tailwind-config projects
-// with one deterministic, zero-LLM strategy — consistent with Tell's trustworthy core.
+// with one deterministic, zero-LLM strategy — consistent with Design Proof's trustworthy core.
 
-import type { BrandDNA, CapturePayload, DesignFingerprint, Reconciliation } from "@tell/schema";
+import type { BrandDNA, CapturePayload, DesignFingerprint, Reconciliation } from "@designproof/schema";
 import { parseColor } from "./color";
 import { resolveDirection } from "./scales";
 import { buildRestylePlan } from "./restyle";
@@ -218,19 +218,19 @@ export function buildAppendedOverridePatch(reconciliation: Reconciliation, sourc
 
   const original = target.contents.replace(/\n+$/g, "");
   const originalLines = original.split("\n");
-  // `data-tell-id` attributes are capture-time instrumentation and do not
+  // `data-dp-id` attributes are capture-time instrumentation and do not
   // exist in the authored app when the browser takes its screenshot. Shipping
   // those selectors would let the diagnostic DOM improve without changing the
   // pixels users actually saw, so the executable fallback keeps only stable
   // global/variable selectors.
   const stableCss = reconciliation.css
-    .replace(/\[data-tell-id="[^"]+"\]\{[^}]*\}\n?/g, "")
-    .replace(/^\s*--tell-(display|body|mono):.*$/gm, "")
+    .replace(/\[data-dp-id="[^"]+"\]\{[^}]*\}\n?/g, "")
+    .replace(/^\s*--dp-(display|body|mono):.*$/gm, "")
     .replace(/\s*font-family:[^;]+!important;?/g, "")
     .trim();
   const addition = [
     "",
-    "/* Tell Proof · candidate repair (verified in a disposable checkout) */",
+    "/* Design Proof · candidate repair (verified in a disposable checkout) */",
     stableCss,
   ].filter((line) => line !== "").join("\n").split("\n");
   const context = originalLines.slice(Math.max(0, originalLines.length - 3));

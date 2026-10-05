@@ -1,6 +1,6 @@
 ---
 name: conversion-landing-craft
-description: High-conversion single-offer landing craft for SaaS — one audience, one offer, one primary action. Part of premium-content-custom-web; improves FAQ objection handling and CTA risk notes in @tell/design-skills.
+description: High-conversion single-offer landing craft for SaaS — one audience, one offer, one primary action. Part of premium-content-custom-web; improves FAQ objection handling and CTA risk notes in @designproof/design-skills.
 ---
 
 # conversion-landing-craft

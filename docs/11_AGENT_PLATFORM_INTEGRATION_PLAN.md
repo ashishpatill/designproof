@@ -1,13 +1,13 @@
-# Tell — Agent & Platform Integration Plan
+# Design Proof — Agent & Platform Integration Plan
 
-> Exhaustive plan for how Tell reaches coding agents and platforms.
+> Exhaustive plan for how Design Proof reaches coding agents and platforms.
 > Patterns are **adapted** from study of a peer local-first design daemon
 > (identity lives only in gitignored `research/plumbing-reference.local.json`).
 > **Do not name that peer in commits, code, docs, or copy.** Do not copy its
-> implementation — learn boundaries and ship Tell-shaped equivalents.
+> implementation — learn boundaries and ship Design Proof-shaped equivalents.
 >
 > Authority chain: `USER_STORY.md` → this plan → `BUILD.md` / `PLAN.md` cut line.
-> Non-negotiables: deterministic core, never auto-apply, `@tell/schema` at
+> Non-negotiables: deterministic core, never auto-apply, `@designproof/schema` at
 > every boundary, offline fixture fallback, Ashish loop first.
 
 ---
@@ -19,75 +19,75 @@ Distribution and multi-harness ergonomics are the gap: clone-or-bust MCP
 registration, Cursor-only agent surface, fragmented `pnpm` scripts, and no
 single source of truth for install snippets.
 
-This plan turns peer learnings into a **Tell-shaped** platform layer:
+This plan turns peer learnings into a **Design Proof-shaped** platform layer:
 
-| Peer lesson (abstract) | Tell adaptation |
+| Peer lesson (abstract) | Design Proof adaptation |
 |---|---|
 | Daemon + thin MCP proxy | Keep engine in packages; MCP/CLI/web wrap same functions |
-| Bidirectional MCP | Export Tell tools; import only read-only connectors later |
-| Multi-agent install strategies | `tell mcp install` with cli / json / manual + Cursor deeplink |
+| Bidirectional MCP | Export Design Proof tools; import only read-only connectors later |
+| Multi-agent install strategies | `designproof mcp install` with cli / json / manual + Cursor deeplink |
 | Hosted curl installer | Optional; monorepo clone remains demo-primary |
 | `install-info` API | Single snippet source for README / UI / CLI / deeplink |
-| Skills staged per run | Guidance copies under `.tell/runs/<id>/`, not global agent skill install |
-| Rich CLI mirroring HTTP | `@tell/cli` subcommands = API = MCP tools |
-| Packaged resources in releases | Publishable `@tell/mcp` + `@tell/cli` with offline report |
+| Skills staged per run | Guidance copies under `.designproof/runs/<id>/`, not global agent skill install |
+| Rich CLI mirroring HTTP | `@designproof/cli` subcommands = API = MCP tools |
+| Packaged resources in releases | Publishable `@designproof/mcp` + `@designproof/cli` with offline report |
 
 ---
 
-## 1. Current Tell baseline (as of plan authoring)
+## 1. Current Design Proof baseline (as of plan authoring)
 
 | Surface | Status | Notes |
 |---|---|---|
-| MCP server | Shipped (partial) | `packages/mcp` — stdio, eleven `tell_*` tools, in-process engine |
-| MCP registration | Manual | Committed `.cursor/mcp.json` → `pnpm -F @tell/mcp start` |
+| MCP server | Shipped (partial) | `packages/mcp` — stdio, eleven `designproof_*` tools, in-process engine |
+| MCP registration | Manual | Committed `.cursor/mcp.json` → `pnpm -F @designproof/mcp start` |
 | Web API | Shipped | `/api/diagnose`, `/api/redesign`, `/api/voice`, `/api/design`, `/api/proof/*`, `/api/setup/*` |
-| CLI | Partial | Root `pnpm` scripts; `tell-mcp` bin private; no unified `tell` |
-| Skills | Partial | `.cursor/skills/` + `agent-skills/` + `@tell/design-skills` engine |
+| CLI | Partial | Root `pnpm` scripts; `dp-mcp` bin private; no unified `designproof` |
+| Skills | Partial | `.cursor/skills/` + `agent-skills/` + `@designproof/design-skills` engine |
 | Agents | Cursor-only | `.cursor/agents/`, hooks, ORCHESTRATION.md |
 | Auth | Demo harness | Playwright `storageState`; setup token; no run-scoped MCP tokens |
 | Publish | Missing | All packages `private: true` |
 
-**Catalog honesty:** Server + `@tell/schema` `MCP_TOOL_NAMES` ship **eleven** tools. Skill `tell-mcp-tools`, `mcp-engineer`, README, AGENTS.md, and BUILD.md must list the same set (no public MCP host).
+**Catalog honesty:** Server + `@designproof/schema` `MCP_TOOL_NAMES` ship **eleven** tools. Skill `dp-mcp-tools`, `mcp-engineer`, README, AGENTS.md, and BUILD.md must list the same set (no public MCP host).
 
 ### 1.1 MCP tools inventory (source of truth = code)
 
 | Tool | Role in Ashish loop |
 |---|---|
-| `tell_capture` | Capture rendered URL → fingerprint input |
-| `tell_diagnose` | Capture + detect (+ optional taste) → report; no URL/path → committed fixture report (not live) |
-| `tell_redesign` | Direction → patch proposal |
-| `tell_apply` | **Patch text + instructions only** — never writes repo |
-| `tell_capture_matrix` | Route × viewport × theme × interaction |
-| `tell_proof_verify` | Report prove: apply patch, recapture, pass/review/fail |
-| `tell_proof_revert` | Revert last proof patch marker |
-| `tell_design_from_features` | Studio author: brief → deterministic design spec + HTML; raw design episode → sibling tell-design-data when present |
-| `tell_voice` | Voice/text art-direction → action items (parity with `/api/voice`) |
-| `tell_install_info` | Install snippets + deeplink shape for Connect Agent |
-| `tell_resolve_intent` | Free text → scenario defaults (deterministic) |
+| `designproof_capture` | Capture rendered URL → fingerprint input |
+| `designproof_diagnose` | Capture + detect (+ optional taste) → report; no URL/path → committed fixture report (not live) |
+| `designproof_redesign` | Direction → patch proposal |
+| `designproof_apply` | **Patch text + instructions only** — never writes repo |
+| `designproof_capture_matrix` | Route × viewport × theme × interaction |
+| `designproof_proof_verify` | Report prove: apply patch, recapture, pass/review/fail |
+| `designproof_proof_revert` | Revert last proof patch marker |
+| `designproof_design_from_features` | Studio author: brief → deterministic design spec + HTML; raw design episode → sibling dp-design-data when present |
+| `designproof_voice` | Voice/text art-direction → action items (parity with `/api/voice`) |
+| `designproof_install_info` | Install snippets + deeplink shape for Connect Agent |
+| `designproof_resolve_intent` | Free text → scenario defaults (deterministic) |
 
-Local training sink (not extra MCP tools): `tell_diagnose`, `tell_redesign`, `tell_proof_verify`, and `tell_design_from_features` reuse the same writer as `/api/design*` when `../tell-design-data` (or `TELL_DESIGN_DATA_REPO`) exists. Still eleven tools; no public MCP host.
+Local training sink (not extra MCP tools): `designproof_diagnose`, `designproof_redesign`, `designproof_proof_verify`, and `designproof_design_from_features` reuse the same writer as `/api/design*` when `../dp-design-data` (or `DP_DESIGN_DATA_REPO`) exists. Still eleven tools; no public MCP host.
 
 Web-only today (MCP gap): `/api/setup/*`, share links, health.
 
 ---
 
-## 2. Architecture target (Tell-shaped)
+## 2. Architecture target (Design Proof-shaped)
 
 ```text
 ┌──────────────────────────────┐
 │ Coding agents / IDEs         │  Cursor (primary), Claude Code, Codex,
 │ (stdio MCP clients)          │  Windsurf, VS Code Copilot Chat, Zed, …
 └──────────────┬───────────────┘
-               │ stdio MCP (tell-mcp)
+               │ stdio MCP (dp-mcp)
                ▼
 ┌──────────────────────────────┐
-│ @tell/mcp  +  @tell/cli      │  Thin adapters — same engine calls
+│ @designproof/mcp  +  @designproof/cli      │  Thin adapters — same engine calls
 └──────────────┬───────────────┘
                │ import packages
                ▼
 ┌──────────────────────────────┐
-│ @tell/core · taste · redesign│  Deterministic through detect/reconcile
-│ @tell/design-skills · schema │  LLM only taste/voice/enhanced draft
+│ @designproof/core · taste · redesign│  Deterministic through detect/reconcile
+│ @designproof/design-skills · schema │  LLM only taste/voice/enhanced draft
 └──────────────┬───────────────┘
                │
      ┌─────────┴──────────┐
@@ -103,9 +103,9 @@ Web-only today (MCP gap): `/api/setup/*`, share links, health.
 
 ### Wave 0 — Correctness & drift (do first, small)
 
-- [x] Sync `tell-mcp-tools` skill + `mcp-engineer` agent to all eleven tools
+- [x] Sync `dp-mcp-tools` skill + `mcp-engineer` agent to all eleven tools
 - [x] Add vitest/CI assertion: MCP tool names exported ≡ skill table ≡ schema enum
-- [x] Add `McpToolName` (or equivalent) to `@tell/schema`
+- [x] Add `McpToolName` (or equivalent) to `@designproof/schema`
 - [x] Document web-only routes as explicit “not in MCP yet” in skill
 - [x] Align README / AGENTS.md / BUILD.md catalogs to the same eleven-tool list (no invented public host)
 
@@ -113,15 +113,15 @@ Web-only today (MCP gap): `/api/setup/*`, share links, health.
 
 ### Wave 1 — Install-info single source of truth
 
-- [ ] Schema: `InstallInfo` in `@tell/schema` (mcp configs, CLI one-liners, requirements, demo URLs)
-- [ ] `GET /api/install-info` on `@tell/web` (works offline with static defaults)
-- [ ] `tell mcp print-config` (CLI or MCP helper) prints Cursor / Claude / VS Code / Windsurf / Zed / Codex snippets from same builder
+- [ ] Schema: `InstallInfo` in `@designproof/schema` (mcp configs, CLI one-liners, requirements, demo URLs)
+- [ ] `GET /api/install-info` on `@designproof/web` (works offline with static defaults)
+- [ ] `designproof mcp print-config` (CLI or MCP helper) prints Cursor / Claude / VS Code / Windsurf / Zed / Codex snippets from same builder
 - [ ] README + BUILD + DEPLOY snippets regenerated from install-info (or linked)
 
 **Payload sketch (zod):**
 
 ```ts
-// conceptual — implement in @tell/schema
+// conceptual — implement in @designproof/schema
 InstallInfo = {
   version: string
   requirements: { node: string, pnpm?: string, playwright: boolean }
@@ -135,7 +135,7 @@ InstallInfo = {
     codex: string      // toml or cli
     manual: object
   }
-  cli: { npx?: string, pnpm: string, tellDiagnose: string }
+  cli: { npx?: string, pnpm: string, dpDiagnose: string }
   deeplink?: { cursor?: string }  // base64 config when ready
 }
 ```
@@ -146,7 +146,7 @@ InstallInfo = {
 
 Peer lesson: three strategies — **cli** (agent owns config), **json** (merge into known path), **manual** (print only).
 
-#### 2.1 Strategy matrix for Tell
+#### 2.1 Strategy matrix for Design Proof
 
 | Agent / host | Strategy | Target path / command | Priority |
 |---|---|---|---|
@@ -157,13 +157,13 @@ Peer lesson: three strategies — **cli** (agent owns config), **json** (merge i
 | Windsurf | json | `~/.codeium/windsurf/mcp_config.json` | P1 |
 | Zed | json | `context_servers` | P2 |
 | Antigravity / Gemini-branded | json | documented path from install-info | P1 |
-| Cline / Kiro / OpenCode / Qwen / Kimi / Pi / Trae / Grok / Hermes / OpenClaw | json/toml/yaml | `tell mcp install <id>` | P1 |
+| Cline / Kiro / OpenCode / Qwen / Kimi / Pi / Trae / Grok / Hermes / OpenClaw | json/toml/yaml | `designproof mcp install <id>` | P1 |
 | Muse Code / Z Code | manual snippet | print until path verified | P3 |
 | Continue.dev | manual | snippet only until verified | P3 |
 
-#### 2.2 Tell commands / UI
+#### 2.2 Design Proof commands / UI
 
-- [ ] `tell mcp install <agent> [--project|--user]`
+- [ ] `designproof mcp install <agent> [--project|--user]`
 - [ ] `tell mcp uninstall <agent>`
 - [ ] `tell mcp status` — probes config presence + daemon health (`/api/health/capture` when web up)
 - [ ] Web Settings (or CaptureBar overflow): “Connect Agent” panel with Copy + Cursor one-click
@@ -171,41 +171,41 @@ Peer lesson: three strategies — **cli** (agent owns config), **json** (merge i
 
 #### 2.3 Optional hosted installer
 
-- [ ] `install.sh` that: checks Node 20+, installs CLI or clones shallow, `playwright install chromium`, runs `tell mcp install "$1"`
+- [ ] `install.sh` that: checks Node 20+, installs CLI or clones shallow, `playwright install chromium`, runs `designproof mcp install "$1"`
 - [ ] Idempotent; refuses unknown agents; documents `/usr/bin/od`-style PATH collisions generically (“shadowed binary names”)
 
 **DoD:** From a clean machine, Ashish (or a judge) can connect Cursor MCP without hand-editing JSON.
 
 **Cut line:** If behind, ship Cursor project `.cursor/mcp.json` writer + deeplink only; keep other agents as print-config.
 
-### Wave 3 — Unified `@tell/cli`
+### Wave 3 — Unified `@designproof/cli`
 
-- [ ] New `packages/cli` with bin `tell`
+- [ ] New `packages/cli` with bin `designproof`
 - [ ] Subcommands mirror MCP/API 1:1:
 
 | Subcommand | Maps to |
 |---|---|
-| `tell diagnose --url` | `/api/diagnose`, `tell_diagnose` |
-| `tell capture --url` | `tell_capture` |
-| `tell redesign --direction` | `tell_redesign` |
+| `designproof diagnose --url` | `/api/diagnose`, `designproof_diagnose` |
+| `tell capture --url` | `designproof_capture` |
+| `tell redesign --direction` | `designproof_redesign` |
 | `tell apply --proposal` | print patch only |
-| `tell design --brief` | `tell_design_from_features` |
-| `tell proof verify\|matrix\|revert` | proof APIs |
+| `tell design --brief` | `designproof_design_from_features` |
+| `design proof verify\|matrix\|revert` | proof APIs |
 | `tell voice --text` | `/api/voice` |
 | `tell mcp …` | Wave 2 |
-| `tell doctor` | toolchain probe |
+| `designproof doctor` | toolchain probe |
 | `tell install-info` | print JSON |
 
 - [ ] CI scripts (`pr-diagnose`, matrix) call CLI instead of ad-hoc `tsx`
 - [ ] `tell apply` **never** writes; proof verify may write only in disposable checkout (existing rule)
 
-**DoD:** `tell diagnose --url http://localhost:3001` returns live report with `meta.live=true` when fixture+Playwright ready.
+**DoD:** `designproof diagnose --url http://localhost:3001` returns live report with `meta.live=true` when fixture+Playwright ready.
 
 ### Wave 4 — Doctor / toolchain detection
 
 Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/fnm, Homebrew).
 
-- [ ] `tell doctor` checks: Node ≥20, pnpm, Playwright Chromium, ports 3000/3001 free-or-ours, `.cursor/mcp.json`, capture health
+- [ ] `designproof doctor` checks: Node ≥20, pnpm, Playwright Chromium, ports 3000/3001 free-or-ours, `.cursor/mcp.json`, capture health
 - [ ] Prepend well-known toolchain bins when spawning capture/setup children (extend `repo-runner` pattern)
 - [ ] Emit adapter-specific fix hints from install-info
 
@@ -213,7 +213,7 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 
 ### Wave 5 — Skills packaging & run staging
 
-#### 5.1 Keep Tell’s dual model (do not collapse)
+#### 5.1 Keep Design Proof’s dual model (do not collapse)
 
 | Kind | Location | Runtime |
 |---|---|---|
@@ -223,12 +223,12 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 
 #### 5.2 Peer lessons to adapt (not copy)
 
-- Frontmatter `name` + `description` (+ optional Tell extensions under `tell:` if needed)
-- **Do not** symlink Tell skills into every agent’s global skill folder on each run
+- Frontmatter `name` + `description` (+ optional Design Proof extensions under `dp:` if needed)
+- **Do not** symlink Design Proof skills into every agent’s global skill folder on each run
 - **Do** stage a run-scoped guidance bundle after diagnose:
 
 ```text
-.tell/runs/<runId>/
+.designproof/runs/<runId>/
   report.json
   skills/           # finding-relevant SKILL fragments + craft floors
   MANIFEST.json     # hashes, schema version
@@ -238,10 +238,10 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 
 #### 5.3 Publishable skill packs (later)
 
-- [ ] When `@tell/mcp` publishes: bundle offline report + selected `agent-skills` + skill index
+- [ ] When `@designproof/mcp` publishes: bundle offline report + selected `agent-skills` + skill index
 - [ ] `tell skills list|show` reads local + bundled index
 
-**DoD:** After `tell_diagnose`, Agent can open staged guidance that names the actual findings without re-reading the whole skill tree.
+**DoD:** After `designproof_diagnose`, Agent can open staged guidance that names the actual findings without re-reading the whole skill tree.
 
 ### Wave 6 — Bidirectional MCP (optional, careful)
 
@@ -249,23 +249,23 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 - [ ] Templates limited to **read-only** connectors useful to Ashish (deploy status, capture host health)
 - [ ] Never import a tool that can write patches into user repos
 - [ ] If OAuth needed for connectors: daemon/web owns OAuth (PKCE); tokens chmod 0600; not agent-subprocess localhost listeners
-- [ ] Imported results wrap through `@tell/schema` before entering report UI
+- [ ] Imported results wrap through `@designproof/schema` before entering report UI
 
 **Cut line:** Skip entirely if Wave 2–3 unfinished. Ashish does not need Figma/media MCP imports for the core demo.
 
 ### Wave 7 — MCP ↔ web parity
 
-- [x] `tell_voice` tool → same as `/api/voice`
-- [ ] Optional `tell_setup_*` **local-only** tools gated like `setup-guard.ts`
-- [ ] `tell_health` → capture readiness
+- [x] `designproof_voice` tool → same as `/api/voice`
+- [ ] Optional `designproof_setup_*` **local-only** tools gated like `setup-guard.ts`
+- [ ] `designproof_health` → capture readiness
 - [x] Session state: prefer explicit `reportId` / file path over sole in-memory `lastReport` for redesign→apply chain
 
 **DoD:** Agent can drive diagnose → voice direction → redesign → copy patch without leaving Chat.
 
 ### Wave 8 — Publish & package
 
-- [ ] Publish `@tell/schema`, `@tell/mcp`, `@tell/cli` (or single `@tell/mcp` with CLI) — decide one package strategy
-- [ ] Bundle `fixtures/reports/tell-report.json` for offline diagnose
+- [ ] Publish `@designproof/schema`, `@designproof/mcp`, `@designproof/cli` (or single `@designproof/mcp` with CLI) — decide one package strategy
+- [ ] Bundle `fixtures/reports/dp-report.json` for offline diagnose
 - [ ] Document: monorepo still required for web UI + fixture app; MCP-only consumers get diagnose/redesign/proof
 - [ ] Version install-info with package version
 
@@ -275,7 +275,7 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 
 ### 4.1 Cursor deeplink flow
 
-1. User opens Tell web → Connect Agent → Cursor
+1. User opens Design Proof web → Connect Agent → Cursor
 2. UI fetches `/api/install-info`
 3. Builds base64 JSON `{ command, args, env }`
 4. Hidden `<a href="cursor://…/mcp/install?name=tell&config=…">` click
@@ -285,16 +285,16 @@ Peer lesson: GUI-stripped PATH + user toolchain dirs (`~/.local/bin`, mise/nvm/f
 
 | Scope | When | Path |
 |---|---|---|
-| Project (default for Tell demo) | Repo already open | `.cursor/mcp.json` |
-| User | Ashish wants Tell on every repo | `~/.cursor/mcp.json` merge |
+| Project (default for Design Proof demo) | Repo already open | `.cursor/mcp.json` |
+| User | Ashish wants Design Proof on every repo | `~/.cursor/mcp.json` merge |
 
-Merge rules: never delete unrelated servers; upsert key `"tell"` only; validate JSON before write; backup `.bak` once.
+Merge rules: never delete unrelated servers; upsert key `"designproof"` only; validate JSON before write; backup `.bak` once.
 
 ### 4.3 Failure modes (must have copy)
 
 | Failure | Ashish-facing copy |
 |---|---|
-| No Node / wrong version | “Tell needs Node 20+. Run `tell doctor`.” |
+| No Node / wrong version | “Design Proof needs Node 20+. Run `designproof doctor`.” |
 | No Playwright | “Live capture needs Chromium. Offline report still works.” |
 | Port conflict | Report conflict; do not kill foreign processes (see local-dev rule) |
 | Deeplink blocked | Show copy JSON fallback immediately |
@@ -322,13 +322,13 @@ Merge rules: never delete unrelated servers; upsert key `"tell"` only; validate 
 | Browser-only (Vercel web) | N/A | N/A | N/A | Capture via remote API |
 | Docker capture host | N/A MCP stdio | N/A | doctor remote | Document MCP limitation if containerized |
 
-**Do not** build Electron desktop or agent-runtime spawning of Claude/Codex as a product goal — Tell diagnoses UI; it does not replace the user’s coding agent.
+**Do not** build Electron desktop or agent-runtime spawning of Claude/Codex as a product goal — Design Proof diagnoses UI; it does not replace the user’s coding agent.
 
 ---
 
 ## 6. Observability & contracts
 
-- [ ] Zod every new install/MCP/CLI boundary in `@tell/schema`
+- [ ] Zod every new install/MCP/CLI boundary in `@designproof/schema`
 - [ ] Analytics optional, privacy-first (no prompt bodies by default)
 - [ ] MCP smoke (`_smoke.mjs`) extended for install-info shape
 - [ ] E2E: Settings Connect Agent copy button; deeplink href shape unit test
@@ -337,10 +337,10 @@ Merge rules: never delete unrelated servers; upsert key `"tell"` only; validate 
 
 ## 7. Explicit non-goals
 
-1. Spawning third-party coding agents as Tell subprocesses for generation
-2. Product user accounts / OAuth login for Tell itself (PLAN.md)
+1. Spawning third-party coding agents as Design Proof subprocesses for generation
+2. Product user accounts / OAuth login for Design Proof itself (PLAN.md)
 3. Auto-apply patches from MCP or CLI
-4. Global symlinking of Tell skills into every agent home on each run
+4. Global symlinking of Design Proof skills into every agent home on each run
 5. Naming or vendoring the peer design daemon in this repository
 6. Copying peer theme packs, templates, or craft aesthetics into offerings
 

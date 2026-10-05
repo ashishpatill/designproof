@@ -18,8 +18,8 @@ export type ElementRole = z.infer<typeof ElementRole>;
 export const ComputedStyleSample = z.object({
   selector: z.string(),
   // Unique handle stamped on the live element during capture (survives into snapshotHtml),
-  // so the redesign can restyle THIS exact element via [data-tell-id="…"] — no selector guessing.
-  tellId: z.string().default(""),
+  // so the redesign can restyle THIS exact element via [data-dp-id="…"] — no selector guessing.
+  dpId: z.string().default(""),
   tag: z.string().default(""),
   role: ElementRole.default("other"),
   rect: z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }).optional(),
@@ -100,7 +100,7 @@ export type InteractionState = z.infer<typeof InteractionState>;
 /**
  * Auth dimension for scenario cells.
  * Authenticated captures load a Playwright storage state (cookies / localStorage)
- * from `TELL_AUTH_STORAGE_STATE` or `CaptureUrlOptions.storageState` — no product login UI.
+ * from `DP_AUTH_STORAGE_STATE` or `CaptureUrlOptions.storageState` — no product login UI.
  */
 export const AuthRole = z.enum(["anonymous", "authenticated"]);
 export type AuthRole = z.infer<typeof AuthRole>;
@@ -202,7 +202,7 @@ export type DesignFingerprint = z.infer<typeof DesignFingerprint>;
 export const Verdict = z.enum(["generic", "drift", "intentional", "uncertain"]);
 export type Verdict = z.infer<typeof Verdict>;
 
-export const TellDetector = z.enum([
+export const DesignProofDetector = z.enum([
   "SystemFontTell",
   "GradientCrutchTell",
   "ShadowEverywhereTell",
@@ -213,7 +213,7 @@ export const TellDetector = z.enum([
   "GrayMushTell",
   "BoilerplateCopyTell",
 ]);
-export type TellDetector = z.infer<typeof TellDetector>;
+export type DesignProofDetector = z.infer<typeof DesignProofDetector>;
 
 export const DriftDetector = z.enum([
   "TokenBypass",
@@ -239,7 +239,7 @@ export type Evidence = z.infer<typeof Evidence>;
 export const Finding = z.object({
   id: z.string(),
   family: z.enum(["tell", "drift"]),
-  detector: z.union([TellDetector, DriftDetector]),
+  detector: z.union([DesignProofDetector, DriftDetector]),
   verdictHint: Verdict,
   facts: z.record(z.any()),
   evidence: z.array(Evidence),
@@ -274,7 +274,7 @@ export const ScoreAxis = z.object({
   label: z.string(),
   weight: z.number(),
   before: z.number(),       // 0..1 quality of the captured page
-  after: z.number(),        // 0..1 quality after Tell's redesign
+  after: z.number(),        // 0..1 quality after Design Proof's redesign
   beforeText: z.string(),   // human-readable measured value, e.g. "1 family · Inter"
   afterText: z.string(),
   rationale: z.string(),    // the rule that justifies the move (cites the methodology)
@@ -286,7 +286,7 @@ export const Scorecard = z.object({
   score: z.number(),        // 0..100 genericness, lower is better
   band: z.enum(["distinctive", "conservative", "template", "slop"]),
   axes: z.array(ScoreAxis),
-  tellScore: z.number().default(0),   // 0..1 cliché-flag modifier
+  dpScore: z.number().default(0),   // 0..1 cliché-flag modifier
   scoredAgainst: z.enum(["baseline", "brand-dna"]).default("baseline"),
 });
 export type Scorecard = z.infer<typeof Scorecard>;
@@ -294,7 +294,7 @@ export type Scorecard = z.infer<typeof Scorecard>;
 /**
  * A project's distinctive design fingerprint — learned once (from a reference URL or explicit
  * choices) and used as the TARGET the redesign steers toward and the yardstick the scorecard
- * measures against. When absent, Tell scores against the generic baseline.
+ * measures against. When absent, Design Proof scores against the generic baseline.
  */
 export const BrandDNA = z.object({
   displayFont: z.string(),
@@ -363,7 +363,7 @@ export const RedesignProposal = z.object({
 });
 export type RedesignProposal = z.infer<typeof RedesignProposal>;
 
-export const TellReport = z.object({
+export const DesignProofReport = z.object({
   /** Session id for redesign → apply chains (MCP / CLI). Additive; offline fixtures omit it. */
   id: z.string().optional(),
   capture: CapturePayload,
@@ -381,7 +381,7 @@ export const TellReport = z.object({
   measures: Scorecard.optional(),
   activeDirection: ArtDirection.optional(),
 });
-export type TellReport = z.infer<typeof TellReport>;
+export type DesignProofReport = z.infer<typeof DesignProofReport>;
 
 /**
  * Per-user design learning — browser/local only (Ashish's machine or future account).

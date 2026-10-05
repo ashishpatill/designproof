@@ -1,6 +1,6 @@
 "use client";
 
-import type { Reconciliation } from "@tell/schema";
+import type { Reconciliation } from "@designproof/schema";
 import { AxisBar } from "@/components/report/axis-bar";
 
 const BAND_COPY: Record<string, string> = {
@@ -52,7 +52,7 @@ export function Scorecard({ reconciliation, live }: { reconciliation: Reconcilia
         ))}
       </div>
       <p className="mt-4 font-mono text-meta text-muted">
-        {reconciliation.elementsRestyled} real elements restyled by <span className="text-secondary">data-tell-id</span> — the preview transforms the page itself, not a filter.
+        {reconciliation.elementsRestyled} real elements restyled by <span className="text-secondary">data-dp-id</span> — the preview transforms the page itself, not a filter.
       </p>
     </section>
   );

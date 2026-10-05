@@ -3,17 +3,17 @@ import { buildPlatformCatalog, PlatformCompatEntry } from "./platform-compat";
 
 /** Every public MCP tool name. CI/docs must match this enum. */
 export const McpToolName = z.enum([
-  "tell_capture",
-  "tell_diagnose",
-  "tell_redesign",
-  "tell_apply",
-  "tell_capture_matrix",
-  "tell_proof_verify",
-  "tell_proof_revert",
-  "tell_design_from_features",
-  "tell_voice",
-  "tell_install_info",
-  "tell_resolve_intent",
+  "designproof_capture",
+  "designproof_diagnose",
+  "designproof_redesign",
+  "designproof_apply",
+  "designproof_capture_matrix",
+  "designproof_proof_verify",
+  "designproof_proof_revert",
+  "designproof_design_from_features",
+  "designproof_voice",
+  "designproof_install_info",
+  "designproof_resolve_intent",
 ]);
 export type McpToolName = z.infer<typeof McpToolName>;
 export const MCP_TOOL_NAMES = McpToolName.options;
@@ -39,7 +39,7 @@ export const InstallInfo = z.object({
     webUrl: z.string(),
   }),
   mcp: z.object({
-    serverName: z.literal("tell"),
+    serverName: z.literal("designproof"),
     tools: z.array(McpToolName),
     cursor: z.object({ mcpServers: z.record(McpStdioServerConfig) }),
     claudeCli: z.string(),
@@ -66,14 +66,14 @@ export const InstallInfo = z.object({
     codexToml: z.string(),
     manual: McpStdioServerConfig,
   }),
-  /** Exhaustive agent/IDE catalog — source for README + `tell mcp install`. */
+  /** Exhaustive agent/IDE catalog — source for README + `designproof mcp install`. */
   platforms: z.array(PlatformCompatEntry),
   cli: z.object({
     pnpmMcp: z.string(),
-    tellDiagnose: z.string(),
-    tellMcpInstallCursor: z.string(),
-    tellMcpInstall: z.string(),
-    tellDoctor: z.string(),
+    dpDiagnose: z.string(),
+    dpMcpInstallCursor: z.string(),
+    dpMcpInstall: z.string(),
+    dpDoctor: z.string(),
   }),
   deeplink: z.object({
     cursor: z.string(),
@@ -83,20 +83,20 @@ export type InstallInfo = z.infer<typeof InstallInfo>;
 
 export type BuildInstallInfoOptions = {
   version?: string;
-  /** Prefer monorepo pnpm launch (default) vs built tell-mcp bin. */
-  launch?: "pnpm" | "tell-mcp";
+  /** Prefer monorepo pnpm launch (default) vs built dp-mcp bin. */
+  launch?: "pnpm" | "dp-mcp";
   fixtureUrl?: string;
   webUrl?: string;
   offlineReportPath?: string;
 };
 
-function stdioLaunch(launch: "pnpm" | "tell-mcp"): McpStdioServerConfig {
-  if (launch === "tell-mcp") {
-    return { command: "tell-mcp", args: [] };
+function stdioLaunch(launch: "pnpm" | "dp-mcp"): McpStdioServerConfig {
+  if (launch === "dp-mcp") {
+    return { command: "dp-mcp", args: [] };
   }
   return {
     command: "pnpm",
-    args: ["-F", "@tell/mcp", "start"],
+    args: ["-F", "@designproof/mcp", "start"],
   };
 }
 
@@ -108,7 +108,7 @@ export function utf8ToBase64(value: string): string {
   return btoa(binary);
 }
 
-export function buildCursorDeeplink(config: McpStdioServerConfig, name = "tell"): string {
+export function buildCursorDeeplink(config: McpStdioServerConfig, name = "designproof"): string {
   const payload = utf8ToBase64(JSON.stringify(config));
   return `cursor://anysphere.cursor-deeplink/mcp/install?name=${encodeURIComponent(name)}&config=${payload}`;
 }
@@ -123,7 +123,7 @@ export function buildInstallInfo(options: BuildInstallInfoOptions = {}): Install
   const version = options.version ?? "0.1.0";
   const fixtureUrl = options.fixtureUrl ?? "http://localhost:3001";
   const webUrl = options.webUrl ?? "http://localhost:3000";
-  const offlineReportPath = options.offlineReportPath ?? "fixtures/reports/tell-report.json";
+  const offlineReportPath = options.offlineReportPath ?? "fixtures/reports/dp-report.json";
 
   const claudeJson = JSON.stringify({
     command: stdio.command,
@@ -145,13 +145,13 @@ export function buildInstallInfo(options: BuildInstallInfoOptions = {}): Install
       webUrl,
     },
     mcp: {
-      serverName: "tell" as const,
+      serverName: "designproof" as const,
       tools: [...MCP_TOOL_NAMES],
-      cursor: { mcpServers: { tell: stdio } },
-      claudeCli: `claude mcp add-json --scope user tell '${claudeJson}'`,
+      cursor: { mcpServers: { designproof: stdio } },
+      claudeCli: `claude mcp add-json --scope user designproof '${claudeJson}'`,
       vscode: {
         servers: {
-          tell: {
+          designproof: {
             type: "stdio" as const,
             command: stdio.command,
             args: stdio.args,
@@ -159,10 +159,10 @@ export function buildInstallInfo(options: BuildInstallInfoOptions = {}): Install
           },
         },
       },
-      windsurf: { mcpServers: { tell: stdio } },
+      windsurf: { mcpServers: { designproof: stdio } },
       zed: {
         context_servers: {
-          tell: {
+          designproof: {
             command: stdio.command,
             args: stdio.args,
             ...(stdio.env ? { env: stdio.env } : {}),
@@ -170,7 +170,7 @@ export function buildInstallInfo(options: BuildInstallInfoOptions = {}): Install
         },
       },
       codexToml: [
-        "[mcp_servers.tell]",
+        "[mcp_servers.designproof]",
         `command = ${JSON.stringify(stdio.command)}`,
         `args = ${JSON.stringify(stdio.args)}`,
       ].join("\n"),
@@ -178,11 +178,11 @@ export function buildInstallInfo(options: BuildInstallInfoOptions = {}): Install
     },
     platforms: buildPlatformCatalog(stdio),
     cli: {
-      pnpmMcp: "pnpm -F @tell/mcp start",
-      tellDiagnose: `tell diagnose --url ${fixtureUrl}`,
-      tellMcpInstallCursor: "tell mcp install cursor --project",
-      tellMcpInstall: "tell mcp install <platform> [--project|--user|--print]",
-      tellDoctor: "tell doctor",
+      pnpmMcp: "pnpm -F @designproof/mcp start",
+      dpDiagnose: `designproof diagnose --url ${fixtureUrl}`,
+      dpMcpInstallCursor: "designproof mcp install cursor --project",
+      dpMcpInstall: "designproof mcp install <platform> [--project|--user|--print]",
+      dpDoctor: "designproof doctor",
     },
     deeplink: {
       cursor: buildCursorDeeplink(stdio),

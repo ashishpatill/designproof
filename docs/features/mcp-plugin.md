@@ -4,15 +4,15 @@ Back: [`../FEATURE-MAP.md`](../FEATURE-MAP.md) · Entry: [`../../AGENTS.md`](../
 
 ## Goal
 
-Tell ships as skills + CLI + **stdio MCP** that Cursor and Grok Build (and other hosts) consume. That plugin loop **is** the product. Not a Studio web app.
+Design Proof ships as skills + CLI + **stdio MCP** that Cursor and Grok Build (and other hosts) consume. That plugin loop **is** the product. Not a Studio web app.
 
 ## Done
 
-- Eleven `tell_*` tools; docs ≡ `@tell/schema` `MCP_TOOL_NAMES` (catalog honesty closed 2026-08-21).
-- `.cursor/mcp.json` → `pnpm -F @tell/mcp start`.
-- `tell mcp install <platform>` (Cursor project json + deeplink; Grok `--project`; others print-config or native add).
-- `GET /api/install-info` + `tell_install_info` + `tell_resolve_intent`.
-- MCP training writes (when sibling `tell-design-data` exists) — **not** the same as curated SFT/DPO (see [training-data-mcp-sink.md](./training-data-mcp-sink.md)).
+- Eleven `designproof_*` tools; docs ≡ `@designproof/schema` `MCP_TOOL_NAMES` (catalog honesty closed 2026-08-21).
+- `.cursor/mcp.json` → `pnpm -F @designproof/mcp start`.
+- `designproof mcp install <platform>` (Cursor project json + deeplink; Grok `--project`; others print-config or native add).
+- `GET /api/install-info` + `designproof_install_info` + `designproof_resolve_intent`.
+- MCP training writes (when sibling `dp-design-data` exists) — **not** the same as curated SFT/DPO (see [training-data-mcp-sink.md](./training-data-mcp-sink.md)).
 
 ## Remaining
 
@@ -23,18 +23,18 @@ Tell ships as skills + CLI + **stdio MCP** that Cursor and Grok Build (and other
 ## How to verify
 
 ```bash
-tell mcp platforms
-tell mcp install cursor --print
-pnpm -F @tell/mcp start   # stdio; Agent chat: tell_diagnose on http://localhost:3001
+designproof mcp platforms
+designproof mcp install cursor --print
+pnpm -F @designproof/mcp start   # stdio; Agent chat: designproof_diagnose on http://localhost:3001
 ```
 
-Catalog must stay at **eleven**. `tell_apply` never writes files.
+Catalog must stay at **eleven**. `designproof_apply` never writes files.
 
 ## Skills to load first
 
-`tell-mcp-tools` · (install copy) `tell-demo-script`
+`dp-mcp-tools` · (install copy) `dp-demo-script`
 
-MCP: the `tell` server only. No in-repo Cursor plugin package.
+MCP: the `designproof` server only. No in-repo Cursor plugin package.
 
 ## Related
 

@@ -1,20 +1,20 @@
 {
-  "name": "@tell/cli",
+  "name": "@designproof/cli",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "tell": "./dist/cli.js"
+    "designproof": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsup src/cli.ts --format esm --external @tell/core --external @tell/schema --external @tell/taste",
+    "build": "tsup src/cli.ts --format esm --external @designproof/core --external @designproof/schema --external @designproof/taste",
     "start": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@tell/core": "workspace:*",
-    "@tell/schema": "workspace:*",
-    "@tell/taste": "workspace:*",
+    "@designproof/core": "workspace:*",
+    "@designproof/schema": "workspace:*",
+    "@designproof/taste": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

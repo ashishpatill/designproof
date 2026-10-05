@@ -20,9 +20,9 @@ Learn (automatic): `.cursor/skills/agency-run-learn` · `research/design-data.RE
 6. Never combine axes. Never craft `--all`.
 7. Status: `pnpm agency:pipeline -- --brief <brief> --status`
 8. **Learn is automatic** on agency runs (`agency-run-learn`) — developer corpus only when design-data pointer is set.
-9. **User sessions** learn separately in the browser (`tell-user-session-learn`) — never via design-data checkout.
-10. **Personal corpus (dev):** `TELL_DESIGN_DATA` + `TELL_DEV_CORPUS=1` or `research/design-data.local.json`.
-11. **Media performance is automatic** — `responsive-performance` is always routed; `pnpm media:site` runs at end of `agency:run` **and** on `agency:pipeline --mark-pass 4-ship`. Specimen UIs use `SiteImg`.
+9. **User sessions** learn separately in the browser (`dp-user-session-learn`) — never via design-data checkout.
+10. **Personal corpus (dev):** `DP_DESIGN_DATA` + `DP_DEV_CORPUS=1` or `research/design-data.local.json`.
+11. **Media performance is automatic** — `responsive-performance` is always routed; `pnpm media:site` runs at end of `agency:run` **and** on `agency:pipeline --mark-pass 4-ship`. Template UIs use `SiteImg`.
 12. **Research gate is automatic on every template** — `designFromFeatures` attaches `researchPlan` (LoadPrior → gap → sport-site-research when sport → IA → training) and merges `followOnCraft` into `routedSkills`.
 13. **Skill wiring is a hard gate** — `assertSkillWiring` (via `assertBasics`) + agency `2-build` artifacts `RESEARCH_GATE.md` / `SKILL_WIRING.json`. Phase fails if research/craft/optim wiring is red.
 
@@ -32,7 +32,7 @@ Learn (automatic): `.cursor/skills/agency-run-learn` · `research/design-data.RE
 Use agency-quality-site.
 pnpm agency:run -- --query "<requirement>" --fresh
 # Learn runs automatically; read LEARN.md after.
-# Optional: point TELL_DESIGN_DATA at your tell-design-data checkout.
+# Optional: point DP_DESIGN_DATA at your dp-design-data checkout.
 ```
 
 ## Session opener (manual)
@@ -47,5 +47,5 @@ Read DESIGN_RIGOR.md. --status, then Goal/Loop ONLY the current phase until --ma
 ## Related
 
 - `agency-run-learn` — automatic engine memory + design-data write-back
-- `premium-content-custom-web`, `agency-minimal-grid`, `gates-until-verified`, `tell-proof-verify`, `design-research-loop`
+- `premium-content-custom-web`, `agency-minimal-grid`, `gates-until-verified`, `dp-proof-verify`, `design-research-loop`
 - `docs/08_AI_DESIGN_METHODS.md` (reference board + compose slices)

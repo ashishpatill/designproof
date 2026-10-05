@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { designFromFeatures, getTemplate } from "@tell/design-skills";
+import { designFromFeatures, getTemplate } from "@designproof/design-skills";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 export const runtime = "nodejs";
 
 /**
- * Specimen document for iframe `src` (gallery thumbs + proof frames).
+ * Template document for iframe `src` (gallery thumbs + proof frames).
  * Avoids embedding ~200KB HTML × N into the RSC/page payload.
  * No process-lifetime HTML cache — hot reload must reflect craft CSS/render changes.
  *

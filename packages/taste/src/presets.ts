@@ -1,4 +1,4 @@
-import { ArtDirection } from "@tell/schema";
+import { ArtDirection } from "@designproof/schema";
 
 export const DIRECTION_PRESETS = {
   editorial: {

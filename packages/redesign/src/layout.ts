@@ -4,7 +4,7 @@
 // sibling rects) for gap normalization. Everything guards `rect` (it is z.optional): with no
 // rects we degrade to non-layout recipes and touch nothing structural.
 
-import type { ComputedStyleSample } from "@tell/schema";
+import type { ComputedStyleSample } from "@designproof/schema";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
@@ -23,7 +23,7 @@ export type LayoutModel = {
 const rectOf = (s: ComputedStyleSample): Rect | null => (s.rect && s.rect.w > 0 ? s.rect : null);
 
 export function analyzeLayout(styles: ComputedStyleSample[]): LayoutModel {
-  const withRect = styles.filter((s) => s.tellId && rectOf(s));
+  const withRect = styles.filter((s) => s.dpId && rectOf(s));
   const hasRects = withRect.length > 0;
 
   const pageWidth = Math.max(360, ...styles.map((s) => rectOf(s)?.w ?? 0), 1440);
@@ -32,8 +32,8 @@ export function analyzeLayout(styles: ComputedStyleSample[]): LayoutModel {
     hasRects, pageWidth,
     heroHeadingId: null, heroContainerId: null,
     contentIds: [], sectionOrder: [], cardIds: [],
-    navId: styles.find((s) => s.role === "nav")?.tellId || null,
-    footerId: styles.find((s) => s.tag === "footer")?.tellId || null,
+    navId: styles.find((s) => s.role === "nav")?.dpId || null,
+    footerId: styles.find((s) => s.tag === "footer")?.dpId || null,
   };
   if (!hasRects) return empty;
 
@@ -41,34 +41,34 @@ export function analyzeLayout(styles: ComputedStyleSample[]): LayoutModel {
   const heroCandidates = withRect
     .filter((s) => (s.role === "display" || s.role === "heading") && (rectOf(s)!.y) < 900)
     .sort((a, b) => (rectOf(b)!.w * rectOf(b)!.h) - (rectOf(a)!.w * rectOf(a)!.h));
-  const heroHeadingId = heroCandidates[0]?.tellId || null;
+  const heroHeadingId = heroCandidates[0]?.dpId || null;
   const heroRect = heroCandidates[0] ? rectOf(heroCandidates[0]!) : null;
 
   // hero container: the smallest surface/section that fully encloses the hero heading and sits high.
   let heroContainerId: string | null = null;
   if (heroRect) {
     const containers = withRect
-      .filter((s) => (s.role === "surface" || s.role === "card" || s.tag === "header" || s.tag === "section") && s.tellId !== heroHeadingId)
+      .filter((s) => (s.role === "surface" || s.role === "card" || s.tag === "header" || s.tag === "section") && s.dpId !== heroHeadingId)
       .filter((s) => {
         const r = rectOf(s)!;
         return r.y <= heroRect.y + 4 && r.y + r.h >= heroRect.y + heroRect.h - 4 && r.x <= heroRect.x + 4 && r.w >= heroRect.w - 8 && r.y < 700;
       })
       .sort((a, b) => (rectOf(a)!.w * rectOf(a)!.h) - (rectOf(b)!.w * rectOf(b)!.h));
-    heroContainerId = containers[0]?.tellId || null;
+    heroContainerId = containers[0]?.dpId || null;
   }
 
   // ── content column: wide containers (surfaces/sections) near page width ──
   const contentIds = withRect
     .filter((s) => (s.role === "surface" || s.role === "card") && rectOf(s)!.w >= pageWidth * 0.7 && rectOf(s)!.h >= 120)
-    .map((s) => s.tellId)
+    .map((s) => s.dpId)
     .filter((id) => id && id !== heroContainerId) as string[];
 
   // ── section containers for rhythm: tall, wide, top→bottom ──
   const sections = withRect
     .filter((s) => (s.role === "surface" || s.role === "card") && rectOf(s)!.w >= pageWidth * 0.6 && rectOf(s)!.h >= 150)
-    .filter((s) => s.tellId !== heroContainerId && s.tag !== "footer" && s.role !== "nav")
+    .filter((s) => s.dpId !== heroContainerId && s.tag !== "footer" && s.role !== "nav")
     .sort((a, b) => rectOf(a)!.y - rectOf(b)!.y);
-  const sectionOrder = sections.map((s, index) => ({ id: s.tellId, index }));
+  const sectionOrder = sections.map((s, index) => ({ id: s.dpId, index }));
 
   // ── grid tiles: repeated cards of similar size (the feature/pricing tiles) ──
   const tiles = withRect.filter((s) => s.role === "card" && rectOf(s)!.w < pageWidth * 0.5 && rectOf(s)!.w > 120);
@@ -79,7 +79,7 @@ export function analyzeLayout(styles: ComputedStyleSample[]): LayoutModel {
     (buckets.get(key) ?? buckets.set(key, []).get(key)!).push(t);
   }
   const cardIds: string[] = [];
-  for (const arr of buckets.values()) if (arr.length >= 2) for (const t of arr) cardIds.push(t.tellId);
+  for (const arr of buckets.values()) if (arr.length >= 2) for (const t of arr) cardIds.push(t.dpId);
 
   return {
     hasRects, pageWidth,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 import {
   resolveShareBackend,
   sanitizeStoreError,
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
-  const parsed = TellReport.safeParse((body as { report?: unknown }).report);
+  const parsed = DesignProofReport.safeParse((body as { report?: unknown }).report);
   if (!parsed.success) {
     return NextResponse.json({ error: "Report payload is missing or invalid." }, { status: 400 });
   }

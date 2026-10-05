@@ -1,0 +1,32 @@
+---
+description: Design Proof mission and golden rules — always apply
+alwaysApply: true
+---
+
+# Design Proof — always apply
+
+Read USER_STORY.md: we build for **Ashish** (solo founder, AI-built UI looks generic, demo tomorrow).
+
+## Golden rules
+1. Product = capture -> diagnose -> art-direct -> reconcile; the report serves the loop, not a dashboard.
+2. Deterministic through capture, fingerprint, detection, and baseline reconciliation; LLM only in taste, voice refinement, or enhanced diff paths.
+3. Never auto-apply fixes. MCP/web returns patches; a human or Cursor agent reviews and applies.
+4. Zod schemas at every package/API/MCP boundary via `@designproof/schema`.
+5. Design Proof's own UI must dogfood the detector rules: tokens, state coverage, contrast, no generic SaaS tells.
+6. Preserve demo reliability: live path first, committed fixture/report fallback always works.
+
+## Model routing (see ORCHESTRATION.md)
+- **Composer 2.5** — orchestrate, UI, MCP, fixtures
+- **Opus 4.8** — schema, detectors, taste engine
+- **GPT 5.5** — user copy, demo narrative
+
+## Delegate to subagents
+`.cursor/agents/` — 11 role-specific agents. Use proactively by feature area.
+
+## Project skills
+`.cursor/skills/` — feature workflows. Invoke with `@skill-name` or let Cursor auto-attach.
+
+**Website builds auto-trigger research:** always-applied rule `dp-domain-research` + engine
+`routeSkills` prepends `website-domain-research` (and `sport-matchday-web` when sport). Agents
+must execute LoadPrior → gap → walkthrough if needed → IA → training emit before pixels.
+

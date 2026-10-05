@@ -1,7 +1,7 @@
 import os from "node:os";
-import { RedesignProposal, type ArtDirection, type BrandDNA, type TellReport } from "@tell/schema";
-import { OfflineRedesignGenerator, type SourceFile } from "@tell/redesign";
-import type { DirectionActionItem } from "@tell/taste";
+import { RedesignProposal, type ArtDirection, type BrandDNA, type DesignProofReport } from "@designproof/schema";
+import { OfflineRedesignGenerator, type SourceFile } from "@designproof/redesign";
+import type { DirectionActionItem } from "@designproof/taste";
 
 type CursorPatchResponse = {
   files?: { file?: string; unifiedDiff?: string; summary?: string }[];
@@ -16,7 +16,7 @@ function truncateForPrompt(text: string, maxLen: number): string {
   return `${text.slice(0, maxLen)}… [truncated]`;
 }
 
-function summarizeReport(report: TellReport, findingId?: string) {
+function summarizeReport(report: DesignProofReport, findingId?: string) {
   const selected = findingId ? report.findings.find((finding) => finding.id === findingId) : undefined;
   return {
     url: report.capture.url,
@@ -73,7 +73,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export type PatchSource = "cursor" | "deterministic";
 
 export async function proposeWithCursorAgent(
-  report: TellReport,
+  report: DesignProofReport,
   direction: ArtDirection,
   findingId?: string,
   dna?: BrandDNA,
@@ -97,11 +97,11 @@ export async function proposeWithCursorAgent(
     const { Agent } = await importSdk("@cursor/sdk");
     const model = process.env.CURSOR_MODEL?.trim() || "composer-2.5";
     const prompt = [
-      "You are Tell's server-side redesign agent.",
+      "You are Design Proof's server-side redesign agent.",
       "Return JSON only. Do not edit files. Do not run tools. Do not include Markdown fences.",
       "Draft a unified diff against the supplied real project sources that materially improves the captured product.",
       "Rules:",
-      "- Keep Tell's deterministic reconciliation as the safety floor.",
+      "- Keep Design Proof's deterministic reconciliation as the safety floor.",
       "- Do not force global text colors over unknown backgrounds.",
       "- You may change TSX/JSX structure, hierarchy, copy, responsive layout, and interaction states when the direction calls for it.",
       "- A palette swap alone is not a redesign. Create a coherent product-level improvement while preserving existing behavior.",

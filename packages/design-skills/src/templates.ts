@@ -259,7 +259,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
       "Money-product landing — inverse-heavy proof, bleed product stages, conversion for treasury buyers.",
     siteKind: "fintech-marketing",
     researchBasis:
-      "Calibrated against fintech-product corridors (invertedShare ~0.7, bleedBands ~13, fold figure ~0.88, accent used as stage not flood). Distinct from SaaS conversion: more inverse bands, specimen on inverse, denser metric register. Keep spanning product fold; deepen uniqueness without empty-height rhythm hacks.",
+      "Calibrated against fintech-product corridors (invertedShare ~0.7, bleedBands ~13, fold figure ~0.88, accent used as stage not flood). Distinct from SaaS conversion: more inverse bands, template on inverse, denser metric register. Keep spanning product fold; deepen uniqueness without empty-height rhythm hacks.",
     brief: DesignBrief.parse({
       productName: "Clearwire",
       tagline: "Treasury that moves at the speed of the invoice",
@@ -358,7 +358,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
         {
           id: "s5",
           name: "Handoff kits",
-          description: "Tokens, specimens, and do-nots packaged so engineering does not invent a second brand",
+          description: "Tokens, templates, and do-nots packaged so engineering does not invent a second brand",
           priority: "p1",
         },
         {
@@ -773,10 +773,10 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     key: "herbarium",
     label: "Field guide",
     marketJob:
-      "Herbarium / voucher landing — glassine press, binomial strip, specimen plate with free botanical photos, dichotomous voucher key, Voucher close.",
+      "Herbarium / voucher landing — glassine press, binomial strip, template plate with free botanical photos, dichotomous voucher key, Voucher close.",
     siteKind: "field-guide",
     researchBasis:
-      "Calibrated against personal-craft + brand-agency + consumer-craft corridors (high figureArea, quiet display, paper-led). Distinct craft soft theme packs miss: glassine press with peeled sheet + museum label, bottom binomial strip, specimen-plate with pressed silhouette + copyright-free botanical inset, dichotomous voucher key (taxon ladder + stacked sheets), paper Voucher close — no pricing, no metrics theatre, zero inverse bands, no floating glass collage.",
+      "Calibrated against personal-craft + brand-agency + consumer-craft corridors (high figureArea, quiet display, paper-led). Distinct craft soft theme packs miss: glassine press with peeled sheet + museum label, bottom binomial strip, template-plate with pressed silhouette + copyright-free botanical inset, dichotomous voucher key (taxon ladder + stacked sheets), paper Voucher close — no pricing, no metrics theatre, zero inverse bands, no floating glass collage.",
     brief: DesignBrief.parse({
       productName: "Vellum Press",
       tagline: "The voucher that keeps every trait under one honest plate",
@@ -796,7 +796,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
         {
           id: "h2",
           name: "Pressed plate",
-          description: "A specimen silhouette with pin marks so the voucher reads as collected matter, not stock art",
+          description: "A template silhouette with pin marks so the voucher reads as collected matter, not stock art",
           priority: "p0",
         },
         {

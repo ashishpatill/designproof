@@ -1,8 +1,8 @@
 /**
  * Starter chips under the home composer prompt.
  *
- * Never show third-party product brands as templates on Tell — only Tell
- * specimen / showcase catalog labels (listTemplates(), Northstar, Roundspool,
+ * Never show third-party product brands as templates on Design Proof — only Design Proof
+ * template / showcase catalog labels (listTemplates(), Northstar, Roundspool,
  * Crease, Baseline, …). See composer-brand-denylist.ts.
  *
  * Phase 0: empty on purpose (no competitor-inspired invent). Phase 2 design

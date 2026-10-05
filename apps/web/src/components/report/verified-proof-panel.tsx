@@ -9,7 +9,7 @@ import {
   RotateCcw,
   ShieldCheck,
 } from "lucide-react";
-import type { TellReport } from "@tell/schema";
+import type { DesignProofReport } from "@designproof/schema";
 import type { ProofResult } from "@/components/report/types";
 
 export function ProofMetric({ label, before, after, good }: { label: string; before: string; after: string; good: boolean }) {
@@ -31,7 +31,7 @@ export function VerifiedProofPanel({
   onRevert,
   onCopy,
 }: {
-  baseline: TellReport;
+  baseline: DesignProofReport;
   result: ProofResult;
   seam: number;
   setSeam: (value: number) => void;

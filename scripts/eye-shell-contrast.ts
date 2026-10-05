@@ -11,7 +11,7 @@
 import { mkdirSync } from "node:fs";
 import { chromium } from "playwright";
 
-const BASE = process.env.TELL_WEB_URL ?? "http://127.0.0.1:3000";
+const BASE = process.env.DP_WEB_URL ?? "http://127.0.0.1:3000";
 const FLOOR = 4.5;
 
 type Rgb = { r: number; g: number; b: number; a: number };
@@ -66,7 +66,7 @@ async function main() {
 
   const raw = (await page.$eval('[data-testid="product-sidebar"]', (root) => {
     const sels =
-      ".tell-rail__brand-name, .tell-rail__brand-meta, .tell-rail__label, .tell-rail__section-label, .tell-rail__link";
+      ".dp-rail__brand-name, .dp-rail__brand-meta, .dp-rail__label, .dp-rail__section-label, .dp-rail__link";
     const nodes = Array.from(root.querySelectorAll(sels));
     return nodes.map((el) => {
       const cs = getComputedStyle(el);

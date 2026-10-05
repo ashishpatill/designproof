@@ -44,7 +44,7 @@ Damp toward the pointer so flicks keep slack instead of welding the trail to the
 - Pause when `document.hidden` or section not intersecting
 - Prefer canvas overlay; moving emitter solely to raise z-index rarely pays off
 
-## Tell constraints
+## Design Proof constraints
 
 - Default product UI: **off** (distracts from proof stages)
 - Allowed as opt-in on art-directed studio heroes with reduced-motion off and content contrast intact

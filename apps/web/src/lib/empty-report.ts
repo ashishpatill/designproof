@@ -1,7 +1,7 @@
-import { TellReport } from "@tell/schema";
+import { DesignProofReport } from "@designproof/schema";
 
 /** Blank session — no findings, no seam — until a live capture or explicit offline load. */
-export const emptyReport: TellReport = TellReport.parse({
+export const emptyReport: DesignProofReport = DesignProofReport.parse({
   capture: {
     url: "",
     capturedAt: new Date(0).toISOString(),

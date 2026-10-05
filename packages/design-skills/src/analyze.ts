@@ -77,7 +77,7 @@ export function inferSiteKind(brief: DesignBrief): SiteKind {
   if (/\b(consumer|shoppers?|everyday|lifestyle|direct.?to.?consumer|dtc|retail brand)\b/.test(blob)) {
     return "consumer-craft";
   }
-  if (/\b(foundry|typeface|type.?specimen|optical size|glyph|typography studio|editorial foundry)\b/.test(blob)) {
+  if (/\b(foundry|typeface|type.?template|optical size|glyph|typography studio|editorial foundry)\b/.test(blob)) {
     return "editorial-foundry";
   }
   if (/\b(dossier|briefing|research desk|capital brief|memo|imprint|folio|thesis desk)\b/.test(blob)) {
@@ -110,24 +110,24 @@ export function analyzeFeatures(brief: DesignBrief): FeatureAnalysis {
         : siteKind === "corporate-story"
           ? ["nav", "hero", "story", "proof", "features", "cta", "footer"]
           : siteKind === "fintech-marketing"
-            ? ["nav", "hero", "metrics", "features", "specimen", "proof", "pricing", "cta", "footer"]
+            ? ["nav", "hero", "metrics", "features", "template", "proof", "pricing", "cta", "footer"]
             : siteKind === "art-directed-studio"
-              ? ["nav", "hero", "features", "specimen", "story", "figure", "proof", "cta", "footer"]
+              ? ["nav", "hero", "features", "template", "story", "figure", "proof", "cta", "footer"]
               : siteKind === "consumer-craft"
-                ? ["nav", "hero", "metrics", "features", "specimen", "proof", "story", "cta", "footer"]
+                ? ["nav", "hero", "metrics", "features", "template", "proof", "story", "cta", "footer"]
                 : siteKind === "editorial-foundry"
-                  ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
+                  ? ["nav", "hero", "features", "figure", "template", "story", "proof", "cta", "footer"]
                   : siteKind === "research-dossier"
-                    ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
+                    ? ["nav", "hero", "features", "figure", "template", "story", "proof", "cta", "footer"]
                     : siteKind === "signal-observatory"
-                      ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
+                      ? ["nav", "hero", "features", "figure", "template", "story", "proof", "cta", "footer"]
                       : siteKind === "archive-index" || siteKind === "commerce-loom" || siteKind === "field-guide"
-                        ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
+                        ? ["nav", "hero", "features", "figure", "template", "story", "proof", "cta", "footer"]
                         : siteKind === "press-atelier" ||
                             siteKind === "lantern-path" ||
                             siteKind === "care-pathway" ||
                             siteKind === "agent-harness"
-                          ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
+                          ? ["nav", "hero", "features", "figure", "template", "story", "proof", "cta", "footer"]
                 : saasMarketingSections;
 
   const goals = [

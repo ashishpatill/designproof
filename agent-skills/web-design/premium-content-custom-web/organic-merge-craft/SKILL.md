@@ -13,7 +13,7 @@ description: SVG filter gooey-merge craft in full — Gaussian blur + color-matr
 4. Use as background accent, loader, or hero atmosphere behind content
 5. Tune blur, contrast, and spacing **together** so merging stays visible
 
-## Tell constraints
+## Design Proof constraints
 
 - `pointer-events: none`; decorative / hidden from AT
 - Under reduced motion: freeze a merged static silhouette or omit

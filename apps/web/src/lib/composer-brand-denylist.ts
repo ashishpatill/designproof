@@ -1,8 +1,8 @@
 /**
- * Third-party product / host brands that must never appear as Tell home
+ * Third-party product / host brands that must never appear as Design Proof home
  * composer starter templates or chips under the prompt.
  *
- * Tell specimens (Northstar, Roundspool, Crease, Baseline, listTemplates /
+ * Design templates (Northstar, Roundspool, Crease, Baseline, listTemplates /
  * showcase catalog labels) are fine. Cursor/GitHub as capture tooling copy is
  * fine — only competitor product chips / domains as starters are banned.
  */

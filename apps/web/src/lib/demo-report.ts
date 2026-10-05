@@ -1,10 +1,10 @@
-// Auto-generated from fixtures/reports/tell-report.json (the deliberately-generic sample app).
+// Auto-generated from fixtures/reports/dp-report.json (the deliberately-generic sample app).
 // Real capture so the on-load demo shows a genuine scorecard + working before/after seam.
 // Screenshot and probe PNGs omitted to keep the client bundle small; live capture fills them in.
 // Regenerate: pnpm sync:demo-report
-import type { TellReport } from "@tell/schema";
+import type { DesignProofReport } from "@designproof/schema";
 
-export const demoReport: TellReport = {
+export const demoReport: DesignProofReport = {
   "capture": {
     "url": "http://localhost:3001",
     "capturedAt": "2026-07-07T13:38:20.057Z",
@@ -13,7 +13,7 @@ export const demoReport: TellReport = {
       "height": 1100
     },
     "screenshotBase64": "",
-    "snapshotHtml": "<!DOCTYPE html><html lang=\"en\"><head><base href=\"http://localhost:3001/\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/_next/static/css/app/layout.css?v=1783431497897\" data-precedence=\"next_static/css/app/layout.css\"><style data-tell-inlined=\"\">body { margin: 0px; font-family: Inter, system-ui, sans-serif; background: rgb(15, 15, 15); color: rgb(244, 244, 245); }\nmain, section, header, footer { text-align: center; }\nbutton, a { border-radius: 8px; }\n.hero { padding: 77px 23px 93px; background: linear-gradient(135deg, rgb(139, 92, 246), rgb(236, 72, 153)); }\n.nav { display: flex; justify-content: center; gap: 19px; padding: 21px; }\n.nav a { color: rgb(243, 244, 246); text-decoration: none; box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.pill { display: inline-block; border-radius: 8px; padding: 11px 17px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.button { display: inline-block; margin: 23px 7px; padding: 13px 27px; background: rgb(139, 92, 246); color: white; border: 0px; text-decoration: none; box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.button.secondary { background: rgb(24, 24, 27); color: rgb(245, 245, 244); }\n.button.no-focus:focus { outline: none; }\n.cards { display: grid; max-width: 1080px; margin: 37px auto; grid-template-columns: repeat(3, 1fr); gap: 19px; padding: 0px 29px; }\n.card { border-radius: 8px; padding: 31px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.card:nth-child(2) { background: rgb(17, 24, 31); }\n.card:nth-child(3) { background: rgb(16, 22, 32); }\n.muted-a { color: rgb(244, 244, 244); }\n.muted-b { color: rgb(245, 245, 245); }\n.muted-c { color: rgb(246, 246, 246); }\n.muted-d { color: rgb(242, 242, 242); }\n.muted-e { color: rgb(243, 243, 243); }\n.mini-stats { display: flex; justify-content: center; flex-wrap: wrap; gap: 19px; padding: 31px 29px 47px; }\n.mini-stat { border-radius: 8px; padding: 17px 23px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; min-width: 120px; }\n.tag-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; padding: 23px 29px 41px; }\n.tag { display: inline-block; border-radius: 8px; padding: 9px 15px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; font-size: 14px; }\n.odd-type h2 { font-size: 29px; }\n.odd-type p:nth-child(2) { font-size: 15px; }\n.odd-type p:nth-child(3) { font-size: 19px; }\n.odd-type p:nth-child(4) { font-size: 22px; }\n.brutalist { font-family: \"IBM Plex Mono\", ui-monospace, monospace; background: rgb(243, 244, 246); color: rgb(17, 24, 39); padding: 88px 24px; text-align: left; }\n</style></head><body data-tell-id=\"t0\"><main data-tell-id=\"t1\"><div class=\"pill\">Demo input — deliberately generic. Not Tell's UI.</div><nav class=\"nav\" data-tell-id=\"t2\"><a href=\"#features\" data-tell-id=\"t3\">🚀 Features</a><a href=\"#metrics\" data-tell-id=\"t4\">📊 Metrics</a><a href=\"/brutalist\" data-tell-id=\"t5\">✨ Brutalist route</a></nav><header class=\"hero\" data-tell-id=\"t6\"><p class=\"pill\" data-tell-id=\"t7\">AI-powered analytics</p><h1 style=\"font-size:63px\" data-tell-id=\"t8\">Ship insights faster ✨</h1><p class=\"muted-a\" style=\"font-size:18px\" data-tell-id=\"t9\">A beautiful dashboard for modern teams.</p><a class=\"button no-focus\" href=\"#features\" data-tell-id=\"t10\">Get started 🚀</a><a class=\"button secondary\" href=\"#metrics\" data-tell-id=\"t11\">View dashboard 📊</a></header><section id=\"features\" class=\"cards odd-type\" data-tell-id=\"t12\"><article class=\"card\" data-tell-id=\"t13\"><h2 data-tell-id=\"t14\">Automate<!-- --> ✨</h2><p class=\"muted-b\" data-tell-id=\"t15\">Everything your team needs in one place.</p><p class=\"muted-c\" data-tell-id=\"t16\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-tell-id=\"t17\">Built for modern workflows.</p><button class=\"button no-focus\" data-tell-id=\"t18\">Learn more</button></article><article class=\"card\" data-tell-id=\"t19\"><h2 data-tell-id=\"t20\">Analyze<!-- --> ✨</h2><p class=\"muted-b\" data-tell-id=\"t21\">Everything your team needs in one place.</p><p class=\"muted-c\" data-tell-id=\"t22\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-tell-id=\"t23\">Built for modern workflows.</p><button class=\"button\" data-tell-id=\"t24\">Learn more</button></article><article class=\"card\" data-tell-id=\"t25\"><h2 data-tell-id=\"t26\">Scale<!-- --> ✨</h2><p class=\"muted-b\" data-tell-id=\"t27\">Everything your team needs in one place.</p><p class=\"muted-c\" data-tell-id=\"t28\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-tell-id=\"t29\">Built for modern workflows.</p><button class=\"button\" data-tell-id=\"t30\">Learn more</button></article></section><section id=\"metrics\" class=\"cards\" data-tell-id=\"t31\"><article class=\"card\" data-tell-id=\"t32\"><h2 style=\"font-size:41px\" data-tell-id=\"t33\">98%</h2><p class=\"muted-e\" data-tell-id=\"t34\">Metric that looks important.</p></article><article class=\"card\" data-tell-id=\"t35\"><h2 style=\"font-size:41px\" data-tell-id=\"t36\">24k</h2><p class=\"muted-e\" data-tell-id=\"t37\">Metric that looks important.</p></article><article class=\"card\" data-tell-id=\"t38\"><h2 style=\"font-size:41px\" data-tell-id=\"t39\">3.2x</h2><p class=\"muted-e\" data-tell-id=\"t40\">Metric that looks important.</p></article></section><section class=\"mini-stats\" aria-label=\"Extra chrome\" data-tell-id=\"t41\"><div class=\"mini-stat\" data-tell-id=\"t42\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t43\">Latency</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t44\">99.9%</p></div><div class=\"mini-stat\" data-tell-id=\"t45\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t46\">Uptime</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t47\">99.9%</p></div><div class=\"mini-stat\" data-tell-id=\"t48\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t49\">Teams</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t50\">99.9%</p></div><div class=\"mini-stat\" data-tell-id=\"t51\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t52\">Regions</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t53\">99.9%</p></div><div class=\"mini-stat\" data-tell-id=\"t54\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t55\">Exports</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t56\">99.9%</p></div><div class=\"mini-stat\" data-tell-id=\"t57\"><p class=\"muted-a\" style=\"font-size:17px\" data-tell-id=\"t58\">Alerts</p><p class=\"muted-b\" style=\"font-size:21px\" data-tell-id=\"t59\">99.9%</p></div></section><section class=\"tag-row\" aria-label=\"Tag chrome\" data-tell-id=\"t60\"><span class=\"tag\" data-tell-id=\"t61\">Realtime</span><span class=\"tag\" data-tell-id=\"t62\">Secure</span><span class=\"tag\" data-tell-id=\"t63\">Fast</span><span class=\"tag\" data-tell-id=\"t64\">Global</span><span class=\"tag\" data-tell-id=\"t65\">Trusted</span><span class=\"tag\" data-tell-id=\"t66\">Simple</span><span class=\"tag\" data-tell-id=\"t67\">Modern</span><span class=\"tag\" data-tell-id=\"t68\">Flexible</span><span class=\"tag\" data-tell-id=\"t69\">Reliable</span><span class=\"tag\" data-tell-id=\"t70\">Smart</span><span class=\"tag\" data-tell-id=\"t71\">Scalable</span><span class=\"tag\" data-tell-id=\"t72\">Open</span><span class=\"tag\" data-tell-id=\"t73\">Synced</span><span class=\"tag\" data-tell-id=\"t74\">Guided</span><span class=\"tag\" data-tell-id=\"t75\">Pro</span><span class=\"tag\" data-tell-id=\"t76\">Live</span><span class=\"tag\" data-tell-id=\"t77\">Beta</span><span class=\"tag\" data-tell-id=\"t78\">Core</span><span class=\"tag\" data-tell-id=\"t79\">Edge</span><span class=\"tag\" data-tell-id=\"t80\">Plus</span></section><footer style=\"padding:47px\" data-tell-id=\"t81\">Made with AI. Looks familiar.</footer></main><next-route-announcer style=\"position: absolute;\"></next-route-announcer></body></html>",
+    "snapshotHtml": "<!DOCTYPE html><html lang=\"en\"><head><base href=\"http://localhost:3001/\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/_next/static/css/app/layout.css?v=1783431497897\" data-precedence=\"next_static/css/app/layout.css\"><style data-dp-inlined=\"\">body { margin: 0px; font-family: Inter, system-ui, sans-serif; background: rgb(15, 15, 15); color: rgb(244, 244, 245); }\nmain, section, header, footer { text-align: center; }\nbutton, a { border-radius: 8px; }\n.hero { padding: 77px 23px 93px; background: linear-gradient(135deg, rgb(139, 92, 246), rgb(236, 72, 153)); }\n.nav { display: flex; justify-content: center; gap: 19px; padding: 21px; }\n.nav a { color: rgb(243, 244, 246); text-decoration: none; box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.pill { display: inline-block; border-radius: 8px; padding: 11px 17px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.button { display: inline-block; margin: 23px 7px; padding: 13px 27px; background: rgb(139, 92, 246); color: white; border: 0px; text-decoration: none; box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.button.secondary { background: rgb(24, 24, 27); color: rgb(245, 245, 244); }\n.button.no-focus:focus { outline: none; }\n.cards { display: grid; max-width: 1080px; margin: 37px auto; grid-template-columns: repeat(3, 1fr); gap: 19px; padding: 0px 29px; }\n.card { border-radius: 8px; padding: 31px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; }\n.card:nth-child(2) { background: rgb(17, 24, 31); }\n.card:nth-child(3) { background: rgb(16, 22, 32); }\n.muted-a { color: rgb(244, 244, 244); }\n.muted-b { color: rgb(245, 245, 245); }\n.muted-c { color: rgb(246, 246, 246); }\n.muted-d { color: rgb(242, 242, 242); }\n.muted-e { color: rgb(243, 243, 243); }\n.mini-stats { display: flex; justify-content: center; flex-wrap: wrap; gap: 19px; padding: 31px 29px 47px; }\n.mini-stat { border-radius: 8px; padding: 17px 23px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; min-width: 120px; }\n.tag-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; padding: 23px 29px 41px; }\n.tag { display: inline-block; border-radius: 8px; padding: 9px 15px; background: rgb(17, 24, 39); box-shadow: rgba(0, 0, 0, 0.35) 0px 10px 25px; font-size: 14px; }\n.odd-type h2 { font-size: 29px; }\n.odd-type p:nth-child(2) { font-size: 15px; }\n.odd-type p:nth-child(3) { font-size: 19px; }\n.odd-type p:nth-child(4) { font-size: 22px; }\n.brutalist { font-family: \"IBM Plex Mono\", ui-monospace, monospace; background: rgb(243, 244, 246); color: rgb(17, 24, 39); padding: 88px 24px; text-align: left; }\n</style></head><body data-dp-id=\"t0\"><main data-dp-id=\"t1\"><div class=\"pill\">Demo input — deliberately generic. Not Design Proof's UI.</div><nav class=\"nav\" data-dp-id=\"t2\"><a href=\"#features\" data-dp-id=\"t3\">🚀 Features</a><a href=\"#metrics\" data-dp-id=\"t4\">📊 Metrics</a><a href=\"/brutalist\" data-dp-id=\"t5\">✨ Brutalist route</a></nav><header class=\"hero\" data-dp-id=\"t6\"><p class=\"pill\" data-dp-id=\"t7\">AI-powered analytics</p><h1 style=\"font-size:63px\" data-dp-id=\"t8\">Ship insights faster ✨</h1><p class=\"muted-a\" style=\"font-size:18px\" data-dp-id=\"t9\">A beautiful dashboard for modern teams.</p><a class=\"button no-focus\" href=\"#features\" data-dp-id=\"t10\">Get started 🚀</a><a class=\"button secondary\" href=\"#metrics\" data-dp-id=\"t11\">View dashboard 📊</a></header><section id=\"features\" class=\"cards odd-type\" data-dp-id=\"t12\"><article class=\"card\" data-dp-id=\"t13\"><h2 data-dp-id=\"t14\">Automate<!-- --> ✨</h2><p class=\"muted-b\" data-dp-id=\"t15\">Everything your team needs in one place.</p><p class=\"muted-c\" data-dp-id=\"t16\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-dp-id=\"t17\">Built for modern workflows.</p><button class=\"button no-focus\" data-dp-id=\"t18\">Learn more</button></article><article class=\"card\" data-dp-id=\"t19\"><h2 data-dp-id=\"t20\">Analyze<!-- --> ✨</h2><p class=\"muted-b\" data-dp-id=\"t21\">Everything your team needs in one place.</p><p class=\"muted-c\" data-dp-id=\"t22\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-dp-id=\"t23\">Built for modern workflows.</p><button class=\"button\" data-dp-id=\"t24\">Learn more</button></article><article class=\"card\" data-dp-id=\"t25\"><h2 data-dp-id=\"t26\">Scale<!-- --> ✨</h2><p class=\"muted-b\" data-dp-id=\"t27\">Everything your team needs in one place.</p><p class=\"muted-c\" data-dp-id=\"t28\">Beautiful insights without the setup.</p><p class=\"muted-d\" data-dp-id=\"t29\">Built for modern workflows.</p><button class=\"button\" data-dp-id=\"t30\">Learn more</button></article></section><section id=\"metrics\" class=\"cards\" data-dp-id=\"t31\"><article class=\"card\" data-dp-id=\"t32\"><h2 style=\"font-size:41px\" data-dp-id=\"t33\">98%</h2><p class=\"muted-e\" data-dp-id=\"t34\">Metric that looks important.</p></article><article class=\"card\" data-dp-id=\"t35\"><h2 style=\"font-size:41px\" data-dp-id=\"t36\">24k</h2><p class=\"muted-e\" data-dp-id=\"t37\">Metric that looks important.</p></article><article class=\"card\" data-dp-id=\"t38\"><h2 style=\"font-size:41px\" data-dp-id=\"t39\">3.2x</h2><p class=\"muted-e\" data-dp-id=\"t40\">Metric that looks important.</p></article></section><section class=\"mini-stats\" aria-label=\"Extra chrome\" data-dp-id=\"t41\"><div class=\"mini-stat\" data-dp-id=\"t42\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t43\">Latency</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t44\">99.9%</p></div><div class=\"mini-stat\" data-dp-id=\"t45\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t46\">Uptime</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t47\">99.9%</p></div><div class=\"mini-stat\" data-dp-id=\"t48\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t49\">Teams</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t50\">99.9%</p></div><div class=\"mini-stat\" data-dp-id=\"t51\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t52\">Regions</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t53\">99.9%</p></div><div class=\"mini-stat\" data-dp-id=\"t54\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t55\">Exports</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t56\">99.9%</p></div><div class=\"mini-stat\" data-dp-id=\"t57\"><p class=\"muted-a\" style=\"font-size:17px\" data-dp-id=\"t58\">Alerts</p><p class=\"muted-b\" style=\"font-size:21px\" data-dp-id=\"t59\">99.9%</p></div></section><section class=\"tag-row\" aria-label=\"Tag chrome\" data-dp-id=\"t60\"><span class=\"tag\" data-dp-id=\"t61\">Realtime</span><span class=\"tag\" data-dp-id=\"t62\">Secure</span><span class=\"tag\" data-dp-id=\"t63\">Fast</span><span class=\"tag\" data-dp-id=\"t64\">Global</span><span class=\"tag\" data-dp-id=\"t65\">Trusted</span><span class=\"tag\" data-dp-id=\"t66\">Simple</span><span class=\"tag\" data-dp-id=\"t67\">Modern</span><span class=\"tag\" data-dp-id=\"t68\">Flexible</span><span class=\"tag\" data-dp-id=\"t69\">Reliable</span><span class=\"tag\" data-dp-id=\"t70\">Smart</span><span class=\"tag\" data-dp-id=\"t71\">Scalable</span><span class=\"tag\" data-dp-id=\"t72\">Open</span><span class=\"tag\" data-dp-id=\"t73\">Synced</span><span class=\"tag\" data-dp-id=\"t74\">Guided</span><span class=\"tag\" data-dp-id=\"t75\">Pro</span><span class=\"tag\" data-dp-id=\"t76\">Live</span><span class=\"tag\" data-dp-id=\"t77\">Beta</span><span class=\"tag\" data-dp-id=\"t78\">Core</span><span class=\"tag\" data-dp-id=\"t79\">Edge</span><span class=\"tag\" data-dp-id=\"t80\">Plus</span></section><footer style=\"padding:47px\" data-dp-id=\"t81\">Made with AI. Looks familiar.</footer></main><next-route-announcer style=\"position: absolute;\"></next-route-announcer></body></html>",
     "cssVariables": [],
     "surfaceTokens": {
       "bodyBg": "rgb(15, 15, 15)",
@@ -30,7 +30,7 @@ export const demoReport: TellReport = {
     "styles": [
       {
         "selector": "body",
-        "tellId": "t0",
+        "dpId": "t0",
         "tag": "body",
         "role": "body",
         "rect": {
@@ -53,7 +53,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "main",
-        "tellId": "t1",
+        "dpId": "t1",
         "tag": "main",
         "role": "surface",
         "rect": {
@@ -76,7 +76,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "nav.nav",
-        "tellId": "t2",
+        "dpId": "t2",
         "tag": "nav",
         "role": "nav",
         "rect": {
@@ -99,7 +99,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "a",
-        "tellId": "t3",
+        "dpId": "t3",
         "tag": "a",
         "role": "link",
         "rect": {
@@ -122,7 +122,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "a",
-        "tellId": "t4",
+        "dpId": "t4",
         "tag": "a",
         "role": "link",
         "rect": {
@@ -145,7 +145,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "a",
-        "tellId": "t5",
+        "dpId": "t5",
         "tag": "a",
         "role": "link",
         "rect": {
@@ -168,7 +168,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "header.hero",
-        "tellId": "t6",
+        "dpId": "t6",
         "tag": "header",
         "role": "surface",
         "rect": {
@@ -191,7 +191,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.pill",
-        "tellId": "t7",
+        "dpId": "t7",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -214,7 +214,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h1",
-        "tellId": "t8",
+        "dpId": "t8",
         "tag": "h1",
         "role": "display",
         "rect": {
@@ -237,7 +237,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t9",
+        "dpId": "t9",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -260,7 +260,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "a.button",
-        "tellId": "t10",
+        "dpId": "t10",
         "tag": "a",
         "role": "button",
         "rect": {
@@ -283,7 +283,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "a.button",
-        "tellId": "t11",
+        "dpId": "t11",
         "tag": "a",
         "role": "button",
         "rect": {
@@ -306,7 +306,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "#features",
-        "tellId": "t12",
+        "dpId": "t12",
         "tag": "section",
         "role": "card",
         "rect": {
@@ -329,7 +329,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t13",
+        "dpId": "t13",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -352,7 +352,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t14",
+        "dpId": "t14",
         "tag": "h2",
         "role": "heading",
         "rect": {
@@ -375,7 +375,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t15",
+        "dpId": "t15",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -398,7 +398,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-c",
-        "tellId": "t16",
+        "dpId": "t16",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -421,7 +421,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-d",
-        "tellId": "t17",
+        "dpId": "t17",
         "tag": "p",
         "role": "heading",
         "rect": {
@@ -444,7 +444,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "button.button",
-        "tellId": "t18",
+        "dpId": "t18",
         "tag": "button",
         "role": "button",
         "rect": {
@@ -467,7 +467,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t19",
+        "dpId": "t19",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -490,7 +490,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t20",
+        "dpId": "t20",
         "tag": "h2",
         "role": "heading",
         "rect": {
@@ -513,7 +513,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t21",
+        "dpId": "t21",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -536,7 +536,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-c",
-        "tellId": "t22",
+        "dpId": "t22",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -559,7 +559,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-d",
-        "tellId": "t23",
+        "dpId": "t23",
         "tag": "p",
         "role": "heading",
         "rect": {
@@ -582,7 +582,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "button.button",
-        "tellId": "t24",
+        "dpId": "t24",
         "tag": "button",
         "role": "button",
         "rect": {
@@ -605,7 +605,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t25",
+        "dpId": "t25",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -628,7 +628,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t26",
+        "dpId": "t26",
         "tag": "h2",
         "role": "heading",
         "rect": {
@@ -651,7 +651,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t27",
+        "dpId": "t27",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -674,7 +674,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-c",
-        "tellId": "t28",
+        "dpId": "t28",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -697,7 +697,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-d",
-        "tellId": "t29",
+        "dpId": "t29",
         "tag": "p",
         "role": "heading",
         "rect": {
@@ -720,7 +720,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "button.button",
-        "tellId": "t30",
+        "dpId": "t30",
         "tag": "button",
         "role": "button",
         "rect": {
@@ -743,7 +743,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "#metrics",
-        "tellId": "t31",
+        "dpId": "t31",
         "tag": "section",
         "role": "card",
         "rect": {
@@ -766,7 +766,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t32",
+        "dpId": "t32",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -789,7 +789,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t33",
+        "dpId": "t33",
         "tag": "h2",
         "role": "display",
         "rect": {
@@ -812,7 +812,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-e",
-        "tellId": "t34",
+        "dpId": "t34",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -835,7 +835,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t35",
+        "dpId": "t35",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -858,7 +858,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t36",
+        "dpId": "t36",
         "tag": "h2",
         "role": "display",
         "rect": {
@@ -881,7 +881,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-e",
-        "tellId": "t37",
+        "dpId": "t37",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -904,7 +904,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "article.card",
-        "tellId": "t38",
+        "dpId": "t38",
         "tag": "article",
         "role": "card",
         "rect": {
@@ -927,7 +927,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "h2",
-        "tellId": "t39",
+        "dpId": "t39",
         "tag": "h2",
         "role": "display",
         "rect": {
@@ -950,7 +950,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-e",
-        "tellId": "t40",
+        "dpId": "t40",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -973,7 +973,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "section.mini-stats",
-        "tellId": "t41",
+        "dpId": "t41",
         "tag": "section",
         "role": "surface",
         "rect": {
@@ -996,7 +996,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t42",
+        "dpId": "t42",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1019,7 +1019,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t43",
+        "dpId": "t43",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1042,7 +1042,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t44",
+        "dpId": "t44",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1065,7 +1065,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t45",
+        "dpId": "t45",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1088,7 +1088,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t46",
+        "dpId": "t46",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1111,7 +1111,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t47",
+        "dpId": "t47",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1134,7 +1134,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t48",
+        "dpId": "t48",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1157,7 +1157,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t49",
+        "dpId": "t49",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1180,7 +1180,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t50",
+        "dpId": "t50",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1203,7 +1203,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t51",
+        "dpId": "t51",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1226,7 +1226,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t52",
+        "dpId": "t52",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1249,7 +1249,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t53",
+        "dpId": "t53",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1272,7 +1272,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t54",
+        "dpId": "t54",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1295,7 +1295,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t55",
+        "dpId": "t55",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1318,7 +1318,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t56",
+        "dpId": "t56",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1341,7 +1341,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "div.mini-stat",
-        "tellId": "t57",
+        "dpId": "t57",
         "tag": "div",
         "role": "other",
         "rect": {
@@ -1364,7 +1364,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-a",
-        "tellId": "t58",
+        "dpId": "t58",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1387,7 +1387,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "p.muted-b",
-        "tellId": "t59",
+        "dpId": "t59",
         "tag": "p",
         "role": "body",
         "rect": {
@@ -1410,7 +1410,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "section.tag-row",
-        "tellId": "t60",
+        "dpId": "t60",
         "tag": "section",
         "role": "surface",
         "rect": {
@@ -1433,7 +1433,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t61",
+        "dpId": "t61",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1456,7 +1456,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t62",
+        "dpId": "t62",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1479,7 +1479,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t63",
+        "dpId": "t63",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1502,7 +1502,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t64",
+        "dpId": "t64",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1525,7 +1525,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t65",
+        "dpId": "t65",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1548,7 +1548,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t66",
+        "dpId": "t66",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1571,7 +1571,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t67",
+        "dpId": "t67",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1594,7 +1594,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t68",
+        "dpId": "t68",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1617,7 +1617,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t69",
+        "dpId": "t69",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1640,7 +1640,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t70",
+        "dpId": "t70",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1663,7 +1663,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t71",
+        "dpId": "t71",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1686,7 +1686,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t72",
+        "dpId": "t72",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1709,7 +1709,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t73",
+        "dpId": "t73",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1732,7 +1732,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t74",
+        "dpId": "t74",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1755,7 +1755,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t75",
+        "dpId": "t75",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1778,7 +1778,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t76",
+        "dpId": "t76",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1801,7 +1801,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t77",
+        "dpId": "t77",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1824,7 +1824,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t78",
+        "dpId": "t78",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1847,7 +1847,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t79",
+        "dpId": "t79",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1870,7 +1870,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "span.tag",
-        "tellId": "t80",
+        "dpId": "t80",
         "tag": "span",
         "role": "other",
         "rect": {
@@ -1893,7 +1893,7 @@ export const demoReport: TellReport = {
       },
       {
         "selector": "footer",
-        "tellId": "t81",
+        "dpId": "t81",
         "tag": "footer",
         "role": "surface",
         "rect": {
@@ -2319,7 +2319,7 @@ export const demoReport: TellReport = {
   },
   "findings": [
     {
-      "id": "tell-system-font",
+      "id": "dp-system-font",
       "family": "tell",
       "detector": "SystemFontTell",
       "verdictHint": "generic",
@@ -2361,7 +2361,7 @@ export const demoReport: TellReport = {
       "severity": "high"
     },
     {
-      "id": "tell-gradient-crutch",
+      "id": "dp-gradient-crutch",
       "family": "tell",
       "detector": "GradientCrutchTell",
       "verdictHint": "generic",
@@ -2380,7 +2380,7 @@ export const demoReport: TellReport = {
       "severity": "medium"
     },
     {
-      "id": "tell-shadow-everywhere",
+      "id": "dp-shadow-everywhere",
       "family": "tell",
       "detector": "ShadowEverywhereTell",
       "verdictHint": "generic",
@@ -2398,7 +2398,7 @@ export const demoReport: TellReport = {
       "severity": "medium"
     },
     {
-      "id": "tell-radius-monotone",
+      "id": "dp-radius-monotone",
       "family": "tell",
       "detector": "RadiusMonotoneTell",
       "verdictHint": "generic",
@@ -2416,7 +2416,7 @@ export const demoReport: TellReport = {
       "severity": "medium"
     },
     {
-      "id": "tell-emoji-chrome",
+      "id": "dp-emoji-chrome",
       "family": "tell",
       "detector": "EmojiChromeTell",
       "verdictHint": "generic",
@@ -2433,7 +2433,7 @@ export const demoReport: TellReport = {
       "severity": "low"
     },
     {
-      "id": "tell-centered-everything",
+      "id": "dp-centered-everything",
       "family": "tell",
       "detector": "CenteredEverythingTell",
       "verdictHint": "generic",
@@ -2450,7 +2450,7 @@ export const demoReport: TellReport = {
       "severity": "medium"
     },
     {
-      "id": "tell-gray-mush",
+      "id": "dp-gray-mush",
       "family": "tell",
       "detector": "GrayMushTell",
       "verdictHint": "generic",
@@ -2608,7 +2608,7 @@ export const demoReport: TellReport = {
       "severity": "high"
     },
     {
-      "id": "tell-acid-accent",
+      "id": "dp-acid-accent",
       "family": "tell",
       "detector": "AcidAccentTell",
       "verdictHint": "generic",
@@ -2662,46 +2662,46 @@ export const demoReport: TellReport = {
   ],
   "verdicts": [
     {
-      "findingId": "tell-system-font",
+      "findingId": "dp-system-font",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "SystemFontTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "SystemFontTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-gradient-crutch",
+      "findingId": "dp-gradient-crutch",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "GradientCrutchTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "GradientCrutchTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-shadow-everywhere",
+      "findingId": "dp-shadow-everywhere",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "ShadowEverywhereTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "ShadowEverywhereTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-radius-monotone",
+      "findingId": "dp-radius-monotone",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "RadiusMonotoneTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "RadiusMonotoneTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-emoji-chrome",
+      "findingId": "dp-emoji-chrome",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "EmojiChromeTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "EmojiChromeTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-centered-everything",
+      "findingId": "dp-centered-everything",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "CenteredEverythingTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "CenteredEverythingTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
-      "findingId": "tell-gray-mush",
+      "findingId": "dp-gray-mush",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "GrayMushTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "GrayMushTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
       "findingId": "drift-near-duplicate-values",
@@ -2734,10 +2734,10 @@ export const demoReport: TellReport = {
       "rationale": "StateGap found inconsistent rendered values. Pick one semantic treatment before the surface keeps splitting."
     },
     {
-      "findingId": "tell-acid-accent",
+      "findingId": "dp-acid-accent",
       "verdict": "generic",
       "confidence": 0.72,
-      "rationale": "AcidAccentTell matches a common AI-built UI pattern. Tell can name it, show the evidence, and draft a more distinctive direction."
+      "rationale": "AcidAccentTell matches a common AI-built UI pattern. Design Proof can name it, show the evidence, and draft a more distinctive direction."
     },
     {
       "findingId": "drift-token-bypass",
@@ -2818,7 +2818,7 @@ export const demoReport: TellReport = {
         "rationale": ""
       }
     ],
-    "tellScore": 0.8,
+    "dpScore": 0.8,
     "scoredAgainst": "baseline"
   }
-} as TellReport;
+} as DesignProofReport;

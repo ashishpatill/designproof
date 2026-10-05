@@ -1,0 +1,50 @@
+# Design Proof web-design skill registry
+
+**Policy:** Learn every part of every script. Constrain shipping defaults. Do not skip techniques.
+
+Coverage table (82/82): `agent-skills/web-design/COVERAGE.md`
+
+## Engine-routed SkillNodeIds
+
+| Design Proof skill id | Engine effect |
+|---|---|
+| `product-proof-stage` | `workflow-proof` + HTMX |
+| `conversion-landing-craft` | FAQ objections + CTA risk |
+| `pricing-decision-craft` | Cadence toggle + risk note |
+| `scroll-reveal-once` | Once-only reveals |
+| `hero-entrance-once` | Hero brand→claim→CTA entrance |
+| `section-stagger-enter` | Staggered children in reveals |
+| `scroll-narrative-craft` | Sticky chapter + progress |
+| `authored-motion-slot` | Rive/Lottie poster slot (immersive) |
+| `motion-stack-craft` | Three/D3/GSAP/OSS judgment + product instruments |
+| `indexed-detail-markers` | `.ds-index-mark` |
+| `honest-integration-marks` | Declared mark row |
+| `paper-technical-frame` | `data-frame=paper-technical` |
+| `split-panel-technical` | Tech brackets on folds |
+| `edge-fade-craft` | Rail alpha masks |
+| `elevation-depth-tokens` | `--sh-sm/raised/overlay` |
+| `editorial-chapter-craft` | Chapter story pacing |
+| `scrub-sequence-craft` | Educational scrub routing |
+| `operational-governance-craft` | Approval + rollback FAQ |
+| `wireframe-annotation-craft` | Template annotations |
+| `ambient-atmosphere-craft` | Static mote field (`data-atmosphere`) |
+| `signal-beam-craft` | CSS accent beam vignette |
+| `glass-shell-craft` | Nav frost + `.ds-glass-panel` |
+| `container-tech-shell` | Framed shell hierarchy (dark-premium) |
+| `website-domain-research` | **Always first** — LoadPrior → gap → walkthrough → IA → training emit |
+| `sport-matchday-web` | Sport research parent (when `sportId`) — extends domain research |
+| `sport-vernacular-craft` | Score-spine + format-lens craft after sport research |
+
+## Agent playbooks (full script duties)
+
+`gates-until-verified`, `agency-quality-site`, `surface-recipe-map`, technique packs, plus formerly avoided crafts now fully documented:
+
+`organic-merge-craft`, `pointer-field-craft`, `beam-state-craft`, `dither-field-craft`, `mesh-field-craft`
+
+## How to add the next skill
+
+1. Extract **all** knobs, pause/cleanup, reduced-motion, brand-accent rules from the source script.
+2. Write Design Proof `SKILL.md` with complete duties + Design Proof shipping defaults.
+3. Prefer `@designproof/design-skills` static/CSS approximations; keep full sims in the skill for agents.
+4. Map the folder in `COVERAGE.md`.
+5. Tests green → commit → push.

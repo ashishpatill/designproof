@@ -1,6 +1,6 @@
 ---
 name: scroll-reveal-once
-description: Once-only scroll reveals without blur spectacle. Wired when Taste motion is light-scroll-reveals in @tell/design-skills. Prefer CSS view timelines with IO fallback.
+description: Once-only scroll reveals without blur spectacle. Wired when Taste motion is light-scroll-reveals in @designproof/design-skills. Prefer CSS view timelines with IO fallback.
 ---
 
 # scroll-reveal-once

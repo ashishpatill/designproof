@@ -130,7 +130,7 @@ export function ctaFor(
     }
     if (siteKind === "editorial-foundry") {
       return {
-        primary: "Request a specimen",
+        primary: "Request a template",
         secondary: "See the cuts",
         note: "Trial files ship with the optical sizes you will actually set.",
       };
@@ -760,7 +760,7 @@ export function pullQuote(brief: DesignBrief, features: FeatureSpec[]): { quote:
       attribution: `In hand · ${n} details · paper-led`,
     },
     "editorial-foundry": {
-      quote: `${brief.productName} earns a specimen request because the cuts on this page are the ones setters actually use.`,
+      quote: `${brief.productName} earns a template request because the cuts on this page are the ones setters actually use.`,
       attribution: `Trial files · optical sizes · ${n} cuts`,
     },
     "research-dossier": {

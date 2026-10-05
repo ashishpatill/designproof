@@ -11,22 +11,22 @@ import {
 } from "./training-data-sink";
 
 describe("training-data-sink", () => {
-  const prevRepo = process.env.TELL_DESIGN_DATA_REPO;
-  const prevFlag = process.env.TELL_TRAINING_DATA;
+  const prevRepo = process.env.DP_DESIGN_DATA_REPO;
+  const prevFlag = process.env.DP_TRAINING_DATA;
   const prevVercel = process.env.VERCEL;
-  const prevSync = process.env.TELL_TRAINING_DATA_SYNC;
+  const prevSync = process.env.DP_TRAINING_DATA_SYNC;
   let tmp: string | undefined;
 
   afterEach(async () => {
     resetTrainingSinkCache();
-    if (prevRepo === undefined) delete process.env.TELL_DESIGN_DATA_REPO;
-    else process.env.TELL_DESIGN_DATA_REPO = prevRepo;
-    if (prevFlag === undefined) delete process.env.TELL_TRAINING_DATA;
-    else process.env.TELL_TRAINING_DATA = prevFlag;
+    if (prevRepo === undefined) delete process.env.DP_DESIGN_DATA_REPO;
+    else process.env.DP_DESIGN_DATA_REPO = prevRepo;
+    if (prevFlag === undefined) delete process.env.DP_TRAINING_DATA;
+    else process.env.DP_TRAINING_DATA = prevFlag;
     if (prevVercel === undefined) delete process.env.VERCEL;
     else process.env.VERCEL = prevVercel;
-    if (prevSync === undefined) delete process.env.TELL_TRAINING_DATA_SYNC;
-    else process.env.TELL_TRAINING_DATA_SYNC = prevSync;
+    if (prevSync === undefined) delete process.env.DP_TRAINING_DATA_SYNC;
+    else process.env.DP_TRAINING_DATA_SYNC = prevSync;
     if (tmp) await rm(tmp, { recursive: true, force: true });
   });
 
@@ -34,12 +34,12 @@ describe("training-data-sink", () => {
     tmp = await mkdtemp(path.join(tmpdir(), "tdd-sink-"));
     await writeFile(
       path.join(tmp, "package.json"),
-      JSON.stringify({ name: "tell-design-data" }),
+      JSON.stringify({ name: "dp-design-data" }),
       "utf8",
     );
-    process.env.TELL_DESIGN_DATA_REPO = tmp;
-    process.env.TELL_TRAINING_DATA = "1";
-    process.env.TELL_TRAINING_DATA_SYNC = "0";
+    process.env.DP_DESIGN_DATA_REPO = tmp;
+    process.env.DP_TRAINING_DATA = "1";
+    process.env.DP_TRAINING_DATA_SYNC = "0";
     delete process.env.VERCEL;
     resetTrainingSinkCache();
     return tmp;
@@ -138,7 +138,7 @@ describe("training-data-sink", () => {
   it("stays off on Vercel by default", async () => {
     await seedRepo();
     process.env.VERCEL = "1";
-    delete process.env.TELL_TRAINING_DATA;
+    delete process.env.DP_TRAINING_DATA;
     resetTrainingSinkCache();
     const result = await writeTrainingEvent("voice", { transcript: "warmer" });
     expect(result).toBeNull();

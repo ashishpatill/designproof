@@ -213,7 +213,7 @@ export function KineticExperience() {
           <a href="#scrub">Scrub</a>
           <a href="#method">Method</a>
           <a className="kn-nav-cta" href="/showcase">
-            Tell Specimens
+            Design Templates
           </a>
         </nav>
       </header>
@@ -347,7 +347,7 @@ export function KineticExperience() {
 
       <footer className="kn-foot">
         <p>
-          Mote template · pointer + scroll frame mapping · built for Tell specimens
+          Mote template · pointer + scroll frame mapping · built for Design templates
         </p>
         <a href="/showcase">Back to gallery</a>
       </footer>

@@ -1,4 +1,4 @@
--- Durable shared Tell reports (Neon / Postgres).
+-- Durable shared Design Proof reports (Neon / Postgres).
 -- Applied automatically on first share when DATABASE_URL is set.
 -- You can also run this once from the Neon SQL editor.
 

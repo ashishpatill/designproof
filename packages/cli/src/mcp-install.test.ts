@@ -8,7 +8,7 @@ describe("installPlatformMcp", () => {
   let tmp: string;
 
   beforeEach(async () => {
-    tmp = await mkdtemp(path.join(os.tmpdir(), "tell-mcp-install-"));
+    tmp = await mkdtemp(path.join(os.tmpdir(), "dp-mcp-install-"));
   });
 
   afterEach(async () => {
@@ -20,24 +20,24 @@ describe("installPlatformMcp", () => {
     expect(result.mode).toBe("wrote");
     expect(result.path).toBe(path.join(tmp, ".cursor", "mcp.json"));
     const raw = JSON.parse(await readFile(result.path!, "utf8")) as {
-      mcpServers: { tell: { command: string } };
+      mcpServers: { designproof: { command: string } };
     };
-    expect(raw.mcpServers.tell.command).toBe("pnpm");
+    expect(raw.mcpServers.designproof.command).toBe("pnpm");
   });
 
   it("writes OpenCode local mcp entry", async () => {
     const result = await installPlatformMcp({ agent: "opencode", cwd: tmp, scope: "project" });
     const raw = JSON.parse(await readFile(result.path!, "utf8")) as {
-      mcp: { tell: { type: string; command: string[] } };
+      mcp: { designproof: { type: string; command: string[] } };
     };
-    expect(raw.mcp.tell.type).toBe("local");
-    expect(raw.mcp.tell.command[0]).toBe("pnpm");
+    expect(raw.mcp.designproof.type).toBe("local");
+    expect(raw.mcp.designproof.command[0]).toBe("pnpm");
   });
 
-  it("writes Codex toml mcp_servers.tell", async () => {
+  it("writes Codex toml mcp_servers.designproof", async () => {
     const result = await installPlatformMcp({ agent: "codex", cwd: tmp, scope: "project" });
     const text = await readFile(result.path!, "utf8");
-    expect(text).toContain("[mcp_servers.tell]");
+    expect(text).toContain("[mcp_servers.designproof]");
     expect(text).toContain('command = "pnpm"');
   });
 
@@ -45,7 +45,7 @@ describe("installPlatformMcp", () => {
     const result = await installPlatformMcp({ agent: "grok-build", cwd: tmp, scope: "project" });
     expect(result.platform).toBe("grok");
     const text = await readFile(result.path!, "utf8");
-    expect(text).toContain("[mcp_servers.tell]");
+    expect(text).toContain("[mcp_servers.designproof]");
   });
 
   it("merges OpenClaw mcp.servers without clobbering siblings", async () => {
@@ -67,7 +67,7 @@ describe("installPlatformMcp", () => {
       };
       expect(raw.keep).toBe(true);
       expect(raw.mcp.servers.other?.command).toBe("echo");
-      expect(raw.mcp.servers.tell?.command).toBe("pnpm");
+      expect(raw.mcp.servers.designproof?.command).toBe("pnpm");
     } finally {
       process.env.HOME = prevHome;
     }

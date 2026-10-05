@@ -14,7 +14,7 @@ type SiteImgProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt" | "l
 };
 
 /**
- * Specimen/site media — loading defaults from responsive-performance.
+ * Template/site media — loading defaults from responsive-performance.
  * Prefer WebP paths produced by `pnpm media:site`.
  */
 export function SiteImg({
@@ -29,7 +29,7 @@ export function SiteImg({
 }: SiteImgProps) {
   const webpSrc = src.replace(/\.(jpe?g|png)$/i, ".webp");
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- specimen sites use static public assets
+    // eslint-disable-next-line @next/next/no-img-element -- template sites use static public assets
     <img
       src={webpSrc}
       alt={alt}

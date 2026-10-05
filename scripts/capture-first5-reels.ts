@@ -11,7 +11,7 @@ import { designFromFeatures, getTemplate } from "../packages/design-skills/src/i
 
 const OUT = resolve(__dirname, "../docs/media/showcase");
 const ARTIFACTS = "/opt/cursor/artifacts/screenshots";
-const TMP = resolve("/tmp/tell-first5-reels");
+const TMP = resolve("/tmp/dp-first5-reels");
 const VIEWPORT = { width: 1440, height: 900 };
 
 const KEYS = [

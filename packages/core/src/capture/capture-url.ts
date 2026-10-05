@@ -8,7 +8,7 @@ import {
   type ColorTheme,
   type InteractionState,
   type ViewportPreset,
-} from "@tell/schema";
+} from "@designproof/schema";
 import { CAPTURE_VIEWPORT_PRESETS, SECONDARY_VIEWPORT_PRESETS } from "./viewports";
 
 export type CaptureUrlOptions = {
@@ -22,12 +22,12 @@ export type CaptureUrlOptions = {
   interaction?: InteractionState;
   /**
    * Auth role for this capture. `authenticated` requires a Playwright storage state
-   * via `storageState` or `TELL_AUTH_STORAGE_STATE`.
+   * via `storageState` or `DP_AUTH_STORAGE_STATE`.
    */
   authRole?: AuthRole;
   /**
    * Playwright storage-state path (or inline object) used when `authRole` is `authenticated`.
-   * Falls back to `TELL_AUTH_STORAGE_STATE` when omitted.
+   * Falls back to `DP_AUTH_STORAGE_STATE` when omitted.
    */
   storageState?: string | { cookies: unknown[]; origins: unknown[] };
 };
@@ -52,12 +52,12 @@ export function resolveAuthStorageState(
     return options.storageState;
   }
 
-  const fromEnv = process.env.TELL_AUTH_STORAGE_STATE?.trim();
+  const fromEnv = process.env.DP_AUTH_STORAGE_STATE?.trim();
   if (fromEnv) {
     const path = resolve(fromEnv);
     if (!existsSync(path)) {
       throw new Error(
-        `Authenticated capture: TELL_AUTH_STORAGE_STATE points to a missing file: ${path}`,
+        `Authenticated capture: DP_AUTH_STORAGE_STATE points to a missing file: ${path}`,
       );
     }
     return path;
@@ -65,7 +65,7 @@ export function resolveAuthStorageState(
 
   throw new Error(
     "Authenticated capture requires a Playwright storage state. " +
-      "Pass CaptureUrlOptions.storageState or set TELL_AUTH_STORAGE_STATE to a storageState JSON path " +
+      "Pass CaptureUrlOptions.storageState or set DP_AUTH_STORAGE_STATE to a storageState JSON path " +
       "(see fixtures/generic-app/auth-storage.json and pnpm auth:fixture).",
   );
 }
@@ -169,13 +169,13 @@ export async function captureUrl(url: string, options: CaptureUrlOptions = {}): 
       ([selector, maxInlineCss, maxSnapshot]) => {
         // NOTE: no named inner functions here — esbuild/tsx would wrap them in a
         // `__name` helper that does not exist inside the serialized browser scope.
-        // Stamp a unique data-tell-id on each sampled element on the LIVE dom (before we clone
+        // Stamp a unique data-dp-id on each sampled element on the LIVE dom (before we clone
         // the tree for the snapshot), classify its rendered role, and record its box. The redesign
-        // engine then restyles THIS exact element via [data-tell-id="…"] — no selector guessing.
+        // engine then restyles THIS exact element via [data-dp-id="…"] — no selector guessing.
         const samples = Array.from(document.querySelectorAll<HTMLElement>(selector)).slice(0, 320).map((el, i) => {
           const cs = getComputedStyle(el);
-          const tellId = "t" + i;
-          el.setAttribute("data-tell-id", tellId);
+          const dpId = "t" + i;
+          el.setAttribute("data-dp-id", dpId);
           const tag = el.tagName.toLowerCase();
           const cls = (typeof el.className === "string" ? el.className : "").toLowerCase();
           const fs = parseFloat(cs.fontSize) || 16;
@@ -196,7 +196,7 @@ export async function captureUrl(url: string, options: CaptureUrlOptions = {}): 
           else if (tag === "p" || tag === "li" || (wordCount >= 3 && !interactive)) role = "body";
           return {
             selector: el.id ? "#" + el.id : cls ? tag + "." + cls.split(" ")[0] : tag,
-            tellId,
+            dpId,
             tag,
             role,
             rect: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) },
@@ -346,7 +346,7 @@ export async function captureUrl(url: string, options: CaptureUrlOptions = {}): 
         head.insertBefore(base, head.firstChild);
         if (inlinedCss) {
           const style = document.createElement("style");
-          style.setAttribute("data-tell-inlined", "");
+          style.setAttribute("data-dp-inlined", "");
           style.textContent = inlinedCss;
           head.appendChild(style);
         }

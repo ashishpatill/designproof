@@ -1,4 +1,4 @@
-import type { ViewportMatrixEntry, ViewportPreset } from "@tell/schema";
+import type { ViewportMatrixEntry, ViewportPreset } from "@designproof/schema";
 
 export const CAPTURE_VIEWPORT_PRESETS: ReadonlyArray<{
   preset: ViewportPreset;

@@ -152,7 +152,7 @@ export function BaselineShell({ children }: { children: ReactNode }) {
           <div className="bl-footer-col">
             <p className="bl-footer-col-title">Utility</p>
             <Link href="/showcase" prefetch>
-              Tell Specimens
+              Design Templates
             </Link>
           </div>
         </nav>

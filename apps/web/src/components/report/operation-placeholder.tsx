@@ -9,7 +9,7 @@ export function OperationPlaceholder({ title, detail }: { title: string; detail:
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-accent/40 bg-accent/10">
           <Loader2 className="h-5 w-5 animate-spin text-accent" />
         </div>
-        <p className="mt-4 font-display text-3xl text-text">{title || "Tell is working"}</p>
+        <p className="mt-4 font-display text-3xl text-text">{title || "Design Proof is working"}</p>
         <p className="mt-2 text-sm text-secondary">{detail || "Preparing the next rendered surface…"}</p>
         <p className="mt-4 font-mono text-meta uppercase tracking-[0.14em] text-muted">previous capture hidden while this runs</p>
       </div>

@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { Finding } from "@tell/schema";
+import { Finding } from "@designproof/schema";
 import { GeminiTasteEngine } from "../src/engine";
 
 const ctx = { fingerprintSummary: "fonts: Inter×40 · gradient: true" };
 
 function systemFontFinding(ratio: number): Finding {
   return Finding.parse({
-    id: "tell-system-font",
+    id: "dp-system-font",
     family: "tell",
     detector: "SystemFontTell",
     verdictHint: "generic",

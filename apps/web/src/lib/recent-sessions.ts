@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const RECENT_SESSIONS_KEY = "tell:recent-sessions";
+export const RECENT_SESSIONS_KEY = "dp:recent-sessions";
 const MAX_RECENT = 12;
 
 export const ComposerMode = z.enum(["design", "url", "github", "offline"]);

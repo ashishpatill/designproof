@@ -1,9 +1,9 @@
-# Tell — Design System
+# Design Proof — Design System
 
 > The tool that names every AI-generated tell must not have a tell itself.
 > This system is written to pass its own audit: a distinctive editorial identity, every value is a
 > token, every interactive component declares a complete state matrix, and nothing reads as a default.
-> Demo beat: *Tell runs on itself and reports zero tells.*
+> Demo beat: *Design Proof runs on itself and reports zero tells.*
 
 Version 0.1 · Warm editorial · Build sprint (Cursor track)
 
@@ -11,25 +11,25 @@ Version 0.1 · Warm editorial · Build sprint (Cursor track)
 
 ## 1. Aesthetic direction
 
-**Concept: print atelier.** Tell reads like a design critic's proof sheet — warm paper, ink neutrals,
+**Concept: print atelier.** Design Proof reads like a design critic's proof sheet — warm paper, ink neutrals,
 registration marks, crop lines, a display face with character. The world it borrows from is editorial
-design and pre-press craft: broadsheets, specimen sheets, proof corrections, the moment a bland comp
+design and pre-press craft: broadsheets, template sheets, proof corrections, the moment a bland comp
 becomes a considered layout. The mood is confident and human until a finding lands, at which point a
 single warm signal marks the spot — like a proofreader's mark on a spread.
 
-Three defaults to consciously avoid (they read as AI-generated — and Tell detects them): Inter-only
-type systems; a single violet→pink hero gradient; shadow-lg on every card. Tell is none of these. It
+Three defaults to consciously avoid (they read as AI-generated — and Design Proof detects them): Inter-only
+type systems; a single violet→pink hero gradient; shadow-lg on every card. Design Proof is none of these. It
 uses a **tri-tone type system** (display serif + humanist sans + mono), a **warm paper-ink palette**
 (not cool SaaS slate), and a **single restrained accent** (terracotta-leaning, not acid green or
 violet). Severity/findings use a curated three-hue legend, never a rainbow dashboard.
 
 **Signature element — the reveal seam.** A diagonal wipe dividing "before" (what you shipped) from
-"after" (what Tell proposes). The seam carries registration/crop marks at its corners — print-craft
+"after" (what Design Proof proposes). The seam carries registration/crop marks at its corners — print-craft
 that says "this is a proof, not a preview." It appears in the hero demo, the before/after component,
 and the landing one-pager. Spend the boldness here; keep everything else editorial and quiet.
 
 **Secondary motif — the proof mark.** A small filled circle with a crosshair (like a registration
-target) marks evidence hotspots on captured screenshots. Used in TellCards, loading states, and the
+target) marks evidence hotspots on captured screenshots. Used in DesignProofCards, loading states, and the
 wordmark glyph.
 
 ---
@@ -147,14 +147,14 @@ A three-role system with **deliberate contrast** — the antidote to Inter-only 
   proofs. Used with restraint; never for body.
 - **Body / UI** — `Source Sans 3` (400/500/600). Everything interface. Humanist, warm, not geometric
   default.
-- **Mono / data** — `IBM Plex Mono` (400/500). URLs, computed values, diffs, Tell scores, eyebrows.
+- **Mono / data** — `IBM Plex Mono` (400/500). URLs, computed values, diffs, Design Proof scores, eyebrows.
   Also carries uppercase registration labels.
 
 Fallbacks: `Georgia, "Times New Roman", serif` for display; `ui-sans-serif, system-ui` for sans;
 `ui-monospace, "SF Mono", monospace` for mono.
 
-**Explicit ban in Tell's own UI:** Do not use Inter, system-ui-only stacks, or a single sans for every
-role. Tell's `SystemFontTell` detector would flag it.
+**Explicit ban in Design Proof's own UI:** Do not use Inter, system-ui-only stacks, or a single sans for every
+role. Design Proof's `SystemFontTell` detector would flag it.
 
 ### 3.1 Type scale
 
@@ -183,13 +183,13 @@ Default UI text is `body` (15px) — editorial density, not marketing 18px.
 `16`=64 · `20`=80 · `24`=96.
 
 Component internal rhythm defaults to `space-2`/`space-3`; section rhythm to `space-8`/`space-12`.
-Asymmetric layouts encouraged — not everything centered (Tell detects `CenteredEverythingTell`).
+Asymmetric layouts encouraged — not everything centered (Design Proof detects `CenteredEverythingTell`).
 
 ### 4.2 Radius — varied (anti-monotone)
 
 `radius-none`=0 · `sm`=2 · `md`=4 (controls) · `lg`=8 (cards) · `xl`=16 (modals) · `full`=9999
 (pill). **Use at least two distinct radii** in any view — monotone 8px-everywhere triggers
-`RadiusMonotoneTell` on the fixture, and Tell's own UI must not trigger it.
+`RadiusMonotoneTell` on the fixture, and Design Proof's own UI must not trigger it.
 
 ### 4.3 Borders
 
@@ -256,11 +256,11 @@ verdict hue at 30%. Label in `eyebrow`. Never color-only.
 
 ### 6.4 CaptureBar
 
-Top bar, `e1`. Left: proof-mark glyph + wordmark `Tell` (Instrument Serif). Center: URL input
+Top bar, `e1`. Left: proof-mark glyph + wordmark `Design Proof` (Instrument Serif). Center: URL input
 (mono, truncating) + `Capture` primary button (becomes `Capturing…` with flash). Right: StatusPill
 (MCP), voice toggle, export report.
 
-### 6.5 TellReport (hero surface — the product loop)
+### 6.5 DesignProofReport (hero surface — the product loop)
 
 Not a dashboard. A **single-column editorial report** with an embedded before/after seam.
 
@@ -268,7 +268,7 @@ Structure top→bottom:
 1. **Score line** (mono, eyebrow): `8 findings · 5 generic · 2 drift · 1 intentional`.
 2. **BeforeAfterSeam** (§6.6) — full width, min-height 360px.
 3. **Findings list** — grouped by verdict (Generic / Drift / Intentional). Each row: VerdictBadge +
-   tell/drift name (mono) + one-line rationale + proof-mark pin linking to evidence.
+   designproof/drift name (mono) + one-line rationale + proof-mark pin linking to evidence.
 4. **VoiceDirector strip** (§6.9) — pinned below findings when a direction is active.
 
 Selected finding raises to `e-signal` and scrolls evidence into view in the inspector.
@@ -283,7 +283,7 @@ bar with proof-mark icon.
 Interaction: drag seam · keyboard ←/→ in 5% steps · double-click reset to 50/50. Reduced-motion:
 jump only, no parallax.
 
-### 6.7 TellCard (genericness finding — core surface)
+### 6.7 DesignProofCard (genericness finding — core surface)
 
 `e2` card. Structure:
 1. Header: tell name (`h3`, mono e.g. `SystemFontTell`), VerdictBadge (`GENERIC`), confidence meter
@@ -295,7 +295,7 @@ jump only, no parallax.
 
 ### 6.8 DriftCard (consistency finding)
 
-Same structure as TellCard but for drift detectors. Evidence shows side-by-side computed values
+Same structure as DesignProofCard but for drift detectors. Evidence shows side-by-side computed values
 (e.g. `#F3F4F6` vs `#F4F4F5` vs `#F5F5F4`) with near-duplicate callout.
 
 ### 6.9 VoiceDirector
@@ -313,7 +313,7 @@ gutter; removals on `--v-generic` wash with `−` gutter. Header: file path (mon
 
 ### 6.11 Inspector Panel
 
-Right-docked, width 440, `e1`, resizable to 560. Hosts TellCard/DriftCard + DiffViewer in tabs
+Right-docked, width 440, `e1`, resizable to 560. Hosts DesignProofCard/DriftCard + DiffViewer in tabs
 (`Finding` / `Fix` / `Evidence`). Empty state when nothing selected (§7).
 
 ### 6.12 StatusPill (MCP connection)
@@ -334,8 +334,8 @@ Error = generic-verdict hue + reason.
 
 ## 7. Canonical state matrix (dogfood contract)
 
-Every interactive component MUST implement each applicable state. Tell's own audit fails the build
-if any is missing. This table is the spec Tell enforces on *itself*.
+Every interactive component MUST implement each applicable state. Design Proof's own audit fails the build
+if any is missing. This table is the spec Design Proof enforces on *itself*.
 
 | State | Required for | Visual contract |
 |---|---|---|
@@ -349,7 +349,7 @@ if any is missing. This table is the spec Tell enforces on *itself*.
 | **error** | inputs, async | `--v-generic` border + caption message; message says what happened + fix |
 | **empty** | any data region | icon + one-line "what this is" + primary action |
 
-**Empty-state copy pattern:** `[proof-mark]  No capture yet.` / `Point Tell at a URL to read its
+**Empty-state copy pattern:** `[proof-mark]  No capture yet.` / `Point Design Proof at a URL to read its
 design surface.` / `[Capture]`.
 
 **Error copy pattern:** `Capture failed: couldn't reach localhost:3000.` / `[Retry] [Edit URL]`.
@@ -362,7 +362,7 @@ visually active in a way that implies the new target has already succeeded.
 
 ## 8. Data visualization — findings, not charts
 
-Tell does not hero-chart KPIs. Data appears as:
+Design Proof does not hero-chart KPIs. Data appears as:
 
 ### 8.1 Score line
 
@@ -404,7 +404,7 @@ draggable seam.
 
 Critic voice: direct, specific, active, sentence case. Name things by what the user controls
 ("Capture", "Draft fix", "Mark intentional"), never by implementation ("run detector pipeline").
-State findings as facts: *"Tell found 8 findings. 5 are generic tells, 2 are drift, 1 is
+State findings as facts: *"Design Proof found 8 findings. 5 are generic tells, 2 are drift, 1 is
 intentional."* No hedging, no apology, no emoji. Rationale reads like a senior designer's note,
 not a chatbot.
 
@@ -412,7 +412,7 @@ not a chatbot.
 
 ## 10.5 App shell (entry + split project)
 
-Tell Proof’s primary surface is an **entry-rail / split-shell**, not a KPI dashboard:
+Design Proof’s primary surface is an **entry-rail / split-shell**, not a KPI dashboard:
 
 | Region | Role |
 |---|---|
@@ -451,8 +451,8 @@ Map semantic tokens to CSS variables in `:root`, expose to Tailwind via `theme.e
 ```
 
 Components reference `bg-surface`, `text-secondary`, `border-strong`, `text-accent`, etc.
-**No raw hex or arbitrary values in component classNames** — Tell's `TokenBypass` drift detector
-flags literals in source; dogfood applies the same rule to Tell's own repo.
+**No raw hex or arbitrary values in component classNames** — Design Proof's `TokenBypass` drift detector
+flags literals in source; dogfood applies the same rule to Design Proof's own repo.
 
 Font wiring:
 ```js
@@ -465,9 +465,9 @@ fontFamily: {
 
 ---
 
-## 12. Dogfood checklist (Tell must pass itself)
+## 12. Dogfood checklist (Design Proof must pass itself)
 
-Before demo, run Tell on `apps/web`. Target: **0 generic tells, 0 unintentional drift.**
+Before demo, run Design Proof on `apps/web`. Target: **0 generic tells, 0 unintentional drift.**
 
 | Check | Pass criteria |
 |---|---|

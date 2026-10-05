@@ -24,8 +24,8 @@ export function formatCaptureHealth(
   }
 
   const detail = (health.error ?? "").trim();
-  if (/TELL_CAPTURE_API_URL/i.test(detail)) {
-    return "Capture unavailable · missing TELL_CAPTURE_API_URL";
+  if (/DP_CAPTURE_API_URL/i.test(detail)) {
+    return "Capture unavailable · missing DP_CAPTURE_API_URL";
   }
   if (health.backend === "remote") {
     return detail

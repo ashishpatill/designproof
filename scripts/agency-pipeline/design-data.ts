@@ -1,17 +1,17 @@
 /**
  * Personal design-data companion checkout — **developer machine only**.
  *
- * This is NOT end-user product learning. It exists so Tell maintainers can
+ * This is NOT end-user product learning. It exists so Design Proof maintainers can
  * improve the design engine from a private corpus checkout. End-user sessions
  * learn separately via browser `UserDesignProfile` (see apps/web
  * `user-session-learn.ts`).
  *
  * Enabled only when:
- *   - Not a public deploy (`VERCEL` / `TELL_DISABLE_DEV_CORPUS=1`), AND
+ *   - Not a public deploy (`VERCEL` / `DP_DISABLE_DEV_CORPUS=1`), AND
  *   - `research/design-data.local.json` exists, OR
- *   - `TELL_DESIGN_DATA` is set with `TELL_DEV_CORPUS=1`
+ *   - `DP_DESIGN_DATA` is set with `DP_DEV_CORPUS=1`
  *
- * Pointer: research/design-data.local.json  OR  env TELL_DESIGN_DATA=/abs/path
+ * Pointer: research/design-data.local.json  OR  env DP_DESIGN_DATA=/abs/path
  */
 import {
   existsSync,
@@ -33,15 +33,15 @@ import {
 
 /** True only on a developer workstation with an explicit corpus pointer. */
 export function isDevCorpusEnabled(root = repoRoot()): boolean {
-  if (process.env.TELL_DISABLE_DEV_CORPUS === "1") return false;
+  if (process.env.DP_DISABLE_DEV_CORPUS === "1") return false;
   // Public/demo hosts must never pull or write a private corpus.
-  if (process.env.VERCEL === "1" && process.env.TELL_DEV_CORPUS !== "1") return false;
-  if (process.env.TELL_PUBLIC_DEMO === "1") return false;
+  if (process.env.VERCEL === "1" && process.env.DP_DEV_CORPUS !== "1") return false;
+  if (process.env.DP_PUBLIC_DEMO === "1") return false;
 
-  const envPath = process.env.TELL_DESIGN_DATA?.trim();
+  const envPath = process.env.DP_DESIGN_DATA?.trim();
   if (envPath) {
     // Env alone is easy to set accidentally in CI — require explicit opt-in.
-    return process.env.TELL_DEV_CORPUS === "1" || existsSync(pointerPath(root));
+    return process.env.DP_DEV_CORPUS === "1" || existsSync(pointerPath(root));
   }
   return existsSync(pointerPath(root));
 }
@@ -88,11 +88,11 @@ function pointerPath(root: string): string {
 
 export function readPointer(root = repoRoot()): DesignDataPointer | null {
   if (!isDevCorpusEnabled(root)) return null;
-  const envPath = process.env.TELL_DESIGN_DATA?.trim();
-  if (envPath && (process.env.TELL_DEV_CORPUS === "1" || existsSync(pointerPath(root)))) {
+  const envPath = process.env.DP_DESIGN_DATA?.trim();
+  if (envPath && (process.env.DP_DEV_CORPUS === "1" || existsSync(pointerPath(root)))) {
     return {
       path: envPath,
-      pull: process.env.TELL_DESIGN_DATA_PULL !== "0",
+      pull: process.env.DP_DESIGN_DATA_PULL !== "0",
     };
   }
   const path = pointerPath(root);
@@ -116,14 +116,14 @@ export function resolveDesignDataRoot(root = repoRoot()): {
   const abs = isAbsolute(pointer.path)
     ? pointer.path
     : resolve(root, pointer.path);
-  const source: DesignDataStatus["source"] = process.env.TELL_DESIGN_DATA
+  const source: DesignDataStatus["source"] = process.env.DP_DESIGN_DATA
     ? "env"
     : "local-json";
   return { root: abs, source, pointer };
 }
 
 function tryCloneOrPull(
-  tellRoot: string,
+  dpRoot: string,
   pointer: DesignDataPointer,
   abs: string,
 ): { pulled: boolean; detail: string } {
@@ -137,7 +137,7 @@ function tryCloneOrPull(
     }
     mkdirSync(dirname(abs), { recursive: true });
     const clone = spawnSync("git", ["clone", "--depth", "1", pointer.repoUrl, abs], {
-      cwd: tellRoot,
+      cwd: dpRoot,
       encoding: "utf8",
     });
     if (clone.status !== 0) {
@@ -173,8 +173,8 @@ function firstExisting(root: string, names: string[]): string | null {
   return null;
 }
 
-export function ensureDesignData(tellRoot = repoRoot()): DesignDataStatus {
-  if (!isDevCorpusEnabled(tellRoot)) {
+export function ensureDesignData(dpRoot = repoRoot()): DesignDataStatus {
+  if (!isDevCorpusEnabled(dpRoot)) {
     return {
       ok: false,
       root: null,
@@ -188,7 +188,7 @@ export function ensureDesignData(tellRoot = repoRoot()): DesignDataStatus {
         "Dev corpus disabled (developer-only). End-user learning uses browser UserDesignProfile.",
     };
   }
-  const { root, source, pointer } = resolveDesignDataRoot(tellRoot);
+  const { root, source, pointer } = resolveDesignDataRoot(dpRoot);
   if (!pointer || !root) {
     return {
       ok: false,
@@ -200,10 +200,10 @@ export function ensureDesignData(tellRoot = repoRoot()): DesignDataStatus {
       hasMemory: false,
       hasMeasurements: false,
       detail:
-        "No design-data pointer. Create research/design-data.local.json (dev machine) or set TELL_DESIGN_DATA + TELL_DEV_CORPUS=1.",
+        "No design-data pointer. Create research/design-data.local.json (dev machine) or set DP_DESIGN_DATA + DP_DEV_CORPUS=1.",
     };
   }
-  const { pulled, detail } = tryCloneOrPull(tellRoot, pointer, root);
+  const { pulled, detail } = tryCloneOrPull(dpRoot, pointer, root);
   const seedsPath = firstExisting(root, [
     "boards.seeds.json",
     "boards.seeds.local.json",
@@ -236,9 +236,9 @@ export function ensureDesignData(tellRoot = repoRoot()): DesignDataStatus {
 
 export function loadDesignDataSeeds(
   category: string,
-  tellRoot = repoRoot(),
+  dpRoot = repoRoot(),
 ): { refs: Array<{ url: string; note?: string }>; mode: string } {
-  const status = ensureDesignData(tellRoot);
+  const status = ensureDesignData(dpRoot);
   if (!status.root) return { refs: [], mode: "design-data:missing" };
   const seedsPath = firstExisting(status.root, [
     "boards.seeds.json",
@@ -266,16 +266,16 @@ function basenameSafe(p: string): string {
   return parts[parts.length - 1] || p;
 }
 
-/** Merge personal-data memory under Tell memory (Tell wins on conflicts for bans already present). */
-export function mergeDesignDataMemory(tellRoot = repoRoot()): EngineMemory {
-  const tellMem = loadMemory(tellRoot);
-  const status = ensureDesignData(tellRoot);
-  if (!status.root || !status.hasMemory) return tellMem;
+/** Merge personal-data memory under Design Proof memory (Design Proof wins on conflicts for bans already present). */
+export function mergeDesignDataMemory(dpRoot = repoRoot()): EngineMemory {
+  const dpMem = loadMemory(dpRoot);
+  const status = ensureDesignData(dpRoot);
+  if (!status.root || !status.hasMemory) return dpMem;
   const memPath = firstExisting(status.root, [
     "agency-engine-memory.json",
     "research/agency-engine-memory.json",
   ]);
-  if (!memPath) return tellMem;
+  if (!memPath) return dpMem;
   try {
     const raw = JSON.parse(readFileSync(memPath, "utf8")) as Partial<EngineMemory>;
     const foreign: EngineMemory = {
@@ -291,36 +291,36 @@ export function mergeDesignDataMemory(tellRoot = repoRoot()): EngineMemory {
     return {
       version: 1,
       updatedAt: new Date().toISOString(),
-      bansExtra: mergeUniqueStrings(foreign.bansExtra, tellMem.bansExtra),
-      nicheBoosts: [...foreign.nicheBoosts, ...tellMem.nicheBoosts].slice(-40),
-      craftHints: [...foreign.craftHints, ...tellMem.craftHints].slice(-40),
-      pipelineNotes: [...foreign.pipelineNotes, ...tellMem.pipelineNotes].slice(-50),
-      seenPatternKeys: mergeUniqueStrings(foreign.seenPatternKeys, tellMem.seenPatternKeys),
+      bansExtra: mergeUniqueStrings(foreign.bansExtra, dpMem.bansExtra),
+      nicheBoosts: [...foreign.nicheBoosts, ...dpMem.nicheBoosts].slice(-40),
+      craftHints: [...foreign.craftHints, ...dpMem.craftHints].slice(-40),
+      pipelineNotes: [...foreign.pipelineNotes, ...dpMem.pipelineNotes].slice(-50),
+      seenPatternKeys: mergeUniqueStrings(foreign.seenPatternKeys, dpMem.seenPatternKeys),
     };
   } catch {
-    return tellMem;
+    return dpMem;
   }
 }
 
 export type CorridorDigest = {
   category: string;
-  source: "design-data" | "tell" | "none";
+  source: "design-data" | "designproof" | "none";
   notes: string[];
 };
 
 /** Pull a few anonymised band medians for DIRECTION corridor honesty. */
 export function corridorDigest(
   category: string,
-  tellRoot = repoRoot(),
+  dpRoot = repoRoot(),
 ): CorridorDigest {
   const paths: Array<{ path: string; source: CorridorDigest["source"] }> = [];
-  const status = ensureDesignData(tellRoot);
+  const status = ensureDesignData(dpRoot);
   if (status.root) {
     const p = firstExisting(status.root, ["aggregate.json", "research/aggregate.json"]);
     if (p) paths.push({ path: p, source: "design-data" });
   }
-  const tellAgg = resolve(tellRoot, "research/aggregate.json");
-  if (existsSync(tellAgg)) paths.push({ path: tellAgg, source: "tell" });
+  const dpAgg = resolve(dpRoot, "research/aggregate.json");
+  if (existsSync(dpAgg)) paths.push({ path: dpAgg, source: "designproof" });
 
   for (const { path, source } of paths) {
     try {
@@ -350,17 +350,17 @@ export function corridorDigest(
 
 /** After learn, mirror engine memory (+ optional LEARN.md) into the personal data repo. */
 export function writeBackDesignData(
-  tellRoot: string,
+  dpRoot: string,
   opts: { runId: string; learnMarkdown?: string },
 ): string {
-  const status = ensureDesignData(tellRoot);
+  const status = ensureDesignData(dpRoot);
   if (!status.root) return "design-data write-back skipped (no checkout)";
-  const mem = loadMemory(tellRoot);
-  saveMemory(tellRoot, mem); // ensure Tell copy is current
+  const mem = loadMemory(dpRoot);
+  saveMemory(dpRoot, mem); // ensure Design Proof copy is current
   const outMem = resolve(status.root, "agency-engine-memory.json");
   writeFileSync(outMem, `${JSON.stringify(mem, null, 2)}\n`, "utf8");
 
-  const learningsSrc = resolve(tellRoot, "research/LEARNINGS.md");
+  const learningsSrc = resolve(dpRoot, "research/LEARNINGS.md");
   if (existsSync(learningsSrc)) {
     cpSync(learningsSrc, resolve(status.root, "LEARNINGS.md"));
   }
@@ -370,8 +370,8 @@ export function writeBackDesignData(
     writeFileSync(resolve(runsDir, "LEARN.md"), opts.learnMarkdown, "utf8");
   }
 
-  // Best-effort commit in the data repo (never fails the Tell run)
-  if (existsSync(resolve(status.root, ".git")) && process.env.TELL_DESIGN_DATA_COMMIT !== "0") {
+  // Best-effort commit in the data repo (never fails the Design Proof run)
+  if (existsSync(resolve(status.root, ".git")) && process.env.DP_DESIGN_DATA_COMMIT !== "0") {
     spawnSync("git", ["add", "agency-engine-memory.json", "LEARNINGS.md", "runs"], {
       cwd: status.root,
       encoding: "utf8",
@@ -391,9 +391,9 @@ export function writeBackDesignData(
 
 export function listMeasurementRefs(
   categoryHint: string,
-  tellRoot = repoRoot(),
+  dpRoot = repoRoot(),
 ): string[] {
-  const status = ensureDesignData(tellRoot);
+  const status = ensureDesignData(dpRoot);
   if (!status.root) return [];
   const dir =
     [

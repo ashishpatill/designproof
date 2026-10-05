@@ -9,4 +9,4 @@ description: >-
 
 See `agent-skills/web-design/website-domain-research/load-prior-domain/SKILL.md`.
 
-Engine: `loadPriorDomain(domainId)` from `@tell/design-skills`.
+Engine: `loadPriorDomain(domainId)` from `@designproof/design-skills`.

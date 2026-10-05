@@ -11,7 +11,7 @@ export function OperationCurtain({ title, detail }: { title: string; detail: str
             <Loader2 className="h-4 w-4 animate-spin text-accent" />
           </span>
           <div>
-            <p className="font-mono text-sm text-text">{title || "Tell is working"}</p>
+            <p className="font-mono text-sm text-text">{title || "Design Proof is working"}</p>
             <p className="mt-1 text-sm text-secondary">{detail || "Please wait while the current operation finishes."}</p>
           </div>
         </div>

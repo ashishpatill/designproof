@@ -1,6 +1,6 @@
 "use client";
 
-import type { Reconciliation } from "@tell/schema";
+import type { Reconciliation } from "@designproof/schema";
 
 export function ReconciliationTable({ reconciliation, live }: { reconciliation: Reconciliation; live: boolean }) {
   if (!reconciliation) return null;

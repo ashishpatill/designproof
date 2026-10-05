@@ -1,5 +1,5 @@
-import type { DesignFingerprint, Finding } from "@tell/schema";
-import { Finding as FindingSchema } from "@tell/schema";
+import type { DesignFingerprint, Finding } from "@designproof/schema";
+import { Finding as FindingSchema } from "@designproof/schema";
 
 export type DesignDocSpec = {
   fonts: string[];

@@ -1,4 +1,4 @@
-# Tell — Claude Design Brief
+# Design Proof — Claude Design Brief
 
 > Use this in **Claude Design** to produce the hi-fi screens, the clickable capture → diagnose →
 > art-direct → fix prototype, and the demo-facing landing/demo one-pager. It inherits every token
@@ -9,9 +9,9 @@
 
 ## 1. What Claude Design should produce
 
-1. **Tell Report** (hero screen, the money shot) — four states: pre-capture (empty), capturing
+1. **Design Proof Report** (hero screen, the money shot) — four states: pre-capture (empty), capturing
    (loading), results (findings + seam), voice-active (direction applied).
-2. **Finding Inspector** — TellCard / DriftCard taste explanation panel.
+2. **Finding Inspector** — DesignProofCard / DriftCard taste explanation panel.
 3. **Before/After Seam** — the draggable reveal (can be embedded in #1 or standalone frame).
 4. **Reconciliation / Diff** — the proposed redesign patch, including measurable contrast/token changes.
 5. **Voice Director** — mic + presets + active direction tag + parsed action items.
@@ -28,25 +28,25 @@ to the React components in `apps/web`.
 - **Print atelier.** Warm paper-ink field (`--bg #181614`), not pure black or cool SaaS slate. A
   tri-tone type system: Instrument Serif (display), Source Sans 3 (UI), IBM Plex Mono (data).
 - **Signature = the reveal seam.** A diagonal or vertical wipe dividing BEFORE (bland capture) from
-  AFTER (Tell's proposed direction), with registration/crop marks at the corners. Put it in the hero
+  AFTER (Design Proof's proposed direction), with registration/crop marks at the corners. Put it in the hero
   demo and the landing. This is the one memorable thing — spend boldness here.
 - **Accent = terracotta `#D4714A`.** Warm, editorial, human — not violet, not acid green.
 - **Verdict legend:** generic=terra, drift=ochre `#C4A035`, intentional=ink `#3A6358`, uncertain=
   paper-500. Always pair hue with glyph + shape.
 - **Avoid:** Inter-only typography; violet→pink gradient hero; shadow on every card; centered-everything
   layout; KPI stat-card dashboard; emoji UI chrome. If a frame could belong to any AI-built SaaS,
-  redo it — and remember Tell would flag it.
+  redo it — and remember Design Proof would flag it.
 
 ---
 
 ## 3. Screen specs
 
-### 3.1 Tell Report — RESULTS (hero)
+### 3.1 Design Proof Report — RESULTS (hero)
 
 **Layout**
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ CaptureBar:  [⊕ Tell]  https://…/generic-app    [Capture] ● MCP  [🎤] │
+│ CaptureBar:  [⊕ Design Proof]  https://…/generic-app    [Capture] ● MCP  [🎤] │
 ├─────────────────────────────────────────────────────────────────┤
 │  SCORE LINE (mono eyebrow):  8 findings · 5 generic · 2 drift · 1 intentional │
 ├─────────────────────────────────────────────────────────────────┤
@@ -58,7 +58,7 @@ to the React components in `apps/web`.
 │                                                                 │
 ├──────────────────────────────┬──────────────────────────────────┤
 │ FINDINGS LIST                │  INSPECTOR (docked)              │
-│ ▸ SystemFontTell    GENERIC  │  TellCard when selected          │
+│ ▸ SystemFontTell    GENERIC  │  DesignProofCard when selected          │
 │ ▸ GradientCrutch…   GENERIC  │                                  │
 │ ▸ GrayMushTell      GENERIC  │                                  │
 │ ▸ FocusRing…        DRIFT    │                                  │
@@ -79,14 +79,14 @@ to the React components in `apps/web`.
 **Content/copy:** eyebrow `RENDERED SURFACE`; score line in mono; finding ids in mono (`SystemFontTell`);
 reconciliation summary should include a contrast floor such as `15.9:1 text · 4.6:1 controls` when live capture is available.
 
-### 3.2 Tell Report — EMPTY (pre-capture)
+### 3.2 Design Proof Report — EMPTY (pre-capture)
 
 Centered but not "AI-default centered-everything" — use asymmetric editorial layout. Left-weighted:
-proof-mark glyph, `No capture yet.` (Instrument Serif, display-l), sub `Point Tell at a URL to read
+proof-mark glyph, `No capture yet.` (Instrument Serif, display-l), sub `Point Design Proof at a URL to read
 its design surface.` (body, secondary), primary `Capture`. Faint crop marks in corners as decoration.
 Calm invitation — not a mood board.
 
-### 3.3 Tell Report — CAPTURING (loading)
+### 3.3 Design Proof Report — CAPTURING (loading)
 
 Brief paper-white **capture flash** across the canvas; then skeleton blocks approximating the report
 layout. Progress mono readout: `Launching headless browser…` → `reading computed styles…` →
@@ -94,7 +94,7 @@ layout. Progress mono readout: `Launching headless browser…` → `reading comp
 `Cloning` → `Installing` → `Waiting for reachable URL` → `Running` → `Capturing`. Hide the stale
 previous preview while setup/capture is active. Reduced-motion: static status label, no flash.
 
-### 3.4 Tell Report — VOICE ACTIVE
+### 3.4 Design Proof Report — VOICE ACTIVE
 
 Same as results but:
 - VoiceDirector shows live transcript or active preset chip highlighted (terra wash).
@@ -104,7 +104,7 @@ Same as results but:
 - After side of seam visibly updates (warmer paper, serif headlines stronger).
 - A subtle "Direction updated" toast bottom-right.
 
-### 3.5 Finding Inspector (TellCard)
+### 3.5 Finding Inspector (DesignProofCard)
 
 ```
 ┌─────────────────────────────┐
@@ -155,20 +155,20 @@ items when present. Show idle, listening, unsupported, and refining states.
 ### 3.10 Report summary (artifact, not dashboard)
 
 Single-column printable report. Top: score line. Then findings grouped by verdict with mono id +
-one-line rationale each. Footer: `Tell · captured generic-app · 8 findings`. No KPI cards, no pie
+one-line rationale each. Footer: `Design Proof · captured generic-app · 8 findings`. No KPI cards, no pie
 charts. A report you'd paste in a PR comment.
 
 ### 3.11 Landing / demo one-pager (for viewers)
 
 Single scroll. Sections in order:
 1. **Hero thesis** — the reveal seam animating across the wordmark. Headline (Instrument Serif):
-   *"Every AI-built UI has a tell."* Sub: one line on what Tell does. Primary CTA `Watch the
+   *"Every AI-built UI has a tell."* Sub: one line on what Design Proof does. Primary CTA `Watch the
    capture`.
 2. **The problem** — three quiet cards: AI makes shipping fast / everything looks the same / taste is
    the missing layer. No gradient hero, no emoji.
 3. **Live demo** — embedded seam drag from generic-app before/after. End on the intentional vs
    generic verdict contrast.
-4. **Dogfood proof** — "Tell runs on itself: 0 tells." Show Tell's own editorial UI (this design
+4. **Dogfood proof** — "Design Proof runs on itself: 0 tells." Show Design Proof's own editorial UI (this design
    system). Credibility beat.
 5. **How** — compact pipeline: capture → fingerprint → detect → reason → art-direct → reconcile;
    MCP badge "runs in Cursor."
@@ -185,7 +185,7 @@ cards only. Nothing that screams AI-generated.
 - **Seam wipe** — drag reveals before/after; slight parallax on layers (`deliberate`, `ease-standard`).
 - **Capture flash** — paper-white overlay 200ms on capture start (`fast`).
 - **Proof mark pulse** — evidence pin scales 1→1.08→1 when finding selected (`slow`, `ease-out`).
-- **Verdict reveal** — TellCard slides up 8px + fades in on selection (`base`).
+- **Verdict reveal** — DesignProofCard slides up 8px + fades in on selection (`base`).
 - **Voice listen** — mic button terra ring pulse (opacity only, 1.2s loop).
 
 All respect `prefers-reduced-motion` (seam jumps, opacity-only, ≤120ms).
@@ -208,24 +208,24 @@ aesthetic.
 
 Paste these one at a time; they assume the tokens from `01_DESIGN_SYSTEM.md` are in context.
 
-**Prompt A — Tell Report (results)**
-> Design a full-screen dark editorial developer tool called Tell. Aesthetic: "print atelier" —
+**Prompt A — Design Proof Report (results)**
+> Design a full-screen dark editorial developer tool called Design Proof. Aesthetic: "print atelier" —
 > background `#181614` warm paper-ink, surfaces `#221F1C` / `#2E2A26`, accent terracotta
 > `#D4714A`, intentional/pass ink `#3A6358`. Fonts: Instrument Serif (display headlines), Source
 > Sans 3 (UI), IBM Plex Mono (data/URLs/finding ids). Top CaptureBar with proof-mark glyph +
-> `Tell` wordmark, URL input in mono, `Capture` button, MCP status pill, mic toggle. Below: mono
+> `Design Proof` wordmark, URL input in mono, `Capture` button, MCP status pill, mic toggle. Below: mono
 > score line `8 findings · 5 generic · 2 drift · 1 intentional`. Center hero: a large before/after
 > seam — left side shows a bland AI-generated SaaS screenshot (Inter font, violet gradient hero,
 > shadow cards, centered text, emoji nav); right side shows the same layout transformed with warm
 > paper tones, serif headlines, restrained shadow, asymmetric layout. Draggable seam handle with
 > registration crop marks at corners. Below: two-column — left an editorial findings list grouped
 > by verdict (GENERIC/DRIFT/INTENTIONAL badges with distinct glyphs); right a docked Inspector with
-> a TellCard for SystemFontTell showing rationale, screenshot evidence with proof-mark pin, and
+> a DesignProofCard for SystemFontTell showing rationale, screenshot evidence with proof-mark pin, and
 > Draft fix / Mark intentional buttons. Bottom: VoiceDirector strip with mic, transcript placeholder,
 > preset chips (Editorial, Precision instrument, Warm minimal, Bold contrast). No KPI stat cards.
 
-**Prompt B — Finding Inspector (TellCard)**
-> Design the Inspector TellCard for Tell (same print-atelier system). Header: finding id
+**Prompt B — Finding Inspector (DesignProofCard)**
+> Design the Inspector DesignProofCard for Design Proof (same print-atelier system). Header: finding id
 > `SystemFontTell` in mono, GENERIC verdict badge (terra, eye glyph, filled circle), 5-segment
 > confidence bar. Body: ≤3-sentence rationale in secondary text, critic voice. Evidence: screenshot
 > crop with proof-mark pin on the Inter font rendering; below, highlighted computed value
@@ -233,7 +233,7 @@ Paste these one at a time; they assume the tokens from `01_DESIGN_SYSTEM.md` are
 > `Mark intentional`. Selected state: subtle terracotta signal glow. Warm dark editorial aesthetic.
 
 **Prompt C — Before/After Seam (standalone)**
-> Design a full-bleed before/after comparison component for Tell. Left: captured screenshot of a
+> Design a full-bleed before/after comparison component for Design Proof. Left: captured screenshot of a
 > generic AI-built landing page (Inter, violet gradient, shadow cards). Right: the same page
 > transformed with editorial warm design (Instrument Serif headlines, terracotta accent, paper
 > tones). Vertical draggable seam with 4px terracotta handle and proof-mark icon. Registration
@@ -241,26 +241,26 @@ Paste these one at a time; they assume the tokens from `01_DESIGN_SYSTEM.md` are
 > Print-atelier aesthetic, warm dark surround.
 
 **Prompt D — Reconciliation / Diff**
-> Design a diff/reconciliation view for Tell. Side-by-side unified diff in IBM Plex Mono;
+> Design a diff/reconciliation view for Design Proof. Side-by-side unified diff in IBM Plex Mono;
 > additions on ink-green wash with `+` gutter, removals on terracotta wash with `−` gutter. Header
 > shows `globals.css` in mono and actions `Copy patch` and `Apply in Cursor`. Below: mini before/after
 > seam preview. Print-atelier dark aesthetic, tokens as specified.
 
 **Prompt E — Voice Director**
-> Design a VoiceDirector strip for Tell. Horizontal bar on warm dark surface. Left: circular mic
+> Design a VoiceDirector strip for Design Proof. Horizontal bar on warm dark surface. Left: circular mic
 > button with terracotta pulsing ring (listening state). Center: transcript "Warmer, more editorial,
 > less shadow" or placeholder "Describe the direction…". Right: preset chips — Editorial, Precision
 > instrument, Warm minimal, Bold contrast — one chip active with terracotta wash. Active direction
 > tag below: `direction: editorial-warm` in mono. Print-atelier aesthetic.
 
 **Prompt F — Landing / demo one-pager**
-> Design a single-scroll landing page for Tell, an AI taste critic that finds what makes rendered
+> Design a single-scroll landing page for Design Proof, an AI taste critic that finds what makes rendered
 > UI look AI-generated and proposes a distinctive redesign. Print-atelier aesthetic: warm paper-ink
 > dark bg, Instrument Serif headlines, terracotta accent, reveal seam motif. Sections: (1) hero —
 > seam wipe animating across wordmark, headline "Every AI-built UI has a tell.", `Watch the capture`
 > CTA; (2) three quiet problem cards (fast to ship / all looks the same / taste is missing); (3)
-> embedded demo seam showing generic before → editorial after; (4) dogfood — "Tell runs on itself:
-> 0 tells" showing Tell's own distinctive UI; (5) pipeline diagram capture → detect → reason →
+> embedded demo seam showing generic before → editorial after; (4) dogfood — "Design Proof runs on itself:
+> 0 tells" showing Design Proof's own distinctive UI; (5) pipeline diagram capture → detect → reason →
 > art-direct → reconcile with MCP badge; (6) tech chips + team + repo. No violet gradients, no KPI
 > cards, no Inter-only type, one orchestrated hero motion.
 
@@ -271,7 +271,7 @@ Paste these one at a time; they assume the tokens from `01_DESIGN_SYSTEM.md` are
 Wire these hotspots:
 
 1. **Empty** → click `Capture` → **Capturing** (auto-advance 2s) → **Results**
-2. **Results** → click finding row → **Inspector** opens with TellCard
+2. **Results** → click finding row → **Inspector** opens with DesignProofCard
 3. **Results** → drag seam ←/→ → before/after reveal
 4. **Results** → click mic or `Editorial` preset → **Voice Active** (after side updates)
 5. **Inspector** → click `Draft fix` → **Diff** view
