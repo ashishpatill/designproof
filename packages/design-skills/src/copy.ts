@@ -265,7 +265,7 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                               ? "The spread"
                               : "The sequence",
     proof,
-    pricing: "Scope and plans",
+    pricing: brief.siteKind === "fintech-marketing" ? "Lanes" : "Scope and plans",
     compare: "What is included",
     faq: "Before you ask",
     cta: "Next step",
@@ -869,7 +869,7 @@ export function navFor(
           : siteKind === "docs-educational"
             ? "Cost path"
             : "Sequence",
-    pricing: "Plans",
+    pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
     compare: "Included",
     faq: "Questions",
     proof: proofLabel,

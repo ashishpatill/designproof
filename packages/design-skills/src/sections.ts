@@ -1447,7 +1447,8 @@ export function buildSections(
             title: brief.productName,
             brandLabel: brief.productName,
             body: sentence(`${brief.productName} for ${brief.audience}`),
-            ctaLabel: cta.secondary,
+            // Fintech: the walkthrough is already the ask. Do not put "Read the mechanics" here.
+            ctaLabel: brief.siteKind === "fintech-marketing" ? cta.primary : cta.secondary,
             blocks: [
               block({ title: "Capabilities", points: editorial.features.map((c) => c.name) }),
               block({

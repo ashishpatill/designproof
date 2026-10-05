@@ -197,6 +197,22 @@ describe("Fintech template says each thing once", () => {
     }
   });
 
+  it("names the lanes section Lanes everywhere and keeps the walkthrough as the only ask", () => {
+    for (const brief of briefs) {
+      const { spec, previewHtml } = designFromFeatures(brief);
+      expect(previewHtml, brief.productName).not.toContain("Read the mechanics");
+      expect(previewHtml, brief.productName).not.toContain("Scope and plans");
+      expect(previewHtml, brief.productName).not.toMatch(/>Plans</);
+      const pricing = spec.sections.find((s) => s.kind === "pricing");
+      expect(pricing?.eyebrow, brief.productName).toBe("Lanes");
+      const nav = spec.sections.find((s) => s.kind === "nav");
+      expect(nav?.navItems?.map((n) => n.label), brief.productName).toContain("Lanes");
+      expect(nav?.navItems?.map((n) => n.label), brief.productName).not.toContain("Plans");
+      const footer = spec.sections.find((s) => s.kind === "footer");
+      expect(footer?.ctaLabel, brief.productName).toBe("Book a walkthrough");
+    }
+  });
+
   it("describes the product, not the engine, in the page description", () => {
     for (const brief of briefs) {
       const { previewHtml } = designFromFeatures(brief);
