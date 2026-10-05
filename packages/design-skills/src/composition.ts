@@ -96,7 +96,7 @@ export function classifyCapability(name: string, description: string): Capabilit
   if (/\b(ledgers?|cut-?offs?|wire transfers?|wires?|movements?|debits?|credits?|postings?|reconcil\w*)\b/.test(text)) {
     return "ledger";
   }
-  if (/\b(queues?|triage|priorit(?:y|ies|ise|ize|ised|ized)|inbox|ranked|ranking|ranks?|backlogs?)\b/.test(text)) {
+  if (/\b(queues?|triage|priorit(?:y|ies|ise|ize|ised|ized)|inbox|ranked|ranking|ranks?|backlogs?|urgen(?:t|cy)|most urgent|sorted by)\b/.test(text)) {
     return "queue";
   }
   if (/\b(choose|choice|choices|compare|comparison|options?|versus|alternatives?|side by side|pick between)\b/.test(text)) {
@@ -131,13 +131,17 @@ const ROLE_FOLD: Record<CapabilityRole, LayoutVariant> = {
   ledger: "hero-wire",
 };
 
+/*
+ * A ledger proof is a ruled index. The cutoff rail is a fold renderer: used as a proof it
+ * draws the first screen's own figure a second time, with the fold's clock labels.
+ */
 const ROLE_PROOF: Record<CapabilityRole, LayoutVariant> = {
   sequence: "workflow-proof",
   queue: "app-shell",
   choice: "compare-matrix",
   explanation: "figure-explainer",
   evidence: "marquee-proof",
-  ledger: "hero-wire",
+  ledger: "feature-index",
 };
 
 /** Used when the proof id would be the same shape as the fold. */
