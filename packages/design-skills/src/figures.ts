@@ -1423,13 +1423,16 @@ export function indexLedger(
   const r = rng(`${seed}:index-ledger:${role}`);
   const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
   /*
-   * Tall plate dilutes CSS ruleDensity (rules ÷ screens). SVG strokes do not count — pack cells
-   * with dual ink + stamps, keep hairlines sparse. Shrinking H to "fill voids" raised rules/screen.
+   * Tall plate dilutes CSS ruleDensity (rules ÷ screens). SVG strokes do not count — each cell is a
+   * catalogue card with drawn matter, so the height reads as cards, not empty ruled rows.
    */
   const H = role === "band" ? 640 : role === "column" ? 520 : 480;
   const padX = role === "band" ? 44 : 28;
   const padY = role === "band" ? 36 : 28;
   const parts: string[] = [];
+  // The letters this brief's entries run across, not a fixed "A–Z".
+  const initials = [...new Set(features.map((f) => (f.title.trim()[0] ?? "").toUpperCase()).filter(Boolean))].sort();
+  const letterSpan = initials.length > 1 ? `${initials[0]}–${initials[initials.length - 1]}` : (initials[0] ?? "A–Z");
 
   // Outer rule — hairline only.
   parts.push(
@@ -1448,31 +1451,38 @@ export function indexLedger(
     `<text class="ds-fig-mono" x="${round(W / 2)}" y="${round(headY)}" font-size="11" fill="var(--surface-muted)" text-anchor="middle">${esc(clip(productName, 32))}</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">A–Z · INDEX</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(letterSpan)} · INDEX</text>`,
   );
 
-  // Build dense entry list from features + synthetic fillers for ink variation.
-  const baseEntries = features.length ? features : [{ title: "Entry", body: "", meta: "001" } as Block];
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  /*
+   * Each entry is drawn once, in catalogue order, down two columns. The ledger used to fill a fixed
+   * twelve cells by cycling the entries, so a five-entry brief named its lead entry three times on
+   * the fold, labelled cells "Core" or "Included" (a tier word the priorities section says once),
+   * headed the columns "A" and "I" whatever the names were, and footed the plate "12 entries". The
+   * placeholder label for a cell with no tier was a made-up "A1 · shelf 001". The rows now fit the entries,
+   * each column is headed by the initial of its first entry, a spare cell stays blank, the
+   * masthead gives the letters the entries run across, and the footer counts the entries the brief
+   * gives.
+   */
+  const entries = (features.length ? features : [{ title: productName, body: "" } as Block]).slice(0, 12);
   const cols = 2;
   const gridTop = padY + 36;
   const gridBottom = H - padY - 22;
   const gridH = gridBottom - gridTop;
   const colGap = 22;
   const colW = (W - padX * 2 - colGap * (cols - 1)) / cols;
-  /*
-   * 2×6 packed cells: dual ink lines + stamps fill voids; hairline only on odd rows so the SVG
-   * stays sparse. CSS bordered rows elsewhere own the ruleDensity budget — not this drawing.
-   */
-  const rowsPerCol = role === "band" ? 6 : 5;
+  const rowsPerCol = Math.max(3, Math.ceil(entries.length / cols));
   const rowH = gridH / rowsPerCol;
+  const initial = (b: Block | undefined): string => (b?.title.trim()[0] ?? "").toUpperCase();
 
   for (let c = 0; c < cols; c += 1) {
     const x0 = padX + c * (colW + colGap);
-    const letter = letters[Math.min(c * 8, letters.length - 1)] ?? letters[c]!;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(gridTop - 4)}" font-size="11" fill="var(--c-accent)">${letter}</text>`,
-    );
+    const head = initial(entries[c * rowsPerCol]);
+    if (head) {
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(gridTop - 4)}" font-size="11" fill="var(--c-accent)">${esc(head)}</text>`,
+      );
+    }
     if (c > 0) {
       parts.push(
         `<line x1="${round(x0 - colGap / 2)}" y1="${round(gridTop)}" x2="${round(x0 - colGap / 2)}" y2="${round(gridBottom)}" stroke="${LINE}" stroke-width="1" opacity="0.4" vector-effect="non-scaling-stroke"/>`,
@@ -1482,40 +1492,54 @@ export function indexLedger(
     for (let row = 0; row < rowsPerCol; row += 1) {
       const y = gridTop + row * rowH;
       const entryIdx = c * rowsPerCol + row;
-      const f = baseEntries[entryIdx % baseEntries.length]!;
+      const f = entries[entryIdx];
+      if (!f) continue;
       const ordinal = String(entryIdx + 1).padStart(3, "0");
-      // Sparse SVG hairlines — do not flood; CSS ruleDensity ignores these strokes anyway.
-      if (row % 2 === 1 || row === rowsPerCol - 1) {
+      /*
+       * A catalogue card: ordinal, name, a dotted leader to the entry's own initial, the accent
+       * rule a library card carries under its heading, typed matter drawn as bars (never the
+       * description, which the index below prints once), and the rod hole at the foot.
+       */
+      const cx = x0 + 4;
+      const cw = colW - 8;
+      const cy = y + 6;
+      const ch = rowH - 12;
+      parts.push(
+        `<rect x="${round(cx)}" y="${round(cy)}" width="${round(cw)}" height="${round(ch)}" fill="var(--c-paper)" stroke="${LINE}" stroke-width="1" opacity="0.98" vector-effect="non-scaling-stroke"/>`,
+      );
+      const textY = cy + 18;
+      const name = clip(f.title, role === "band" ? 30 : 18);
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(cx + 10)}" y="${round(textY)}" font-size="11" fill="var(--surface-quiet)">${ordinal}</text>`,
+      );
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(cx + 44)}" y="${round(textY)}" font-size="11" fill="var(--surface-muted)">${esc(name)}</text>`,
+      );
+      const leaderFrom = cx + 44 + name.length * 6.8 + 10;
+      const leaderTo = cx + cw - 26;
+      if (leaderTo - leaderFrom > 24) {
         parts.push(
-          `<line x1="${round(x0)}" y1="${round(y + rowH)}" x2="${round(x0 + colW)}" y2="${round(y + rowH)}" stroke="${LINE}" stroke-width="1" opacity="0.38" vector-effect="non-scaling-stroke"/>`,
+          `<line x1="${round(leaderFrom)}" y1="${round(textY - 3)}" x2="${round(leaderTo)}" y2="${round(textY - 3)}" stroke="${LINE}" stroke-width="1" stroke-dasharray="1 5" opacity="0.8" vector-effect="non-scaling-stroke"/>`,
         );
       }
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="var(--surface-quiet)">${ordinal}</text>`,
-      );
-      const title = clip(f.title ?? `Entry ${ordinal}`, role === "band" ? 22 : 14);
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="var(--surface-muted)">${esc(title)}</text>`,
-      );
-      const sub = clip(
-        f.kicker || `${letter}${row + 1} · shelf ${ordinal}`,
-        role === "band" ? 22 : 16,
+        `<text class="ds-fig-mono" x="${round(cx + cw - 10)}" y="${round(textY)}" font-size="11" fill="${entryIdx === 0 ? ACCENT : "var(--surface-quiet)"}" text-anchor="end">${esc(initial(f))}</text>`,
       );
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.72)}" font-size="11" fill="var(--surface-quiet)">${esc(sub)}</text>`,
+        `<line x1="${round(cx + 10)}" y1="${round(textY + 8)}" x2="${round(cx + cw - 10)}" y2="${round(textY + 8)}" stroke="${ACCENT}" stroke-width="1" opacity="${entryIdx === 0 ? 0.8 : 0.45}" vector-effect="non-scaling-stroke"/>`,
       );
-      // Accent stamp — filled mark, not an extra rule.
-      if (row % 2 === 0) {
+      const barTop = textY + 20;
+      const barBottom = cy + ch - 18;
+      const bars = Math.max(1, Math.min(5, Math.floor((barBottom - barTop) / 12)));
+      for (let k = 0; k < bars; k += 1) {
+        const wMul = k === 0 ? 0.7 : 0.35 + r() * 0.45;
         parts.push(
-          `<rect x="${round(x0 + colW - 10)}" y="${round(y + rowH * 0.28)}" width="5" height="5" fill="${ACCENT}" opacity="0.75"/>`,
+          `<rect x="${round(cx + 44)}" y="${round(barTop + k * 12)}" width="${round((cw - 64) * wMul)}" height="2.2" fill="var(--surface-quiet)" opacity="${round(0.4 + (k % 2) * 0.15)}"/>`,
         );
       }
-      // Pale letter watermark — ink without hairline flood.
-      if (row % 3 === 1) {
-        parts.push(
-          `<text class="ds-fig-mono" x="${round(x0 + colW - 14)}" y="${round(y + rowH * 0.78)}" font-size="11" fill="var(--surface-quiet)" opacity="0.35" text-anchor="end">${letter}</text>`,
-        );
-      }
+      parts.push(
+        `<circle cx="${round(cx + cw / 2)}" cy="${round(cy + ch - 9)}" r="3" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+      );
     }
   }
 
@@ -1523,7 +1547,7 @@ export function indexLedger(
     `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · index ledger</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${cols * rowsPerCol} entries</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${features.length} ${features.length === 1 ? "entry" : "entries"}</text>`,
   );
 
   return frame(parts.join(""), {
@@ -1532,6 +1556,7 @@ export function indexLedger(
     kind: "index-ledger",
     label: `${productName} index ledger`,
     inset: role === "band" ? BLEED_INSET : 0,
+    dense: true,
   });
 }
 

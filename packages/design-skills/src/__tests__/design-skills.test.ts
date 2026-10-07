@@ -1104,7 +1104,8 @@ describe("research-backed offerings + implementation basics", () => {
   });
 
   it("keeps story Note labels from sliding under capability marks", () => {
-    const noteKinds = ["observatory", "archive", "loom", "herbarium", "press", "lantern", "clinic"] as const;
+    // Archive is not here: its entry essay groups the entries by priority and carries no Note labels.
+    const noteKinds = ["observatory", "loom", "herbarium", "press", "lantern", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;

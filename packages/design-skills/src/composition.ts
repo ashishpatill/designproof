@@ -555,6 +555,15 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    */
   if (siteKind === "archive-index") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-register", surface: "paper", columns: split.wide });
+    /*
+     * One catalogue holds every entry with its description. The page used to follow it with a
+     * figure band that named the first four entries twice more beside a "cost · cumulative" chart
+     * with made-up values, a specimen strip that named them again, and an entry essay that printed
+     * each description under a list of the other names and a shelf index of every name. A
+     * five-entry brief named its lead entry up to seventeen times, and every brief left two entries
+     * with no catalogue row. The figure and specimen bands are gone, and the entry essay now groups
+     * the entries by the priority the brief gives, so it says something the catalogue does not.
+     */
     plans.push({
       id: "features",
       kind: "features",
@@ -563,25 +572,14 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    plans.push({
       id: "story",
       kind: "story",
       layout: "story-entry",
-      surface: "paper",
-      bond: true,
+      surface: "raised",
       columns: "7fr 5fr",
     });
-    // No second feature-rows catalogue — that left Cross stamps / Registry close as empty airways.
-    // Cross-stamp register lives inside the entry folio (concept-true mid-page proof).
-    // No shared marquee-proof — entry folio essay is Stamp Roll's proof, not a SaaS board.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the fold's index ledger is the register's proof, not a SaaS board.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "sunken", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
