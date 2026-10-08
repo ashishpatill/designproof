@@ -1,6 +1,6 @@
 # Tools and skills (this repo)
 
-Honest registry of what **tell-proof** ships. Do not invent MCP servers, plugins, or skills that are not listed here.
+Honest registry of what **designproof** (formerly `tell-proof`) ships. Do not invent MCP servers, plugins, or skills that are not listed here.
 
 Back: [`AGENTS.md`](../AGENTS.md) · Map: [`FEATURE-MAP.md`](./FEATURE-MAP.md)
 

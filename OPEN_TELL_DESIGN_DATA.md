@@ -1,10 +1,10 @@
 # Automatic training data (local Tell runs)
 
-When **tell-proof** and **tell-design-data** are siblings:
+When **designproof** (this repo, formerly `tell-proof`) and **tell-design-data** are siblings:
 
 ```text
 workspace/
-  tell-proof/
+  designproof/
   tell-design-data/
 ```
 
@@ -16,7 +16,7 @@ running `pnpm dev` in Tell **automatically**:
 Covered flows: Capture · voice · redesign · restyle · prove/verify/matrix ·
 **Studio / showcase / template HTML** (`/api/design`, `/api/design/html`).
 
-Optional `.env.local` in tell-proof:
+Optional `.env.local` in designproof:
 
 ```bash
 TELL_DESIGN_DATA_REPO=/absolute/path/to/tell-design-data
