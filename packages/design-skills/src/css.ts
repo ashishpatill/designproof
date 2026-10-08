@@ -301,6 +301,18 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="docs-educational"] .ds-reveal:not(.is-in){transform:translateX(-0.75rem)}
   [data-sitekind="docs-educational"] .ds-figure-steps [data-step].is-active{transform:translateX(6px)}
 }
+/* Index rows now carry their description beside the drawn mark. The minimal lean gives the mark a
+   4.5rem column, and a 9.5rem mark in it ran over the sentence. The shared rows also overlap their
+   neighbours by a negative margin, which cut the last line of a description on a phone. */
+[data-sitekind="docs-educational"] .ds-index-row{grid-template-columns:var(--align-rail) minmax(12rem,26ch) minmax(0,1fr) minmax(9rem,13rem)}
+[data-sitekind="docs-educational"] .ds-index-row:nth-child(n){margin-block:0}
+/* Each part's drawing is the index's figure now that no plate sits beside it, so it is set at a size
+   that reads as a drawing rather than an icon. */
+[data-sitekind="docs-educational"] .ds-index-mark,
+[data-sitekind="docs-educational"] .ds-chapter-mark{width:13rem}
+@media (max-width:820px){
+  [data-sitekind="docs-educational"] .ds-index-row{grid-template-columns:2rem 1fr}
+}
 `,
     "fintech-marketing": `
 @keyframes ds-fin-in{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:none}}

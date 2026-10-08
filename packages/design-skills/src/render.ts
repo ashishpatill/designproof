@@ -195,7 +195,18 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.brief.siteKind === "corporate-story" ||
     spec.brief.siteKind === "archive-index"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
-      : listed;
+      /*
+       * Educational: names only too. The mechanism plate draws each part as a numbered column
+       * whose height is the brief's priority for it, so it gets that priority and nothing else.
+       */
+      : spec.brief.siteKind === "docs-educational"
+        ? listed.map((b) => ({
+            ...b,
+            body: "",
+            points: [],
+            kicker: spec.brief.features.find((f) => f.name === b.title)?.priority,
+          }))
+        : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
   return planFigures({
     productName: spec.brief.productName,
@@ -871,17 +882,22 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
 
   /*
    * Mechanism fold — docs-educational signature.
-   * Scrub instrument owns the fold (stage list + range + mechanism plate). Not buried mid-page.
+   * Scrub instrument owns the fold (part list + range + mechanism plate). Not buried mid-page.
+   *
+   * Each part is named once, in the list. The plate under the range used to name them all again,
+   * and a caption under it printed the active part's name a third time. The list is headed by the
+   * count the brief gives, not "The scrub", and the range steps through the parts rather than
+   * "the mechanism", which a marina or a garden does not have.
    */
   if (section.layout === "hero-mechanism") {
-    const steps = (section.aside.length ? section.aside : section.blocks).slice(0, 4);
+    const steps = (section.aside.length ? section.aside : section.blocks).slice(0, 6);
     const mid = Math.min(1, Math.max(0, steps.length - 1));
+    const many = `${count(steps.length)[0]!.toUpperCase()}${count(steps.length).slice(1)} ${steps.length === 1 ? "part" : "parts"}`;
     const plateFig = figures.hero
       ? `<figure class="ds-mechanism-plate" data-instrument="scrub" aria-label="${esc(caption)}">${figures.hero}
-          <label class="ds-scrub"><span class="ds-caption">Step through the mechanism</span>
-            <input type="range" min="0" max="${Math.max(0, steps.length - 1)}" value="${mid}" data-scrub aria-label="Step through the mechanism" />
+          <label class="ds-scrub"><span class="ds-caption">Step through the parts</span>
+            <input type="range" min="0" max="${Math.max(0, steps.length - 1)}" value="${mid}" data-scrub aria-label="Step through the parts" />
           </label>
-          <figcaption data-scrub-caption>${esc(steps[mid]?.title ?? caption)}</figcaption>
         </figure>`
       : "";
     const list = `<ol class="ds-figure-steps ds-mechanism-steps">${steps
@@ -894,7 +910,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       <div class="ds-wrap-wide ds-mechanism-fold">
         <div class="ds-mechanism-claim">${copy}
           <div class="ds-mechanism-legend">
-            <p class="ds-eyebrow">The scrub</p>
+            <p class="ds-eyebrow">${esc(many)}</p>
             ${list}
           </div>
         </div>
@@ -1154,8 +1170,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         });
         return `<ol class="ds-handoff-strip" aria-label="Handoff strip">${cells.join("")}</ol>`;
       }
+      // Educational rows carry their description too: the fold prints none.
       const quietIndex =
-        spec.brief.siteKind === "docs-educational" ||
         spec.brief.siteKind === "press-atelier" ||
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
@@ -1309,7 +1325,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     spec.brief.siteKind !== "saas-marketing" &&
     spec.brief.siteKind !== "dashboard-webapp" &&
     // Archive skips it too: the drawing named the entries again, right under the fold's ledger.
-    spec.brief.siteKind !== "archive-index"
+    spec.brief.siteKind !== "archive-index" &&
+    // Educational as well: a drawn interface and a "how it is put together" list named every part again.
+    spec.brief.siteKind !== "docs-educational"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1444,7 +1462,10 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${
-        spec?.brief.siteKind === "art-directed-studio" || spec?.brief.siteKind === "corporate-story"
+        // Educational chapters are priority tiers too, not "4 beats · editorial order".
+        spec?.brief.siteKind === "art-directed-studio" ||
+        spec?.brief.siteKind === "corporate-story" ||
+        spec?.brief.siteKind === "docs-educational"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -2949,7 +2970,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "fintech-marketing" ||
     spec.brief.siteKind === "art-directed-studio" ||
     spec.brief.siteKind === "corporate-story" ||
-    spec.brief.siteKind === "archive-index"
+    spec.brief.siteKind === "archive-index" ||
+    spec.brief.siteKind === "docs-educational"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>
