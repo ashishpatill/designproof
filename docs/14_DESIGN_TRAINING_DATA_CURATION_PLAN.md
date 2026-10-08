@@ -18,7 +18,7 @@
 
 ## 0. Separation of concerns (hard rule)
 
-| Lives in Tell (`tell-proof`) | Lives in `tell-design-data` (private/dev repo) |
+| Lives in Tell (`designproof`, formerly `tell-proof`) | Lives in `tell-design-data` (private/dev repo) |
 |---|---|
 | Literature survey + this plan | Convert / watch / reward / SFT·DPO export CLI |
 | Product loop (diagnose → redesign → proof) | Raw episodes + curated JSONL store |
@@ -32,7 +32,7 @@
 
 ## 1. How auto collection works (developer machine)
 
-**Built into tell-proof (local/dev):** when this repo is checked out next to Tell as
+**Built into designproof (local/dev):** when this repo is checked out next to Tell as
 `../tell-design-data` (or `TELL_DESIGN_DATA_REPO` is set), these **Studio routes**
 and **local stdio MCP tools** write automatically on every successful run
 (same writer: `@tell/design-skills/training-data-sink`):

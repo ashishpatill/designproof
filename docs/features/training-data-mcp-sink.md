@@ -10,7 +10,7 @@ Every local diagnose / voice / redesign / proof / Studio design run writes a **r
 - **DPO** — preference pairs (chosen vs rejected on the **same** brief).
 - **Sink** — Tell’s thin writer (`training-data-sink`). Not a collector. Missing sibling ⇒ no-op.
 
-Do **not** commit training JSONL in tell-proof. Do **not** grow a collector here.
+Do **not** commit training JSONL in designproof. Do **not** grow a collector here.
 
 ## Done
 
