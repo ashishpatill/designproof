@@ -131,10 +131,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "editorial-foundry") {
+      /*
+       * No fold note: "trial files ship with the optical sizes you will actually set" sat on every
+       * foundry page, a pottery studio's included, and no brief says what ships or in which files.
+       * "Request a specimen" asked every product to post out a type specimen. The buttons say what
+       * the page is: a specimen, and the cuts in it.
+       */
       return {
-        primary: "Request a specimen",
-        secondary: "See the cuts",
-        note: "Trial files ship with the optical sizes you will actually set.",
+        primary: "Open the specimen",
+        secondary: "See every cut",
+        note: "",
       };
     }
     if (siteKind === "research-dossier") {
@@ -929,6 +935,35 @@ export function observatoryQuestions(brief: DesignBrief, features: FeatureSpec[]
   return out;
 }
 
+/**
+ * Foundry questions. Every answer is built from this brief: its product, its audience, and its cut
+ * names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, and that every capability ships "from day one". No brief declares any of those. The
+ * approval question stays only when the brief itself declares an approval step.
+ */
+export function foundryQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} specimen for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which cut handles approvals?`,
+      body: sentence(`${features[at]!.name}, cut ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} specimen?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} cuts`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1100,7 +1135,10 @@ export function navFor(
             // Observatory: the index is headed "The channels", so the menu calls it "Channels".
             : siteKind === "signal-observatory"
               ? "Channels"
-              : "Capabilities",
+              // Foundry: the index is headed "The cuts", so the menu calls it "Cuts".
+              : siteKind === "editorial-foundry"
+                ? "Cuts"
+                : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1111,7 +1149,8 @@ export function navFor(
               siteKind === "archive-index" ||
               siteKind === "docs-educational" ||
               siteKind === "field-guide" ||
-              siteKind === "signal-observatory"
+              siteKind === "signal-observatory" ||
+              siteKind === "editorial-foundry"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

@@ -520,12 +520,15 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-hero-seam/.test(html)
           && /ds-spine/.test(html)
           && /data-figure="type-ladder"/.test(html)
-          && /ds-marginalia/.test(html)
-          && /ds-cut-slips/.test(html)
+          // The marginalia group the cuts by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || /ds-marginalia/.test(html))
+          // No cut slips naming the other cuts again, and no figure band or specimen band under the index.
+          && !/class="ds-cut-slips"/.test(html)
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && /Colophon/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Foundry offerings use hard-seam + type ladder + marginalia with cut slips + colophon — no pricing, no metrics theatre, no sparse second catalogue, zero inverse bands.",
+      "Foundry offerings use hard-seam + type ladder naming each cut once + marginalia grouping the cuts by priority + colophon — no pricing, no metrics theatre, no sparse second catalogue, no cut slips, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-dossier",

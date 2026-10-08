@@ -373,6 +373,23 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="editorial-foundry"] .ds-reveal .ds-stagger > *{animation-name:ds-foundry-mask}
   [data-sitekind="editorial-foundry"] .ds-reveal:not(.is-in){clip-path:inset(0 0 92% 0);opacity:0}
 }
+
+/* Marginalia: each priority beat carries its own margin note beside it, pointing at the cuts'
+   index numbers, instead of a separate rail under the essay. */
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,14rem);column-gap:var(--gutter);align-items:start;
+}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > *{grid-column:1}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-note{grid-column:2;grid-row:1 / span 3;align-self:center}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-rule{grid-column:1 / -1}
+[data-sitekind="editorial-foundry"] .ds-marginalia-title a{color:inherit;text-underline-offset:0.2em}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which runs the next row's rule through the last line of a description on a phone. */
+[data-sitekind="editorial-foundry"] .ds-index-row:nth-child(n){margin-block:0}
+@media (max-width:800px){
+  [data-sitekind="editorial-foundry"] .ds-marginalia-beat{grid-template-columns:1fr}
+  [data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-note{grid-column:1;grid-row:auto;margin-top:var(--s-sm)}
+}
 `,
     "research-dossier": `
 @keyframes ds-dossier-in{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}

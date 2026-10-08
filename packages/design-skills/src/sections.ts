@@ -32,6 +32,7 @@ import {
   educationalQuestions,
   fieldGuideQuestions,
   observatoryQuestions,
+  foundryQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -322,7 +323,9 @@ export function buildSections(
                     ? fieldGuideQuestions(brief, features)
                     : brief.siteKind === "signal-observatory"
                       ? observatoryQuestions(brief, features)
-                      : questions(brief, features);
+                      : brief.siteKind === "editorial-foundry"
+                        ? foundryQuestions(brief, features)
+                        : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -392,6 +395,7 @@ export function buildSections(
         const isDiligence = brief.siteKind === "corporate-story";
         const isMechanism = brief.siteKind === "docs-educational";
         const isWire = brief.siteKind === "fintech-marketing";
+        const isFoundry = brief.siteKind === "editorial-foundry";
         const craftFold =
           isDossier || isObservatory || isArchive || isLoom || isField || isPress || isLantern || isClinic || isHarness
           || isPipeline || isQueue || isDiligence || isMechanism || isWire;
@@ -419,10 +423,15 @@ export function buildSections(
              * again in the specimen band and the event waterfall; the index now holds every
              * description.
              */
-            body: isArchive || isMechanism || isField || isObservatory ? "" : heroLede(brief, editorial.heroLines),
+            /*
+             * Foundry: same rule. The lead description sat under the headline and was printed again
+             * in the marginalia essay; the index now holds every description.
+             */
+            body: isArchive || isMechanism || isField || isObservatory || isFoundry ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
-            secondaryLabel: craftFold ? undefined : cta.secondary,
+            // Foundry: one button on the fold. "See the cuts" sat on the fold and again in the close.
+            secondaryLabel: craftFold || isFoundry ? undefined : cta.secondary,
             // Compact claim — leave the fold to the instrument plate / rail.
             // When Phase-1 `authored` is present (incl. no-key deterministicAuthored),
             // surface the grounded note even on craft folds so product-specific CTA
@@ -525,6 +534,8 @@ export function buildSections(
           brief.siteKind === "field-guide" ||
           // Observatory too: its index stopped at three or four channels, whatever the brief gave.
           brief.siteKind === "signal-observatory" ||
+          // Foundry as well: its index stopped at three or four cuts, whatever the brief gave.
+          brief.siteKind === "editorial-foundry" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -602,7 +613,14 @@ export function buildSections(
                        */
                       : brief.siteKind === "signal-observatory"
                         ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
-                        : rawSlice;
+                        /*
+                         * Foundry: every row keeps its description, because the fold prints none.
+                         * Rows are numbered the way the fold's ladder numbers its rungs, and carry no
+                         * tier word, because the marginalia say that once.
+                         */
+                        : brief.siteKind === "editorial-foundry"
+                          ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                          : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -703,8 +721,9 @@ export function buildSections(
                 ? sentence(`The ${count(features.length)} parts of ${brief.productName}`)
                 : isConsumer
                   ? sentence(`Built for the day you actually have`)
+                  // Foundry: "cuts drawn for real reading sizes" was on a pottery studio's page too.
                   : isFoundry
-                    ? sentence(`Cuts drawn for real reading sizes`)
+                    ? sentence(`${brief.productName}, cut by cut`)
                   : isDossier
                     ? sentence(`Instruments a capital brief actually uses`)
                     // Observatory: "channels an on-call desk actually watches" was on a pottery studio's page too.
@@ -767,8 +786,9 @@ export function buildSections(
                 ? ""
                 : isConsumer
                   ? sentence(`Each capability is something you can point at on the product — not a lifestyle claim`)
+                  // Foundry: "a style picker dressed as a product" was on every foundry page.
                   : isFoundry
-                    ? sentence(`Each cut is a size and a job — not a style picker dressed as a product`)
+                    ? ""
                   : isDossier
                     ? sentence(`Each instrument is a named reading — not a dashboard dressed as research`)
                     // Observatory: "a chart dressed as a product" was on every observatory page.
@@ -1169,6 +1189,49 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Foundry: the marginalia essay printed every description a second time, right under the
+         * index, with the other cut names hung beside each one as "cut slips" and a "Note 01" label
+         * in the margin, under "measure, hierarchy, and the notes that keep a layout from drifting",
+         * a line printed on every foundry page. Now each beat is one priority tier from the brief and
+         * names the cuts in it once. With a single priority there is nothing to group, so the
+         * section is left out.
+         */
+        if (brief.siteKind === "editorial-foundry") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              names: features.filter((f) => f.priority === priority).map((f) => f.name),
+              at: features.flatMap((f, i) => (f.priority === priority ? [String(i + 1).padStart(2, "0")] : [])),
+            }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} cuts come first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // The renderer sets this under the tier; the cuts keep their own case.
+                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  // The margin gives each cut's number in the index, not its name again.
+                  points: t.at,
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1207,8 +1270,6 @@ export function buildSections(
             eyebrow:
               brief.siteKind === "consumer-craft"
                   ? "In use"
-                  : brief.siteKind === "editorial-foundry"
-                    ? "Composition notes"
                   : brief.siteKind === "research-dossier"
                     ? "Reading notes"
                         : brief.siteKind === "commerce-loom"
@@ -1225,8 +1286,6 @@ export function buildSections(
             title:
               brief.siteKind === "consumer-craft"
                   ? sentence(`A day with ${brief.productName}`)
-                  : brief.siteKind === "editorial-foundry"
-                    ? sentence(`How the face is set on a real page`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`How a brief is actually read`)
                         : brief.siteKind === "commerce-loom"
@@ -1249,8 +1308,6 @@ export function buildSections(
             body:
               brief.siteKind === "consumer-craft"
                   ? sentence(`From morning pack to evening empty — what you actually do with it`)
-                  : brief.siteKind === "editorial-foundry"
-                    ? sentence(`Measure, hierarchy, and the notes that keep a layout from drifting`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
                         : brief.siteKind === "commerce-loom"
@@ -1293,7 +1350,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1642,7 +1699,10 @@ export function buildSections(
                     // Observatory likewise: the fold's first line names the audience, and so does the first answer.
                     : brief.siteKind === "signal-observatory"
                       ? sentence(`What to know before opening ${brief.productName}`)
-                      : sentence(`Questions ${brief.audience} ask first`),
+                      // Foundry likewise: the fold's first line names the audience, and so does the first answer.
+                      : brief.siteKind === "editorial-foundry"
+                        ? sentence(`Questions about the ${brief.productName} specimen`)
+                        : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1675,8 +1735,11 @@ export function buildSections(
                         ? "Session"
                   : eyebrow.cta,
             title: sentence(
+              // Foundry: "request a specimen" fit one type foundry; the close says where to begin.
               brief.siteKind === "editorial-foundry"
-                ? `Request a specimen of ${brief.productName}`
+                ? features[0]
+                  ? `Start the ${brief.productName} specimen with ${lower(features[0].name)}`
+                  : `Start the ${brief.productName} specimen`
                 : brief.siteKind === "research-dossier"
                   ? `Request the next ${brief.productName} folio`
                   // Observatory: "calibrate a window" fit one on-call desk; the close says where to begin.
@@ -1729,8 +1792,17 @@ export function buildSections(
             // Not `cta.note` — the fold already said that, and a closing band that repeats the
             // reassurance from the top of the page reads as a page with one idea.
             body: sentence(
+              /*
+               * Foundry: "edition notes, trial files, and the cuts ... actually set" closed every
+               * foundry page, a pottery studio's included. The close gives the count the brief gives
+               * instead.
+               */
               brief.siteKind === "editorial-foundry"
-                ? `Edition notes, trial files, and the cuts ${brief.audience} actually set`
+                ? features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "cut is" : "cuts are"
+                    } set in the index above`
+                  : ""
                 : brief.siteKind === "research-dossier"
                   ? `Numbered folios, source notes, and the instruments ${brief.audience} actually open`
                   /*
@@ -1818,6 +1890,9 @@ export function buildSections(
                     // Field guide likewise: the button leads back to the index.
                     : brief.siteKind === "field-guide" && features.length > 1
                       ? `Read all ${count(features.length)} traits`
+                      // Foundry likewise: the button leads back to the index.
+                      : brief.siteKind === "editorial-foundry" && features.length > 1
+                        ? `Read all ${count(features.length)} cuts`
                       // Observatory likewise: the button leads back to the index.
                       : brief.siteKind === "signal-observatory" && features.length > 1
                         ? `Read all ${count(features.length)} channels`

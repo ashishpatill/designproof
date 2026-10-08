@@ -1016,13 +1016,21 @@ export function typeLadder(
   const parts: string[] = [];
   const padX = W * (role === "band" ? 0.08 : 0.1);
   const padY = H * 0.07;
-  const steps = [
-    { label: "Display", h: H * 0.2 },
-    { label: "Title", h: H * 0.12 },
-    { label: "Deck", h: H * 0.075 },
-    { label: "Text", h: H * 0.05 },
-    { label: "Caption", h: H * 0.035 },
-  ];
+  /*
+   * One rung per cut, up to eight, each stepping down in size and labelled with its index number
+   * and its own name — the fold's one list of the cuts. A short brief keeps five rungs so the ladder
+   * still steps from display to caption; the spare rungs stay unnamed. The rungs used to be fixed
+   * "Display", "Title", "Deck", "Text", and "Caption" sizes on every page, a pottery studio's
+   * included, with the first five capability names set beside them whatever they were, and the
+   * product name printed again under the ladder as "· optical sizes".
+   */
+  const SIZES = [0.2, 0.12, 0.075, 0.05, 0.035, 0.03, 0.026, 0.022];
+  const rungs = Math.max(5, Math.min(cuts.length, SIZES.length));
+  const gapAt = Math.max(10, H * 0.012) + Math.max(10, H * 0.014);
+  const room = H - padY * 2 - 8 - gapAt * (rungs - 1);
+  const want = SIZES.slice(0, rungs).reduce((a, h) => a + h * H, 0);
+  const fit = Math.min(1, room / want);
+  const steps = SIZES.slice(0, rungs).map((h) => ({ h: H * h * fit }));
   const initials = productName
     .split(/[\s-]+/)
     .filter(Boolean)
@@ -1080,12 +1088,12 @@ export function typeLadder(
       gx += glyphW + gap;
     }
     const labelY = y + glyphH * 0.55;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(s.label)}</text>`,
-    );
     if (cut) {
       parts.push(
-        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY + 14)}" font-size="${FIG_MONO_PX}" fill="var(--surface-muted)" text-anchor="end">${esc(clip(cut.title, 22))}</text>`,
+        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(cut.meta ?? String(i + 1).padStart(2, "0"))}</text>`,
+      );
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY + 14)}" font-size="${FIG_MONO_PX}" fill="var(--surface-muted)" text-anchor="end">${esc(clip(cut.title, 28))}</text>`,
       );
     }
     if (i < steps.length - 1) {
@@ -1096,10 +1104,6 @@ export function typeLadder(
       y = ruleY + Math.max(10, H * 0.014);
     }
   }
-
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 28)}" y="${round(H - padY + 4)}" font-size="${FIG_MONO_PX}" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · optical sizes</text>`,
-  );
 
   return frame(parts.join(""), {
     width: W,
