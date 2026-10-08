@@ -204,8 +204,10 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /data-figure="mechanism-plate"/.test(html)
           && !/class="[^"]*ds-hero-stackfold/.test(html)
           && !/class="[^"]*ds-hero-overfigure/.test(html)
+          // No specimen strip of bare names or "what is included" table naming the parts again.
+          && !spec.sections.some((s) => s.kind === "specimen" || s.kind === "compare")
         ),
-      "Educational offerings use mechanism fold + scrub on the fold — never shared stackfold skeleton.",
+      "Educational offerings use mechanism fold + scrub on the fold — never shared stackfold skeleton, and no specimen strip or included table.",
     ),
     check(
       "kind-saas-pipeline",

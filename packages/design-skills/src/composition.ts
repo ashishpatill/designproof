@@ -626,18 +626,21 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Docs / mechanism explainer — teaching surface with a real weight valley.
+   * Docs / mechanism explainer — scrub fold, one index, the brief's own priorities.
    *
-   * Generic path stacked medium-density bands (metrics + features + chapters + compare) so
-   * section-weight variation collapsed (~0.34). Dedicated plan: stackfold figure, scrub instrument,
-   * catalogue, quiet sunken specimen, dense chapter register, dense compare, inverse close.
-   * No metric theatre — the scrub owns the stakes.
+   * The page used to follow the scrub fold with a specimen strip that named the first four parts as
+   * bare titles, an index whose rows were bare names beside a drawing that named them again, a
+   * chapter register that printed every description a second time under "placement, preemption,
+   * backpressure, failure — the cost function in order" (a line written for one routing runtime
+   * and printed on a marina's page too), and a "what is included" table with made-up Core /
+   * Standard / Full columns whose own lede called it "the same list as above". A four-part brief
+   * named each part nine times, and a five-part brief left two parts out of the index. The fold
+   * names each part once, the index holds every description once, and the chapters now group the
+   * parts by the priority the brief gives, so they say something the index does not.
    */
   if (siteKind === "docs-educational") {
     // Scrub owns the fold — do not bury the instrument under a second stackfold hero.
     plans.push({ id: "hero", kind: "hero", layout: "hero-mechanism", surface: "paper", columns: split.hero });
-    // Quiet valley after the scrub peak — titles-only horizon (see renderSpecimen).
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
     plans.push({
       id: "features",
       kind: "features",
@@ -650,11 +653,10 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       kind: "story",
       layout: "story-chapters",
       surface: "raised",
-      bond: true,
       columns: split.wide,
     });
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised", bond: true });
-    // Inverse close is the dense peak against the sunken specimen valley.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr" });
+    // Inverse close is the dense peak against the quiet index.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

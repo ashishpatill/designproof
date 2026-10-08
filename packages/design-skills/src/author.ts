@@ -22,6 +22,7 @@ import {
   studioQuestions,
   corporateQuestions,
   archiveQuestions,
+  educationalQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -328,7 +329,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
               ? corporateQuestions(brief, brief.features)
               : brief.siteKind === "archive-index"
                 ? archiveQuestions(brief, brief.features)
-                : questions(brief, brief.features);
+                : brief.siteKind === "docs-educational"
+                  ? educationalQuestions(brief, brief.features)
+                  : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

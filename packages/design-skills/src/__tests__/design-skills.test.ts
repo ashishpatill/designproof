@@ -192,7 +192,9 @@ describe("premium-content-custom-web engine", () => {
     expect(previewHtml).toContain("Signal Path");
     expect(previewHtml).toContain('data-instrument="scrub"');
     expect(previewHtml).toContain('data-figure="mechanism-plate"');
-    expect(previewHtml).toContain("<figcaption data-scrub-caption>");
+    expect(previewHtml).toContain("data-scrub");
+    // No caption under the range printing the active part's name again; the list beside it names it.
+    expect(previewHtml).not.toContain("<figcaption data-scrub-caption>");
   });
 
   it("covers every skill node across showcase kinds", () => {

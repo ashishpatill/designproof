@@ -29,6 +29,7 @@ import {
   studioQuestions,
   corporateQuestions,
   archiveQuestions,
+  educationalQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -313,7 +314,9 @@ export function buildSections(
               ? corporateQuestions(brief, features)
               : brief.siteKind === "archive-index"
                 ? archiveQuestions(brief, features)
-                : questions(brief, features);
+                : brief.siteKind === "docs-educational"
+                  ? educationalQuestions(brief, features)
+                  : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -396,7 +399,12 @@ export function buildSections(
              * unseen and was printed again in the entry essay. The catalogue now holds every
              * description, the lead one included, and the fold carries none.
              */
-            body: isArchive ? "" : heroLede(brief, editorial.heroLines),
+            /*
+             * Educational: same rule. The lead description sat under the headline and was printed
+             * again in the chapter register; the index now holds every description, the lead one
+             * included, and the fold names the parts without describing them.
+             */
+            body: isArchive || isMechanism ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             secondaryLabel: craftFold ? undefined : cta.secondary,
@@ -420,7 +428,7 @@ export function buildSections(
                       ? block({
                           title: src.name,
                           // Corporate: the fold names capabilities; the catalogue holds their sentences.
-                          body: isMechanism || isPipeline || isQueue || isWire
+                          body: isPipeline || isQueue || isWire
                             ? sentence(src.claim || src.consequence || src.name)
                             : "",
                           emphasis: "normal",
@@ -436,12 +444,17 @@ export function buildSections(
                     note: "",
                   }))
                 : [],
+            /*
+             * Educational: the scrub steps through every part, up to six. It stopped at four, so a
+             * five-part brief's fifth part was never on the fold. Names only; the index says what
+             * each one does.
+             */
             aside: editorial.features
-              .slice(0, 4)
+              .slice(0, isMechanism ? 6 : 4)
               .map((c, i) =>
                 block({
                   title: c.name,
-                  body: isMechanism ? sentence(c.claim || c.name) : "",
+                  body: "",
                   meta: c.tier,
                   emphasis: i === 0 ? "lead" : "normal",
                 }),
@@ -491,6 +504,8 @@ export function buildSections(
           brief.siteKind === "art-directed-studio" ||
           brief.siteKind === "corporate-story" ||
           brief.siteKind === "archive-index" ||
+          // Educational too: a five-part brief left its last two parts out of the index.
+          brief.siteKind === "docs-educational" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -547,7 +562,14 @@ export function buildSections(
                  */
                 : brief.siteKind === "archive-index"
                   ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(3, "0") }))
-                  : rawSlice;
+                  /*
+                   * Educational: every row keeps its description, because the fold prints none.
+                   * Rows are numbered the way the fold's scrub numbers them, and carry no tier word,
+                   * because the priorities section says that once.
+                   */
+                  : brief.siteKind === "docs-educational"
+                    ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                    : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -735,10 +757,13 @@ export function buildSections(
                   // "two carry the argument" line read the same on every page.
                   // Corporate: "two carry the argument, the others remove reasons to say no" was
                   // the same line on every corporate page; the priorities section says which lead.
+                  // Educational: "two carry the argument, the other two remove reasons to say no"
+                  // was on every explainer; the priorities section says which parts lead.
                   : brief.siteKind === "saas-marketing" ||
                       brief.siteKind === "dashboard-webapp" ||
                       brief.siteKind === "fintech-marketing" ||
-                      brief.siteKind === "corporate-story"
+                      brief.siteKind === "corporate-story" ||
+                      brief.siteKind === "docs-educational"
                     ? ""
                     : featuresLede(brief, features),
             blocks: slice,
@@ -992,6 +1017,45 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Educational: the chapters printed every description a second time, right under the
+         * index, below "placement, preemption, backpressure, failure — the cost function in order",
+         * a line written for one routing runtime and printed on every explainer. Now each chapter is
+         * one priority tier from the brief and names the parts in it once. With a single priority
+         * there is nothing to group, so the section is left out.
+         */
+        if (brief.siteKind === "docs-educational") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({ tier, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} parts to read first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  body: sentence(
+                    `${count(t.names.length)[0]!.toUpperCase()}${count(t.names.length).slice(1)} ${
+                      t.names.length === 1 ? "part" : "parts"
+                    }: ${spoken(t.names.map((n) => lower(n)))}`,
+                  ),
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1074,8 +1138,6 @@ export function buildSections(
                     ? sentence(`How ${brief.productName} moves an account`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`How a day on ${brief.productName} actually runs`)
-                      : brief.siteKind === "docs-educational"
-                          ? sentence(`How ${brief.productName} decides under constraint`)
                           : brief.siteKind === "fintech-marketing"
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
@@ -1104,8 +1166,6 @@ export function buildSections(
                     ? sentence(`From first signal to booked walkthrough — the path revenue leaders actually take`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`Queue, deal room, playbook, handoff — the loop account executives live in`)
-                      : brief.siteKind === "docs-educational"
-                          ? sentence(`Placement, preemption, backpressure, failure — the cost function in order`)
                           : brief.siteKind === "fintech-marketing"
                             ? sentence(`Wire, wallet, approval, FX — the send path treasury actually walks`)
                   : sentence(`The sequence ${brief.audience} actually meet, in order`),
@@ -1473,10 +1533,13 @@ export function buildSections(
             eyebrow: eyebrow.faq,
             // Archive: the fold's first line already names the audience, and the first answer says
             // who keeps it, so the heading names the product rather than the audience a third time.
+            // Educational likewise: the fold's first line names the audience and so does the first answer.
             title:
               brief.siteKind === "archive-index"
                 ? sentence(`${brief.productName}, asked and answered`)
-                : sentence(`Questions ${brief.audience} ask first`),
+                : brief.siteKind === "docs-educational"
+                  ? sentence(`Questions about ${brief.productName}`)
+                  : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1538,6 +1601,9 @@ export function buildSections(
                 // Corporate: "your own material" closed every corporate page, a marina's included.
                 : brief.siteKind === "corporate-story" && features[0]
                   ? `${brief.productName} starts with ${lower(features[0].name)}`
+                // Educational: "your own material" closed every explainer too. The close says where to begin.
+                : brief.siteKind === "docs-educational" && features[0]
+                  ? `Start with ${lower(features[0].name)}`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
                   // The audience's last word is not who the reader shows a product to: "revenue
@@ -1584,6 +1650,13 @@ export function buildSections(
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                       features.length === 2 ? "part sits" : "parts sit"
                     } in the list above`
+                // Educational: the count the brief gives, not "four capabilities, one conversation".
+                : brief.siteKind === "docs-educational"
+                  ? features.length > 1
+                    ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                        features.length === 2 ? "part follows" : "parts follow"
+                      } in the index above`
+                    : ""
                 // Corporate: the count the brief gives, not a stock "one conversation" line.
                 : brief.siteKind === "corporate-story" && features.length > 1
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
@@ -1612,7 +1685,10 @@ export function buildSections(
                 // Corporate: the button leads back to the catalogue, so it says what is there.
                 : brief.siteKind === "corporate-story" && features.length > 1
                   ? `Read all ${count(features.length)} capabilities`
-                  : cta.secondary,
+                  // Educational likewise: the button leads back to the index.
+                  : brief.siteKind === "docs-educational" && features.length > 1
+                    ? `Read all ${count(features.length)} parts`
+                    : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote: brief.siteKind === "saas-marketing" ? riskLine : undefined,
           }),

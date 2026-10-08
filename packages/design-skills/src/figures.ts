@@ -2617,7 +2617,16 @@ export function postureGrid(
 }
 
 /**
- * Mechanism plate — educational fold instrument (scrub drives stages). Cost-axis stack, not empty flow cards.
+ * Mechanism plate — educational fold instrument. The scrub moves along it.
+ *
+ * One numbered column per part, in the brief's order, up to six. A column's height is the priority
+ * the brief gives that part (core, supporting, additional), and the plate says so in its one label.
+ * The plate used to set a "cost · cumulative" axis with values of 100, 70, 40 and 10 that no brief
+ * gave, a line rising through them, every part's name a second time above the line, and the second
+ * part's description cut mid-word. The names sit in the scrub list beside the plate, once.
+ *
+ * Nodes and stems carry `ds-scrub-node` / `ds-scrub-stem` and a `data-step`, so the fold's range
+ * input lights the part it is on. `kicker` carries the brief's priority code (p0, p1, p2).
  */
 export function mechanismPlate(
   productName: string,
@@ -2625,75 +2634,53 @@ export function mechanismPlate(
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const items = features.slice(0, 4);
+  const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 720 : 920;
   const H = role === "band" ? 700 : role === "column" ? 620 : 520;
   void seed;
   const pad = W * 0.06;
   const parts: string[] = [];
-  parts.push(text("COST · CUMULATIVE", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.2 }));
-  parts.push(
-    text(clip(productName, 28), W - pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
-  );
-  const axisX = pad + 48;
-  const axisY = pad + 48;
-  const axisH = H - pad * 2 - 80;
-  const axisW = W - pad * 2 - 64;
-  parts.push(rule(axisX, axisY, axisX, axisY + axisH));
-  parts.push(rule(axisX, axisY + axisH, axisX + axisW, axisY + axisH));
-  [100, 70, 40, 10].forEach((v, i) => {
-    const y = axisY + (axisH * i) / 3;
-    parts.push(rule(axisX, y, axisX + axisW, y, "var(--surface-border)"));
-    parts.push(
-      text(String(v), axisX - 12, y + 4, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
-    );
+  const weight = (b: Block): number => (b.kicker === "p0" ? 1 : b.kicker === "p1" ? 0.64 : b.kicker === "p2" ? 0.36 : 1);
+  const weights = items.map(weight);
+  const graded = new Set(weights).size > 1;
+  // Only say what the heights mean when they differ; equal columns need no legend.
+  if (graded) parts.push(text("HEIGHT · PRIORITY", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.2 }));
+  const top = pad + 56;
+  const floor = H - pad - 44;
+  const span = floor - top;
+  const n = Math.max(1, items.length);
+  const colW = (W - pad * 2) / n;
+  const mid = Math.min(1, Math.max(0, items.length - 1));
+  const tops = items.map((_, i) => ({ x: pad + colW * (i + 0.5), y: floor - span * weights[i]! }));
+  items.forEach((_, i) => {
+    const { x, y } = tops[i]!;
+    const w = Math.min(colW * 0.62, 120);
+    parts.push(box(x - w / 2, y, w, floor - y, { fill: "var(--c-paper-raised)", stroke: LINE }));
+    parts.push(rule(x - w / 2, y, x + w / 2, y, "var(--c-border-strong)"));
   });
-  const n = Math.max(2, items.length);
-  items.forEach((b, i) => {
-    const x = axisX + ((i + 0.5) / n) * axisW;
-    const y = axisY + axisH * (1 - (0.25 + (i / Math.max(1, n - 1)) * 0.65));
-    if (i > 0) {
-      const px = axisX + ((i - 0.5) / n) * axisW;
-      const py = axisY + axisH * (1 - (0.25 + ((i - 1) / Math.max(1, n - 1)) * 0.65));
-      parts.push(
-        `<path class="ds-draw" pathLength="1" d="M${round(px)} ${round(py)} L${round(x)} ${round(y)}" fill="none" stroke="${ACCENT}" stroke-width="2.5" stroke-linecap="round"/>`,
-      );
-    }
-    const lead = i === 1;
+  if (tops.length > 1) {
     parts.push(
-      `<circle cx="${round(x)}" cy="${round(y)}" r="${lead ? 7 : 5}" fill="${lead ? PAPER : ACCENT}" stroke="${ACCENT}" stroke-width="2"/>`,
-    );
-    parts.push(
-      text(clip(b.title, 16), x, axisY - 4, {
-        size: FIG_MONO_PX,
-        fill: lead ? ACCENT : QUIET,
-        mono: true,
-        anchor: "middle",
-      }),
-    );
-    parts.push(
-      text(String(i + 1).padStart(2, "0"), x, axisY + axisH + 22, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-        anchor: "middle",
-      }),
-    );
-  });
-  const active = items[1] ?? items[0];
-  if (active) {
-    parts.push(
-      text(clip(active.body || active.title, 64), axisX + 12, axisY + 28, {
-        size: 13,
-        fill: BODY,
-      }),
+      `<path class="ds-draw" pathLength="1" d="${tops.map((t, i) => `${i ? "L" : "M"}${round(t.x)} ${round(t.y)}`).join(" ")}" fill="none" stroke="${ACCENT}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
     );
   }
+  parts.push(rule(pad, floor, W - pad, floor));
+  tops.forEach(({ x, y }, i) => {
+    const on = i === mid;
+    parts.push(
+      `<line class="ds-scrub-stem" data-step="${i}" x1="${round(x)}" y1="${round(y)}" x2="${round(x)}" y2="${round(floor)}" stroke="${ACCENT}" stroke-width="2" opacity="${on ? 1 : 0}"/>`,
+    );
+    parts.push(
+      `<circle class="ds-scrub-node" data-step="${i}" cx="${round(x)}" cy="${round(y)}" r="${on ? 6 : 4}" fill="${on ? PAPER : ACCENT}" stroke="${ACCENT}" stroke-width="2" opacity="${on ? 1 : 0.45}"/>`,
+    );
+    parts.push(
+      text(String(i + 1).padStart(2, "0"), x, floor + 24, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "middle" }),
+    );
+  });
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "mechanism-plate",
-    label: `${productName} mechanism`,
+    label: `${productName} parts${graded ? " by priority" : ""}`,
     inset: role === "band" ? BLEED_INSET : 0,
     dense: true,
   });

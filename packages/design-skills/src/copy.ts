@@ -196,6 +196,9 @@ export function ctaFor(
     // Corporate: "Everything here is verifiable before you commit" was a promise no brief made, and
     // it opened every corporate page, a marina's or a pottery studio's included.
     if (siteKind === "corporate-story") return { ...GOAL_CTA[goal], note: "" };
+    // Educational: the same note ("Everything here is verifiable before you commit") reached every
+    // explainer through the authored path, a marina's and a pottery studio's included.
+    if (siteKind === "docs-educational") return { ...GOAL_CTA[goal], note: "" };
     return GOAL_CTA[goal];
   })();
   // Agency brief "one CTA" wins when set — every page repeats the same verb.
@@ -244,7 +247,8 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                                   : "Why the argument holds";
   return {
     metrics: "What changes",
-    features: brief.siteKind === "docs-educational" ? "The mechanism" : "Capabilities",
+    // Educational: "The mechanism" headed a marina's and a garden's index too.
+    features: brief.siteKind === "docs-educational" ? "Parts" : "Capabilities",
     figure: brief.siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       brief.siteKind === "corporate-story"
@@ -292,7 +296,9 @@ export function featuresTitle(brief: DesignBrief, features: FeatureSpec[]): stri
   const vocab = vocabulary(brief);
   const noun = vocab[0] ?? "work";
   const lead = features[0]?.name.toLowerCase() ?? noun;
-  if (brief.siteKind === "docs-educational") return `What ${brief.productName} does with ${noun}`;
+  // Educational: "What Signal Path does with cost" took the brief's most frequent word, which read
+  // "does with plot" on a garden's page. The index says what each part does, so the title does too.
+  if (brief.siteKind === "docs-educational") return `What each ${brief.productName} part does`;
   if (brief.siteKind === "corporate-story") return `How ${brief.productName} works in practice`;
   return `Everything ${brief.productName} does, starting with ${lead}`;
 }
@@ -823,6 +829,35 @@ export function archiveQuestions(brief: DesignBrief, features: FeatureSpec[]): A
   return out;
 }
 
+/**
+ * Educational questions. Every answer is built from this brief: its product, its audience, and its
+ * part names. The explainer had no questions before; the shared `questions` it would have used
+ * promise "cancel anytime", a comparison table, a result in "one session" on the reader's data, and
+ * a person who answers procurement. No brief declares any of those. The approval question stays
+ * only when the brief itself declares an approval step.
+ */
+export function educationalQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is ${brief.productName} written for?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which part handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What does ${brief.productName} not cover?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} parts`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -982,16 +1017,15 @@ export function navFor(
               : "Why it holds";
   const labels: Record<string, string> = {
     // Archive: the catalogue is headed "The entries", so the menu calls it that too.
-    features: siteKind === "archive-index" ? "Entries" : "Capabilities",
+    // Educational: the index is headed "Parts", so the menu calls it that too.
+    features: siteKind === "archive-index" ? "Entries" : siteKind === "docs-educational" ? "Parts" : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
         ? "Pipeline"
         : siteKind === "fintech-marketing"
           ? "Send path"
-          : siteKind === "docs-educational"
-            ? "Cost path"
-            : siteKind === "corporate-story" || siteKind === "archive-index"
+          : siteKind === "corporate-story" || siteKind === "archive-index" || siteKind === "docs-educational"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
