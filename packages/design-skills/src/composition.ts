@@ -272,15 +272,14 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     plans.push({ id: "app", kind: "app", layout: "app-shell", surface: "paper", columns: "260px 1fr" });
     // Index bonded to the shell — legend for the board above (density peak).
     plans.push({ id: "features", kind: "features", layout: "feature-index", surface: "paper", bond: true });
-    // Bonded inverse proof — second density peak after the quiet valley, not another quiet twin.
-    plans.push({ id: "proof", kind: "proof", layout: "marquee-proof", surface: "inverse", bond: true });
-    plans.push({ id: "figure", kind: "figure", layout: "figure-explainer", surface: "paper", columns: split.feature });
     /*
-     * Specification + FAQ are the densest prose peak. Kept paper/raised so section-weight
-     * variation is honest rather than empty-height.
+     * No proof board, no step-by-step chart, and no "what is included" table. The proof board
+     * printed every description twice (cut short in a drawing, then in full under it), the chart
+     * listed the first four names twice over a cost curve no brief declared, and the table's own
+     * lede said it was "the same list as above". The working surface above is the proof, and the
+     * catalogue is the one place each capability is described.
      */
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised" });
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

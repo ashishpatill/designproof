@@ -2438,9 +2438,11 @@ export function queueConsole(
   features: Block[],
   seed: string,
   role: FigureRole = "band",
-  opts: { once?: boolean; heading?: string } = {},
+  /** `numbers: false` drops the rank deltas and row ages, which no brief supplies. */
+  opts: { once?: boolean; heading?: string; numbers?: boolean } = {},
 ): string {
   const items = features.slice(0, 6);
+  const numbers = opts.numbers !== false;
   const W = role === "band" ? 1440 : role === "column" ? 720 : 920;
   const H = role === "band" ? 760 : role === "column" ? 640 : 540;
   const r = rng(`${seed}:queue`);
@@ -2461,15 +2463,17 @@ export function queueConsole(
       }),
     );
     parts.push(text(clip(b.title, 16), pad + 48, y, { size: 13, fill: INK, weight: lead ? 600 : 500 }));
-    const delta = lead ? "+3" : r() > 0.5 ? "−1" : "0";
-    parts.push(
-      text(delta, pad + railW - 20, y, {
-        size: FIG_MONO_PX,
-        fill: lead ? ACCENT : QUIET,
-        mono: true,
-        anchor: "end",
-      }),
-    );
+    if (numbers) {
+      const delta = lead ? "+3" : r() > 0.5 ? "−1" : "0";
+      parts.push(
+        text(delta, pad + railW - 20, y, {
+          size: FIG_MONO_PX,
+          fill: lead ? ACCENT : QUIET,
+          mono: true,
+          anchor: "end",
+        }),
+      );
+    }
   });
   const mainX = pad + railW + 20;
   const mainW = W - mainX - pad;
@@ -2505,14 +2509,16 @@ export function queueConsole(
         parts.push(text(ln, mainX + 20, y + 28 + j * 16, { size: FIG_MONO_PX, fill: BODY }));
       });
     }
-    parts.push(
-      text(`${40 + Math.floor(r() * 55)}m`, mainX + mainW - 24, y + 8, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-        anchor: "end",
-      }),
-    );
+    if (numbers) {
+      parts.push(
+        text(`${40 + Math.floor(r() * 55)}m`, mainX + mainW - 24, y + 8, {
+          size: FIG_MONO_PX,
+          fill: QUIET,
+          mono: true,
+          anchor: "end",
+        }),
+      );
+    }
   }
   return frame(parts.join(""), {
     width: W,
@@ -3457,10 +3463,12 @@ export function planFigures(input: {
       case "pipeline-board":
         return pipelineBoard(input.productName, input.features, seed, role);
       case "queue-console":
-        return input.siteKind === "saas-marketing"
+        return input.siteKind === "saas-marketing" || input.siteKind === "dashboard-webapp"
           ? queueConsole(input.productName, input.features, seed, role, {
               once: true,
               heading: input.features[0]?.title,
+              // Workspace: no made-up rank changes or minutes beside the rows.
+              numbers: input.siteKind !== "dashboard-webapp",
             })
           : queueConsole(input.productName, input.features, seed, role);
       case "posture-grid":

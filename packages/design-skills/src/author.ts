@@ -11,7 +11,7 @@
  * CI / no-key path stays on deterministic tables — missing Gemini must not fail.
  */
 import { hasApprovalWorkflowSignal } from "./analyze";
-import { ctaFor, lower, questions, riskReversal, saasQuestions, sentence } from "./copy";
+import { ctaFor, lower, questions, riskReversal, saasQuestions, sentence, workspaceQuestions } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
 
 const STOP = new Set([
@@ -303,7 +303,11 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
   const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta);
   // SaaS has no comparison table under its lanes any more; its answers are built from the lanes.
   const faq =
-    brief.siteKind === "saas-marketing" ? saasQuestions(brief, brief.features) : questions(brief, brief.features);
+    brief.siteKind === "saas-marketing"
+      ? saasQuestions(brief, brief.features)
+      : brief.siteKind === "dashboard-webapp"
+        ? workspaceQuestions(brief, brief.features)
+        : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

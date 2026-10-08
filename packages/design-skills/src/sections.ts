@@ -24,6 +24,7 @@ import {
   pullQuote,
   questions,
   saasQuestions,
+  workspaceQuestions,
   riskReversal,
   sentence,
 } from "./copy";
@@ -297,7 +298,9 @@ export function buildSections(
     ? authored.faq
     : brief.siteKind === "saas-marketing"
       ? saasQuestions(brief, features)
-      : questions(brief, features);
+      : brief.siteKind === "dashboard-webapp"
+        ? workspaceQuestions(brief, features)
+        : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -458,7 +461,11 @@ export function buildSections(
         const total = allBlocks.length;
         const wanted = Math.min(total, Math.max(3, Math.ceil(total * 0.6)));
         // SaaS keeps one complete catalogue (see featureLayouts), so its single band holds every row.
-        const first = brief.siteKind === "saas-marketing" || total - wanted < 2 ? total : wanted;
+        // Workspace has one catalogue band too; splitting it left the last capabilities with no row.
+        const first =
+          brief.siteKind === "saas-marketing" || brief.siteKind === "dashboard-webapp" || total - wanted < 2
+            ? total
+            : wanted;
         const rawSlice =
           featureCursor === 0 ? allBlocks.slice(0, first) : allBlocks.slice(Math.max(0, featureCursor));
         /*
@@ -480,10 +487,19 @@ export function buildSections(
         const proofTellsOne =
           proofPlan?.layout === "workflow-proof" || proofPlan?.layout === "figure-explainer";
         const proofOwner = proofTellsOne ? (p0[1] ?? features[1] ?? features[0])?.name : undefined;
+        /*
+         * Workspace catalogue is the one home for each description too. The only row left bare is
+         * the one whose sentence the fold already printed as its lede.
+         */
+        const foldLede = normTitle(heroLede(brief, editorial.heroLines)).replace(/[.!?]+$/, "");
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
-            : rawSlice;
+            : brief.siteKind === "dashboard-webapp"
+              ? rawSlice.map((b) =>
+                  b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
+                )
+              : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -604,7 +620,10 @@ export function buildSections(
                   // SaaS: the lead capability is already the fold's subject and the first row here.
                   : brief.siteKind === "saas-marketing"
                     ? sentence(`What ${brief.productName} does, one capability at a time`)
-                    : featuresTitle(brief, features),
+                    // Workspace: the lead view is already the fold's subject and the shell's open view.
+                    : brief.siteKind === "dashboard-webapp"
+                      ? sentence(`What each ${brief.productName} view does`)
+                      : featuresTitle(brief, features),
             body: isSecond
               ? isStudio
                 ? sentence(`Handoffs, critique, and the rules that stop the system from drifting`)
@@ -657,7 +676,7 @@ export function buildSections(
                           ? sentence(`Each turn is a session beat — not a workflow approve stamp dressed as trust`)
                   // SaaS: the heading already names the product and its lead capability; a stock
                   // "two carry the argument" line read the same on every page.
-                  : brief.siteKind === "saas-marketing"
+                  : brief.siteKind === "saas-marketing" || brief.siteKind === "dashboard-webapp"
                     ? ""
                     : featuresLede(brief, features),
             blocks: slice,
@@ -1349,7 +1368,9 @@ export function buildSections(
                   // leaders at B2B software companies" closed on "in front of your companies".
                   : brief.siteKind === "saas-marketing" && features[0]
                     ? `See ${brief.productName} run ${lower(features[0].name)} on your own data`
-                    : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
+                    : brief.siteKind === "dashboard-webapp" && features[0]
+                      ? `Open ${brief.productName} on your own ${lower(features[0].name)}`
+                      : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
             ),
             // Not `cta.note` — the fold already said that, and a closing band that repeats the
             // reassurance from the top of the page reads as a page with one idea.
@@ -1374,7 +1395,12 @@ export function buildSections(
                         ? `Stage marks, care plates, and the rounds a ward lead actually charts`
                       : brief.siteKind === "agent-harness"
                         ? `Turn marks, tool permits, and the finish checks a harness engineer actually runs`
-                : `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} capabilities, one conversation`,
+                // Workspace: a count the brief gives, not a stock "one conversation" line.
+                : brief.siteKind === "dashboard-webapp" && features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "view sits" : "views sit"
+                    } beside it`
+                  : `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} capabilities, one conversation`,
             ),
             ctaLabel: cta.primary,
             secondaryLabel: cta.secondary,
@@ -1413,26 +1439,42 @@ export function buildSections(
 
       case "app": {
         const isDash = brief.siteKind === "dashboard-webapp";
+        const rows = editorial.features.slice(0, isDash ? 8 : 6).map((c, i) =>
+          block({
+            title: c.name,
+            meta: `${(i + 3) * 7}`,
+            kicker: i === 0 ? "Now" : i < 3 ? "Today" : "Queued",
+            /*
+             * Workspace rows carry the tier the brief's priority gives. "Priority · live" was the
+             * row's own first word again, and the minutes in an age column were made up.
+             */
+            points: isDash ? [c.tier] : undefined,
+          }),
+        );
+        /*
+         * Workspace counters count the rows on show. Name-and-tier tiles reprinted the first four
+         * capability names a third time inside the same surface.
+         */
+        const states = ["Now", "Today", "Queued"].map((label) => ({
+          value: String(rows.filter((r) => r.kicker === label).length),
+          label,
+          note: "",
+        }));
         sections.push(
           SectionSpec.parse({
             ...base,
-            eyebrow: brief.productName,
-            title: editorial.features[0]?.name ?? "Workspace",
+            eyebrow: isDash ? "Workspace" : brief.productName,
+            // The open view's name is printed by the shell itself; the heading names the surface.
+            title: isDash ? `Inside ${brief.productName}` : editorial.features[0]?.name ?? "Workspace",
             body: sentence(`The working surface ${brief.audience} keep open all day`),
             brandLabel: brief.productName,
             aside: editorial.features.map((c) => block({ title: c.name })),
-            blocks: editorial.features.slice(0, isDash ? 8 : 6).map((c, i) =>
-              block({
-                title: c.name,
-                meta: `${(i + 3) * 7}`,
-                kicker: i === 0 ? "Now" : i < 3 ? "Today" : "Queued",
-                // Short detail — long cells stole body-measure from the FAQ prose column.
-                points: isDash ? [`${c.name.split(/\s+/)[0] ?? c.name} · live`] : undefined,
-              }),
-            ),
-            metrics: editorial.outcomesAreStated
-              ? outcomes(editorial.outcomeFeatures)
-              : outcomeNames(editorial.features),
+            blocks: rows,
+            metrics: isDash
+              ? states.filter((m) => m.value !== "0")
+              : editorial.outcomesAreStated
+                ? outcomes(editorial.outcomeFeatures)
+                : outcomeNames(editorial.features),
             ctaLabel: cta.primary,
           }),
         );
