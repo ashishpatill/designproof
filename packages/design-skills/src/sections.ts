@@ -108,6 +108,156 @@ function featureBlocks(copies: FeatureCopy[]): Block[] {
   );
 }
 
+function normTitle(value: string): string {
+  return value.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** Titles already painted on the fold. The proof must not repeat them. */
+function foldTitles(layout: string, names: string[]): Set<string> {
+  const titled = new Set(names.map(normTitle));
+  // The cutoff rail adds clock labels beside the ledger rows. The rows themselves
+  // are capability names, and those names are passed in with the rest.
+  if (layout === "hero-wire") {
+    for (const clock of ["09:00", "12:00", "15:00", "17:00"]) titled.add(clock);
+  }
+  return titled;
+}
+
+/**
+ * Names the fold actually paints.
+ * Pipeline, wire, and queue instruments draw every capability, not only the labels
+ * on the rail. A choice fold names each row.
+ */
+function namesPaintedOnFold(layout: string, allNames: string[], railNames: string[]): string[] {
+  if (
+    layout === "hero-wire" ||
+    layout === "hero-pipeline" ||
+    layout === "hero-queue" ||
+    layout === "feature-alternating"
+  ) {
+    return allNames;
+  }
+  return railNames;
+}
+
+const EVIDENCE_WORD =
+  /\b(\d+|named|names|counts?|attendance|compliance|compliant|audits?|certif\w*|attest\w*|slas?|kpis?|metrics?|scorecards?|checks?)\b/i;
+
+function phraseRepeatsTitle(phrase: string, used: Set<string>): boolean {
+  const key = normTitle(phrase);
+  if (!key || used.has(key)) return true;
+  for (const title of used) {
+    if (title.length >= 3 && key.includes(title)) return true;
+  }
+  return false;
+}
+
+/**
+ * Numbers, names, or compliance the brief actually stated.
+ * Not a second copy of a ledger row name.
+ */
+function evidencePhrases(
+  features: { name: string; description: string; priority: "p0" | "p1" | "p2" }[],
+  used: Set<string>,
+): { title: string; body: string; priority: "p0" | "p1" | "p2" }[] {
+  const out: { title: string; body: string; priority: "p0" | "p1" | "p2" }[] = [];
+  const seen = new Set<string>();
+  const short = [
+    /\bnamed\s+[a-z][\w-]*/gi,
+    /\battendance\s+counts?\b/gi,
+    /\ba parent can check\b/gi,
+    /\b\d[\d,.]*(?:\s*%|\s+[a-z][\w-]*)?/gi,
+    /\b(?:compliance|compliant|audits?|certif\w*|attest\w*|slas?|kpis?|metrics?|scorecards?)\b/gi,
+  ];
+  const push = (feature: (typeof features)[number], part: string) => {
+    const cleaned = part.replace(/\s+/g, " ").trim().replace(/[.;,]+$/g, "");
+    if (cleaned.length < 3) return;
+    if (phraseRepeatsTitle(cleaned, used)) return;
+    if (normTitle(cleaned) === normTitle(feature.name)) return;
+    const title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    const key = normTitle(title);
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ title, body: feature.description, priority: feature.priority });
+  };
+  for (const feature of features) {
+    const found: string[] = [];
+    for (const pattern of short) {
+      pattern.lastIndex = 0;
+      for (const match of feature.description.matchAll(pattern)) found.push(match[0]);
+    }
+    const parts = found.length
+      ? found
+      : feature.description
+          .split(/[.;,:]|\band\b|\bthen\b/i)
+          .filter((part) => EVIDENCE_WORD.test(part));
+    for (const part of parts) {
+      push(feature, part);
+      if (out.length >= 5) return out;
+    }
+  }
+  return out;
+}
+
+/** "Scrub how How a visit works works" doubles words the capability name already has. */
+function scrubClaim(name: string, description: string, used: Set<string> = new Set()): string {
+  const raw = name.trim();
+  // The first screen already named this capability. Saying it again is the repeat.
+  if (used.has(normTitle(raw))) return sentence("Scrub the mechanism");
+  const template = `Scrub how ${raw} works`;
+  const repeated = raw
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .some((word) => {
+      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const hits = template.toLowerCase().match(new RegExp(`\\b${escaped}\\b`, "g"));
+      return (hits?.length ?? 0) > 1;
+    });
+  if (repeated) {
+    // The description is already a scrub step. Repeating it as the claim tells the line twice.
+    return sentence("Scrub the mechanism");
+  }
+  return sentence(template);
+}
+
+function titleNotUsed(name: string, description: string, used: Set<string>): string {
+  const nameClean = name.replace(/\s+/g, " ").trim();
+  if (nameClean && !used.has(normTitle(nameClean))) return nameClean;
+  const desc = description.replace(/\s+/g, " ").trim();
+  if (desc && !used.has(normTitle(desc))) return desc;
+  const fallback = desc ? `${desc} — shown in proof` : `${nameClean} detail`;
+  return used.has(normTitle(fallback)) ? `${fallback} (${nameClean})` : fallback;
+}
+
+/** Clauses of a sequence, skipping any title the fold already used. */
+function stageClauses(text: string, used: Set<string>): string[] {
+  // "Each bed goes through stages: prepared, sown" — the steps are after the colon.
+  const colon = text.indexOf(":");
+  const afterColon = colon >= 0 && text.slice(colon + 1).trim().length >= 3 ? text.slice(colon + 1) : text;
+  // "from intake to discharge" names two real steps. Split them instead of padding with "Step 1".
+  const steps = afterColon.replace(/,?\s*\bfrom\s+([^,.;]+?)\s+to\s+([^,.;]+)/i, ", $1, $2");
+  const raw = steps
+    .split(/[.;,]|\bthen\b|\band\b/i)
+    .map((part) => part.replace(/\s+/g, " ").trim())
+    .filter((part) => part.length >= 3);
+  const out: string[] = [];
+  for (const part of raw) {
+    if (used.has(normTitle(part))) continue;
+    if (out.some((title) => normTitle(title) === normTitle(part))) continue;
+    out.push(part.charAt(0).toUpperCase() + part.slice(1));
+    if (out.length >= 5) break;
+  }
+  let n = 1;
+  while (out.length < 3) {
+    const label = `Step ${n}`;
+    n += 1;
+    if (used.has(normTitle(label))) continue;
+    out.push(label);
+  }
+  return out.slice(0, 5);
+}
+
 export function buildSections(
   brief: DesignBrief,
   analysis: FeatureAnalysis,
@@ -124,6 +274,11 @@ export function buildSections(
     p0Count: p0.length,
     goal: brief.businessGoal,
     hasApprovalWorkflow: analysis.hasApprovalWorkflow,
+    capabilities: features.map((f) => ({
+      name: f.name,
+      description: f.description,
+      priority: f.priority,
+    })),
   });
 
   const eyebrow = eyebrows(brief);
@@ -222,18 +377,36 @@ export function buildSections(
             // surface the grounded note even on craft folds so product-specific CTA
             // copy actually reaches HTML. Sync path without authored stays compact.
             ctaNote: craftFold && !authored ? undefined : cta.note,
-            blocks: named.map((b, i) => {
-              const src = (core.length ? core : editorial.features.slice(0, 3))[i];
-              return src
-                ? block({
-                    title: src.name,
-                    body: isMechanism || isPipeline || isQueue || isDiligence || isWire
-                      ? sentence(src.claim || src.consequence || src.name)
-                      : "",
-                    emphasis: "normal",
-                  })
-                : b;
-            }),
+            blocks:
+              p.layout === "feature-alternating"
+                ? editorial.features.map((c) =>
+                    block({
+                      title: c.name,
+                      body: sentence(c.claim || c.name),
+                      emphasis: "normal",
+                    }),
+                  )
+                : named.map((b, i) => {
+                    const src = (core.length ? core : editorial.features.slice(0, 3))[i];
+                    return src
+                      ? block({
+                          title: src.name,
+                          body: isMechanism || isPipeline || isQueue || isDiligence || isWire
+                            ? sentence(src.claim || src.consequence || src.name)
+                            : "",
+                          emphasis: "normal",
+                        })
+                      : b;
+                  }),
+            // Evidence fold is a metric band. Values are declared names — not invented rates.
+            metrics:
+              p.layout === "metric-band"
+                ? (core.length ? core : editorial.features.slice(0, 4)).map((c) => ({
+                    value: c.name,
+                    label: c.tier,
+                    note: "",
+                  }))
+                : [],
             aside: editorial.features
               .slice(0, 4)
               .map((c, i) =>
@@ -759,23 +932,58 @@ export function buildSections(
 
       case "proof": {
         const q = pullQuote(brief, features);
-        // Fill the board. Three chips beside a lonely quote still left a dark void; five evidence
-        // cells from declared features are the matter a proof band is supposed to carry.
-        const evidence = features.slice(0, 5).map((f) =>
-          block({
-            title: f.name,
-            body: f.description,
-            // Sentence case — screaming micro-labels inflate the uppercase count and read as chrome.
-            meta: f.priority === "p0" ? "Primary" : "In product",
-            kicker: f.priority === "p0" ? "Primary" : "In product",
-            emphasis: f.priority === "p0" ? "lead" : "normal",
-          }),
+        const fold = plan.find((row) => row.kind === "hero");
+        const topCaps = features.filter((f) => f.priority === "p0");
+        const foldNamed = (topCaps.length ? topCaps : features).slice(0, 4);
+        const usedOnFold = foldTitles(
+          fold?.layout ?? "",
+          namesPaintedOnFold(
+            fold?.layout ?? "",
+            features.map((f) => f.name),
+            foldNamed.map((f) => f.name),
+          ),
         );
+        const proofFeature = topCaps[1] ?? features[1] ?? features[0];
         const isWorkflow = p.layout === "workflow-proof";
+        const isConsole = p.layout === "app-shell";
+        const isMatrix = p.layout === "compare-matrix";
+        const isScrub = p.layout === "figure-explainer";
+        const isIndex =
+          p.layout === "feature-index" || p.layout === "feature-rows" || p.layout === "feature-alternating";
+        const isWireProof = p.layout === "hero-wire";
+        const isMetricProof = p.layout === "metric-band";
+        const isMarquee = p.layout === "marquee-proof" || p.layout === "pullquote";
+        // Evidence cells. A proof board uses numbers, names, or compliance the brief
+        // stated — not a second copy of titles the fold already painted.
+        const paintedNames = features.some((f) => usedOnFold.has(normTitle(f.name)));
+        const fromBrief =
+          isMarquee && brief.siteKind === "saas-marketing" && paintedNames
+            ? evidencePhrases(features, usedOnFold)
+            : [];
+        const evidence =
+          fromBrief.length >= 2
+            ? fromBrief.map((line) =>
+                block({
+                  title: line.title,
+                  body: line.body,
+                  meta: line.priority === "p0" ? "Primary" : "In product",
+                  kicker: line.priority === "p0" ? "Primary" : "In product",
+                  emphasis: line.priority === "p0" ? "lead" : "normal",
+                }),
+              )
+            : features.slice(0, 5).map((f) =>
+                block({
+                  title: titleNotUsed(f.name, f.description, usedOnFold),
+                  body: f.description,
+                  meta: f.priority === "p0" ? "Primary" : "In product",
+                  kicker: f.priority === "p0" ? "Primary" : "In product",
+                  emphasis: f.priority === "p0" ? "lead" : "normal",
+                }),
+              );
         /*
-         * Workflow proof stages — five named handoffs that mirror how a careful product ships work.
-         * Titles stay fixed (mechanism vocabulary); bodies come only from declared features.
-         * Authored role/gate copy is used only when hasApprovalWorkflowSignal (and provided).
+         * Stage-by-stage proof. Approval briefs keep the named handoff vocabulary.
+         * Any other sequence uses clauses from the second capability, never the fold's titles,
+         * and never an approve gate that the brief did not declare.
          */
         const workflowBodies = features.slice(0, 5);
         const defaultStages = [
@@ -785,13 +993,35 @@ export function buildSections(
           { id: "review", title: "Review", role: "Human edits before anything ships" },
           { id: "approve", title: "Approve", role: "Explicit gate — never auto-apply" },
         ] as const;
+        const declaredStages = stageClauses(
+          proofFeature?.description || proofFeature?.name || "",
+          usedOnFold,
+        ).map((title, i) => ({
+          id: `step-${i + 1}`,
+          title,
+          role: proofFeature?.description || title,
+        }));
         const stageDefs =
           isWorkflow && analysis.hasApprovalWorkflow && authored?.proof.stages?.length === 5
             ? authored.proof.stages
-            : defaultStages;
+            : analysis.hasApprovalWorkflow
+              ? defaultStages
+              : declaredStages;
         const workflowStages = isWorkflow
           ? stageDefs.map((stage, i) => {
               const src = workflowBodies[i] ?? workflowBodies[workflowBodies.length - 1] ?? features[0];
+              // A declared sequence: the step is the line. Naming every other capability
+              // under it, or repeating the whole sentence, tells the fold's lines again.
+              if (!analysis.hasApprovalWorkflow) {
+                return block({
+                  title: stage.title,
+                  body: "",
+                  meta: stage.id,
+                  kicker: `Step ${i + 1} of ${stageDefs.length}`,
+                  emphasis: i === 0 ? "lead" : i === stageDefs.length - 1 ? "lead" : "normal",
+                  points: [],
+                });
+              }
               return block({
                 title: stage.title,
                 body: src
@@ -799,11 +1029,45 @@ export function buildSections(
                   : sentence(stage.role),
                 meta: stage.id,
                 kicker: src?.name ?? "Sample",
-                emphasis: i === 0 ? "lead" : i === 4 ? "lead" : "normal",
+                emphasis: i === 0 ? "lead" : i === stageDefs.length - 1 ? "lead" : "normal",
                 points: src ? [src.name, stage.role] : [stage.role],
               });
             })
           : [];
+        // One row per line. A repeated sentence is not a new step, and the side numbers
+        // follow the rows that remain so the list cannot skip (01, 02, 03, 05).
+        const consoleSource = features.slice(0, 6).filter((feature, index, all) => {
+          const title = normTitle(titleNotUsed(feature.name, feature.description, usedOnFold));
+          const first = all.findIndex(
+            (other) => normTitle(titleNotUsed(other.name, other.description, usedOnFold)) === title,
+          );
+          return first === index;
+        });
+        const consoleRows = consoleSource.map((f, i) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            meta: `${(i + 3) * 7}`,
+            kicker: i === 0 ? "Now" : i < 3 ? "Today" : "Queued",
+            // Not the title again. The row already tells that line.
+            points: [f.priority === "p0" ? "Primary" : "In product"],
+          }),
+        );
+        const matrixRows = features.map((f) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            meta: f.priority === "p0" ? "Primary" : "In product",
+          }),
+        );
+        const scrubSteps = stageClauses(proofFeature?.description || proofFeature?.name || "", usedOnFold).map(
+          (title) => block({ title }),
+        );
+        const indexRows = features.map((f, i) =>
+          block({
+            title: titleNotUsed(f.name, f.description, usedOnFold),
+            body: f.description,
+            meta: String(i + 1).padStart(2, "0"),
+          }),
+        );
         const proofTitle =
           brief.siteKind === "saas-marketing"
             ? isWorkflow
@@ -847,20 +1111,91 @@ export function buildSections(
           sentence(
             `Five named states. Every panel traces to a declared capability — nothing invented for theatre`,
           );
-        const marqueeClaim = authored?.proof.claim ?? q.quote;
+        // A plate can show fewer lines than the brief listed. The count written over that
+        // list has to match the lines on it, not the longer catalogue.
+        const shownOnPlate = fromBrief.length >= 2 ? fromBrief.length : features.length;
+        const plateQuote =
+          shownOnPlate === features.length ? q : pullQuote(brief, features.slice(0, shownOnPlate));
+        const marqueeClaim =
+          shownOnPlate === features.length ? (authored?.proof.claim ?? q.quote) : plateQuote.quote;
         const gateCopy =
           analysis.hasApprovalWorkflow && authored?.proof.gateCopy
             ? authored.proof.gateCopy
             : "Human approves before apply";
+        const sequenceClaim = sentence(
+          proofFeature && !usedOnFold.has(normTitle(proofFeature.name))
+            ? `${proofFeature.name} in stages, from what was declared`
+            : `${brief.productName}, one step at a time, as declared`,
+        );
+        const proofBody = isWorkflow
+          ? analysis.hasApprovalWorkflow
+            ? workflowClaim
+            : sequenceClaim
+          : isConsole
+            ? sentence(`${brief.productName} keeps the list open`)
+            : isMatrix
+              ? sentence(`The options side by side, as a table`)
+              : isScrub
+                ? scrubClaim(proofFeature?.name ?? brief.productName, proofFeature?.description ?? "", usedOnFold)
+                : isWireProof
+                  ? sentence(`Movements on ${brief.productName} against the cutoff`)
+                  : marqueeClaim;
+        const proofBlocks = isWorkflow
+          ? workflowStages
+          : isConsole
+            ? consoleRows
+            : isMatrix
+              ? matrixRows
+              : isScrub
+                ? scrubSteps
+                : isIndex
+                  ? indexRows
+                  : evidence;
         sections.push(
           SectionSpec.parse({
             ...base,
-            eyebrow: isWorkflow ? "Sample workflow" : eyebrow.proof,
+            eyebrow: isWorkflow
+              ? analysis.hasApprovalWorkflow
+                ? "Sample workflow"
+                : "Stage by stage"
+              : isConsole
+                ? "Console"
+                : isMatrix
+                  ? "Compared"
+                  : isScrub
+                    ? "How it works"
+                    : isWireProof
+                      ? "Cutoffs"
+                      : eyebrow.proof,
             title: proofTitle,
-            body: isWorkflow ? workflowClaim : marqueeClaim,
-            quote: isWorkflow ? undefined : marqueeClaim,
-            quoteAttribution: isWorkflow ? gateCopy : q.attribution,
-            blocks: isWorkflow ? workflowStages : evidence,
+            body: proofBody,
+            quote: isMarquee ? marqueeClaim : undefined,
+            quoteAttribution: isWorkflow
+              ? analysis.hasApprovalWorkflow
+                ? gateCopy
+                : undefined
+              : isMarquee
+                ? plateQuote.attribution
+                : undefined,
+            blocks: proofBlocks,
+            aside: isConsole
+              ? consoleSource.map((_f, i) => block({ title: String(i + 1).padStart(2, "0") }))
+              : [],
+            metrics: isConsole
+              ? features.slice(0, 3).map((_f, i) => ({
+                  value: String(i + 1).padStart(2, "0"),
+                  label: ["Now", "Today", "Queued"][i] ?? "Queued",
+                  note: "",
+                }))
+              : isMetricProof
+                ? features.slice(0, 4).map((f) => ({
+                    value: titleNotUsed(f.name, f.description, usedOnFold),
+                    label: f.priority === "p0" ? "Primary" : "In product",
+                    note: "",
+                  }))
+                : [],
+            brandLabel: isConsole ? brief.productName : undefined,
+            ctaLabel: isConsole ? cta.primary : undefined,
           }),
         );
         break;

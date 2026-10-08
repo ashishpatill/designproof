@@ -16,10 +16,9 @@
  * Not scored: nav/footer chrome, Privacy/Terms/Careers, eyebrows(), headline/heroLede,
  * pullQuote (outside the proof claim), plan-lane titles (Core / Standard / Full).
  *
- * Measured on master (Freightlane / Willowvet / Scalehouse, saas-marketing + demos):
- * authored-node phrase overlap ≈ 57.1% (16/28 shared÷min) with ctaFor().note scored
- * even when craftFold omits it from HTML. Residual CTA/FAQ scaffolding expected;
- * operator/approve workflow narrative must not be shared after PR 69. Ceiling 70%.
+ * Same site type, same goal, same counts used to share one proof layout and treat
+ * about 57% shared wording as acceptable. That is not a pass. These briefs differ
+ * in the kind of work, and the page shape has to differ with them.
  *
  * Phase 1 (`author.ts`) can inject brief-grounded CTA/FAQ/proof when GEMINI_API_KEY
  * is set; this suite stays on the no-key / sync `designFromFeatures` path so CI
@@ -31,7 +30,7 @@ import { ctaFor, questions, riskReversal } from "../copy";
 import { designFromFeatures } from "../orchestrate";
 import { DesignBrief, type DesignBrief as DesignBriefT } from "../types";
 
-/** Ordinary, non-showcase briefs — no draft/approve language, not SHOWCASE_BRIEFS. */
+/** Ordinary, non-showcase briefs — five capabilities, two top-priority, saas-marketing, demos. */
 function ordinaryBriefs(): DesignBriefT[] {
   return [
     DesignBrief.parse({
@@ -42,11 +41,11 @@ function ordinaryBriefs(): DesignBriefT[] {
       siteKind: "saas-marketing",
       lockSiteKind: true,
       features: [
-        { id: "f1", name: "Lane board", description: "See open lanes by region and dock hour", priority: "p0" },
-        { id: "f2", name: "Dock windows", description: "Book arrival slots without phone tag", priority: "p0" },
-        { id: "f3", name: "Carrier roster", description: "Keep preferred carriers ranked by on-time rate", priority: "p1" },
-        { id: "f4", name: "Exception log", description: "Flag missed windows with a reason code", priority: "p1" },
-        { id: "f5", name: "Route notes", description: "Attach yard notes that travel with the load", priority: "p2" },
+        { id: "f1", name: "Tender steps", description: "A load moves in order: tender, then dock, then release", priority: "p0" },
+        { id: "f2", name: "Exception queue", description: "Triage missed windows in one ranked queue before the next truck", priority: "p0" },
+        { id: "f3", name: "Carrier roster", description: "Keep preferred carriers listed by region", priority: "p1" },
+        { id: "f4", name: "Yard notes", description: "Attach notes that travel with the load", priority: "p1" },
+        { id: "f5", name: "Rate sheet", description: "Store the agreed lane price", priority: "p2" },
       ],
       taste: {
         aestheticLean: "conversion-sharp",
@@ -62,11 +61,11 @@ function ordinaryBriefs(): DesignBriefT[] {
       siteKind: "saas-marketing",
       lockSiteKind: true,
       features: [
-        { id: "v1", name: "Visit schedule", description: "Day board of appointments by room and clinician", priority: "p0" },
-        { id: "v2", name: "Treatment notes", description: "Record vaccines and meds against the patient chart", priority: "p0" },
-        { id: "v3", name: "Client reminders", description: "Send visit reminders before the appointment", priority: "p1" },
-        { id: "v4", name: "Inventory count", description: "Track clinic stock for vaccines and consumables", priority: "p1" },
-        { id: "v5", name: "Referral packet", description: "Package history when sending to a specialist", priority: "p2" },
+        { id: "v1", name: "Treatment choice", description: "Choose between in-clinic care and a referral option for the same visit", priority: "p0" },
+        { id: "v2", name: "How a visit works", description: "Explain the mechanism of a visit from intake to discharge", priority: "p0" },
+        { id: "v3", name: "Reminder notes", description: "Send a note before the appointment", priority: "p1" },
+        { id: "v4", name: "Stock list", description: "Track vaccines on hand", priority: "p1" },
+        { id: "v5", name: "Chart packet", description: "Package history when sending to a specialist", priority: "p2" },
       ],
       taste: {
         aestheticLean: "conversion-sharp",
@@ -82,11 +81,11 @@ function ordinaryBriefs(): DesignBriefT[] {
       siteKind: "saas-marketing",
       lockSiteKind: true,
       features: [
-        { id: "m1", name: "Lesson plan", description: "Outline repertoire and drills for each student week", priority: "p0" },
-        { id: "m2", name: "Practice log", description: "Students log minutes and what they worked", priority: "p0" },
-        { id: "m3", name: "Recital list", description: "Track pieces ready for the next recital", priority: "p1" },
-        { id: "m4", name: "Parent note", description: "Share a short progress note after each lesson", priority: "p1" },
-        { id: "m5", name: "Studio calendar", description: "Hold lesson slots and make-up windows", priority: "p2" },
+        { id: "m1", name: "Lesson ledger", description: "A ledger of movements through the week: assigned, practiced, performed", priority: "p0" },
+        { id: "m2", name: "Recital evidence", description: "Named pieces and attendance counts a parent can check", priority: "p0" },
+        { id: "m3", name: "Parent note", description: "Share a short progress note after each lesson", priority: "p1" },
+        { id: "m4", name: "Room hold", description: "Hold the teaching room for the hour", priority: "p1" },
+        { id: "m5", name: "Repertoire list", description: "Keep the pieces currently in study", priority: "p2" },
       ],
       taste: {
         aestheticLean: "conversion-sharp",
@@ -95,6 +94,30 @@ function ordinaryBriefs(): DesignBriefT[] {
       },
     }),
   ];
+}
+
+/** Both top capabilities are the same kind of work. The proof still must not copy the fold. */
+function sameKindBrief(): DesignBriefT {
+  return DesignBrief.parse({
+    productName: "Twinrail",
+    tagline: "Two sequences of steps for the same desk",
+    audience: "operators who run the desk",
+    businessGoal: "demos",
+    siteKind: "saas-marketing",
+    lockSiteKind: true,
+    features: [
+      { id: "t1", name: "Open steps", description: "Walk intake as a sequence of steps from request to scheduled", priority: "p0" },
+      { id: "t2", name: "Close steps", description: "A second sequence of steps from done to archived", priority: "p0" },
+      { id: "t3", name: "Roster", description: "People assigned to the work", priority: "p1" },
+      { id: "t4", name: "Notes", description: "Notes kept with the record", priority: "p1" },
+      { id: "t5", name: "Archive tag", description: "A label for finished records", priority: "p2" },
+    ],
+    taste: {
+      aestheticLean: "conversion-sharp",
+      motion: "light-scroll-reveals",
+      colorMood: "neutral-professional",
+    },
+  });
 }
 
 function normalizeNode(text: string): string {
@@ -305,106 +328,224 @@ const APPROVAL_NARRATIVE = [
   "explicit gate — never auto-apply",
 ];
 
-/** Honest ceiling: measured ≈57.1% (16/28) on these briefs with ctaFor().note scored. */
-const OVERLAP_CEILING = 0.7;
+function sectionChunk(html: string, sectionId: string): string {
+  const page = stripChrome(html);
+  const re = new RegExp(
+    `<section[^>]*(?:id="${sectionId}"|data-section="${sectionId}")[^>]*>[\\s\\S]*?<\\/section>`,
+  );
+  return page.match(re)?.[0] ?? "";
+}
+
+/** Item titles on a screen — not the page headline. */
+function plainText(chunk: string): string {
+  return chunk.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** Visible proof lines told more than once. A second card, nav slot, or table cell of the same line fails. */
+function repeatedProofLines(proofChunk: string): string[] {
+  const counts = new Map<string, number>();
+  for (const match of proofChunk.matchAll(/>([^<]+)</g)) {
+    const line = match[1]!.replace(/\s+/g, " ").trim().toLowerCase().replace(/[.!?]+$/g, "");
+    if (line.length < 12) continue;
+    counts.set(line, (counts.get(line) ?? 0) + 1);
+  }
+  return [...counts.entries()].filter(([, n]) => n > 1).map(([line]) => line);
+}
+
+/** First-screen titles (feature names the fold actually paints) that the proof still says. */
+function repeatedFoldNames(brief: DesignBriefT, foldChunk: string, proofChunk: string): string[] {
+  const fold = plainText(foldChunk);
+  const proof = plainText(proofChunk);
+  return brief.features
+    .map((feature) => feature.name.replace(/\s+/g, " ").trim().toLowerCase())
+    .filter((name) => name.length >= 3 && fold.includes(name) && proof.includes(name));
+}
+
+function itemTitles(chunk: string): Set<string> {
+  const found = new Set<string>();
+  const patterns = [
+    /class="ds-stage-label"[^>]*>([^<]+)/g,
+    /class="ds-priority-label"[^>]*>([^<]+)/g,
+    /class="ds-cutoff-label"[^>]*>([^<]+)/g,
+    /class="ds-workflow-label"[^>]*>([^<]+)/g,
+    /class="ds-metric-value"[^>]*>([^<]+)/g,
+    /<h3>([^<]+)<\/h3>/g,
+    /<strong>([^<]+)<\/strong>/g,
+    /<th scope="row">([^<]+)/g,
+  ];
+  for (const re of patterns) {
+    for (const match of chunk.matchAll(re)) {
+      const title = match[1]!.replace(/\s+/g, " ").trim().toLowerCase();
+      if (title.length >= 2) found.add(title);
+    }
+  }
+  return found;
+}
 
 describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
-  it("authored-node phrase overlap ≤70% on ordinary saas-marketing/demos (measured ~57.1%; residual CTA/FAQ scaffolding expected)", () => {
+  it("same type and same counts diverge when the capabilities are different kinds of work", () => {
     const briefs = ordinaryBriefs();
     const pages = briefs.map((brief) => {
+      expect(brief.features).toHaveLength(5);
+      expect(brief.features.filter((f) => f.priority === "p0")).toHaveLength(2);
       const analysis = analyzeFeatures(brief);
-      expect(analysis.hasApprovalWorkflow, `${brief.productName} must not trigger approval workflow`).toBe(
-        false,
-      );
+      expect(analysis.hasApprovalWorkflow, `${brief.productName} must not trigger approval workflow`).toBe(false);
       const { previewHtml, spec } = designFromFeatures(brief);
       expect(previewHtml.length, `${brief.productName} must emit real HTML`).toBeGreaterThan(500);
       expect(spec.brief.siteKind).toBe("saas-marketing");
       expect(spec.brief.businessGoal).toBe("demos");
-      expect(spec.sections.some((s) => s.layout === "workflow-proof")).toBe(false);
-      expect(spec.sections.some((s) => s.layout === "marquee-proof")).toBe(true);
-
-      const buckets = extractAuthoredNodes(brief, previewHtml, analysis.hasApprovalWorkflow);
-      expect(buckets.cta.length, `${brief.productName} CTA nodes`).toBe(4);
-      expect(buckets.faq.length, `${brief.productName} FAQ nodes`).toBeGreaterThan(0);
-      expect(buckets.proof.length, `${brief.productName} proof nodes`).toBeGreaterThan(0);
-
-      // Real generation still emits primary / secondary / riskReversal into HTML.
-      const ctaCfg = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta);
-      expect(previewHtml).toContain(ctaCfg.primary);
-      expect(previewHtml).toContain(ctaCfg.secondary);
-      expect(previewHtml).toContain(riskReversal(brief));
-
-      return {
-        brief,
-        buckets,
-        nodes: authoredNodeSet(buckets),
-        html: previewHtml,
-      };
+      const fold = spec.sections.find((s) => s.kind === "hero");
+      const proof = spec.sections.find((s) => s.id === "proof");
+      expect(fold, `${brief.productName} fold`).toBeTruthy();
+      expect(proof, `${brief.productName} proof`).toBeTruthy();
+      expect(proof!.layout, `${brief.productName} proof copies the fold`).not.toBe(fold!.layout);
+      const heroChunk = sectionChunk(previewHtml, "hero");
+      const proofChunk = sectionChunk(previewHtml, "proof");
+      const foldTitles = itemTitles(heroChunk);
+      const proofTitles = itemTitles(proofChunk);
+      // A plate that already lists the evidence has no card headings. Those lines are the titles.
+      if (proof!.layout === "marquee-proof" && !/data-proof-board/.test(proofChunk)) {
+        const stack = proofChunk.match(/<svg[^>]*data-figure="stack"[^>]*>[\s\S]*?<\/svg>/);
+        if (stack) {
+          for (const text of stack[0].matchAll(/<text[^>]*font-weight="600"[^>]*>([^<]+)/g)) {
+            const title = text[1]!.replace(/\s+/g, " ").trim().toLowerCase();
+            if (title.length >= 2) proofTitles.add(title);
+          }
+        }
+      }
+      const shared = [...foldTitles].filter((title) => proofTitles.has(title));
+      expect(shared, `${brief.productName} proof repeats fold titles: ${shared.join(", ")}`).toEqual([]);
+      const repeated = repeatedFoldNames(brief, heroChunk, proofChunk);
+      expect(
+        repeated,
+        `${brief.productName} proof repeats first-screen titles: ${repeated.join(", ")}`,
+      ).toEqual([]);
+      const toldTwice = repeatedProofLines(proofChunk);
+      expect(
+        toldTwice,
+        `${brief.productName} proof tells the same line twice: ${toldTwice.join(" | ")}`,
+      ).toEqual([]);
+      expect(foldTitles.size, `${brief.productName} fold has no item titles`).toBeGreaterThan(0);
+      expect(proofTitles.size, `${brief.productName} proof has no item titles`).toBeGreaterThan(0);
+      return { brief, fold: fold!.layout, proof: proof!.layout, html: previewHtml };
     });
 
-    const reports: string[] = [];
-    let maxRatio = 0;
+    const expected = [
+      { product: "Freightlane", fold: "hero-pipeline", proof: "app-shell" },
+      { product: "Willowvet", fold: "feature-alternating", proof: "figure-explainer" },
+      { product: "Scalehouse", fold: "hero-wire", proof: "marquee-proof" },
+    ] as const;
+    pages.forEach((page, i) => {
+      const want = expected[i]!;
+      expect(page.brief.productName).toBe(want.product);
+      expect(page.fold, want.product).toBe(want.fold);
+      expect(page.proof, want.product).toBe(want.proof);
+    });
 
-    for (let i = 0; i < pages.length; i++) {
-      for (let j = i + 1; j < pages.length; j++) {
-        const left = pages[i]!;
-        const right = pages[j]!;
-        const { ratio, shared, sharedCount } = phraseOverlapRatio(left.nodes, right.nodes);
-        maxRatio = Math.max(maxRatio, ratio);
-        reports.push(
-          `${left.brief.productName} vs ${right.brief.productName}: ${(ratio * 100).toFixed(1)}% shared (${sharedCount}/${Math.min(left.nodes.size, right.nodes.size)})`,
-        );
+    const signatures = new Set(pages.map((page) => `${page.fold}|${page.proof}`));
+    expect(signatures.size, `pages collapsed to ${[...signatures].join(" ; ")}`).toBe(pages.length);
 
-        // After PR 69, ordinary briefs must not share the operator/approve workflow story.
-        for (const phrase of APPROVAL_NARRATIVE) {
-          expect(
-            shared.some((s) => s.includes(phrase)),
-            `shared approval narrative "${phrase}" between ${left.brief.productName} and ${right.brief.productName}`,
-          ).toBe(false);
-        }
-
-        expect(
-          ratio,
-          `phrase overlap too high for ${left.brief.productName} vs ${right.brief.productName}: ${reports.join("; ")}`,
-        ).toBeLessThanOrEqual(OVERLAP_CEILING);
-      }
+    // The shape is the layout, not a renamed three-card row.
+    expect(pages[0]!.html).toContain("ds-stage-rail");
+    expect(pages[0]!.html).toContain("ds-hero-pipeline");
+    expect(pages[0]!.html).toContain("data-app-shell");
+    expect(pages[1]!.html).toContain("ds-alt-row");
+    expect(pages[1]!.html).toContain("data-scrub");
+    const willowHero = sectionChunk(pages[1]!.html, "hero");
+    const willowRows = willowHero.match(/class="ds-alt-row[^"]*"/g) ?? [];
+    expect(willowRows, "Willowvet fold must be one row per choice").toHaveLength(5);
+    expect(willowHero, "Willowvet fold must not be a single list of names").not.toContain('data-figure="stack"');
+    expect(pages[2]!.html).toContain("ds-cutoff-rail");
+    expect(pages[2]!.html).toContain("ds-hero-wire");
+    const scaleProof = sectionChunk(pages[2]!.html, "proof");
+    expect(scaleProof).toContain('data-figure="stack"');
+    expect(scaleProof).not.toMatch(/<ul[^>]*\bdata-proof-board\b/);
+    for (const line of ["Named pieces", "Attendance counts", "A parent can check"]) {
+      expect(scaleProof.match(new RegExp(`>${line}<`, "g")) ?? [], line).toHaveLength(1);
     }
-
-    // Surface measured overlap in the failure message / assertion context.
-    expect(
-      maxRatio,
-      `measured max authored-node overlap among ordinary demos briefs: ${reports.join("; ")}`,
-    ).toBeLessThanOrEqual(OVERLAP_CEILING);
-    // Sanity: residual scaffolding overlap is expected (not near-zero yet).
-    expect(maxRatio).toBeGreaterThan(0.2);
+    const shownLines = ["Named pieces", "Attendance counts", "A parent can check"].filter((line) =>
+      scaleProof.includes(`>${line}<`),
+    );
+    const countWord: Record<string, number> = {
+      one: 1,
+      two: 2,
+      three: 3,
+      four: 4,
+      five: 5,
+      six: 6,
+      seven: 7,
+      eight: 8,
+      nine: 9,
+      ten: 10,
+    };
+    const countClaims = [
+      ...scaleProof.matchAll(/\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+capabilities\b/gi),
+    ];
+    expect(countClaims.length, "Scalehouse proof states how many lines are shown").toBeGreaterThan(0);
+    for (const claim of countClaims) {
+      const raw = claim[1]!.toLowerCase();
+      const stated = countWord[raw] ?? Number(raw);
+      expect(stated, `says ${claim[0]} over ${shownLines.length} lines`).toBe(shownLines.length);
+    }
+    expect(scaleProof.toLowerCase(), "Scalehouse proof still says five").not.toMatch(/\bfive\b/);
+    const freightProof = sectionChunk(pages[0]!.html, "proof");
+    const load = "A load moves in order: tender, then dock, then release";
+    expect(freightProof.split(load).length - 1).toBe(1);
+    for (const name of ["Tender steps", "Exception queue", "Carrier roster", "Yard notes", "Rate sheet"]) {
+      expect(freightProof, name).not.toContain(name);
+    }
+    const sideNav = freightProof.match(/data-app-views[\s\S]*?<\/ul>/)?.[0] ?? "";
+    const sideNums = [...sideNav.matchAll(/>(\d{2})</g)].map((match) => match[1]!);
+    const sideValues = sideNums.map((n) => Number(n));
+    expect(sideValues, `side list skips: ${sideNums.join(", ")}`).toEqual(sideValues.map((_, i) => i + 1));
+    // 01, 02, 03, 05 is a skip. A fifth step stays only when its line is not the load sentence again.
+    expect(sideNums).not.toEqual(["01", "02", "03", "05"]);
+    for (const page of pages) {
+      expect(page.html).not.toMatch(/class="ds-bento"/);
+    }
   });
 
-  it("content-specificity metric exists; feature proof board + feature FAQ rows share brief vocabulary", () => {
+  it("when both top capabilities are the same kind, the proof is not a copy of the fold", () => {
+    const brief = sameKindBrief();
+    expect(brief.features).toHaveLength(5);
+    expect(brief.features.filter((f) => f.priority === "p0")).toHaveLength(2);
+    const { previewHtml, spec } = designFromFeatures(brief);
+    const fold = spec.sections.find((s) => s.kind === "hero");
+    const proof = spec.sections.find((s) => s.id === "proof");
+    expect(fold?.layout).toBe("hero-pipeline");
+    expect(proof?.layout).toBe("workflow-proof");
+    expect(proof?.layout).not.toBe(fold?.layout);
+    const foldTitles = itemTitles(sectionChunk(previewHtml, "hero"));
+    const proofTitles = itemTitles(sectionChunk(previewHtml, "proof"));
+    const shared = [...foldTitles].filter((title) => proofTitles.has(title));
+    expect(shared, `same-kind proof repeats fold titles: ${shared.join(", ")}`).toEqual([]);
+    expect(foldTitles.size).toBeGreaterThan(0);
+    expect(proofTitles.size).toBeGreaterThan(0);
+    expect(previewHtml).toContain("ds-stage-rail");
+    expect(previewHtml).toContain("data-workflow-proof");
+    expect(previewHtml).not.toContain("Human gate");
+    expect(previewHtml).not.toContain('data-workflow-step="approve"');
+  });
+
+  it("feature FAQ rows still share brief vocabulary; proof is not graded as a shared-word ceiling", () => {
     for (const brief of ordinaryBriefs()) {
       const analysis = analyzeFeatures(brief);
-      const { previewHtml } = designFromFeatures(brief);
+      const { previewHtml, spec } = designFromFeatures(brief);
       const buckets = extractAuthoredNodes(brief, previewHtml, analysis.hasApprovalWorkflow);
       const metric = contentSpecificity(buckets, brief);
-
       expect(Number.isFinite(metric.ratio), `${brief.productName} specificity ratio`).toBe(true);
-      expect(metric.total).toBeGreaterThan(0);
-
-      // Feature-derived proof board cells (feature names) must hit brief vocab.
-      expect(
-        metric.featureProofTotal,
-        `${brief.productName} expected feature names on proof board`,
-      ).toBeGreaterThan(0);
-      expect(metric.featureProofHits).toBe(metric.featureProofTotal);
-
-      // Feature FAQ rows (Is <feature>… / Do we need <feature>…) must hit brief vocab.
-      expect(
-        metric.featureFaqTotal,
-        `${brief.productName} expected feature-named FAQ rows`,
-      ).toBeGreaterThan(0);
+      expect(metric.featureFaqTotal, `${brief.productName} feature FAQ rows`).toBeGreaterThan(0);
       expect(metric.featureFaqHits).toBe(metric.featureFaqTotal);
-
-      // Do not fail on overall ratio — goal-keyed CTA/FAQ scaffolding is still generic (next PR).
-      expect(metric.ratio).toBeGreaterThanOrEqual(0);
+      const proof = spec.sections.find((s) => s.id === "proof");
+      expect(proof?.layout).not.toBe(spec.sections.find((s) => s.kind === "hero")?.layout);
+      if (proof?.layout === "marquee-proof") {
+        const vocab = briefVocabulary(brief);
+        const grounded = buckets.proof.filter((line) => lineSharesBriefToken(line, vocab));
+        expect(grounded.length, `${brief.productName} evidence board`).toBeGreaterThan(0);
+        const heroChunk = sectionChunk(previewHtml, "hero");
+        const proofChunk = sectionChunk(previewHtml, "proof");
+        expect(repeatedFoldNames(brief, heroChunk, proofChunk)).toEqual([]);
+      }
     }
   });
 
@@ -452,5 +593,63 @@ describe("cross-brief distinctiveness (Phase 0 honesty)", () => {
       ).toBe(true);
       expect(previewHtml).toMatch(/Who approves irreversible actions/i);
     }
+  });
+  it("briefs these rules were not written against keep first-screen names out of the proof", () => {
+    const fresh = (
+      productName: string,
+      tagline: string,
+      audience: string,
+      caps: [string, string][],
+    ): DesignBriefT =>
+      DesignBrief.parse({
+        productName,
+        tagline,
+        audience,
+        businessGoal: "demos",
+        siteKind: "saas-marketing",
+        lockSiteKind: true,
+        features: caps.map(([name, description], i) => ({
+          id: `n${i}`,
+          name,
+          description,
+          priority: i < 2 ? "p0" : i < 4 ? "p1" : "p2",
+        })),
+        taste: { aestheticLean: "conversion-sharp", motion: "light-scroll-reveals", colorMood: "neutral-professional" },
+      });
+    const briefs = [
+      fresh("Harborbook", "Berth planning for small marinas", "marina harbour masters", [
+        ["Berth requests", "Incoming boat requests sorted by urgency so the harbour master works the most urgent first"],
+        ["Fuel log", "Every fuel sale posted against the berth account and reconciled each night"],
+        ["Crew list", "Who is on shift at the dock"],
+        ["Weather board", "Today's wind and tide"],
+        ["Mooring map", "Where each boat is tied up"],
+      ]),
+      fresh("Plotwise", "Planning software for community gardens", "garden coordinators", [
+        ["Plot plans", "Compare three plot layouts side by side before the season"],
+        ["Season stages", "Each bed goes through stages: prepared, sown, growing, harvested"],
+        ["Member roll", "Gardeners and their plots"],
+        ["Tool shed", "Which tools are out"],
+        ["Water rota", "Who waters on which day"],
+      ]),
+      fresh("Brightdesk", "Help desk for school IT teams", "school IT leads", [
+        ["Uptime report", "98 percent of tickets closed inside the SLA, with an audit of every one"],
+        ["Repair walkthrough", "Explains how a laptop repair works, from drop-off to return"],
+        ["Device list", "Every device the school owns"],
+        ["Staff notes", "Notes for teachers"],
+        ["Loan cart", "Spare laptops on loan"],
+      ]),
+    ];
+    const shapes = new Set<string>();
+    for (const brief of briefs) {
+      const { previewHtml, spec } = designFromFeatures(brief);
+      const fold = sectionChunk(previewHtml, "hero");
+      const proof = sectionChunk(previewHtml, "proof");
+      expect(proof.length, `${brief.productName} must render a proof`).toBeGreaterThan(200);
+      expect(repeatedFoldNames(brief, fold, proof), `${brief.productName} proof repeats the first screen`).toEqual([]);
+      // No approve gate the brief never declared.
+      expect(proof, `${brief.productName} proof invents an approval`).not.toMatch(/human approve/i);
+      shapes.add(spec.sections.map((s) => s.layout).join(","));
+    }
+    expect(shapes.size).toBe(briefs.length);
   });
 });

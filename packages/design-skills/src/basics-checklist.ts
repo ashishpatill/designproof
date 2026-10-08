@@ -57,6 +57,74 @@ function dsDrawIsHeaderHairline(svg: string): boolean {
  * Fast, deterministic gates over a generated spec + preview HTML.
  * Meant for vitest and as a preflight before burning a research loop on craft score.
  */
+
+function heroLayoutOf(spec: { sections: { kind: string; id: string; layout: string }[] }): string {
+  return spec.sections.find((s) => s.kind === "hero")?.layout ?? "";
+}
+
+function proofLayoutOf(spec: { sections: { kind: string; id: string; layout: string }[] }): string {
+  return spec.sections.find((s) => s.id === "proof" || s.kind === "proof")?.layout ?? "";
+}
+
+/** Fold chrome for a marketing page whose first capability picked the shape. */
+function saasFoldMatches(spec: { sections: { kind: string; id: string; layout: string }[] }, html: string): boolean {
+  if (/class="[^"]*ds-hero-stackfold/.test(html)) return false;
+  const layout = heroLayoutOf(spec);
+  if (layout === "hero-pipeline") {
+    return /ds-hero-pipeline/.test(html) && /ds-stage-rail/.test(html) && /data-figure="pipeline-board"/.test(html);
+  }
+  if (layout === "hero-queue") {
+    return /ds-hero-queue/.test(html) && /ds-priority-rail/.test(html) && /data-figure="queue-console"/.test(html);
+  }
+  if (layout === "hero-wire") {
+    return /ds-hero-wire/.test(html) && /ds-cutoff-rail/.test(html) && /data-figure="wire-ledger"/.test(html);
+  }
+  if (layout === "hero-mechanism") {
+    return /ds-hero-mechanism/.test(html) && /data-instrument="scrub"/.test(html) && /data-figure="mechanism-plate"/.test(html);
+  }
+  if (layout === "metric-band") {
+    return /data-section="hero"/.test(html) && /ds-metrics/.test(html);
+  }
+  if (layout === "feature-alternating") {
+    return /data-section="hero"/.test(html) && /ds-alt-row/.test(html);
+  }
+  return false;
+}
+
+function saasFoldStructure(spec: { sections: { kind: string; id: string; layout: string }[] }, html: string): boolean {
+  const layout = heroLayoutOf(spec);
+  if (layout === "hero-pipeline") return /ds-pipeline-fold/.test(html) && /ds-pipeline-field/.test(html) && /ds-hero-pipeline/.test(html);
+  if (layout === "hero-queue") return /ds-queue-fold/.test(html) && /ds-queue-field/.test(html) && /ds-hero-queue/.test(html);
+  if (layout === "hero-wire") return /ds-wire-fold/.test(html) && /ds-wire-field/.test(html) && /ds-hero-wire/.test(html);
+  if (layout === "hero-mechanism") return /ds-mechanism-fold/.test(html) && /ds-mechanism-stage/.test(html) && /ds-hero-mechanism/.test(html);
+  if (layout === "metric-band") return /data-section="hero"/.test(html) && /ds-metric/.test(html);
+  if (layout === "feature-alternating") return /data-section="hero"/.test(html) && /ds-alt-row/.test(html);
+  return false;
+}
+
+function saasProofMatches(
+  spec: { sections: { kind: string; id: string; layout: string }[] },
+  html: string,
+  hasBoard: boolean,
+): boolean {
+  const layout = proofLayoutOf(spec);
+  if (layout === "workflow-proof") return /data-workflow-proof/.test(html);
+  if (layout === "marquee-proof" || layout === "pullquote") {
+    if (hasBoard) return true;
+    // Evidence drawn once on the plate. A card row would tell those lines again.
+    return layout === "marquee-proof" && /data-figure="stack"/.test(html);
+  }
+  if (layout === "app-shell") return /data-app-shell/.test(html);
+  if (layout === "compare-matrix") return /ds-matrix/.test(html);
+  if (layout === "figure-explainer") return /data-scrub/.test(html);
+  if (layout === "hero-wire") return /ds-cutoff-rail/.test(html);
+  if (layout === "metric-band") return /ds-metrics/.test(html);
+  if (layout === "feature-index" || layout === "feature-rows" || layout === "feature-alternating") {
+    return /data-section="proof"/.test(html);
+  }
+  return hasBoard || /data-workflow-proof/.test(html);
+}
+
 export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
   const findings: BasicsFinding[] = [
     check(
@@ -141,14 +209,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
     ),
     check(
       "kind-saas-pipeline",
-      spec.brief.siteKind !== "saas-marketing"
-        || (
-          /ds-hero-pipeline/.test(html)
-          && /ds-stage-rail/.test(html)
-          && /data-figure="pipeline-board"/.test(html)
-          && !/class="[^"]*ds-hero-stackfold/.test(html)
-        ),
-      "SaaS owns a pipeline fold (stage rail + pipeline board) — not the shared stackfold skeleton.",
+      spec.brief.siteKind !== "saas-marketing" || saasFoldMatches(spec, html),
+      "SaaS fold matches the first capability's shape — stage board, priority rail, cutoff rail, scrub, metric band, or side-by-side rows — not the shared stackfold.",
     ),
     check(
       "pipeline-board-no-title-rail",
@@ -784,7 +846,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           return /ds-press-plate/.test(html) && /ds-hero-glassine/.test(html);
         }
         if (kind === "saas-marketing") {
-          return /ds-pipeline-fold/.test(html) && /ds-pipeline-field/.test(html) && /ds-hero-pipeline/.test(html);
+          return saasFoldStructure(spec, html);
         }
         if (kind === "dashboard-webapp") {
           return /ds-queue-fold/.test(html) && /ds-queue-field/.test(html) && /ds-hero-queue/.test(html);
@@ -862,7 +924,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
         ].includes(kind);
         if (craftProof) return !hasBoard;
         if (kind === "saas-marketing") {
-          return hasBoard || /data-workflow-proof/.test(html);
+          return saasProofMatches(spec, html, hasBoard);
         }
         return hasBoard;
       })(),

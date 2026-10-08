@@ -2,8 +2,9 @@
  * Composition — what sections exist, in what order, on which surface, in which layout.
  *
  * This is where art direction lives. Two briefs that route to the same site kind should still
- * produce visibly different pages, because the section plan responds to how many capabilities were
- * declared, how they are prioritised, and what the business goal is.
+ * produce visibly different pages. On a marketing page the fold and the proof follow what each
+ * top capability is (a sequence, a queue, a choice, an explanation, evidence, or a ledger).
+ * Capability count and top-priority count only decide how many catalogue rows, not which shape.
  *
  * Measured corridors this targets (docs/10_DESIGN_EVIDENCE.md):
  *  - page height 6.65–12.9 viewports → the argument needs 8–11 real sections, not 5 stubs
@@ -60,6 +61,121 @@ export interface CompositionInput {
   goal: "leads" | "demos" | "trust" | "sales" | "activation";
   /** SaaS-only: interactive workflow-proof when the brief names drafts/approval. */
   hasApprovalWorkflow: boolean;
+  /**
+   * Declared capabilities. The first top-priority one picks the fold.
+   * The second picks the proof. Absent on older callers — marketing then falls back to evidence.
+   */
+  capabilities?: CapabilityCue[];
+}
+
+/** One declared capability, enough to tell what kind of work it is. */
+export interface CapabilityCue {
+  name: string;
+  description: string;
+  priority: "p0" | "p1" | "p2";
+}
+
+/**
+ * Kind of work, read from the capability's own name and description.
+ * Not from how many capabilities the brief listed.
+ */
+export type CapabilityRole =
+  | "sequence"
+  | "queue"
+  | "choice"
+  | "explanation"
+  | "evidence"
+  | "ledger";
+
+/**
+ * One role. More specific work-shapes are tested first so a ranked queue is not
+ * swallowed by a weak sequence word, and a ledger is not swallowed by "named".
+ */
+export function classifyCapability(name: string, description: string): CapabilityRole {
+  const text = `${name} ${description}`.toLowerCase();
+  if (/\b(ledgers?|cut-?offs?|wire transfers?|wires?|movements?|debits?|credits?|postings?|reconcil\w*)\b/.test(text)) {
+    return "ledger";
+  }
+  if (/\b(queues?|triage|priorit(?:y|ies|ise|ize|ised|ized)|inbox|ranked|ranking|ranks?|backlogs?|urgen(?:t|cy)|most urgent|sorted by)\b/.test(text)) {
+    return "queue";
+  }
+  if (/\b(choose|choice|choices|compare|comparison|options?|versus|alternatives?|side by side|pick between)\b/.test(text)) {
+    return "choice";
+  }
+  if (/\b(how it works|explains?|explanation|mechanisms?|diagrams?|scrub|walkthroughs?|teaches?|teaching)\b/.test(text)) {
+    return "explanation";
+  }
+  if (/\b(steps?|stages?|sequences?|pipelines?|workflows?|handoffs?|phases?|in order)\b/.test(text)) {
+    return "sequence";
+  }
+  if (/\b(evidence|compliance|audits?|certif\w*|metrics?|kpis?|slas?|attest\w*|scorecards?|counts?|named)\b/.test(text) || /\d/.test(text)) {
+    return "evidence";
+  }
+  return "evidence";
+}
+
+/**
+ * Role → existing shape id.
+ *
+ * Choice has no fold id that places options next to each other; `feature-alternating` is that
+ * shape. A ledger's cutoff rail is `hero-wire`, which is a fold. There is no second cutoff-rail
+ * id, so a ledger proof uses `hero-wire` only when the fold is not already that rail, and a
+ * ruled index (`feature-index`, not cards) when reusing the rail would copy the fold.
+ */
+const ROLE_FOLD: Record<CapabilityRole, LayoutVariant> = {
+  sequence: "hero-pipeline",
+  queue: "hero-queue",
+  choice: "feature-alternating",
+  explanation: "hero-mechanism",
+  evidence: "metric-band",
+  ledger: "hero-wire",
+};
+
+/*
+ * A ledger proof is a ruled index. The cutoff rail is a fold renderer: used as a proof it
+ * draws the first screen's own figure a second time, with the fold's clock labels.
+ */
+const ROLE_PROOF: Record<CapabilityRole, LayoutVariant> = {
+  sequence: "workflow-proof",
+  queue: "app-shell",
+  choice: "compare-matrix",
+  explanation: "figure-explainer",
+  evidence: "marquee-proof",
+  ledger: "feature-index",
+};
+
+/** Used when the proof id would be the same shape as the fold. */
+const ROLE_PROOF_DISTINCT: Record<CapabilityRole, LayoutVariant> = {
+  sequence: "workflow-proof",
+  queue: "app-shell",
+  choice: "compare-matrix",
+  explanation: "figure-explainer",
+  evidence: "marquee-proof",
+  ledger: "feature-index",
+};
+
+export function shapesForCapabilities(cues: CapabilityCue[]): {
+  first: LayoutVariant;
+  proof: LayoutVariant;
+  firstRole: CapabilityRole;
+  proofRole: CapabilityRole;
+} {
+  const rank = { p0: 0, p1: 1, p2: 2 } as const;
+  const ranked = [...cues].sort((a, b) => rank[a.priority] - rank[b.priority]);
+  const top = ranked.filter((c) => c.priority === "p0");
+  const firstCue = top[0] ?? ranked[0];
+  const secondCue = top[1] ?? ranked[1] ?? firstCue;
+  const firstRole: CapabilityRole = firstCue
+    ? classifyCapability(firstCue.name, firstCue.description)
+    : "evidence";
+  const proofRole: CapabilityRole = secondCue
+    ? classifyCapability(secondCue.name, secondCue.description)
+    : firstRole;
+  const first = ROLE_FOLD[firstRole];
+  let proof = ROLE_PROOF[proofRole];
+  if (proof === first) proof = ROLE_PROOF_DISTINCT[proofRole];
+  if (proof === first) proof = first === "marquee-proof" ? "feature-index" : "marquee-proof";
+  return { first, proof, firstRole, proofRole };
 }
 
 /**
@@ -110,8 +226,16 @@ function heroLayout(siteKind: SiteKind, lean: AestheticLean): LayoutVariant {
   return "hero-split";
 }
 
-/** Feature presentation depends on how many capabilities there are and how they are ranked. */
-function featureLayouts(count: number, p0: number, lean: AestheticLean): LayoutVariant[] {
+/**
+ * Catalogue bands. Count decides how many bands (how many rows), not which shape.
+ * Marketing keeps one index shape. Other leans keep the shape they already used;
+ * a second band, when the count asks for one, repeats that shape instead of swapping it.
+ */
+function featureLayouts(count: number, p0: number, lean: AestheticLean, siteKind?: SiteKind): LayoutVariant[] {
+  // Marketing: count only decides whether a second catalogue band exists, not which shape.
+  if (siteKind === "saas-marketing") {
+    return count >= 5 ? ["feature-index", "feature-index"] : ["feature-index"];
+  }
   if (count <= 2) return ["feature-alternating"];
   if (lean === "minimal-clean") return count >= 6 ? ["feature-index", "feature-rows"] : ["feature-rows"];
   if (lean === "refined-story") return ["feature-alternating", "feature-index"];
@@ -122,7 +246,7 @@ function featureLayouts(count: number, p0: number, lean: AestheticLean): LayoutV
 }
 
 export function planSections(input: CompositionInput): SectionPlan[] {
-  const { siteKind, lean, featureCount, p0Count, goal, density, hasApprovalWorkflow } = input;
+  const { siteKind, lean, featureCount, p0Count, goal, density } = input;
   const split = SPLIT[lean];
   const plans: SectionPlan[] = [];
 
@@ -747,7 +871,15 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     return plans;
   }
 
-  plans.push({ id: "hero", kind: "hero", layout: heroLayout(siteKind, lean), surface: "paper", columns: split.hero });
+  // Marketing fold follows the first top-priority capability. Other kinds keep their signature fold.
+  const roleShapes = siteKind === "saas-marketing" ? shapesForCapabilities(input.capabilities ?? []) : null;
+  plans.push({
+    id: "hero",
+    kind: "hero",
+    layout: roleShapes?.first ?? heroLayout(siteKind, lean),
+    surface: "paper",
+    columns: split.hero,
+  });
 
   // Catalog folds (pipeline / posture / queue / wire) already name the capabilities.
   // A metric row of the same titles under the fold reads as a paired screenshot, not stakes.
@@ -757,7 +889,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: lean === "refined-story" ? "raised" : "inverse" });
   }
 
-  const featureVariants = featureLayouts(featureCount, p0Count, lean);
+  const featureVariants = featureLayouts(featureCount, p0Count, lean, siteKind);
   featureVariants.forEach((layout, i) => {
     plans.push({
       id: i === 0 ? "features" : `features-${i + 1}`,
@@ -779,17 +911,16 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     }
   });
 
-  // Dense proof board on inverse — never a lonely quote floating in a dark void.
-  // SaaS uses the interactive workflow-proof stage only when the brief names
-  // drafts / approval / a human gate. Ordinary SaaS keeps the feature-evidence board.
-  // Bonded to the specimen above so a light airway cannot open between drawn product and proof.
+  // Proof follows the second top-priority capability and is bonded to the specimen above
+  // so a light airway cannot open between the drawn product and the proof.
+  // It must not reuse the fold's shape. A sequence is a stage-by-stage proof, not a quote strip.
   plans.push({
     id: "proof",
     kind: "proof",
-    layout: siteKind === "saas-marketing" && hasApprovalWorkflow ? "workflow-proof" : "marquee-proof",
+    layout: roleShapes?.proof ?? "marquee-proof",
     surface: "inverse",
     bond: true,
-    columns: split.feature,
+    columns: roleShapes?.proof === "app-shell" ? "260px 1fr" : split.feature,
   });
 
   plans.push({

@@ -5,9 +5,9 @@
  * what keeps the emitted page consistent with the design system it declares, and it is what makes
  * the generated markup safe to hand to a developer as a starting point.
  */
-import { helmSessionTurns } from "./copy";
+import { count, helmSessionTurns } from "./copy";
 import { renderCss } from "./css";
-import { horizonPlot, isReading, miniPageMatter, planFigures, type FigurePlan } from "./figures";
+import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -880,7 +880,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
           `<li><a href="${w.href}" class="ds-cutoff-chip${i === 1 ? " is-live" : ""}" data-cutoff="${w.id}"><span class="ds-cutoff-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-cutoff-label">${esc(w.label)}</span></a></li>`,
       )
       .join("")}</ol></nav>`;
-    return `<section id="top" class="ds-section ds-hero ds-hero-wire" data-surface="${section.surface}" data-section="${esc(section.id)}">
+    return `<section id="${section.id === "hero" ? "top" : esc(section.id)}" class="ds-section ds-hero ds-hero-wire" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${rail}
       <div class="ds-wrap-wide ds-wire-fold">
         <div class="ds-wire-claim">${copy}</div>
@@ -996,9 +996,10 @@ function renderMetricBand(section: SectionSpec, figures: FigurePlan, spec?: Desi
     spec?.brief.siteKind === "dashboard-webapp"
       ? ""
       : sectionHead(section, 2);
-  return `<section class="ds-section ds-section-tight ds-metrics-band" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+  return `<section class="ds-section ds-section-tight ds-metrics-band" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${section.id === "hero" ? "top" : esc(section.id)}">
     <div class="ds-wrap-wide">
       ${head}
+      ${section.ctaLabel ? actions(section) : ""}
       <div class="ds-metrics">
         ${section.metrics
           .map(
@@ -1130,6 +1131,28 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     }
     if (section.layout === "feature-alternating") {
       /*
+       * Choice fold: every capability is its own row. The name sits on one side and
+       * what it is sits beside it. A stack of every name in a single figure is not
+       * that row, so the hero does not borrow one.
+       */
+      if (section.kind === "hero") {
+        return `<div class="ds-alt">${section.blocks
+          .map(
+            (b) => `<div class="ds-alt-row ds-alt-pair">
+            <div class="ds-alt-name">
+              <h3>${esc(b.title)}</h3>
+              ${b.kicker ? `<p class="ds-alt-tier">${esc(b.kicker)}</p>` : ""}
+            </div>
+            <div class="ds-alt-detail">
+              ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
+              ${b.points.length ? `<ul class="ds-card-points">${b.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>` : ""}
+            </div>
+            <div class="ds-alt-mark" aria-hidden="true">${markFor(b)}</div>
+          </div>`,
+          )
+          .join("")}</div>`;
+      }
+      /*
        * One panel, next to the lead capability only.
        *
        * Every row used to get its own copy, built from `blocks.slice(i, i + 3)`, so a five-row
@@ -1215,9 +1238,10 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
-  return `<section class="ds-section" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
+  return `<section class="ds-section" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${section.id === "hero" ? "top" : esc(section.id)}">
     <div class="${frame(section)}">
       ${sectionHead(section, 2, frame(section) === "ds-wrap-wide")}
+      ${section.ctaLabel ? actions(section) : ""}
       ${standing}
       ${inner}
       ${rail}
@@ -1305,7 +1329,13 @@ function renderFigure(section: SectionSpec): string {
             <input type="range" min="0" max="${max}" value="${mid}" data-scrub aria-label="Step through the mechanism" />
           </label>
         </div>
-        <figcaption data-scrub-caption>${esc(section.figureCaption ?? section.title)}</figcaption>
+        ${
+          section.figureCaption &&
+          section.figureCaption.replace(/\s+/g, " ").trim().toLowerCase() !==
+            section.title.replace(/\s+/g, " ").trim().toLowerCase()
+            ? `<figcaption data-scrub-caption>${esc(section.figureCaption)}</figcaption>`
+            : `<figcaption class="ds-sr" data-scrub-caption></figcaption>`
+        }
       </figure>
     </div>
   </section>`;
@@ -1841,7 +1871,7 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         : kind === "corporate-story"
           ? "ds-proof-board ds-proof-board-spine"
           : "ds-proof-board";
-  const board = cells.length
+  const boardMarkup = cells.length
     ? `<ul class="${boardClass}" data-proof-board>${cells
         .map((b, i) => {
           const mark = figures.marks[i] ?? "";
@@ -1855,17 +1885,34 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         })
         .join("")}</ul>`
     : "";
-  const figure = figures.body
+  const featureNames = new Set(
+    (spec?.brief.features ?? []).map((f) => f.name.replace(/\s+/g, " ").trim().toLowerCase()),
+  );
+  const evidencePlate =
+    Boolean(spec) &&
+    cells.length >= 2 &&
+    cells.every((b) => !featureNames.has(b.title.replace(/\s+/g, " ").trim().toLowerCase()));
+  // SaaS evidence is already the plate. Cards under it would tell those lines again.
+  // Other kinds keep the board the showcase proofs are built on.
+  const tellOnce = evidencePlate && kind === "saas-marketing";
+  const board = tellOnce ? "" : boardMarkup;
+  const drawn = evidencePlate && spec ? stackDiagram(cells, spec.brief.productName, "plate") : figures.body;
+  const plateDrawing = tellOnce
+    ? drawn.replace(/aria-label="[^"]*"/, 'aria-label="Evidence"')
+    : drawn;
+  const figure = plateDrawing
     ? plate(
-        figures.body,
-        section.quoteAttribution ??
-          (kind === "dashboard-webapp"
-            ? "Live desk"
-            : kind === "fintech-marketing"
-              ? "Treasury controls"
-              : kind === "corporate-story"
-                ? "Diligence pack"
-                : "Declared scope"),
+        plateDrawing,
+        tellOnce
+          ? ""
+          : section.quoteAttribution ??
+            (kind === "dashboard-webapp"
+              ? "Live desk"
+              : kind === "fintech-marketing"
+                ? "Treasury controls"
+                : kind === "corporate-story"
+                  ? "Diligence pack"
+                  : "Declared scope"),
         "ds-proof-figure ds-plate-lit",
       )
     : figures.field
@@ -1886,7 +1933,7 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
         ? `${cells.length} controls · audit-ready`
         : kind === "corporate-story"
           ? `${cells.length} pillars · verifiable`
-          : `${cells.length} capabilities · declared scope`;
+          : `${count(cells.length)} capabilities · declared scope`;
   return `<section class="ds-section ds-proof" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${secMeta(metaLabel, metaDetail)}
@@ -1961,11 +2008,16 @@ function renderWorkflowProof(section: SectionSpec, figures: FigurePlan, spec?: D
     })
     .join("");
 
-  const figure = figures.body
-    ? plate(figures.body, section.quoteAttribution ?? "Sample workflow", "ds-proof-figure ds-plate-lit")
-    : figures.field
-      ? `<figure class="ds-proof-figure ds-proof-figure-field" aria-hidden="true">${figures.field}</figure>`
-      : "";
+  // Approval briefs carry a gate. A declared sequence does not, and its plate would be a
+  // stack of every capability name the first screen already painted.
+  const approval = stages.some((b) => (b.meta ?? "").toLowerCase() === "approve");
+  const figure = !approval
+    ? ""
+    : figures.body
+      ? plate(figures.body, section.quoteAttribution ?? "Sample workflow", "ds-proof-figure ds-plate-lit")
+      : figures.field
+        ? `<figure class="ds-proof-figure ds-proof-figure-field" aria-hidden="true">${figures.field}</figure>`
+        : "";
 
   // Honest integration marks — capability names only; never invent partner logos.
   const markNames = (spec?.brief.features ?? [])
@@ -1981,7 +2033,7 @@ function renderWorkflowProof(section: SectionSpec, figures: FigurePlan, spec?: D
 
   return `<section class="ds-section ds-proof ds-workflow" data-surface="${section.surface}" data-section="${esc(section.id)}" data-workflow-proof id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Workflow", "Sample · five named states · human approve")}
+      ${approval ? secMeta("Workflow", "Sample · five named states · human approve") : secMeta("Declared sequence", `${stages.length} steps from the brief`)}
       <div class="ds-proof-stage ds-workflow-stage" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "5fr 7fr"))}">
         <header class="ds-proof-head">
           ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
@@ -2250,9 +2302,7 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
     : sectionHead(section);
   const lede = isDash
     ? ""
-    : section.body
-      ? `<p class="ds-lede">${esc(section.body)} Each row is a live decision for ${esc(spec.brief.audience)} — state, detail, and age — so this surface stays the source of truth rather than a report you refresh.</p>`
-      : "";
+    : `<p class="ds-lede">Each row is a live decision for ${esc(spec.brief.audience)} — state, detail, and age — so this surface stays the source of truth rather than a report you refresh.</p>`;
   return `<section id="${esc(section.id)}" class="ds-section ds-app-band" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${head}
@@ -2299,13 +2349,19 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
               <tbody>
                 ${rows
                   .map(
-                    (b) => `<tr data-row-view="${esc(b.title)}" data-row-state="${esc((b.kicker ?? "Queued").toLowerCase())}">
+                    (b, i) => {
+                      const view = section.aside[i]?.title || b.title;
+                      const told = b.title.replace(/\s+/g, " ").trim().toLowerCase();
+                      const detail = [b.points[0], b.body].find(
+                        (part) => part && part.replace(/\s+/g, " ").trim().toLowerCase() !== told,
+                      );
+                      return `<tr data-row-view="${esc(view)}" data-row-state="${esc((b.kicker ?? "Queued").toLowerCase())}">
                       <th scope="row">${esc(b.title)}</th>
                       <td><span class="ds-pill${b.kicker === "Now" ? " ds-pill-signal" : ""}">${esc(b.kicker ?? "Queued")}</span></td>
-                      <td>${esc(b.points[0] ?? b.body ?? b.kicker ?? b.title)}</td>
+                      <td>${esc(detail ?? "")}</td>
                       <td class="ds-num">${esc(b.meta ?? "0")}m</td>
-                    </tr>`,
-                  )
+                    </tr>`;
+                    })
                   .join("")}
               </tbody>
             </table>

@@ -3462,8 +3462,20 @@ export function planFigures(input: {
   // Archive register fold: the index ledger always owns the spanning field.
   // Commerce loom fold: the warp/weft weave always owns the spanning field.
   // Field guide fold: the specimen plate always owns the spanning field.
+  // The fold's shape picks the drawing. Site kind is only the fallback when the fold
+  // is not one of the instrument layouts (a metric band or side-by-side rows, for example).
   const heroKind =
-    input.siteKind === "editorial-foundry"
+    input.heroLayout === "hero-pipeline"
+      ? ("pipeline-board" as Kind)
+      : input.heroLayout === "hero-queue"
+        ? ("queue-console" as Kind)
+        : input.heroLayout === "hero-wire"
+          ? ("wire-ledger" as Kind)
+          : input.heroLayout === "hero-mechanism"
+            ? ("mechanism-plate" as Kind)
+            : input.heroLayout === "hero-diligence"
+              ? ("posture-grid" as Kind)
+    : input.siteKind === "editorial-foundry"
       ? ("type-ladder" as Kind)
       : input.siteKind === "research-dossier"
         ? ("dossier-plate" as Kind)
