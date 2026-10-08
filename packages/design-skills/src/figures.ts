@@ -2681,7 +2681,13 @@ export function mechanismPlate(
 }
 
 /**
- * Wire ledger — fintech fold instrument. Multi-entity ruled ledger with cutoff ticks.
+ * Wire ledger — fintech fold instrument. Ruled ledger with cutoff ticks.
+ *
+ * Every row is one capability, named once, with its tier from the brief. The ledger used to set
+ * wire cut-off times (09:00 to 17:00), "Entity / Path / Status / FX" columns, made-up FX rates,
+ * CLEARING and POSTED states, a cut-short description in every row, and a "±0.4% tolerance" line
+ * on every fintech page, a marina's included. None of that came from any brief. The ticks stay as
+ * marks; the row's other columns are drawn as entries rather than invented values.
  */
 export function wireLedger(
   productName: string,
@@ -2689,71 +2695,57 @@ export function wireLedger(
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const items = features.slice(0, 5);
+  const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 720 : 920;
   const H = role === "band" ? 760 : role === "column" ? 640 : 540;
   const r = rng(`${seed}:wire`);
   const pad = W * 0.05;
   const parts: string[] = [];
-  parts.push(text("WIRE LEDGER", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }));
   parts.push(
-    text(clip(productName, 28), W - pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
+    text(clip(productName.toUpperCase(), 28), pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }),
   );
-  // Cutoff ticks
-  const cutoffs = ["09:00", "12:00", "15:00", "17:00"];
-  cutoffs.forEach((c, i) => {
+  // Ticks without times: the rhythm of a ledger, not a schedule no brief declared.
+  for (let i = 0; i < 4; i += 1) {
     const x = pad + 80 + i * ((W - pad * 2 - 100) / 3);
     parts.push(rule(x, pad + 28, x, pad + 48));
-    parts.push(text(c, x, pad + 64, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "middle" }));
-  });
+  }
   parts.push(
     `<path class="ds-draw" pathLength="1" d="M${round(pad + 80)} ${round(pad + 38)} L${round(W - pad - 20)} ${round(pad + 38)}" fill="none" stroke="${ACCENT}" stroke-width="2" stroke-linecap="round"/>`,
   );
   parts.push(rule(pad, pad + 80, W - pad, pad + 80));
-  const headers = ["Entity", "Path", "Status", "FX"];
-  const colW = [0.28, 0.32, 0.2, 0.2].map((f) => (W - pad * 2) * f);
+  const headers = ["Capability", "", "Tier"];
+  const colW = [0.36, 0.44, 0.2].map((f) => (W - pad * 2) * f);
   let hx = pad;
   headers.forEach((h, i) => {
-    parts.push(text(h, hx + 8, pad + 104, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 0.8 }));
+    if (h) parts.push(text(h, hx + 8, pad + 104, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 0.8 }));
     hx += colW[i]!;
   });
   parts.push(rule(pad, pad + 116, W - pad, pad + 116));
+  const pitch = Math.min(72, (H - pad - (pad + 148)) / Math.max(1, items.length));
   items.forEach((b, i) => {
-    const y = pad + 148 + i * 72;
-    const lead = i === 1;
-    if (lead) parts.push(box(pad, y - 28, W - pad * 2, 64, { r: 0, fill: ACCENT_FIELD, stroke: "none" }));
-    let x = pad;
-    const cells = [
-      clip(b.title, 22),
-      clip(b.body || "Same-day path", 28),
-      lead ? "CLEARING" : i === 0 ? "QUEUED" : "POSTED",
-      `${(0.8 + r() * 1.4).toFixed(2)}`,
-    ];
-    cells.forEach((cell, ci) => {
+    const y = pad + 148 + i * pitch;
+    const lead = i === 0;
+    if (lead) parts.push(box(pad, y - 28, W - pad * 2, pitch - 8, { r: 0, fill: ACCENT_FIELD, stroke: "none" }));
+    parts.push(text(clip(b.title, 22), pad + 8, y, { size: 14, fill: INK, weight: 600 }));
+    const barX = pad + colW[0]! + 8;
+    const barW = (colW[1]! - 24) * (0.35 + r() * 0.55);
+    parts.push(box(barX, y - 9, barW, 10, { r: 3, fill: lead ? ACCENT_FIELD : "var(--c-paper-raised)", stroke: LINE }));
+    if (b.kicker) {
       parts.push(
-        text(cell, x + 8, y, {
-          size: ci === 0 ? 14 : FIG_MONO_PX,
-          fill: lead && ci === 2 ? ACCENT : INK,
-          weight: ci === 0 ? 600 : 400,
-          mono: ci !== 0,
+        text(clip(b.kicker.toUpperCase(), 12), pad + colW[0]! + colW[1]! + 8, y, {
+          size: FIG_MONO_PX,
+          fill: lead ? ACCENT : QUIET,
+          mono: true,
         }),
       );
-      x += colW[ci]!;
-    });
-    parts.push(rule(pad, y + 28, W - pad, y + 28));
+    }
+    parts.push(rule(pad, y + pitch - 44, W - pad, y + pitch - 44));
   });
-  parts.push(
-    text("Tolerance ±0.4% · illustrative", pad, H - pad + 4, {
-      size: FIG_MONO_PX,
-      fill: QUIET,
-      mono: true,
-    }),
-  );
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "wire-ledger",
-    label: `${productName} wire ledger`,
+    label: `${productName} ledger`,
     inset: role === "band" ? BLEED_INSET : 0,
     dense: true,
   });

@@ -25,6 +25,7 @@ import {
   questions,
   saasQuestions,
   workspaceQuestions,
+  fintechQuestions,
   riskReversal,
   sentence,
 } from "./copy";
@@ -300,7 +301,9 @@ export function buildSections(
       ? saasQuestions(brief, features)
       : brief.siteKind === "dashboard-webapp"
         ? workspaceQuestions(brief, features)
-        : questions(brief, features);
+        : brief.siteKind === "fintech-marketing"
+          ? fintechQuestions(brief, features)
+          : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -462,8 +465,12 @@ export function buildSections(
         const wanted = Math.min(total, Math.max(3, Math.ceil(total * 0.6)));
         // SaaS keeps one complete catalogue (see featureLayouts), so its single band holds every row.
         // Workspace has one catalogue band too; splitting it left the last capabilities with no row.
+        // Fintech as well: its second band printed the tail as bare names under "also included".
         const first =
-          brief.siteKind === "saas-marketing" || brief.siteKind === "dashboard-webapp" || total - wanted < 2
+          brief.siteKind === "saas-marketing" ||
+          brief.siteKind === "dashboard-webapp" ||
+          brief.siteKind === "fintech-marketing" ||
+          total - wanted < 2
             ? total
             : wanted;
         const rawSlice =
@@ -495,7 +502,7 @@ export function buildSections(
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
-            : brief.siteKind === "dashboard-webapp"
+            : brief.siteKind === "dashboard-webapp" || brief.siteKind === "fintech-marketing"
               ? rawSlice.map((b) =>
                   b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
                 )
@@ -623,7 +630,12 @@ export function buildSections(
                     // Workspace: the lead view is already the fold's subject and the shell's open view.
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`What each ${brief.productName} view does`)
-                      : featuresTitle(brief, features),
+                      // Fintech: a count the brief gives; the lead name is already the fold's lede.
+                      : brief.siteKind === "fintech-marketing"
+                        ? sentence(
+                            `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} things ${brief.productName} does`,
+                          )
+                        : featuresTitle(brief, features),
             body: isSecond
               ? isStudio
                 ? sentence(`Handoffs, critique, and the rules that stop the system from drifting`)
@@ -676,7 +688,9 @@ export function buildSections(
                           ? sentence(`Each turn is a session beat — not a workflow approve stamp dressed as trust`)
                   // SaaS: the heading already names the product and its lead capability; a stock
                   // "two carry the argument" line read the same on every page.
-                  : brief.siteKind === "saas-marketing" || brief.siteKind === "dashboard-webapp"
+                  : brief.siteKind === "saas-marketing" ||
+                      brief.siteKind === "dashboard-webapp" ||
+                      brief.siteKind === "fintech-marketing"
                     ? ""
                     : featuresLede(brief, features),
             blocks: slice,
@@ -1263,7 +1277,9 @@ export function buildSections(
 
       case "pricing": {
         const isSaas = brief.siteKind === "saas-marketing";
-        const lanes = isSaas ? addedLanes(brief, features) : plans(brief, features);
+        // Fintech lanes follow SaaS: each lane names only what it adds, with no billing terms.
+        const isFintech = brief.siteKind === "fintech-marketing";
+        const lanes = isSaas || isFintech ? addedLanes(brief, features) : plans(brief, features);
         if (lanes.length < 2) break;
         sections.push(
           SectionSpec.parse({
@@ -1272,10 +1288,12 @@ export function buildSections(
             title: sentence(`Three ways to scope ${brief.productName}`),
             body: isSaas
               ? sentence(`Each lane adds named capabilities to the one before it`)
-              : sentence(
-                  `Lanes are drawn from the ${count(features.length)} declared capabilities. Nothing is invented to fill a column`,
-                ),
-            secondaryLabel: isSaas ? "Ask about this lane" : undefined,
+              : isFintech
+                ? sentence(`Each ${brief.productName} capability sits in one lane, and each lane adds to the one before it`)
+                : sentence(
+                    `Lanes are drawn from the ${count(features.length)} declared capabilities. Nothing is invented to fill a column`,
+                  ),
+            secondaryLabel: isSaas || isFintech ? "Ask about this lane" : undefined,
             ctaLabel: cta.primary,
             blocks: lanes.map((l) =>
               block({
@@ -1370,7 +1388,10 @@ export function buildSections(
                     ? `See ${brief.productName} run ${lower(features[0].name)} on your own data`
                     : brief.siteKind === "dashboard-webapp" && features[0]
                       ? `Open ${brief.productName} on your own ${lower(features[0].name)}`
-                      : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
+                      // Fintech closed on "in front of your cash", from the audience's last word.
+                      : brief.siteKind === "fintech-marketing" && features[0]
+                        ? `See ${lower(features[0].name)} in ${brief.productName}`
+                        : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
             ),
             // Not `cta.note` — the fold already said that, and a closing band that repeats the
             // reassurance from the top of the page reads as a page with one idea.
@@ -1400,15 +1421,21 @@ export function buildSections(
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                       features.length === 2 ? "view sits" : "views sit"
                     } beside it`
-                  : `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} capabilities, one conversation`,
+                  // Fintech: the count the brief gives and where those capabilities sit.
+                  : brief.siteKind === "fintech-marketing" && features.length > 1
+                    ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                        features.length === 2 ? "capability sits" : "capabilities sit"
+                      } ${plan.some((row) => row.kind === "pricing") ? "in the lanes" : "in the list"} above`
+                    : `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} capabilities, one conversation`,
             ),
             ctaLabel: cta.primary,
-            secondaryLabel: cta.secondary,
+            /*
+             * Fintech: "Read the mechanics" led back to the catalogue, and the risk line promised a
+             * hold that could be cancelled anytime. No brief declares a hold or its terms.
+             */
+            secondaryLabel: brief.siteKind === "fintech-marketing" ? "See every capability" : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
-            ctaNote:
-              brief.siteKind === "saas-marketing" || brief.siteKind === "fintech-marketing"
-                ? riskLine
-                : undefined,
+            ctaNote: brief.siteKind === "saas-marketing" ? riskLine : undefined,
           }),
         );
         break;
@@ -1420,7 +1447,8 @@ export function buildSections(
             title: brief.productName,
             brandLabel: brief.productName,
             body: sentence(`${brief.productName} for ${brief.audience}`),
-            ctaLabel: cta.secondary,
+            // Fintech: the walkthrough is already the ask. Do not put "Read the mechanics" here.
+            ctaLabel: brief.siteKind === "fintech-marketing" ? cta.primary : cta.secondary,
             blocks: [
               block({ title: "Capabilities", points: editorial.features.map((c) => c.name) }),
               block({

@@ -265,7 +265,7 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                               ? "The spread"
                               : "The sequence",
     proof,
-    pricing: "Scope and plans",
+    pricing: brief.siteKind === "fintech-marketing" ? "Lanes" : "Scope and plans",
     compare: "What is included",
     faq: "Before you ask",
     cta: "Next step",
@@ -637,6 +637,70 @@ export function workspaceQuestions(brief: DesignBrief, features: FeatureSpec[]):
   return out;
 }
 
+/**
+ * Fintech questions. Every answer is built from this brief: its product, its audience, its
+ * capability names and priority, and the lane each capability sits in. The shared `questions`
+ * promised "cancel anytime", a comparison table this page no longer has, a person who answers
+ * security and procurement, and a human approval gate with a rollback path. No brief declares any
+ * of those, and the approval pair was printed on every fintech page whatever the product did.
+ */
+export function fintechQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const last = features[features.length - 1];
+  const lead = features[0];
+  const lanes = addedLanes(brief, features);
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(`${Audience}, using the ${count(features.length)} capabilities named on this page`),
+  });
+  const core = features.filter((f) => f.priority === "p0");
+  const rest = features.filter((f) => f.priority !== "p0");
+  if (core.length && rest.length) {
+    out.push({
+      title: `Which ${brief.productName} capabilities come first?`,
+      body: sentence(
+        `${spoken(core.map((f) => f.name))}. ${spoken(rest.map((f, i) => (i === 0 ? f.name : lower(f.name))))} ${
+          rest.length === 1 ? "follows" : "follow"
+        }`,
+      ),
+    });
+  }
+  if (last && last !== lead && lanes.length >= 2) {
+    const home = lanes.find((l) => l.points.includes(last.name));
+    const before = home ? lanes[lanes.indexOf(home) - 1] : undefined;
+    if (home) {
+      out.push({
+        title: `Which lane includes ${lower(last.name)}?`,
+        body: sentence(before ? `${home.title}, on top of everything in ${before.title}` : home.title),
+      });
+    }
+  } else if (last && last !== lead) {
+    out.push({
+      title: `Is ${lower(last.name)} part of ${brief.productName}?`,
+      body: sentence(`Yes. It is one of the ${count(features.length)} capabilities on this page`),
+    });
+  }
+  const next = lanes[1];
+  if (next?.points.length) {
+    out.push({
+      title: `What does the ${next.title} lane add?`,
+      body: sentence(`${spoken(next.points)}, added to everything in ${lanes[0]!.title}`),
+    });
+  }
+  out.push({
+    title: `What is not part of ${brief.productName}?`,
+    body: sentence(`Anything not named on this page. ${brief.productName} is the ${count(features.length)} capabilities above`),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `How do we see ${brief.productName} for ourselves?`,
+    body: sentence(`Choose "${cta}" at the top or the foot of this page`),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -805,7 +869,7 @@ export function navFor(
           : siteKind === "docs-educational"
             ? "Cost path"
             : "Sequence",
-    pricing: "Plans",
+    pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
     compare: "Included",
     faq: "Questions",
     proof: proofLabel,
