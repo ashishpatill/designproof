@@ -195,7 +195,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.brief.siteKind === "corporate-story" ||
     spec.brief.siteKind === "archive-index" ||
     // Field guide: the specimen plate draws no names or sentences; the binomial strip names them.
-    spec.brief.siteKind === "field-guide"
+    spec.brief.siteKind === "field-guide" ||
+    // Observatory: the signal lattice numbers its rows; the scrub rail names the channels.
+    spec.brief.siteKind === "signal-observatory"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       /*
        * Educational: names only too. The mechanism plate draws each part as a numbered column
@@ -414,23 +416,28 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const latticeFig = figures.hero
       ? `<figure class="ds-chrono-lattice" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
+    /*
+     * The chronometer keeps its hour ticks as a scale but prints no hours and no "UTC": the same
+     * 00 → 12 UTC ran down every observatory page, a pottery studio's included, and no brief gives a
+     * time zone or a clock.
+     */
     const ticks = Array.from({ length: 13 }, (_, i) => {
-      const label = String(i).padStart(2, "0");
       const major = i % 3 === 0;
-      return `<li class="ds-chrono-tick${major ? " is-major" : ""}" style="--tick:${i}"><span>${label}</span></li>`;
+      return `<li class="ds-chrono-tick${major ? " is-major" : ""}" style="--tick:${i}"></li>`;
     }).join("");
-    const chronometer = `<aside class="ds-chronometer" aria-hidden="true"><ol>${ticks}</ol><span class="ds-chronometer-label">UTC</span></aside>`;
-    const windows = [
-      { id: "t24", label: "T−24h", href: "#features" },
-      { id: "live", label: "Live", href: "#figure" },
-      { id: "p6", label: "+6h", href: "#story" },
-      { id: "cal", label: "Calibrate", href: "#cta" },
-    ];
-    const scrub = `<nav class="ds-scrub-rail" aria-label="Time windows"><ol>${windows
-      .map(
-        (w, i) =>
-          `<li><a href="${w.href}" class="ds-scrub-chip${i === 1 ? " is-live" : ""}" data-window="${w.id}"><span class="ds-scrub-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-scrub-label">${esc(w.label)}</span></a></li>`,
-      )
+    const chronometer = `<aside class="ds-chronometer" aria-hidden="true"><ol>${ticks}</ol></aside>`;
+    /*
+     * The scrub rail is the fold's one list of the channels: one chip per channel, numbered the way
+     * the index numbers it, each jumping to its own index row. It used to print "T−24h", "Live",
+     * "+6h", and "Calibrate" on every page, with "Live" lit and pointing at a figure band the page
+     * may not have.
+     */
+    const channels = catalogue(spec);
+    const scrub = `<nav class="ds-scrub-rail" aria-label="Channels"><ol>${channels
+      .map((b, i) => {
+        const n = b.meta ?? String(i + 1).padStart(2, "0");
+        return `<li><a href="#channel-${esc(n)}" class="ds-scrub-chip${i === 0 ? " is-live" : ""}" data-window="${esc(n)}"><span class="ds-scrub-meta">${esc(n)}</span><span class="ds-scrub-label">${esc(b.title)}</span></a></li>`;
+      })
       .join("")}</ol></nav>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-chrono" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${chronometer}
@@ -1174,7 +1181,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "press-atelier" ||
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
-        spec.brief.siteKind === "signal-observatory" ||
+        // Observatory rows carry their description too: the fold prints none.
         spec.brief.siteKind === "editorial-foundry" ||
         spec.brief.siteKind === "research-dossier" ||
         spec.brief.siteKind === "commerce-loom" ||
@@ -1188,6 +1195,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isArchive = spec.brief.siteKind === "archive-index";
       // Field guide rows are the binomial strip's jump targets.
       const isField = spec.brief.siteKind === "field-guide";
+      // Observatory rows are the scrub rail's jump targets.
+      const isObservatory = spec.brief.siteKind === "signal-observatory";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1195,7 +1204,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
               ? ` id="entry-${esc(b.meta ?? String(i + 1).padStart(3, "0"))}"`
               : isField
                 ? ` id="trait-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
-                : ""
+                : isObservatory
+                  ? ` id="channel-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                  : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1336,7 +1347,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Educational as well: a drawn interface and a "how it is put together" list named every part again.
     spec.brief.siteKind !== "docs-educational" &&
     // Field guide too: the list beside the drawing named every trait again, right under the index.
-    spec.brief.siteKind !== "field-guide"
+    spec.brief.siteKind !== "field-guide" &&
+    // Observatory as well: the list beside the drawing named the channels again, right under the index.
+    spec.brief.siteKind !== "signal-observatory"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1617,35 +1630,40 @@ function renderSpread(section: SectionSpec, figures: FigurePlan): string {
 /**
  * Event waterfall / span tape — signal-observatory mid-page instrument.
  *
- * Horizontal instrument-time ruler + staggered span rows (trace-desk reading).
- * Not the essay+aside list clone shared by entry/hang/ember.
+ * Channel ruler + staggered span rows (trace-desk reading). Not the essay+aside list clone shared
+ * by entry/hang/ember.
+ *
+ * Each span is one priority tier from the brief. Its track lights the channels in that tier at
+ * their place on a ruler numbered the way the index numbers them, and its body names them once.
+ * The waterfall used to print every description a second time against a T+00h → T+24h ruler and
+ * "T+06h" stamps no brief gave, with a "Note 01" label and a drawing on every span, under a
+ * "5 spans · instrument time" line.
  */
-function renderChrono(section: SectionSpec, figures: FigurePlan): string {
+function renderChrono(section: SectionSpec, spec: DesignSpec): string {
   const blocks = section.blocks;
-  const count = blocks.length || 1;
-  const hours = [0, 6, 12, 18, 24];
-  const ruler = hours
-    .map((h) => {
-      const label = `T+${String(h).padStart(2, "0")}h`;
-      return `<span class="ds-chrono-ruler-tick" style="--t:${h / 24}">${esc(label)}</span>`;
-    })
+  const channels = catalogue(spec);
+  const total = channels.length || 1;
+  const numbers = new Map(channels.map((b, i) => [b.title, i] as const));
+  const pct = (v: number) => Math.round(v * 100) / 100;
+  const ruler = channels
+    .map((b, i) => `<span class="ds-chrono-ruler-tick">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>`)
     .join("");
   const spans = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-chrono-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const t = esc(b.meta || `T+${String(i * 6).padStart(2, "0")}h`);
-      const start = Math.min(62, i * 11);
-      const width = Math.max(30, 92 - start - Math.max(0, count - 1 - i) * 3);
-      return `<li class="ds-chrono-span" style="--i:${i};--span-start:${start}%;--span-width:${width}%">
-        <div class="ds-chrono-span-track" aria-hidden="true">
-          <span class="ds-chrono-span-bar"></span>
-        </div>
+      const at = b.points.map((name) => numbers.get(name)).filter((n): n is number => n !== undefined);
+      const bars = at
+        .map(
+          (n) =>
+            `<span class="ds-chrono-span-bar" style="--span-start:${pct((n / total) * 100)}%;--span-width:${pct(100 / total)}%"></span>`,
+        )
+        .join("");
+      const start = Math.min(48, i * 12);
+      return `<li class="ds-chrono-span" style="--i:${i};--span-start:${start}%">
+        <div class="ds-chrono-span-track" aria-hidden="true">${bars}</div>
         <div class="ds-chrono-span-body">
-          <p class="ds-chrono-span-time">${t}</p>
+          <p class="ds-chrono-span-time">${b.points.length} ${b.points.length === 1 ? "channel" : "channels"}</p>
           <h3>${esc(b.title)}</h3>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-chrono-note">${esc(b.kicker)}</p>` : ""}
-          ${mark}
         </div>
       </li>`;
     })
@@ -1653,10 +1671,10 @@ function renderChrono(section: SectionSpec, figures: FigurePlan): string {
   return `<section class="ds-section ds-story ds-chrono" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Chronology", `${count} spans · instrument time`)}
+      ${secMeta("Waterfall", `${blocks.length} tiers`)}
       ${sectionHead(section, 2, true)}
       <div class="ds-chrono-desk" aria-label="Instrument desk">
-        <div class="ds-chrono-ruler" aria-label="Instrument time">${ruler}</div>
+        <div class="ds-chrono-ruler" aria-label="Channels" style="--n:${total}">${ruler}</div>
         <ol class="ds-chrono-waterfall" aria-label="Event waterfall">${spans}</ol>
       </div>
     </div>
@@ -2257,26 +2275,12 @@ function renderCtaBand(section: SectionSpec, figures: FigurePlan, spec?: DesignS
   const isColophon = /Colophon|Imprint|Calibration|Registry|Care label|Voucher|Pressroom/i.test(section.eyebrow ?? "");
   const colophonClass = isColophon ? " ds-closing-colophon" : "";
   // Observatory calibration close — paper strip of tolerance numerals (not metrics theatre).
-  const isObservatoryCal =
-    Boolean(spec && spec.brief.siteKind === "signal-observatory") &&
-    /Calibration/i.test(section.eyebrow ?? "");
-  const tolLadder = ["±0.5", "±1.0", "±1.5", "±2.0"];
-  const fromCatalogue = isObservatoryCal && spec ? catalogue(spec).slice(0, 4) : [];
-  const calLabels =
-    fromCatalogue.length > 0
-      ? fromCatalogue.map((b) => b.title)
-      : isObservatoryCal && spec
-        ? spec.brief.features.slice(0, 4).map((f) => f.name)
-        : [];
-  const calStrip =
-    calLabels.length > 0
-      ? `<ol class="ds-cal-strip" aria-label="Tolerance marks">${calLabels
-          .map(
-            (name, i) =>
-              `<li class="ds-cal-mark"><span class="ds-cal-tol">${tolLadder[i % tolLadder.length]}</span><span class="ds-cal-ch">${esc(name.slice(0, 14))}</span></li>`,
-          )
-          .join("")}</ol>`
-      : "";
+  /*
+   * No tolerance strip on the observatory close: it set "±0.5", "±1.0", "±1.5", "±2.0" beside the
+   * first four channel names, cut to fourteen letters, on every page. No brief gives a tolerance,
+   * and the names were their fourth telling on the page.
+   */
+  const calStrip = "";
   return `<section class="ds-section ds-closing${colophonClass}" data-surface="${section.surface}" data-section="${esc(section.id)}" id="cta">
     <div class="ds-wrap-wide ds-closing-grid">
       <div class="ds-cta">
@@ -2553,7 +2557,7 @@ function renderSection(
     case "story-spread":
       return wrapped(renderSpread(section, figures));
     case "story-chrono":
-      return wrapped(renderChrono(section, figures));
+      return wrapped(renderChrono(section, spec));
     case "story-entry":
       return wrapped(renderEntry(section, spec));
     case "story-hangtag":
@@ -2981,7 +2985,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "corporate-story" ||
     spec.brief.siteKind === "archive-index" ||
     spec.brief.siteKind === "docs-educational" ||
-    spec.brief.siteKind === "field-guide"
+    spec.brief.siteKind === "field-guide" ||
+    spec.brief.siteKind === "signal-observatory"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

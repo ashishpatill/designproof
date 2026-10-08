@@ -24,6 +24,7 @@ import {
   archiveQuestions,
   educationalQuestions,
   fieldGuideQuestions,
+  observatoryQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -334,7 +335,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
                   ? educationalQuestions(brief, brief.features)
                   : brief.siteKind === "field-guide"
                     ? fieldGuideQuestions(brief, brief.features)
-                    : questions(brief, brief.features);
+                    : brief.siteKind === "signal-observatory"
+                      ? observatoryQuestions(brief, brief.features)
+                      : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

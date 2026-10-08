@@ -500,16 +500,22 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Signal observatory — enterprise telemetry / instrument-desk craft.
+   * Signal observatory — chronometer fold, one channel index, the brief's own priorities as a
+   * waterfall.
    *
-   * Measured enterprise-observability + enterprise-data pages sit at high figure area
-   * (~0.4–0.78), mid fold figure, moderate-to-high alignment axes, and instrument-dense
-   * matter — not SaaS conversion, foundry seams, or dossier folios. Chronometer + scrub
-   * rail + signal lattice + chrono essay + calibration are craft a theme pack will not invent.
+   * The page used to follow the chronometer fold with an index of bare names (three of them,
+   * whatever the brief gave) under "channels an on-call desk actually watches", a "how it is put
+   * together" drawing that named them again, a figure band with a "cost · cumulative" chart of
+   * made-up values under "how X reads a window", a specimen band that printed the first four
+   * descriptions, and an event waterfall that printed every description a second time against a
+   * T+00h → T+24h ruler no brief gave. A five-channel brief named its lead channel eleven times.
+   * The fold names each channel once, in its scrub rail; the index holds every description once;
+   * and the waterfall now sorts the channels by the priority the brief gives, so it says something
+   * the index does not.
    */
   if (siteKind === "signal-observatory") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-chrono", surface: "paper", columns: split.wide });
-    // Channel index — named signals, not metric theatre.
+    // Channel index — every channel, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -517,26 +523,16 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    // Teaching figure: lattice redrawn with channel callouts.
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    // Event waterfall — instrument-time spans (observatory signature; not essay+aside).
+    // Event waterfall — one span per priority tier the brief gives. It sits in a sunken tray where
+    // the specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-chrono",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — event waterfall is the observatory proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the event waterfall is the observatory instrument.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // Calibration close on paper — not inverse demo theatre.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });

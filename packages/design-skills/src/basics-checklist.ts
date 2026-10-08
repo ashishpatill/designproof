@@ -556,16 +556,20 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-scrub-rail/.test(html)
           && /data-figure="signal-lattice"/.test(html)
           && /ds-chrono/.test(html)
-          && /class="ds-chrono-desk"/.test(html)
-          && /aria-label="Event waterfall"/.test(html)
-          && /class="ds-chrono-waterfall"/.test(html)
+          // The event waterfall sorts the channels by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/class="ds-chrono-desk"/.test(html)
+              && /aria-label="Event waterfall"/.test(html)
+              && /class="ds-chrono-waterfall"/.test(html)))
+          // No figure band or specimen band naming the channels again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && !/class="ds-chrono-aside"/.test(html)
           && !/class="ds-chrono-grid"/.test(html)
           && /Calibration/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Observatory offerings use chronometer + scrub rail + signal lattice + event waterfall + calibration — no pricing, no metrics theatre, zero inverse bands.",
+      "Observatory offerings use chronometer + scrub rail of the channels + signal lattice + event waterfall sorting the channels by priority + calibration — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
         check(
       "kind-archive",

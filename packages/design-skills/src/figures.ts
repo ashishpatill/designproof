@@ -1246,6 +1246,11 @@ export function dossierPlate(
  * A channel grid with amplitude bars and status dots. Labels stay mono ≤11px so the type probe
  * does not treat them as display (foundry SVG-text lesson). Theme packs do not invent instrument
  * lattices from a density slider.
+ *
+ * The lattice numbers its rows the way the index does and names no channels: the scrub rail under
+ * the fold is its one list of them. It used to name them again (padding a short brief to four rows
+ * by repeating the first), beside tolerances ("±0.5", "±1.0") and a "LIVE" / "WINDOW" / "00:10"
+ * legend no brief gave, hours 00 → 12 and "UTC", and the product name a second time.
  */
 /** Corner L-brackets for a live window — instrument ticks, not a full chrome box. */
 function liveWindowCorners(x: number, y: number, w: number, h: number, arm = 10): string {
@@ -1292,23 +1297,14 @@ export function signalLattice(
     parts.push(
       `<line x1="${round(x)}" y1="${round(chronY - (tall ? 8 : 4))}" x2="${round(x)}" y2="${round(chronY + (tall ? 8 : 4))}" stroke="${tall || isNow ? ACCENT : LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
-    if (tall) {
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x)}" y="${round(chronY - 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">${String(i).padStart(2, "0")}</text>`,
-      );
-    }
     if (isNow) {
       parts.push(
         `<circle cx="${round(x)}" cy="${round(chronY)}" r="2.5" fill="var(--surface-bg, var(--c-paper))" stroke="${ACCENT}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
       );
     }
   }
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(chronY - 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">UTC</text>`,
-  );
-
   const channels = features.slice(0, 6);
-  const count = Math.max(4, channels.length);
+  const count = Math.max(1, channels.length);
   const gridTop = padY + 44;
   const gridBottom = H - padY - 28;
   const gridH = gridBottom - gridTop;
@@ -1318,11 +1314,7 @@ export function signalLattice(
   const barRight = W - padX - 24;
   const barW = barRight - barLeft;
 
-  // Tolerance ladder keyed to channel index — same values the calibration close echoes.
-  const tolerances = ["±0.5", "±1.0", "±0.5", "±1.5", "±1.0", "±2.0"];
-
   for (let i = 0; i < count; i += 1) {
-    const f = channels[i] ?? channels[i % Math.max(1, channels.length)]!;
     const y0 = gridTop + rowH * i;
     const mid = y0 + rowH / 2;
     // Row rule
@@ -1331,12 +1323,9 @@ export function signalLattice(
         `<line x1="${round(padX + 8)}" y1="${round(y0)}" x2="${round(W - padX - 8)}" y2="${round(y0)}" stroke="${LINE}" stroke-width="1" opacity="0.35" vector-effect="non-scaling-stroke"/>`,
       );
     }
-    // Channel id + title (mono only)
+    // Channel number only (mono), the way the index numbers it.
     parts.push(
-      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid - 4)}" font-size="11" fill="var(--surface-quiet)">${String(i + 1).padStart(2, "0")}</text>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid + 12)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f?.title ?? `ch-${i + 1}`, 16))}</text>`,
+      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid + 4)}" font-size="11" fill="var(--surface-quiet)">${esc(channels[i]?.meta ?? String(i + 1).padStart(2, "0"))}</text>`,
     );
 
     // Amplitude bars — dense instrument matter without SVG display type.
@@ -1364,9 +1353,6 @@ export function signalLattice(
     parts.push(
       `<line x1="${round(barLeft)}" y1="${round(thrY)}" x2="${round(barRight)}" y2="${round(thrY)}" stroke="${ACCENT}" stroke-width="1" opacity="0.45" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>`,
     );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(barLeft + 4)}" y="${round(thrY - 3)}" font-size="11" fill="var(--surface-quiet)">${tolerances[i % tolerances.length]}</text>`,
-    );
 
     // Status dot
     const status = i % 3 === 0 ? ACCENT : LINE;
@@ -1375,27 +1361,13 @@ export function signalLattice(
     );
   }
 
-  // Live window — corner ticks + WINDOW / duration legend (not a full boxed chrome).
+  // Window bracket — corner ticks only, no legend.
   const winX = barLeft + barW * 0.62;
   const winW = barW * 0.16;
-  const winMin = Math.max(8, Math.round((winW / barW) * 60));
-  const duration = `00:${String(winMin).padStart(2, "0")}`;
   parts.push(liveWindowCorners(winX, gridTop, winW, gridH, role === "band" ? 12 : 8));
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + winW / 2)}" y="${round(gridTop - 6)}" font-size="11" fill="var(--c-accent)" text-anchor="middle">LIVE</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + 6)}" y="${round(gridTop + 14)}" font-size="11" fill="var(--c-accent)">WINDOW</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + winW - 6)}" y="${round(gridTop + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${duration}</text>`,
-  );
 
   parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · signal lattice</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${count} channels</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${count} ${count === 1 ? "channel" : "channels"}</text>`,
   );
 
   return frame(parts.join(""), {

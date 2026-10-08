@@ -31,6 +31,7 @@ import {
   archiveQuestions,
   educationalQuestions,
   fieldGuideQuestions,
+  observatoryQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -319,7 +320,9 @@ export function buildSections(
                   ? educationalQuestions(brief, features)
                   : brief.siteKind === "field-guide"
                     ? fieldGuideQuestions(brief, features)
-                    : questions(brief, features);
+                    : brief.siteKind === "signal-observatory"
+                      ? observatoryQuestions(brief, features)
+                      : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -411,7 +414,12 @@ export function buildSections(
              * Field guide: same rule. The lead description sat on the specimen tag and was printed
              * again in the voucher key; the index now holds every description.
              */
-            body: isArchive || isMechanism || isField ? "" : heroLede(brief, editorial.heroLines),
+            /*
+             * Observatory: same rule. The lead description sat under the headline and was printed
+             * again in the specimen band and the event waterfall; the index now holds every
+             * description.
+             */
+            body: isArchive || isMechanism || isField || isObservatory ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             secondaryLabel: craftFold ? undefined : cta.secondary,
@@ -515,6 +523,8 @@ export function buildSections(
           brief.siteKind === "docs-educational" ||
           // Field guide as well: its index stopped at four traits, whatever the brief gave.
           brief.siteKind === "field-guide" ||
+          // Observatory too: its index stopped at three or four channels, whatever the brief gave.
+          brief.siteKind === "signal-observatory" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -585,7 +595,14 @@ export function buildSections(
                      */
                     : brief.siteKind === "field-guide"
                       ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
-                      : rawSlice;
+                      /*
+                       * Observatory: every row keeps its description, because the fold prints none.
+                       * Rows are numbered the way the fold's scrub rail numbers them, and carry no
+                       * tier word, because the waterfall says that once.
+                       */
+                      : brief.siteKind === "signal-observatory"
+                        ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                        : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -690,8 +707,9 @@ export function buildSections(
                     ? sentence(`Cuts drawn for real reading sizes`)
                   : isDossier
                     ? sentence(`Instruments a capital brief actually uses`)
+                    // Observatory: "channels an on-call desk actually watches" was on a pottery studio's page too.
                     : isObservatory
-                      ? sentence(`Channels an on-call desk actually watches`)
+                      ? sentence(`${brief.productName}, channel by channel`)
                       // Archive: the brief's own count, not a line about what "an archive index" keeps.
                       : isArchive
                         ? sentence(`The ${count(features.length)} ${features.length === 1 ? "entry" : "entries"} in ${brief.productName}`)
@@ -753,8 +771,9 @@ export function buildSections(
                     ? sentence(`Each cut is a size and a job — not a style picker dressed as a product`)
                   : isDossier
                     ? sentence(`Each instrument is a named reading — not a dashboard dressed as research`)
+                    // Observatory: "a chart dressed as a product" was on every observatory page.
                     : isObservatory
-                      ? sentence(`Each channel is a named signal — not a chart dressed as a product`)
+                      ? ""
                       // Archive: "a search box dressed as an archive" was on every archive page.
                       : isArchive
                         ? ""
@@ -1112,6 +1131,44 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Observatory: the event waterfall printed every description a second time, right under
+         * the index and the specimen band, against a T+00h → T+24h ruler and "T+06h" stamps no brief
+         * gave, under "tick beads, channel notes, and the handoffs that keep calm honest", a line
+         * printed on every observatory page. Now each span is one priority tier from the brief and
+         * names the channels in it once. With a single priority there is nothing to sort, so the
+         * section is left out.
+         */
+        if (brief.siteKind === "signal-observatory") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({ tier, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} channels to watch first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // The renderer sets this under the tier; the channels keep their own case.
+                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  points: t.names,
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1154,8 +1211,6 @@ export function buildSections(
                     ? "Composition notes"
                   : brief.siteKind === "research-dossier"
                     ? "Reading notes"
-                    : brief.siteKind === "signal-observatory"
-                      ? "Incident time"
                         : brief.siteKind === "commerce-loom"
                           ? "Hangtag notes"
                         : brief.siteKind === "press-atelier"
@@ -1174,8 +1229,6 @@ export function buildSections(
                     ? sentence(`How the face is set on a real page`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`How a brief is actually read`)
-                    : brief.siteKind === "signal-observatory"
-                      ? sentence(`How a window is actually walked`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`How a hangtag is actually cut`)
                         : brief.siteKind === "press-atelier"
@@ -1200,8 +1253,6 @@ export function buildSections(
                     ? sentence(`Measure, hierarchy, and the notes that keep a layout from drifting`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
-                    : brief.siteKind === "signal-observatory"
-                      ? sentence(`Tick beads, channel notes, and the handoffs that keep calm honest`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
                         : brief.siteKind === "press-atelier"
@@ -1230,9 +1281,7 @@ export function buildSections(
                       ? ["Turn tape", "Tool permit", "Steer pin", "Mid-run redirect", "Eval close", "Local session"][i] ?? c.title
                     : c.title,
                 body: c.body,
-                meta: brief.siteKind === "signal-observatory"
-                  ? `T+${String(i * 6).padStart(2, "0")}h`
-                    : brief.siteKind === "commerce-loom"
+                meta: brief.siteKind === "commerce-loom"
                       ? ["XS", "S", "M", "L", "XL", "XXL"][i % 6]
                         : brief.siteKind === "press-atelier"
                           ? `Sig ${"ABCDEFGH"[i] ?? String(i + 1)}`
@@ -1244,7 +1293,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "signal-observatory" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1590,7 +1639,10 @@ export function buildSections(
                   // Field guide likewise: the tag names the audience, and so does the first answer.
                   : brief.siteKind === "field-guide"
                     ? sentence(`What people ask about ${brief.productName}`)
-                    : sentence(`Questions ${brief.audience} ask first`),
+                    // Observatory likewise: the fold's first line names the audience, and so does the first answer.
+                    : brief.siteKind === "signal-observatory"
+                      ? sentence(`What to know before opening ${brief.productName}`)
+                      : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1627,8 +1679,11 @@ export function buildSections(
                 ? `Request a specimen of ${brief.productName}`
                 : brief.siteKind === "research-dossier"
                   ? `Request the next ${brief.productName} folio`
+                  // Observatory: "calibrate a window" fit one on-call desk; the close says where to begin.
                   : brief.siteKind === "signal-observatory"
-                    ? `Calibrate a ${brief.productName} window`
+                    ? features[0]
+                      ? `Start the ${brief.productName} desk on ${lower(features[0].name)}`
+                      : `Start the ${brief.productName} desk`
                     // Archive: the close names the first and last entries the brief gives.
                     : brief.siteKind === "archive-index"
                       ? features.length > 1
@@ -1678,8 +1733,17 @@ export function buildSections(
                 ? `Edition notes, trial files, and the cuts ${brief.audience} actually set`
                 : brief.siteKind === "research-dossier"
                   ? `Numbered folios, source notes, and the instruments ${brief.audience} actually open`
+                  /*
+                   * Observatory: "tolerance marks, channel maps, and the windows ... actually watch"
+                   * closed every observatory page, a pottery studio's included. The close gives the
+                   * count the brief gives instead.
+                   */
                   : brief.siteKind === "signal-observatory"
-                    ? `Tolerance marks, channel maps, and the windows ${brief.audience} actually watch`
+                    ? features.length > 1
+                      ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                          features.length === 2 ? "channel sits" : "channels sit"
+                        } in the index above`
+                      : ""
                     /*
                      * Archive: "numbered stamps, cross-refs, and the entries ... actually keep" closed
                      * every archive page, a marina's included. The title already names the first and
@@ -1754,7 +1818,10 @@ export function buildSections(
                     // Field guide likewise: the button leads back to the index.
                     : brief.siteKind === "field-guide" && features.length > 1
                       ? `Read all ${count(features.length)} traits`
-                      : cta.secondary,
+                      // Observatory likewise: the button leads back to the index.
+                      : brief.siteKind === "signal-observatory" && features.length > 1
+                        ? `Read all ${count(features.length)} channels`
+                        : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote: brief.siteKind === "saas-marketing" ? riskLine : undefined,
           }),
