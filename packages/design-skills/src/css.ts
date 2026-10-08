@@ -409,6 +409,22 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="signal-observatory"] .ds-reveal.is-in .ds-cal-tol,
   [data-sitekind="signal-observatory"] .ds-reveal.is-in .ds-index-mark{letter-spacing:0.16em}
 }
+/* The waterfall's ruler is numbered like the index, one column per channel, and each span lights
+   its channels in their own columns. */
+[data-sitekind="signal-observatory"] .ds-chrono-ruler{grid-template-columns:repeat(var(--n,5),minmax(0,1fr))}
+[data-sitekind="signal-observatory"] .ds-chrono-ruler-tick,
+[data-sitekind="signal-observatory"] .ds-chrono-ruler-tick:last-child{justify-self:center}
+[data-sitekind="signal-observatory"] .ds-chrono-span-body h3{margin-bottom:0.2rem}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which ran the next row's rule through the last line of a description on a phone. */
+[data-sitekind="signal-observatory"] .ds-index-row:nth-child(n){margin-block:0}
+/* The scrub rail now holds one chip per channel. On a phone it scrolls sideways in one row
+   instead of wrapping into a stack that covers the page. */
+@media (max-width:800px){
+  [data-sitekind="signal-observatory"] .ds-scrub-rail ol{flex-wrap:nowrap;overflow-x:auto;padding:0 var(--gutter)}
+  [data-sitekind="signal-observatory"] .ds-scrub-chip{min-width:9.5rem;border-top:0;border-left:1px solid var(--c-border)}
+  [data-sitekind="signal-observatory"] .ds-chrono-span-bar{left:var(--span-start);width:var(--span-width)}
+}
 `,
     "archive-index": `
 @keyframes ds-archive-in{from{opacity:0;transform:translateX(-1.25rem)}to{opacity:1;transform:none}}

@@ -145,10 +145,17 @@ export function ctaFor(
       };
     }
     if (siteKind === "signal-observatory") {
+      /*
+       * No fold note: "windows ship with the channels you actually watch — not a demo theatre"
+       * reached every observatory page through the authored path, a pottery studio's included, and
+       * no brief says how anything ships. "Open a desk window" borrowed the sample's own lead
+       * channel ("Live window") for every product. The buttons say what the page is: a desk, and the
+       * channels on it.
+       */
       return {
-        primary: "Open a desk window",
-        secondary: "Read the channels",
-        note: "Windows ship with the channels you actually watch — not a demo theatre.",
+        primary: "Open the desk",
+        secondary: "See every channel",
+        note: "",
       };
     }
     if (siteKind === "archive-index") {
@@ -893,6 +900,35 @@ export function fieldGuideQuestions(brief: DesignBrief, features: FeatureSpec[])
   return out;
 }
 
+/**
+ * Observatory questions. Every answer is built from this brief: its product, its audience, and its
+ * channel names. The shared `questions` it used promised "cancel anytime", a comparison table the
+ * page never draws, a result in "one session" on the reader's data, a person who answers
+ * procurement and security, and that every capability ships "from day one". No brief declares any
+ * of those. The approval question stays only when the brief itself declares an approval step.
+ */
+export function observatoryQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} desk for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which channel handles approvals?`,
+      body: sentence(`${features[at]!.name}, channel ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} desk?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} channels`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1061,7 +1097,10 @@ export function navFor(
           ? "Parts"
           : siteKind === "field-guide"
             ? "Traits"
-            : "Capabilities",
+            // Observatory: the index is headed "The channels", so the menu calls it "Channels".
+            : siteKind === "signal-observatory"
+              ? "Channels"
+              : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1071,7 +1110,8 @@ export function navFor(
           : siteKind === "corporate-story" ||
               siteKind === "archive-index" ||
               siteKind === "docs-educational" ||
-              siteKind === "field-guide"
+              siteKind === "field-guide" ||
+              siteKind === "signal-observatory"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
