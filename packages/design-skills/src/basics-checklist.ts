@@ -627,18 +627,20 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-epin/.test(html)
           && /ds-binomial-strip/.test(html)
           && /data-figure="specimen-plate"/.test(html)
-          && /ds-range/.test(html)
-          && /class="ds-range-ladder"/.test(html)
           && /aria-label="Dichotomous key"/.test(html)
-          && /class="ds-range-sheets"/.test(html)
+          // The voucher key sorts the traits by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/ds-range/.test(html) && /class="ds-range-ladder"/.test(html) && /class="ds-range-sheets"/.test(html)))
           && !/class="ds-range-aside"/.test(html)
+          // No figure band or specimen strip naming the traits again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && !/class="ds-gather-stack"/.test(html)
           && !/class="ds-gather-forme"/.test(html)
           && /Voucher/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + specimen tag + binomial strip + dichotomous voucher key + Voucher — no pricing, no metrics theatre, zero inverse bands.",
+      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + specimen tag + binomial strip of the traits + dichotomous voucher key sorting the traits by priority + Voucher — no pricing, no metrics theatre, no figure band or specimen strip, zero inverse bands.",
     ),
     check(
       "kind-press",

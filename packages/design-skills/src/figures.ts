@@ -3021,6 +3021,11 @@ export function loomWeave(
  * Pressed-leaf silhouette + copyright-free botanical photo inset in a voucher window, taxonomic
  * mono labels ≤11px, range ticks. Soft theme packs float glass cards; they do not invent a
  * herbarium voucher with pressed geometry and a taxon rail.
+ *
+ * The plate draws no trait names: the binomial strip under it is the fold's one list of them. It
+ * used to name the first three again beside "Voucher · herbarium", "Range · W → E", "Blot", rank
+ * letters Kingdom to Species, and the product name a second time, on every page, a marina's
+ * included. The photo window now runs the height of the pressed leaf.
  */
 export function specimenPlate(
   productName: string,
@@ -3035,7 +3040,7 @@ export function specimenPlate(
   const padY = role === "band" ? 36 : 24;
   const parts: string[] = [];
   const photos = [FREE_PHOTOS.botanicalA, FREE_PHOTOS.botanicalB, FREE_PHOTOS.botanicalC];
-  const ranks = ["K", "P", "C", "O", "F", "G", "S"];
+  const ticks = 7;
 
   parts.push(
     `<rect x="${round(padX)}" y="${round(padY)}" width="${round(W - padX * 2)}" height="${round(H - padY * 2)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
@@ -3043,9 +3048,6 @@ export function specimenPlate(
 
   const headY = padY + 14;
   // Keep head mono on the right half — left is reserved for the absolute specimen tag.
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W * 0.52)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Voucher · herbarium</text>`,
-  );
   parts.push(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 22))} · Specimen</text>`,
   );
@@ -3056,13 +3058,10 @@ export function specimenPlate(
   // Taxon rank ticks along the right — left is reserved for the absolute specimen tag.
   const rankTop = padY + 36;
   const rankBot = H - padY - 28;
-  for (let i = 0; i < ranks.length; i += 1) {
-    const y = rankTop + (i / (ranks.length - 1)) * (rankBot - rankTop);
+  for (let i = 0; i < ticks; i += 1) {
+    const y = rankTop + (i / (ticks - 1)) * (rankBot - rankTop);
     parts.push(
       `<line x1="${round(W - padX - 16)}" y1="${round(y)}" x2="${round(W - padX - 8)}" y2="${round(y)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(W - padX - 20)}" y="${round(y + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${ranks[i]}</text>`,
     );
   }
 
@@ -3103,15 +3102,12 @@ export function specimenPlate(
   parts.push(
     `<ellipse cx="${round(midX + leafW * 0.08)}" cy="${round(midY + leafH * 0.12)}" rx="22" ry="14" fill="${ACCENT_FIELD}" opacity="0.35"/>`,
   );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(midX + leafW * 0.08)}" y="${round(midY + leafH * 0.12 + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">Blot</text>`,
-  );
 
   // Photo voucher window on the right.
   const winX = leafX + leafW + 16;
   const winY = leafY + 12;
   const winW = W - padX - 16 - winX;
-  const winH = leafH * 0.62;
+  const winH = leafH * 0.9;
   const clipId = "spec-photo-clip";
   parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(winX)}" y="${round(winY)}" width="${round(winW)}" height="${round(winH)}"/></clipPath></defs>`);
   parts.push(
@@ -3124,33 +3120,7 @@ export function specimenPlate(
     `<text class="ds-fig-mono" x="${round(winX + 8)}" y="${round(winY + 16)}" font-size="11" fill="var(--surface-quiet)">Plate A</text>`,
   );
 
-  // Feature callouts under photo — sparse mono.
-  const base = features.length ? features : [{ title: "Trait", body: "", meta: "01" } as Block];
-  const callTop = winY + winH + 18;
-  for (let i = 0; i < Math.min(3, base.length); i += 1) {
-    const y = callTop + i * 22;
-    const f = base[i]!;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(winX + 8)}" y="${round(y)}" font-size="11" fill="var(--surface-quiet)">${String(i + 1).padStart(2, "0")}</text>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(winX + 36)}" y="${round(y)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f.title, 22))}</text>`,
-    );
-    // Tiny secondary photo chips for remaining stock — ink without card collage.
-    if (i > 0 && photos[i]) {
-      const chip = 28;
-      const cx = winX + winW - chip - 6;
-      const cy = callTop + (i - 1) * (chip + 6);
-      const cid = `spec-chip-${i}`;
-      parts.push(`<defs><clipPath id="${cid}"><rect x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}"/></clipPath></defs>`);
-      parts.push(
-        `<image href="${photos[i]}" x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})" opacity="0.85"/>`,
-      );
-      parts.push(
-        `<rect x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-    }
-  }
+  void features;
 
   // Range ticks under leaf.
   const rangeY = leafY + leafH - 4;
@@ -3160,13 +3130,7 @@ export function specimenPlate(
       `<line x1="${round(x)}" y1="${round(rangeY)}" x2="${round(x)}" y2="${round(rangeY + 8)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
   }
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(leafX + 20)}" y="${round(rangeY + 20)}" font-size="11" fill="var(--surface-quiet)">Range · W → E</text>`,
-  );
 
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · specimen plate</text>`,
-  );
   parts.push(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">free botanical stock</text>`,
   );
