@@ -1210,8 +1210,11 @@ describe("research-backed offerings + implementation basics", () => {
     const dashboard = designFromFeatures(SHOWCASE_BRIEFS.dashboard!);
     expect(dashboard.previewHtml).toContain("ds-proof-board-stack");
 
+    // Corporate proves with its fold's posture grid; the shared board reprinted every description.
     const corporate = designFromFeatures(SHOWCASE_BRIEFS.corporate!);
-    expect(corporate.previewHtml).toContain("ds-proof-board-spine");
+    expect(hasLiveBoard(corporate.previewHtml)).toBe(false);
+    expect(corporate.spec.sections.some((s) => s.kind === "proof")).toBe(false);
+    expect(corporate.previewHtml).toContain('data-figure="posture-grid"');
   });
 
   it("does not bolt the shared marquee-proof board onto craft templates", () => {

@@ -2532,6 +2532,12 @@ export function queueConsole(
 
 /**
  * Posture grid — corporate diligence fold. Principles × outcomes matrix, not horizon ticks.
+ *
+ * Each cell is one capability, numbered and named once; the grid grows to three rows so a fifth or
+ * sixth capability is not left off. The grid used to read "DILIGENCE POSTURE" on every corporate
+ * page, a marina's or a pottery studio's included, print each description cut into short lines
+ * (the same sentences the fold's lede and the catalogue print in full), and label empty footers
+ * "Principle 01" to "Principle 04". None of that came from any brief.
  */
 export function postureGrid(
   productName: string,
@@ -2539,15 +2545,14 @@ export function postureGrid(
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const items = features.slice(0, 4);
+  const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 680 : 920;
   const H = role === "band" ? 720 : role === "column" ? 640 : 520;
   void seed;
   const pad = W * 0.06;
   const parts: string[] = [];
-  parts.push(text("DILIGENCE POSTURE", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }));
   parts.push(
-    text(clip(productName, 32), W - pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
+    text(clip(productName.toUpperCase(), 32), pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }),
   );
   // Header hairline only — sequence lives on the 01–04 ordinals. A polyline through
   // cell centroids reads as a scribble across titles (the orange Z on Lattice).
@@ -2555,11 +2560,11 @@ export function postureGrid(
     `<path class="ds-draw" pathLength="1" d="M${round(pad)} ${round(pad + 28)} L${round(W - pad)} ${round(pad + 28)}" fill="none" stroke="${ACCENT}" stroke-width="1.5" stroke-linecap="round"/>`,
   );
   const cols = 2;
-  const rows = 2;
+  const rows = Math.max(2, Math.ceil(items.length / cols));
   const gap = 28;
   const cellW = (W - pad * 2 - gap) / cols;
-  const cellH = (H - pad * 2 - 56 - gap) / rows;
-  items.slice(0, 4).forEach((b, i) => {
+  const cellH = (H - pad * 2 - 56 - gap * (rows - 1)) / rows;
+  items.forEach((b, i) => {
     const c = i % cols;
     const row = Math.floor(i / cols);
     const x = pad + c * (cellW + gap);
@@ -2568,30 +2573,19 @@ export function postureGrid(
     parts.push(
       text(String(i + 1).padStart(2, "0"), x + 20, y + 36, {
         size: 28,
-        fill: i === 3 ? ACCENT : "var(--c-border-strong)",
+        fill: i === 0 ? ACCENT : "var(--c-border-strong)",
         mono: true,
         weight: 500,
       }),
     );
     parts.push(text(clip(b.title, 28), x + 20, y + 72, { size: 18, fill: INK, weight: 600 }));
-    const lines = wrap(b.body || b.title, Math.max(18, Math.round(cellW / 11)), 4);
-    lines.forEach((ln, j) => {
-      parts.push(text(ln, x + 20, y + 104 + j * 22, { size: 14, fill: BODY }));
-    });
-    parts.push(rule(x + 20, y + cellH - 36, x + cellW - 20, y + cellH - 36));
-    parts.push(
-      text(b.meta || `Principle ${String(i + 1).padStart(2, "0")}`, x + 20, y + cellH - 16, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-      }),
-    );
+    parts.push(rule(x + 20, y + cellH - 24, x + cellW - 20, y + cellH - 24));
   });
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "posture-grid",
-    label: `${productName} diligence posture`,
+    label: `${productName} capabilities`,
     inset: role === "band" ? BLEED_INSET : 0,
     dense: true,
   });

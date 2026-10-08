@@ -859,6 +859,41 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     return plans;
   }
 
+  /*
+   * Corporate story — diligence fold, one catalogue, the brief's own priorities.
+   *
+   * The page used to add a specimen strip that listed the capability names as bare values, a
+   * shared proof board that printed every description again (cut short in a drawing, then in full),
+   * an "also included" band for the tail, chapters that named every capability once more under
+   * "language, principles, outcomes, posture — the diligence path in order" (a line written for one
+   * sample product and printed on a marina's page too), and a "what is included" table whose own
+   * lede said it was "the same list as above". A five-capability brief named each capability up to
+   * seven times and left one with no row at all. The fold's posture grid names every capability
+   * once, the catalogue holds every description once, and the chapters now group the work by the
+   * priority the brief gives, so they say something the catalogue does not.
+   */
+  if (siteKind === "corporate-story") {
+    plans.push({ id: "hero", kind: "hero", layout: heroLayout(siteKind, lean), surface: "paper", columns: split.hero });
+    plans.push({
+      id: "features",
+      kind: "features",
+      layout: "feature-alternating",
+      surface: "paper",
+      columns: split.feature,
+    });
+    plans.push({
+      id: "story",
+      kind: "story",
+      layout: "story-chapters",
+      surface: "raised",
+      columns: split.wide,
+    });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr" });
+    plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
+    plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
+    return plans;
+  }
+
   // Marketing fold follows the first top-priority capability. Other kinds keep their signature fold.
   const roleShapes = siteKind === "saas-marketing" ? shapesForCapabilities(input.capabilities ?? []) : null;
   plans.push({
@@ -871,8 +906,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
 
   // Catalog folds (pipeline / posture / queue / wire) already name the capabilities.
   // A metric row of the same titles under the fold reads as a paired screenshot, not stakes.
-  const foldOwnsCatalog =
-    siteKind === "saas-marketing" || siteKind === "corporate-story";
+  const foldOwnsCatalog = siteKind === "saas-marketing";
   if (!foldOwnsCatalog) {
     plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: lean === "refined-story" ? "raised" : "inverse" });
   }
@@ -914,7 +948,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   /*
    * SaaS has no chapter register. It listed every capability a fifth time in "editorial order"
    * under a heading written for one sample product, directly after the catalogue and the proof had
-   * already told each of them. Corporate keeps its chapters.
+   * already told each of them. Corporate returns earlier with its own priority chapters.
    */
   if (siteKind !== "saas-marketing") {
     plans.push({
@@ -928,7 +962,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     });
   }
 
-  // Fintech / studio / consumer / educational / archive return earlier — only SaaS/corporate here.
+  // Fintech / studio / corporate / consumer / educational / archive return earlier — only SaaS here.
   if (siteKind === "saas-marketing" && featureCount >= 3) {
     const lanes = goal === "sales" || goal === "leads" || goal === "demos";
     if (lanes) {
@@ -938,10 +972,6 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     } else {
       plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "paper" });
     }
-  }
-
-  if (siteKind === "corporate-story") {
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised" });
   }
 
   // FAQ answers the table above it. Bonded, the compare+faq pair is the densest beat on the page —

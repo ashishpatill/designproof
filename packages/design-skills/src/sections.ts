@@ -27,6 +27,7 @@ import {
   workspaceQuestions,
   fintechQuestions,
   studioQuestions,
+  corporateQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -307,7 +308,9 @@ export function buildSections(
           ? fintechQuestions(brief, features)
           : brief.siteKind === "art-directed-studio"
             ? studioQuestions(brief, features)
-            : questions(brief, features);
+            : brief.siteKind === "corporate-story"
+              ? corporateQuestions(brief, features)
+              : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -408,7 +411,8 @@ export function buildSections(
                     return src
                       ? block({
                           title: src.name,
-                          body: isMechanism || isPipeline || isQueue || isDiligence || isWire
+                          // Corporate: the fold names capabilities; the catalogue holds their sentences.
+                          body: isMechanism || isPipeline || isQueue || isWire
                             ? sentence(src.claim || src.consequence || src.name)
                             : "",
                           emphasis: "normal",
@@ -429,7 +433,7 @@ export function buildSections(
               .map((c, i) =>
                 block({
                   title: c.name,
-                  body: isMechanism || isDiligence ? sentence(c.claim || c.name) : "",
+                  body: isMechanism ? sentence(c.claim || c.name) : "",
                   meta: c.tier,
                   emphasis: i === 0 ? "lead" : "normal",
                 }),
@@ -471,11 +475,13 @@ export function buildSections(
         // Workspace has one catalogue band too; splitting it left the last capabilities with no row.
         // Fintech as well: its second band printed the tail as bare names under "also included".
         // Studio too: its "also in practice" band held the tail under a line about handoffs.
+        // Corporate as well: its "also included" band held the tail, and one capability got no row.
         const first =
           brief.siteKind === "saas-marketing" ||
           brief.siteKind === "dashboard-webapp" ||
           brief.siteKind === "fintech-marketing" ||
           brief.siteKind === "art-directed-studio" ||
+          brief.siteKind === "corporate-story" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -514,7 +520,18 @@ export function buildSections(
               ? rawSlice.map((b) =>
                   b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
                 )
-              : rawSlice;
+              /*
+               * Corporate: same rule, and no tier word above each row. The priorities section
+               * groups the capabilities by tier once, so a "Core" or "Included" label on every row
+               * said it a second time.
+               */
+              : brief.siteKind === "corporate-story"
+                ? rawSlice.map((b) => ({
+                    ...b,
+                    kicker: undefined,
+                    body: b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? "" : b.body,
+                  }))
+                : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -698,9 +715,12 @@ export function buildSections(
                           ? sentence(`Each turn is a session beat — not a workflow approve stamp dressed as trust`)
                   // SaaS: the heading already names the product and its lead capability; a stock
                   // "two carry the argument" line read the same on every page.
+                  // Corporate: "two carry the argument, the others remove reasons to say no" was
+                  // the same line on every corporate page; the priorities section says which lead.
                   : brief.siteKind === "saas-marketing" ||
                       brief.siteKind === "dashboard-webapp" ||
-                      brief.siteKind === "fintech-marketing"
+                      brief.siteKind === "fintech-marketing" ||
+                      brief.siteKind === "corporate-story"
                     ? ""
                     : featuresLede(brief, features),
             blocks: slice,
@@ -906,6 +926,45 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Corporate: the chapters were every capability name again under "language, principles,
+         * outcomes, posture — the diligence path in order", a line written for one sample product
+         * and printed on every corporate page. Now each chapter is one priority tier from the brief
+         * and says how many capabilities sit in it and which. With a single priority there is
+         * nothing to group, so the section is left out.
+         */
+        if (brief.siteKind === "corporate-story") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({ tier, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Where ${brief.productName} puts its weight`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  body: sentence(
+                    `${count(t.names.length)[0]!.toUpperCase()}${count(t.names.length).slice(1)} ${
+                      t.names.length === 1 ? "capability" : "capabilities"
+                    }: ${spoken(t.names.map((n) => lower(n)))}`,
+                  ),
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         sections.push(
           SectionSpec.parse({
             ...base,
@@ -960,9 +1019,7 @@ export function buildSections(
                     ? sentence(`How ${brief.productName} moves an account`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`How a day on ${brief.productName} actually runs`)
-                      : brief.siteKind === "corporate-story"
-                        ? sentence(`How ${brief.productName} earns the room`)
-                        : brief.siteKind === "docs-educational"
+                      : brief.siteKind === "docs-educational"
                           ? sentence(`How ${brief.productName} decides under constraint`)
                           : brief.siteKind === "fintech-marketing"
                             ? sentence(`How a send clears on ${brief.productName}`)
@@ -994,9 +1051,7 @@ export function buildSections(
                     ? sentence(`From first signal to booked walkthrough — the path revenue leaders actually take`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`Queue, deal room, playbook, handoff — the loop account executives live in`)
-                      : brief.siteKind === "corporate-story"
-                        ? sentence(`Language, principles, outcomes, posture — the diligence path in order`)
-                        : brief.siteKind === "docs-educational"
+                      : brief.siteKind === "docs-educational"
                           ? sentence(`Placement, preemption, backpressure, failure — the cost function in order`)
                           : brief.siteKind === "fintech-marketing"
                             ? sentence(`Wire, wallet, approval, FX — the send path treasury actually walks`)
@@ -1421,6 +1476,9 @@ export function buildSections(
                 // Studio: "your own material" closed every studio page, a pottery studio's included.
                 : brief.siteKind === "art-directed-studio" && features[0]
                   ? `Start with ${lower(features[0].name)} at ${brief.productName}`
+                // Corporate: "your own material" closed every corporate page, a marina's included.
+                : brief.siteKind === "corporate-story" && features[0]
+                  ? `${brief.productName} starts with ${lower(features[0].name)}`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
                   // The audience's last word is not who the reader shows a product to: "revenue
@@ -1462,6 +1520,11 @@ export function buildSections(
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                       features.length === 2 ? "part sits" : "parts sit"
                     } in the list above`
+                // Corporate: the count the brief gives, not a stock "one conversation" line.
+                : brief.siteKind === "corporate-story" && features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "capability is" : "capabilities are"
+                    } described above`
                 // Workspace: a count the brief gives, not a stock "one conversation" line.
                 : brief.siteKind === "dashboard-webapp" && features.length > 1
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
@@ -1479,7 +1542,13 @@ export function buildSections(
              * Fintech: "Read the mechanics" led back to the catalogue, and the risk line promised a
              * hold that could be cancelled anytime. No brief declares a hold or its terms.
              */
-            secondaryLabel: brief.siteKind === "fintech-marketing" ? "See every capability" : cta.secondary,
+            secondaryLabel:
+              brief.siteKind === "fintech-marketing"
+                ? "See every capability"
+                // Corporate: the button leads back to the catalogue, so it says what is there.
+                : brief.siteKind === "corporate-story" && features.length > 1
+                  ? `Read all ${count(features.length)} capabilities`
+                  : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote: brief.siteKind === "saas-marketing" ? riskLine : undefined,
           }),
