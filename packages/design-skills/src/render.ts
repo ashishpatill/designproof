@@ -193,7 +193,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.brief.siteKind === "fintech-marketing" ||
     spec.brief.siteKind === "art-directed-studio" ||
     spec.brief.siteKind === "corporate-story" ||
-    spec.brief.siteKind === "archive-index"
+    spec.brief.siteKind === "archive-index" ||
+    // Field guide: the specimen plate draws no names or sentences; the binomial strip names them.
+    spec.brief.siteKind === "field-guide"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       /*
        * Educational: names only too. The mechanism plate draws each part as a numbered column
@@ -577,21 +579,20 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-voucher-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const ranks = [
-      { id: "K", label: "Kingdom" },
-      { id: "P", label: "Phylum" },
-      { id: "C", label: "Class" },
-      { id: "O", label: "Order" },
-      { id: "F", label: "Family" },
-      { id: "G", label: "Genus" },
-      { id: "S", label: "Species" },
-    ];
-    const binomial = `<nav class="ds-taxon-rail ds-binomial-strip" aria-label="Dichotomous key"><ol>${ranks
-      .map((R, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-taxon-chip${i === 5 ? " is-active" : ""}" data-rank="${R.id}"><span class="ds-taxon-meta">${R.id}</span><span class="ds-taxon-label">${esc(R.label)}</span></a></li>`;
+    /*
+     * The binomial strip is the fold's one list of the traits: one chip per trait, numbered the way
+     * the index numbers it, each jumping to its own index row. It used to print Kingdom → Species on
+     * every page, a pottery studio's included, with the first six ranks pointing at fixed sections
+     * (#figure, #specimen, #proof) whether or not the page had them, and "Genus" always lit.
+     */
+    const traits = catalogue(spec);
+    const binomial = `<nav class="ds-taxon-rail ds-binomial-strip" aria-label="Dichotomous key"><ol>${traits
+      .map((b, i) => {
+        const n = b.meta ?? String(i + 1).padStart(2, "0");
+        return `<li><a href="#trait-${esc(n)}" class="ds-taxon-chip${i === 0 ? " is-active" : ""}" data-rank="${esc(n)}"><span class="ds-taxon-meta">${esc(n)}</span><span class="ds-taxon-label">${esc(b.title)}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
+    const many = `${count(traits.length)[0]!.toUpperCase()}${count(traits.length).slice(1)} ${traits.length === 1 ? "trait" : "traits"}`;
     const ePins = [1, 2, 3, 4]
       .map((n) => `<span class="ds-epin" style="--n:${n}" data-pin="${n}"><i>${n}</i></span>`)
       .join("");
@@ -602,8 +603,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       <div class="ds-glassine-press ds-dissecting-tray">
         <header class="ds-voucher-masthead" aria-label="Tray masthead">
           <span class="ds-voucher-vol">Tray</span>
-          <span class="ds-voucher-issue">Hinged glassine</span>
-          <span class="ds-voucher-date">Dissecting plate</span>
+          <span class="ds-voucher-issue">${esc(many)}</span>
           <span class="ds-voucher-mark">${esc(spec.brief.productName)}</span>
         </header>
         <div class="ds-press-stage ds-tray-well">
@@ -617,11 +617,10 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
           </div>
           ${tagString}
           <div class="ds-press-label ds-specimen-tag">
-            <p class="ds-tag-pinmeta">Pin 02 · voucher</p>
             <p class="ds-brand-mark">${esc(spec.brief.productName)}</p>
             ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
             <h1 class="ds-display">${esc(section.title)}</h1>
-            <p class="ds-lede">${esc(section.body)}</p>
+            ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
             ${actions(section)}
           </div>
         </div>
@@ -1179,7 +1178,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "editorial-foundry" ||
         spec.brief.siteKind === "research-dossier" ||
         spec.brief.siteKind === "commerce-loom" ||
-        spec.brief.siteKind === "field-guide" ||
+        // Field guide rows carry their description too: the fold prints none.
         spec.brief.siteKind === "lantern-path" ||
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
@@ -1187,9 +1186,17 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "agent-harness";
       const isArchive = spec.brief.siteKind === "archive-index";
+      // Field guide rows are the binomial strip's jump targets.
+      const isField = spec.brief.siteKind === "field-guide";
       return `<ol class="ds-index">${section.blocks
         .map(
-          (b, i) => `<li class="ds-index-row"${isArchive ? ` id="entry-${esc(b.meta ?? String(i + 1).padStart(3, "0"))}"` : ""} data-feature="${esc(b.title)}">
+          (b, i) => `<li class="ds-index-row"${
+            isArchive
+              ? ` id="entry-${esc(b.meta ?? String(i + 1).padStart(3, "0"))}"`
+              : isField
+                ? ` id="trait-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                : ""
+          } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
             ${!quietIndex && b.body ? `<p>${esc(b.body)}</p>` : ""}
@@ -1327,7 +1334,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Archive skips it too: the drawing named the entries again, right under the fold's ledger.
     spec.brief.siteKind !== "archive-index" &&
     // Educational as well: a drawn interface and a "how it is put together" list named every part again.
-    spec.brief.siteKind !== "docs-educational"
+    spec.brief.siteKind !== "docs-educational" &&
+    // Field guide too: the list beside the drawing named every trait again, right under the index.
+    spec.brief.siteKind !== "field-guide"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1889,50 +1898,50 @@ function renderRounds(section: SectionSpec, figures: FigurePlan): string {
 /**
  * Dichotomous voucher key — field-guide mid-page instrument.
  *
- * Horizontal taxon ladder + stacked voucher sheets with couplet forks.
- * Not the essay+aside list clone shared by gather/entry/hang/ember.
+ * Horizontal couplet ladder + stacked voucher sheets. Not the essay+aside list clone shared by
+ * gather/entry/hang/ember.
+ *
+ * Each couplet is one priority tier from the brief. Its first lead names the traits in that tier,
+ * once; its second lead sends the reader to the next couplet, the way a real key does. The key used
+ * to print every description a second time, with leads no brief gave ("trait holds → photo inset",
+ * "trait fails → re-key from kingdom"), a "Note 01" label and a drawing on every sheet, and a ladder
+ * that listed every name again under "5 couplets · voucher key".
  */
-function renderRange(section: SectionSpec, figures: FigurePlan): string {
+function renderRange(section: SectionSpec): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const ranks = ["K", "P", "C", "O", "F", "G"];
+  const number = (b: Block, i: number) => esc(b.meta ?? String(i + 1));
   const ladder = blocks
     .map((b, i) => {
-      const rank = esc(b.meta ?? ranks[i % 6]!);
+      const n = b.points.length;
       return `<li class="ds-range-step" style="--i:${i}">
-        <span class="ds-range-rank">${rank}</span>
-        <span class="ds-range-step-title">${esc(b.title)}</span>
-        <span class="ds-range-fork" aria-hidden="true">a · b</span>
+        <a class="ds-range-step-link" href="#couplet-${number(b, i)}">
+          <span class="ds-range-rank">${number(b, i)}</span>
+          <span class="ds-range-step-title">${n} ${n === 1 ? "trait" : "traits"}</span>
+          <span class="ds-range-fork" aria-hidden="true">${i < blocks.length - 1 ? "a · b" : "a"}</span>
+        </a>
       </li>`;
     })
     .join("");
   const sheets = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-range-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const rank = esc(b.meta ?? ranks[i % 6]!);
       const next = blocks[i + 1];
-      const yesLead = next ? esc(next.title) : "Voucher close";
-      const noLead = i > 0 ? esc(blocks[0]!.title) : "Re-key from Kingdom";
-      return `<article class="ds-range-sheet" style="--i:${i}">
+      return `<article class="ds-range-sheet" id="couplet-${number(b, i)}" style="--i:${i}">
         <header class="ds-range-sheet-head">
-          <p class="ds-range-rank">${rank}</p>
+          <p class="ds-range-rank">${number(b, i)}</p>
           <h3>${esc(b.title)}</h3>
-          <p class="ds-range-couplet-label">Couplet ${String(i + 1).padStart(2, "0")}</p>
         </header>
-        ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${b.kicker ? `<p class="ds-range-note">${esc(b.kicker)}</p>` : ""}
-        <ol class="ds-range-couplet" aria-label="Couplet ${i + 1}">
-          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">Trait holds → ${yesLead}</span></li>
-          <li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Trait fails → ${noLead}</span></li>
+        <ol class="ds-range-couplet" aria-label="Couplet ${number(b, i)}">
+          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">${esc(b.body)}</span></li>
+          ${next ? `<li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Otherwise, go to ${number(next, i + 1)}</span></li>` : ""}
         </ol>
-        ${mark}
       </article>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-range" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Range", `${count} couplets · voucher key`)}
+      ${secMeta("Key", `${count} couplets`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-range-ladder" aria-label="Dichotomous key">${ladder}</ol>
       <div class="ds-range-sheets">${sheets}</div>
@@ -2550,7 +2559,7 @@ function renderSection(
     case "story-hangtag":
       return wrapped(renderHangtag(section, figures));
     case "story-range":
-      return wrapped(renderRange(section, figures));
+      return wrapped(renderRange(section));
     case "story-gather":
       return wrapped(renderGather(section, figures));
     case "story-ember":
@@ -2971,7 +2980,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "art-directed-studio" ||
     spec.brief.siteKind === "corporate-story" ||
     spec.brief.siteKind === "archive-index" ||
-    spec.brief.siteKind === "docs-educational"
+    spec.brief.siteKind === "docs-educational" ||
+    spec.brief.siteKind === "field-guide"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

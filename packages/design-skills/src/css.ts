@@ -453,6 +453,24 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="field-guide"] .ds-reveal .ds-stagger > *{animation-name:ds-field-in}
   [data-sitekind="field-guide"] .ds-reveal:not(.is-in){transform:translateY(2.1rem) scale(0.97)}
 }
+/* The key's ladder steps are links to their couplets; they keep the step's stacked layout. */
+[data-sitekind="field-guide"] .ds-range-step-link{display:flex;flex-direction:column;gap:0.35rem;color:inherit;text-decoration:none}
+[data-sitekind="field-guide"] .ds-range-step-link:hover .ds-range-step-title,
+[data-sitekind="field-guide"] .ds-range-step-link:focus-visible .ds-range-step-title{color:var(--c-accent)}
+/* Each couplet now follows its header directly: no description sits between them, so the dashed
+   rule above the leads only doubled the header's own rule. The first lead names the traits and is
+   the sheet's content, so it reads at body size. */
+[data-sitekind="field-guide"] .ds-range-couplet{margin-top:0;border-top:0;padding-top:0}
+[data-sitekind="field-guide"] .ds-range-couplet li:first-child .ds-range-lead-copy{font-size:var(--t-body-size,1rem);color:var(--c-ink)}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which ran the next row's rule through the last line of a description on a phone. */
+[data-sitekind="field-guide"] .ds-index-row:nth-child(n){margin-block:0}
+/* The trait names are short and the descriptions are the row's content, so the name column gives
+   the description the room. */
+[data-sitekind="field-guide"] .ds-index-row{grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(0,1fr) minmax(7rem,9.5rem)}
+@media (max-width:820px){
+  [data-sitekind="field-guide"] .ds-index-row{grid-template-columns:2rem 1fr}
+}
 `,
     "press-atelier": `
 @keyframes ds-press-snap{0%{opacity:0;transform:translateY(0.55rem)}55%{opacity:1;transform:translateY(-0.12rem)}100%{opacity:1;transform:none}}

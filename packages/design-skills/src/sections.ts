@@ -30,6 +30,7 @@ import {
   corporateQuestions,
   archiveQuestions,
   educationalQuestions,
+  fieldGuideQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -316,7 +317,9 @@ export function buildSections(
                 ? archiveQuestions(brief, features)
                 : brief.siteKind === "docs-educational"
                   ? educationalQuestions(brief, features)
-                  : questions(brief, features);
+                  : brief.siteKind === "field-guide"
+                    ? fieldGuideQuestions(brief, features)
+                    : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -404,7 +407,11 @@ export function buildSections(
              * again in the chapter register; the index now holds every description, the lead one
              * included, and the fold names the parts without describing them.
              */
-            body: isArchive || isMechanism ? "" : heroLede(brief, editorial.heroLines),
+            /*
+             * Field guide: same rule. The lead description sat on the specimen tag and was printed
+             * again in the voucher key; the index now holds every description.
+             */
+            body: isArchive || isMechanism || isField ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             secondaryLabel: craftFold ? undefined : cta.secondary,
@@ -506,6 +513,8 @@ export function buildSections(
           brief.siteKind === "archive-index" ||
           // Educational too: a five-part brief left its last two parts out of the index.
           brief.siteKind === "docs-educational" ||
+          // Field guide as well: its index stopped at four traits, whatever the brief gave.
+          brief.siteKind === "field-guide" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -569,7 +578,14 @@ export function buildSections(
                    */
                   : brief.siteKind === "docs-educational"
                     ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
-                    : rawSlice;
+                    /*
+                     * Field guide: every row keeps its description, because the fold prints none.
+                     * Rows are numbered the way the fold's binomial strip numbers them, and carry no
+                     * tier word, because the key says that once.
+                     */
+                    : brief.siteKind === "field-guide"
+                      ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                      : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -681,8 +697,9 @@ export function buildSections(
                         ? sentence(`The ${count(features.length)} ${features.length === 1 ? "entry" : "entries"} in ${brief.productName}`)
                         : isLoom
                           ? sentence(`Lines a merchandising loom actually cuts`)
+                          // Field guide: "traits a field voucher actually keeps" was on a marina's page too.
                           : isField
-                            ? sentence(`Traits a field voucher actually keeps`)
+                            ? sentence(`${brief.productName}, trait by trait`)
                         : isLantern
                           ? sentence(`Chapters a night walk actually keeps`)
                         : isClinic
@@ -743,8 +760,9 @@ export function buildSections(
                         ? ""
                         : isLoom
                           ? sentence(`Each line is a woven SKU — not a product card dressed as merchandising`)
+                          // Field guide: "a nature photo dressed as science" was on every field-guide page.
                           : isField
-                            ? sentence(`Each trait is a pressed voucher — not a nature photo dressed as science`)
+                            ? ""
                         : isPress
                           ? sentence(`Each plate is a numbered signature — not a gallery dressed as a pressroom`)
                         : isLantern
@@ -1056,6 +1074,44 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Field guide: the dichotomous key printed every description a second time, right under
+         * the index, with leads no brief gave ("trait holds → photo inset", "trait fails → re-key
+         * from kingdom") under "range beads, taxon ranks, and the notes that keep a voucher honest",
+         * a line printed on every field-guide page. Now each couplet is one priority tier from the
+         * brief and names the traits in it once. With a single priority there is nothing to key
+         * out, so the section is left out.
+         */
+        if (brief.siteKind === "field-guide") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({ tier, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} traits matter most`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // The renderer sets this as the couplet's first lead; the traits keep their own case.
+                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  points: t.names,
+                  meta: String(i + 1),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1102,8 +1158,6 @@ export function buildSections(
                       ? "Incident time"
                         : brief.siteKind === "commerce-loom"
                           ? "Hangtag notes"
-                          : brief.siteKind === "field-guide"
-                            ? "Range notes"
                         : brief.siteKind === "press-atelier"
                           ? "Gather notes"
                         : brief.siteKind === "lantern-path"
@@ -1124,8 +1178,6 @@ export function buildSections(
                       ? sentence(`How a window is actually walked`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`How a hangtag is actually cut`)
-                          : brief.siteKind === "field-guide"
-                            ? sentence(`How a voucher is actually read`)
                         : brief.siteKind === "press-atelier"
                           ? sentence(`How a signature is actually gathered`)
                         : brief.siteKind === "lantern-path"
@@ -1152,8 +1204,6 @@ export function buildSections(
                       ? sentence(`Tick beads, channel notes, and the handoffs that keep calm honest`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
-                          : brief.siteKind === "field-guide"
-                            ? sentence(`Range beads, taxon ranks, and the notes that keep a voucher honest`)
                         : brief.siteKind === "press-atelier"
                           ? sentence(`Fold ticks, plate index, and the gathers that keep a forme honest`)
                         : brief.siteKind === "lantern-path"
@@ -1184,8 +1234,6 @@ export function buildSections(
                   ? `T+${String(i * 6).padStart(2, "0")}h`
                     : brief.siteKind === "commerce-loom"
                       ? ["XS", "S", "M", "L", "XL", "XXL"][i % 6]
-                      : brief.siteKind === "field-guide"
-                        ? ["K", "P", "C", "O", "F", "G"][i % 6]
                         : brief.siteKind === "press-atelier"
                           ? `Sig ${"ABCDEFGH"[i] ?? String(i + 1)}`
                         : brief.siteKind === "lantern-path"
@@ -1196,7 +1244,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "signal-observatory" || brief.siteKind === "commerce-loom" || brief.siteKind === "field-guide" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "signal-observatory" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1539,7 +1587,10 @@ export function buildSections(
                 ? sentence(`${brief.productName}, asked and answered`)
                 : brief.siteKind === "docs-educational"
                   ? sentence(`Questions about ${brief.productName}`)
-                  : sentence(`Questions ${brief.audience} ask first`),
+                  // Field guide likewise: the tag names the audience, and so does the first answer.
+                  : brief.siteKind === "field-guide"
+                    ? sentence(`What people ask about ${brief.productName}`)
+                    : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1585,8 +1636,11 @@ export function buildSections(
                         : `${brief.productName}: ${lower(features[0]?.name ?? brief.productName)}`
                       : brief.siteKind === "commerce-loom"
                         ? `Cut a sample from ${brief.productName}`
+                        // Field guide: "request a voucher" fit one herbarium; the close says where to begin.
                         : brief.siteKind === "field-guide"
-                          ? `Request a voucher of ${brief.productName}`
+                          ? features[0]
+                            ? `Start the ${brief.productName} guide at ${lower(features[0].name)}`
+                            : `Start the ${brief.productName} guide`
                       : brief.siteKind === "press-atelier"
                         ? `Lock a forme on ${brief.productName}`
                       : brief.siteKind === "lantern-path"
@@ -1635,8 +1689,17 @@ export function buildSections(
                       ? ""
                       : brief.siteKind === "commerce-loom"
                         ? `Size tapes, SKU cells, and the lines ${brief.audience} actually cut`
+                        /*
+                         * Field guide: "pressed plates, range notes, and the vouchers ... actually
+                         * keep" closed every field-guide page, a pottery studio's included. The close
+                         * gives the count the brief gives instead.
+                         */
                         : brief.siteKind === "field-guide"
-                          ? `Pressed plates, range notes, and the vouchers ${brief.audience} actually keep`
+                          ? features.length > 1
+                            ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                                features.length === 2 ? "trait follows" : "traits follow"
+                              } in the index above`
+                            : ""
                       : brief.siteKind === "press-atelier"
                         ? `Plate numbers, densitometer marks, and the formes ${brief.audience} actually run`
                       : brief.siteKind === "lantern-path"
@@ -1688,7 +1751,10 @@ export function buildSections(
                   // Educational likewise: the button leads back to the index.
                   : brief.siteKind === "docs-educational" && features.length > 1
                     ? `Read all ${count(features.length)} parts`
-                    : cta.secondary,
+                    // Field guide likewise: the button leads back to the index.
+                    : brief.siteKind === "field-guide" && features.length > 1
+                      ? `Read all ${count(features.length)} traits`
+                      : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote: brief.siteKind === "saas-marketing" ? riskLine : undefined,
           }),

@@ -820,12 +820,16 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Field guide — herbarium / voucher craft.
+   * Field guide — glassine fold, one index, the brief's own priorities as a key.
    *
-   * Personal-craft + brand-agency corridors favour figure-dense paper surfaces and quiet display.
-   * Soft theme packs answer with floating glass card collages. This offering invents unreplicable
-   * voucher grammar: taxon rail, specimen plate (pressed silhouette + free botanical photo),
-   * dichotomous voucher key (ladder + stacked sheets), Voucher close.
+   * The page used to follow the glassine fold with an index of bare names (four of them, whatever
+   * the brief gave), a "how it is put together" drawing that named them again, a figure band with
+   * a "cost · cumulative" chart of made-up values under "how X presses a voucher", a specimen strip
+   * of bare names, and a dichotomous key that printed every description a second time with invented
+   * leads ("trait holds → photo inset", "trait fails → re-key from kingdom"). A five-trait brief
+   * named its lead trait thirteen times. The fold names each trait once, in its binomial strip; the
+   * index holds every description once; and the key now sorts the traits by the priority the brief
+   * gives, so it says something the index does not.
    */
   if (siteKind === "field-guide") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-voucher", surface: "paper", columns: split.wide });
@@ -837,23 +841,14 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    plans.push({
       id: "story",
       kind: "story",
       layout: "story-range",
-      surface: "paper",
-      bond: true,
+      // The key's stacked sheets sit in a sunken tray, where the specimen strip's valley used to be.
+      surface: "sunken",
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — dichotomous voucher key is the field-guide proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the dichotomous key is the field-guide instrument.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

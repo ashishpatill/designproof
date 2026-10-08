@@ -173,10 +173,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "field-guide") {
+      /*
+       * No fold note: "vouchers ship with pressed plates and range notes — not a demo theatre"
+       * reached every field-guide page through the authored path, a marina's included, and no brief
+       * says how anything ships. "Request a voucher" fit one herbarium; a pottery studio has no
+       * vouchers to request. The buttons say what the page is: a guide, and the traits in it.
+       */
       return {
-        primary: "Request a voucher",
-        secondary: "Open the plate",
-        note: "Vouchers ship with pressed plates and range notes — not a demo theatre.",
+        primary: "Open the guide",
+        secondary: "See every trait",
+        note: "",
       };
     }
     if (siteKind === "care-pathway") {
@@ -858,6 +864,35 @@ export function educationalQuestions(brief: DesignBrief, features: FeatureSpec[]
   return out;
 }
 
+/**
+ * Field-guide questions. Every answer is built from this brief: its product, its audience, and its
+ * trait names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement,
+ * and that every capability ships "from day one". No brief declares any of those. The approval
+ * question stays only when the brief itself declares an approval step.
+ */
+export function fieldGuideQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who uses ${brief.productName}?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which trait handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} guide?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} traits`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1018,14 +1053,25 @@ export function navFor(
   const labels: Record<string, string> = {
     // Archive: the catalogue is headed "The entries", so the menu calls it that too.
     // Educational: the index is headed "Parts", so the menu calls it that too.
-    features: siteKind === "archive-index" ? "Entries" : siteKind === "docs-educational" ? "Parts" : "Capabilities",
+    // Field guide: the index is headed "The traits", so the menu calls it "Traits".
+    features:
+      siteKind === "archive-index"
+        ? "Entries"
+        : siteKind === "docs-educational"
+          ? "Parts"
+          : siteKind === "field-guide"
+            ? "Traits"
+            : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
         ? "Pipeline"
         : siteKind === "fintech-marketing"
           ? "Send path"
-          : siteKind === "corporate-story" || siteKind === "archive-index" || siteKind === "docs-educational"
+          : siteKind === "corporate-story" ||
+              siteKind === "archive-index" ||
+              siteKind === "docs-educational" ||
+              siteKind === "field-guide"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
