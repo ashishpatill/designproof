@@ -197,7 +197,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     // Field guide: the specimen plate draws no names or sentences; the binomial strip names them.
     spec.brief.siteKind === "field-guide" ||
     // Observatory: the signal lattice numbers its rows; the scrub rail names the channels.
-    spec.brief.siteKind === "signal-observatory"
+    spec.brief.siteKind === "signal-observatory" ||
+    // Foundry: the type ladder names each cut on its own rung, and no sentence.
+    spec.brief.siteKind === "editorial-foundry"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       /*
        * Educational: names only too. The mechanism plate draws each part as a numbered column
@@ -1182,7 +1184,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
         // Observatory rows carry their description too: the fold prints none.
-        spec.brief.siteKind === "editorial-foundry" ||
+        // Foundry rows as well: the ladder on the fold names the cuts and prints no sentence.
         spec.brief.siteKind === "research-dossier" ||
         spec.brief.siteKind === "commerce-loom" ||
         // Field guide rows carry their description too: the fold prints none.
@@ -1197,6 +1199,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isField = spec.brief.siteKind === "field-guide";
       // Observatory rows are the scrub rail's jump targets.
       const isObservatory = spec.brief.siteKind === "signal-observatory";
+      // Foundry rows are numbered like the ladder's rungs, and the margin points at them.
+      const isFoundry = spec.brief.siteKind === "editorial-foundry";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1206,7 +1210,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                 ? ` id="trait-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                 : isObservatory
                   ? ` id="channel-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
-                  : ""
+                  : isFoundry
+                    ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                    : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1349,7 +1355,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Field guide too: the list beside the drawing named every trait again, right under the index.
     spec.brief.siteKind !== "field-guide" &&
     // Observatory as well: the list beside the drawing named the channels again, right under the index.
-    spec.brief.siteKind !== "signal-observatory"
+    spec.brief.siteKind !== "signal-observatory" &&
+    // Foundry too: the list beside the drawing named every cut again, right under the index.
+    spec.brief.siteKind !== "editorial-foundry"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1514,58 +1522,39 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
  * Reading column on the shared rail; annotations hang in the outer column as true marginalia
  * (not cards). A full-bleed hairline interrupts the measure between beats. Hard for a generic
  * theme pack to fake without inventing this layout grammar.
+ *
+ * Each beat is one priority tier from the brief and names the cuts in it once; its margin note,
+ * set beside it, says how many cuts the tier holds and where they sit in the index, by number,
+ * each number jumping to its row. The essay used to
+ * print every description a second time, hang the other cut names beside each one as "cut slips"
+ * with "Display", "Title", and "Deck" sizes no brief gave, and set a "Note 01" label and the cut's
+ * name again in the margin, under a "5 cuts · annotated" line.
  */
-function renderMarginalia(section: SectionSpec, figures: FigurePlan): string {
+function renderMarginalia(section: SectionSpec): string {
   const count = section.blocks.length;
-  const cuts = ["Display", "Title", "Deck", "Text", "Caption", "Tabular"];
-  const notes = section.blocks
-    .map((b, i) => {
-      const note = b.kicker || b.meta || `Cut ${String(i + 1).padStart(2, "0")}`;
-      return `<li class="ds-marginalia-note" style="--note-i:${i}">
-        <p class="ds-marginalia-meta">${esc(note)}</p>
-        <p class="ds-marginalia-title">${esc(b.title)}</p>
-      </li>`;
-    })
-    .join("");
   const essay = section.blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-marginalia-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      // Cut slips — optical-size companions that travel with the reading (foundry mid-page proof).
-      const related = section.blocks
-        .map((other, j) => ({ other, j }))
-        .filter(({ j }) => j !== i)
-        .slice(0, 3);
-      const slips =
-        related.length > 0
-          ? `<ul class="ds-cut-slips" aria-label="Optical-size slips for ${esc(b.title)}">${related
-              .map(({ other, j }) => {
-                const cut = esc(other.meta || cuts[j % cuts.length]!);
-                return `<li class="ds-cut-slip">
-                  <span class="ds-cut-size" aria-hidden="true">${cut}</span>
-                  <span class="ds-cut-name">${esc(other.title)}</span>
-                </li>`;
-              })
-              .join("")}</ul>`
-          : "";
+      const n = b.points.length;
+      // The margin note jumps to each cut's own index row.
+      const at = b.points.map((num) => `<a href="#cut-${esc(num)}">${esc(num)}</a>`).join(", ");
       return `<article class="ds-marginalia-beat">
         <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
         <h3>${esc(b.title)}</h3>
         ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${slips}
-        ${mark}
+        <aside class="ds-marginalia-note" aria-label="Where the ${esc(b.title.toLowerCase())} cuts sit in the index">
+          <p class="ds-marginalia-meta">${n} ${n === 1 ? "cut" : "cuts"}</p>
+          <p class="ds-marginalia-title">Index ${at}</p>
+        </aside>
         ${i < count - 1 ? `<hr class="ds-marginalia-rule" aria-hidden="true"/>` : ""}
       </article>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-marginalia" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Essay", `${count} cuts · annotated`)}
+      ${secMeta("Marginalia", `${count} tiers`)}
       ${sectionHead(section, 2, false)}
-      <div class="ds-marginalia-grid" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "7fr 5fr"))}">
+      <div class="ds-marginalia-grid">
         <div class="ds-marginalia-essay">${essay}</div>
-        <aside class="ds-marginalia-rail" aria-label="Marginal notes">
-          <ol class="ds-marginalia-notes">${notes}</ol>
-        </aside>
       </div>
     </div>
   </section>`;
@@ -2553,7 +2542,7 @@ function renderSection(
     case "story-chapters":
       return wrapped(renderChapters(section, figures, spec));
     case "story-marginalia":
-      return wrapped(renderMarginalia(section, figures));
+      return wrapped(renderMarginalia(section));
     case "story-spread":
       return wrapped(renderSpread(section, figures));
     case "story-chrono":
@@ -2986,7 +2975,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "archive-index" ||
     spec.brief.siteKind === "docs-educational" ||
     spec.brief.siteKind === "field-guide" ||
-    spec.brief.siteKind === "signal-observatory"
+    spec.brief.siteKind === "signal-observatory" ||
+    spec.brief.siteKind === "editorial-foundry"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

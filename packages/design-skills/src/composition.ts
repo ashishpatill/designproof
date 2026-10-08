@@ -405,17 +405,27 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Editorial foundry — typography spine, hard-seam fold, paper-led scroll.
+   * Editorial foundry — typography spine, hard-seam fold, one cut index, the brief's own priorities
+   * as marginalia.
    *
    * Measured type-foundry / personal-craft / editorial-longform pages sit at foldFigure ~0.97,
    * figureArea ~0.38, invertedShare ~0, display ~3.3vw, alignment axes ~6. They are not SaaS
    * conversion ladders, studio selected-work grids, or consumer product plates: the argument is
    * the type system itself. Hard seam + type ladder + marginalia + colophon are the craft that
    * generic engines do not invent from a theme pack.
+   *
+   * The page used to follow the seam fold with an index of bare names (three or four of them,
+   * whatever the brief gave) beside a "how it is put together" list that named them again, a
+   * figure band that drew the ladder a second time beside a "cost · cumulative" chart of made-up
+   * values, a specimen band of bare names, and a marginalia essay that printed every description
+   * again with the other names hung beside each one as "cut slips". A five-cut brief named its lead
+   * cut fourteen times. The fold names each cut once, on its ladder; the index holds every
+   * description once; and the marginalia now group the cuts by the priority the brief gives, so
+   * they say something the index does not.
    */
   if (siteKind === "editorial-foundry") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-seam", surface: "paper", columns: "1fr 1fr" });
-    // Cut catalogue — indexed list on a shared rail, not metric theatre.
+    // Cut index — every cut, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -423,29 +433,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    // Optical-size ladder as the teaching figure (foundry signature).
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    // Quiet sunken valley — honest weight variation without empty height.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    // Marginalia essay — annotations hang in the outer column (editorial-longform craft).
+    // Marginalia — one beat per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-marginalia",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
       columns: "7fr 5fr",
     });
-    // No second feature-alternating catalogue — empty airways after marquee cut.
-    // Cut slips live inside the marginalia essay (foundry mid-page proof).
     // No shared marquee-proof — type ladder + marginalia already prove foundry craft.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // Colophon close on paper — not inverse demo-booking theatre.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
