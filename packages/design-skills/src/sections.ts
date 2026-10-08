@@ -33,6 +33,8 @@ import {
   fieldGuideQuestions,
   observatoryQuestions,
   foundryQuestions,
+  pressQuestions,
+  PRESS_SIGS,
   spoken,
   riskReversal,
   sentence,
@@ -325,7 +327,9 @@ export function buildSections(
                       ? observatoryQuestions(brief, features)
                       : brief.siteKind === "editorial-foundry"
                         ? foundryQuestions(brief, features)
-                        : questions(brief, features);
+                        : brief.siteKind === "press-atelier"
+                          ? pressQuestions(brief, features)
+                          : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -402,7 +406,11 @@ export function buildSections(
         sections.push(
           SectionSpec.parse({
             ...base,
-            eyebrow: brief.audience,
+            /*
+             * Press: the claim hides its eyebrow, so the audience sat in the page unseen; the first
+             * answer says who the press sheet is for.
+             */
+            eyebrow: isPress ? "" : brief.audience,
             title: headline(brief, features),
             /*
              * Archive: the register's claim hides its lede, so the lead description sat in the page
@@ -427,7 +435,11 @@ export function buildSections(
              * Foundry: same rule. The lead description sat under the headline and was printed again
              * in the marginalia essay; the index now holds every description.
              */
-            body: isArchive || isMechanism || isField || isObservatory || isFoundry ? "" : heroLede(brief, editorial.heroLines),
+            /*
+             * Press: same rule. The claim hides its lede, so the lead description sat in the page
+             * unseen and was printed again in the gather essay; the index now holds every description.
+             */
+            body: isArchive || isMechanism || isField || isObservatory || isFoundry || isPress ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             // Foundry: one button on the fold. "See the cuts" sat on the fold and again in the close.
@@ -536,6 +548,8 @@ export function buildSections(
           brief.siteKind === "signal-observatory" ||
           // Foundry as well: its index stopped at three or four cuts, whatever the brief gave.
           brief.siteKind === "editorial-foundry" ||
+          // Press too: its index stopped at four plates on a six-plate brief.
+          brief.siteKind === "press-atelier" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -620,7 +634,14 @@ export function buildSections(
                          */
                         : brief.siteKind === "editorial-foundry"
                           ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
-                          : rawSlice;
+                          /*
+                           * Press: every row keeps its description, because the fold prints none.
+                           * Rows are lettered the way the press sheet letters its signatures, and
+                           * carry no tier word, because the gather says that once.
+                           */
+                          : brief.siteKind === "press-atelier"
+                            ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: `Sig ${PRESS_SIGS[i] ?? String(i + 1)}` }))
+                            : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -737,6 +758,9 @@ export function buildSections(
                           // Field guide: "traits a field voucher actually keeps" was on a marina's page too.
                           : isField
                             ? sentence(`${brief.productName}, trait by trait`)
+                        // Press: "everything X does, starting with Y" named the lead plate before its row did.
+                        : isPress
+                          ? sentence(`${brief.productName}, plate by plate`)
                         : isLantern
                           ? sentence(`Chapters a night walk actually keeps`)
                         : isClinic
@@ -802,8 +826,9 @@ export function buildSections(
                           // Field guide: "a nature photo dressed as science" was on every field-guide page.
                           : isField
                             ? ""
+                        // Press: "a gallery dressed as a pressroom" was on every press page.
                         : isPress
-                          ? sentence(`Each plate is a numbered signature — not a gallery dressed as a pressroom`)
+                          ? ""
                         : isLantern
                           ? sentence(`Each chapter is a lantern waypoint — not a dark glow page dressed as cinema`)
                         : isClinic
@@ -1232,6 +1257,49 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Press: the gather essay printed every description a second time, right under the index,
+         * with the name over each one, "Note 01" labels, and a drawing on every forme, under "how a
+         * signature is actually gathered" and "fold ticks, plate index, and the gathers that keep a
+         * forme honest", lines printed on every press page. Now each forme is one priority tier from
+         * the brief and names the plates in it once. With a single priority there is nothing to
+         * group, so the section is left out.
+         */
+        if (brief.siteKind === "press-atelier") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              names: features.filter((f) => f.priority === priority).map((f) => f.name),
+              at: features.flatMap((f, i) => (f.priority === priority ? [PRESS_SIGS[i] ?? String(i + 1)] : [])),
+            }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} plates come first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // The plates keep their own case after the first.
+                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  // The forme gives each plate's signature letter in the index, not its name again.
+                  points: t.at,
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1274,8 +1342,6 @@ export function buildSections(
                     ? "Reading notes"
                         : brief.siteKind === "commerce-loom"
                           ? "Hangtag notes"
-                        : brief.siteKind === "press-atelier"
-                          ? "Gather notes"
                         : brief.siteKind === "lantern-path"
                           ? "Ember notes"
                         : brief.siteKind === "care-pathway"
@@ -1290,8 +1356,6 @@ export function buildSections(
                     ? sentence(`How a brief is actually read`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`How a hangtag is actually cut`)
-                        : brief.siteKind === "press-atelier"
-                          ? sentence(`How a signature is actually gathered`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`How a night walk is actually read`)
                         : brief.siteKind === "care-pathway"
@@ -1312,8 +1376,6 @@ export function buildSections(
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
-                        : brief.siteKind === "press-atelier"
-                          ? sentence(`Fold ticks, plate index, and the gathers that keep a forme honest`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
                         : brief.siteKind === "care-pathway"
@@ -1340,8 +1402,6 @@ export function buildSections(
                 body: c.body,
                 meta: brief.siteKind === "commerce-loom"
                       ? ["XS", "S", "M", "L", "XL", "XXL"][i % 6]
-                        : brief.siteKind === "press-atelier"
-                          ? `Sig ${"ABCDEFGH"[i] ?? String(i + 1)}`
                         : brief.siteKind === "lantern-path"
                           ? `Ch ${["I","II","III","IV","V","VI"][i] ?? String(i + 1)}`
                         : brief.siteKind === "care-pathway"
@@ -1350,7 +1410,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1702,7 +1762,10 @@ export function buildSections(
                       // Foundry likewise: the fold's first line names the audience, and so does the first answer.
                       : brief.siteKind === "editorial-foundry"
                         ? sentence(`Questions about the ${brief.productName} specimen`)
-                        : sentence(`Questions ${brief.audience} ask first`),
+                        // Press likewise: the first answer names the audience.
+                        : brief.siteKind === "press-atelier"
+                          ? sentence(`Questions about the ${brief.productName} press sheet`)
+                          : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1759,8 +1822,11 @@ export function buildSections(
                           ? features[0]
                             ? `Start the ${brief.productName} guide at ${lower(features[0].name)}`
                             : `Start the ${brief.productName} guide`
+                      // Press: "lock a forme" fit one pressroom; the close says where to begin.
                       : brief.siteKind === "press-atelier"
-                        ? `Lock a forme on ${brief.productName}`
+                        ? features[0]
+                          ? `Start the ${brief.productName} press sheet with ${lower(features[0].name)}`
+                          : `Start the ${brief.productName} press sheet`
                       : brief.siteKind === "lantern-path"
                         ? `Walk the next ${brief.productName} chapter`
                       : brief.siteKind === "care-pathway"
@@ -1836,8 +1902,17 @@ export function buildSections(
                                 features.length === 2 ? "trait follows" : "traits follow"
                               } in the index above`
                             : ""
+                      /*
+                       * Press: "plate numbers, densitometer marks, and the formes ... actually run"
+                       * closed every press page, a pottery studio's included. The close gives the
+                       * count the brief gives instead.
+                       */
                       : brief.siteKind === "press-atelier"
-                        ? `Plate numbers, densitometer marks, and the formes ${brief.audience} actually run`
+                        ? features.length > 1
+                          ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                              features.length === 2 ? "plate is" : "plates are"
+                            } set in the index above`
+                          : ""
                       : brief.siteKind === "lantern-path"
                         ? `Waypoint marks, path plates, and the chapters ${brief.audience} actually walk`
                       : brief.siteKind === "care-pathway"
@@ -1893,6 +1968,9 @@ export function buildSections(
                       // Foundry likewise: the button leads back to the index.
                       : brief.siteKind === "editorial-foundry" && features.length > 1
                         ? `Read all ${count(features.length)} cuts`
+                      // Press likewise: the button leads back to the index.
+                      : brief.siteKind === "press-atelier" && features.length > 1
+                        ? `Read all ${count(features.length)} plates`
                       // Observatory likewise: the button leads back to the index.
                       : brief.siteKind === "signal-observatory" && features.length > 1
                         ? `Read all ${count(features.length)} channels`

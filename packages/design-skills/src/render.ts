@@ -5,7 +5,7 @@
  * what keeps the emitted page consistent with the design system it declares, and it is what makes
  * the generated markup safe to hand to a developer as a starting point.
  */
-import { count, helmSessionTurns } from "./copy";
+import { count, helmSessionTurns, PRESS_SIGS } from "./copy";
 import { renderCss } from "./css";
 import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
@@ -199,7 +199,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     // Observatory: the signal lattice numbers its rows; the scrub rail names the channels.
     spec.brief.siteKind === "signal-observatory" ||
     // Foundry: the type ladder names each cut on its own rung, and no sentence.
-    spec.brief.siteKind === "editorial-foundry"
+    spec.brief.siteKind === "editorial-foundry" ||
+    // Press: the press sheet names each plate on its own signature, and no sentence.
+    spec.brief.siteKind === "press-atelier"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       /*
        * Educational: names only too. The mechanism plate draws each part as a numbered column
@@ -650,17 +652,24 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const sheetFig = figures.hero
       ? `<figure class="ds-press-sheet" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const sigs = "ABCDEFGH".split("");
+    /*
+     * One signature per plate, up to the sheet's eight, each jumping to its row in the index. The
+     * rail used to be "Sig A" to "Sig H" on every page whatever the brief gave, pointing at a figure
+     * band, a specimen band, and a proof section the page did not always have, and the masthead
+     * read "Forme · Sig A–H" over a sheet of three plates.
+     */
+    const plates = (spec.sections.find((s) => s.kind === "features")?.blocks.length ?? 0) || 1;
+    const sigs = PRESS_SIGS.slice(0, Math.min(8, plates)).split("");
     const rail = `<nav class="ds-sig-rail" aria-label="Signature index"><ol>${sigs
       .map((S, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-sig-letter${i === 0 ? " is-active" : ""}" data-sig="${S}"><span>Sig ${S}</span></a></li>`;
+        return `<li><a href="#plate-${S.toLowerCase()}" class="ds-sig-letter${i === 0 ? " is-active" : ""}" data-sig="${S}"><span>Sig ${S}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
+    const span = sigs.length > 1 ? `Sig A–${sigs[sigs.length - 1]}` : "Sig A";
     const mast = `<header class="ds-press-masthead" aria-label="Press masthead">
-      <span class="ds-press-vol">Forme</span>
-      <span class="ds-press-issue">Sig A–H</span>
-      <span class="ds-press-date">Press sheet</span>
+      <span class="ds-press-vol">Press sheet</span>
+      <span class="ds-press-issue">${span}</span>
+      <span class="ds-press-date">${plates} ${plates === 1 ? "plate" : "plates"}</span>
       <span class="ds-press-mark">${esc(spec.brief.productName)}</span>
     </header>`;
     // Registration corner marks frame the sheet only — never the claim or masthead.
@@ -1180,7 +1189,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       }
       // Educational rows carry their description too: the fold prints none.
       const quietIndex =
-        spec.brief.siteKind === "press-atelier" ||
+        // Press rows carry their description too: the press sheet names the plates and prints no sentence.
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
         // Observatory rows carry their description too: the fold prints none.
@@ -1201,6 +1210,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isObservatory = spec.brief.siteKind === "signal-observatory";
       // Foundry rows are numbered like the ladder's rungs, and the margin points at them.
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
+      // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
+      const isPress = spec.brief.siteKind === "press-atelier";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1212,7 +1223,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                   ? ` id="channel-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                   : isFoundry
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
-                    : ""
+                    : isPress
+                      ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
+                      : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1357,7 +1370,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Observatory as well: the list beside the drawing named the channels again, right under the index.
     spec.brief.siteKind !== "signal-observatory" &&
     // Foundry too: the list beside the drawing named every cut again, right under the index.
-    spec.brief.siteKind !== "editorial-foundry"
+    spec.brief.siteKind !== "editorial-foundry" &&
+    // Press as well: the list beside the drawing named every plate again, right under the index.
+    spec.brief.siteKind !== "press-atelier"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1780,28 +1795,31 @@ function renderHangtag(section: SectionSpec, figures: FigurePlan): string {
  *
  * Overlapping press formes with registration corners + densitometer strip.
  * Not the essay+aside list clone shared by range/entry/hang/ember.
+ *
+ * Each forme is one priority tier from the brief and names the plates in it once; its note says
+ * how many plates the tier holds and which signatures they are, each letter jumping to its row in
+ * the index. The stack used to print every description a second time with the plate's name over
+ * it, a "Note 01" label, and a drawing on every forme, under a "5 formes · densitometer" line and
+ * a "CMYK · gather check" label printed on every press page.
  */
-function renderGather(section: SectionSpec, figures: FigurePlan): string {
+function renderGather(section: SectionSpec): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const sigs = "ABCDEFGH".split("");
   const formes = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-gather-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const sig = esc(b.meta ?? `Sig ${sigs[i] ?? String(i + 1)}`);
-      const letter = esc((b.meta ?? sigs[i] ?? String(i + 1)).replace(/^Sig\s+/i, "").slice(0, 2));
-      return `<article class="ds-gather-forme" style="--i:${i}" data-sig="${sig}">
+      const num = esc(b.meta ?? String(i + 1).padStart(2, "0"));
+      const n = b.points.length;
+      const at = b.points.map((S) => `<a href="#plate-${esc(S.toLowerCase())}">${esc(S)}</a>`).join(", ");
+      return `<article class="ds-gather-forme" style="--i:${i}" data-sig="${num}">
         <div class="ds-gather-regs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
         <header class="ds-gather-forme-head">
-          <span class="ds-gather-forme-letter">${letter}</span>
+          <span class="ds-gather-forme-letter" aria-hidden="true">${num}</span>
           <div class="ds-gather-forme-copy">
-            <p class="ds-chapter-index">${sig}</p>
             <h3>${esc(b.title)}</h3>
           </div>
         </header>
         ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${b.kicker ? `<p class="ds-gather-note">${esc(b.kicker)}</p>` : ""}
-        ${mark}
+        <p class="ds-gather-note">${n} ${n === 1 ? "plate" : "plates"} · Sig ${at}</p>
       </article>`;
     })
     .join("");
@@ -1813,12 +1831,11 @@ function renderGather(section: SectionSpec, figures: FigurePlan): string {
     <span class="ds-densito-bar" data-tone="g25"></span>
     <span class="ds-densito-bar" data-tone="g50"></span>
     <span class="ds-densito-bar" data-tone="g75"></span>
-    <span class="ds-densito-label">CMYK · gather check</span>
   </div>`;
   return `<section class="ds-section ds-story ds-gather" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Gather", `${count} formes · densitometer`)}
+      ${secMeta("Gather", `${count} tiers`)}
       ${sectionHead(section, 2, true)}
       ${densito}
       <div class="ds-gather-stack" aria-label="Signature stack">${formes}</div>
@@ -2554,7 +2571,7 @@ function renderSection(
     case "story-range":
       return wrapped(renderRange(section));
     case "story-gather":
-      return wrapped(renderGather(section, figures));
+      return wrapped(renderGather(section));
     case "story-ember":
       return wrapped(renderEmber(section, figures));
     case "story-rounds":
@@ -2976,7 +2993,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "docs-educational" ||
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
-    spec.brief.siteKind === "editorial-foundry"
+    spec.brief.siteKind === "editorial-foundry" ||
+    spec.brief.siteKind === "press-atelier"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

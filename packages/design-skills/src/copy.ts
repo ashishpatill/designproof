@@ -143,6 +143,19 @@ export function ctaFor(
         note: "",
       };
     }
+    if (siteKind === "press-atelier") {
+      /*
+       * No fold note. Press used the trust goal's "see the approach" and "read the detail", and on
+       * the authored path a "<lead> ships first — everything here is verifiable before you commit"
+       * note hidden on the fold, on every press page. The buttons say what the page is: a press
+       * sheet, and the plates on it.
+       */
+      return {
+        primary: "Open the press sheet",
+        secondary: "See every plate",
+        note: "",
+      };
+    }
     if (siteKind === "research-dossier") {
       return {
         primary: "Request the brief",
@@ -964,6 +977,47 @@ export function foundryQuestions(brief: DesignBrief, features: FeatureSpec[]): A
   return out;
 }
 
+/** Press signature letters: the sheet, the rail, the index, and the gather all letter a plate the same way. */
+export const PRESS_SIGS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/** A plate that does the approving: approve, approval(s), approving, or sign-off. */
+const PRESS_APPROVAL_STEP = /\b(?:approv(?:e|es|al|als|ing)|sign-?offs?)\b/i;
+
+/**
+ * Press questions. Every answer is built from this brief: its product, its audience, and its plate
+ * names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, that every capability ships "from day one", and "no hidden tier". No brief declares any
+ * of those. The approval question stays only when the brief itself declares an approval step.
+ */
+export function pressQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  const sig = (i: number) => PRESS_SIGS[i] ?? String(i + 1);
+  out.push({ title: `Who is the ${brief.productName} press sheet for?`, body: sentence(Audience) });
+  /*
+   * An approval step, not the word "approved": the sample's densitometer strip keeps ink honest
+   * "when a proof drifts off the approved forme", which the shared signal reads as an approval
+   * workflow, and the answer then said the densitometer strip handles approvals.
+   */
+  const at = features.findIndex((f) => PRESS_APPROVAL_STEP.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which plate handles approvals?`,
+      body: sentence(`${features[at]!.name}, Sig ${sig(at)} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} press sheet?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} plates`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1138,7 +1192,10 @@ export function navFor(
               // Foundry: the index is headed "The cuts", so the menu calls it "Cuts".
               : siteKind === "editorial-foundry"
                 ? "Cuts"
-                : "Capabilities",
+                // Press: the index is headed "The plates", so the menu calls it "Plates".
+                : siteKind === "press-atelier"
+                  ? "Plates"
+                  : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1150,7 +1207,8 @@ export function navFor(
               siteKind === "docs-educational" ||
               siteKind === "field-guide" ||
               siteKind === "signal-observatory" ||
-              siteKind === "editorial-foundry"
+              siteKind === "editorial-foundry" ||
+              siteKind === "press-atelier"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

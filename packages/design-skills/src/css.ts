@@ -516,6 +516,20 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="press-atelier"] .ds-reveal,
   [data-sitekind="press-atelier"] .ds-reveal .ds-stagger > *{animation-name:ds-press-snap}
 }
+
+/* Gather formes are one priority tier each now, a name list and a note, with no drawing under
+   them. The shared overlap was sized for formes that carried a description and a drawing, and on
+   these shorter formes it hid the next forme's tier number under the one above. */
+[data-sitekind="press-atelier"] .ds-gather-forme + .ds-gather-forme{margin-top:-3.9rem}
+[data-sitekind="press-atelier"] .ds-gather-note a{color:inherit;text-underline-offset:0.2em}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which runs the next row's rule through the last line of a description on a phone. */
+[data-sitekind="press-atelier"] .ds-index-row:nth-child(n){margin-block:0}
+/* Rows are lettered "Sig A" like the sheet's cells; the letter stays on the same line as "Sig". */
+[data-sitekind="press-atelier"] .ds-index-num{white-space:nowrap}
+@media (max-width:820px){
+  [data-sitekind="press-atelier"] .ds-index-row{grid-template-columns:3rem 1fr}
+}
 `,
     "lantern-path": `
 @keyframes ds-lantern-in{from{opacity:0;transform:translateY(1.6rem) scale(0.985)}to{opacity:1;transform:none}}
