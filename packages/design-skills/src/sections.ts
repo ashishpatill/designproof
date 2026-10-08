@@ -15,12 +15,15 @@ import {
   featuresTitle,
   headline,
   heroLede,
+  lower,
   navFor,
   outcomeNames,
   outcomes,
+  addedLanes,
   plans,
   pullQuote,
   questions,
+  saasQuestions,
   riskReversal,
   sentence,
 } from "./copy";
@@ -290,7 +293,11 @@ export function buildSections(
         note: authored.cta.note,
       }
     : { ...ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta) };
-  const faqItems = authored?.faq?.length ? authored.faq : questions(brief, features);
+  const faqItems = authored?.faq?.length
+    ? authored.faq
+    : brief.siteKind === "saas-marketing"
+      ? saasQuestions(brief, features)
+      : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -450,9 +457,33 @@ export function buildSections(
          */
         const total = allBlocks.length;
         const wanted = Math.min(total, Math.max(3, Math.ceil(total * 0.6)));
-        const first = total - wanted < 2 ? total : wanted;
-        const slice =
+        // SaaS keeps one complete catalogue (see featureLayouts), so its single band holds every row.
+        const first = brief.siteKind === "saas-marketing" || total - wanted < 2 ? total : wanted;
+        const rawSlice =
           featureCursor === 0 ? allBlocks.slice(0, first) : allBlocks.slice(Math.max(0, featureCursor));
+        /*
+         * SaaS catalogue is the one home for each description. A row stays a bare name only when
+         * another section tells that same capability: a side-by-side fold prints every description,
+         * a stage-by-stage or scrubbed proof spells out the second top capability, and an index,
+         * console, table, or evidence proof prints every description itself.
+         */
+        const proofPlan = plan.find((row) => row.kind === "proof");
+        const foldPlan = plan.find((row) => row.kind === "hero");
+        const proofTellsAll =
+          foldPlan?.layout === "feature-alternating" ||
+          proofPlan?.layout === "app-shell" ||
+          proofPlan?.layout === "compare-matrix" ||
+          proofPlan?.layout === "feature-index" ||
+          proofPlan?.layout === "feature-rows" ||
+          proofPlan?.layout === "feature-alternating" ||
+          proofPlan?.layout === "marquee-proof";
+        const proofTellsOne =
+          proofPlan?.layout === "workflow-proof" || proofPlan?.layout === "figure-explainer";
+        const proofOwner = proofTellsOne ? (p0[1] ?? features[1] ?? features[0])?.name : undefined;
+        const slice =
+          brief.siteKind === "saas-marketing"
+            ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
+            : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -570,7 +601,10 @@ export function buildSections(
                           ? sentence(`Stages a care pathway actually keeps`)
                         : isHarness
                           ? sentence(`Permits a local session actually keeps`)
-                  : featuresTitle(brief, features),
+                  // SaaS: the lead capability is already the fold's subject and the first row here.
+                  : brief.siteKind === "saas-marketing"
+                    ? sentence(`What ${brief.productName} does, one capability at a time`)
+                    : featuresTitle(brief, features),
             body: isSecond
               ? isStudio
                 ? sentence(`Handoffs, critique, and the rules that stop the system from drifting`)
@@ -621,7 +655,11 @@ export function buildSections(
                           ? sentence(`Each stage is a chart waypoint — not a SaaS pipeline dressed as care`)
                         : isHarness
                           ? sentence(`Each turn is a session beat — not a workflow approve stamp dressed as trust`)
-                  : featuresLede(brief, features),
+                  // SaaS: the heading already names the product and its lead capability; a stock
+                  // "two carry the argument" line read the same on every page.
+                  : brief.siteKind === "saas-marketing"
+                    ? ""
+                    : featuresLede(brief, features),
             blocks: slice,
           }),
         );
@@ -1061,13 +1099,16 @@ export function buildSections(
         const scrubSteps = stageClauses(proofFeature?.description || proofFeature?.name || "", usedOnFold).map(
           (title) => block({ title }),
         );
-        const indexRows = features.map((f, i) =>
-          block({
-            title: titleNotUsed(f.name, f.description, usedOnFold),
-            body: f.description,
+        const indexRows = features.map((f, i) => {
+          const title = titleNotUsed(f.name, f.description, usedOnFold);
+          // When the fold already spent the name, the row's title is the description; printing it
+          // again as the body set every line twice, one under the other.
+          return block({
+            title,
+            body: normTitle(title) === normTitle(f.description) ? "" : f.description,
             meta: String(i + 1).padStart(2, "0"),
-          }),
-        );
+          });
+        });
         const proofTitle =
           brief.siteKind === "saas-marketing"
             ? isWorkflow
@@ -1202,16 +1243,20 @@ export function buildSections(
       }
 
       case "pricing": {
-        const lanes = plans(brief, features);
+        const isSaas = brief.siteKind === "saas-marketing";
+        const lanes = isSaas ? addedLanes(brief, features) : plans(brief, features);
         if (lanes.length < 2) break;
         sections.push(
           SectionSpec.parse({
             ...base,
             eyebrow: eyebrow.pricing,
             title: sentence(`Three ways to scope ${brief.productName}`),
-            body: sentence(
-              `Lanes are drawn from the ${count(features.length)} declared capabilities. Nothing is invented to fill a column`,
-            ),
+            body: isSaas
+              ? sentence(`Each lane adds named capabilities to the one before it`)
+              : sentence(
+                  `Lanes are drawn from the ${count(features.length)} declared capabilities. Nothing is invented to fill a column`,
+                ),
+            secondaryLabel: isSaas ? "Ask about this lane" : undefined,
             ctaLabel: cta.primary,
             blocks: lanes.map((l) =>
               block({
@@ -1300,7 +1345,11 @@ export function buildSections(
                         ? `Start the next ${brief.productName} session`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
-                  : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
+                  // The audience's last word is not who the reader shows a product to: "revenue
+                  // leaders at B2B software companies" closed on "in front of your companies".
+                  : brief.siteKind === "saas-marketing" && features[0]
+                    ? `See ${brief.productName} run ${lower(features[0].name)} on your own data`
+                    : `Put ${brief.productName} in front of your ${brief.audience.split(" ").slice(-1)[0] ?? "team"}`,
             ),
             // Not `cta.note` — the fold already said that, and a closing band that repeats the
             // reassurance from the top of the page reads as a page with one idea.

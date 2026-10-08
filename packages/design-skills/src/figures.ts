@@ -321,8 +321,14 @@ function box(
  * and one row carrying a measured state. Rows are the real capability names, so the plate is a
  * claim about this product rather than a stock dashboard.
  */
-export function interfacePlate(productName: string, rows: Block[], seed: string, role: FigureRole = "plate"): string {
-  if (role === "band") return interfaceBand(productName, rows, seed);
+export function interfacePlate(
+  productName: string,
+  rows: Block[],
+  seed: string,
+  role: FigureRole = "plate",
+  opts: { once?: boolean } = {},
+): string {
+  if (role === "band") return interfaceBand(productName, rows, seed, opts);
   /*
    * In a fold column the plate is the thing a buyer is looking at, and it was being drawn at a
    * postcard's proportion inside half a screen — which put its own labels under seven pixels once
@@ -427,7 +433,7 @@ export function interfacePlate(productName: string, rows: Block[], seed: string,
  * the rail, the table and the detail panel are all on show at once, at the proportion the surface
  * actually has, instead of a narrow plate enlarged until its own chrome looks heavy.
  */
-function interfaceBand(productName: string, rows: Block[], seed: string): string {
+function interfaceBand(productName: string, rows: Block[], seed: string, opts: { once?: boolean } = {}): string {
   const items = rows.slice(0, 6);
   if (!items.length) return "";
   const W = 1240;
@@ -484,8 +490,18 @@ function interfaceBand(productName: string, rows: Block[], seed: string): string
     const lead = i === 1;
     if (lead) parts.push(box(tx - 12, y - 16, tw + 24, rowPitch - 6, { r: 7, fill: ACCENT_FIELD }));
     parts.push(`<circle cx="${tx + 6}" cy="${y + 4}" r="3.5" fill="${lead ? ACCENT : LINE}"/>`);
-    parts.push(text(clip(b.title, 34), tx + 22, y + 9, { size: FT.body, fill: lead ? INK : BODY }));
-    if (rowSub) {
+    if (opts.once) {
+      /*
+       * `once`: the rail beside this table already names every capability. The table is the open
+       * view's rows, drawn as entries, so the same names are not set a second time in one picture.
+       */
+      const w = (tw - 120) * (0.35 + r() * 0.5);
+      parts.push(box(tx + 22, y, w, 10, { r: 3, fill: lead ? ACCENT_FIELD : "var(--c-paper-raised)", stroke: LINE }));
+      if (rowSub) parts.push(box(tx + 22, y + 24, w * 0.55, 6, { r: 3, fill: "var(--c-paper-raised)" }));
+    } else {
+      parts.push(text(clip(b.title, 34), tx + 22, y + 9, { size: FT.body, fill: lead ? INK : BODY }));
+    }
+    if (!opts.once && rowSub) {
       const sub = b.points[0] ?? b.body ?? "";
       if (sub) parts.push(text(clip(sub, 48), tx + 22, y + 30, { size: FT.micro, fill: QUIET }));
     }
@@ -509,6 +525,9 @@ function interfaceBand(productName: string, rows: Block[], seed: string): string
   parts.push(text(clip(items[1]?.title ?? items[0]!.title, 26), px, 112, { size: FT.body, fill: INK, weight: 600 }));
   parts.push(rule(px, 130, px + panelW, 130));
   detailLines.forEach((ln, i) => parts.push(text(ln, px, 158 + i * 22, { size: FT.small, fill: BODY })));
+  if (opts.once && !detailLines.length) {
+    parts.push(box(px, 150, panelW * 0.9, 8, { r: 3, fill: "var(--c-paper-raised)" }));
+  }
   parts.push(box(px, gy, panelW, H - gy - 40, { r: 8, stroke: LINE }));
   parts.push(text("Last 12 periods", px + 14, gy + 22, { size: FT.micro, fill: QUIET, mono: true, track: 0.6 }));
   const n = 12;
@@ -2366,7 +2385,9 @@ export function pipelineBoard(
     });
     const bodyTop = y + 52 + titleLines.length * 16 + 12;
     const bodyCols = Math.max(8, Math.floor(contentW / approxAdvance(FIG_MONO_PX, true)));
-    const matter = wrap(s.body || s.title, bodyCols, 3);
+    // No sentence, no matter lines: the title is already set above, and printing it again as the
+    // column's body was the same label twice in one card.
+    const matter = s.body ? wrap(s.body, bodyCols, 3) : [];
     matter.forEach((ln, j) => {
       parts.push(text(ln, x + colInset, bodyTop + j * 16, { size: FIG_MONO_PX, fill: BODY }));
     });
@@ -2417,6 +2438,7 @@ export function queueConsole(
   features: Block[],
   seed: string,
   role: FigureRole = "band",
+  opts: { once?: boolean; heading?: string } = {},
 ): string {
   const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 720 : 920;
@@ -2453,18 +2475,36 @@ export function queueConsole(
   const mainW = W - mainX - pad;
   parts.push(box(mainX, pad, mainW, H - pad * 2, { r: 0, fill: PAPER, stroke: LINE }));
   parts.push(text(clip(productName, 24), mainX + 20, pad + 28, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 0.8 }));
-  parts.push(text("Operator console", mainX + 20, pad + 56, { size: 18, fill: INK, weight: 600 }));
-  // Dense rows
+  parts.push(text(clip(opts.heading ?? "Operator console", 40), mainX + 20, pad + 56, { size: 18, fill: INK, weight: 600 }));
+  if (opts.once) {
+    // The ranked rows draw in under the heading: one line of motion, the order being set.
+    parts.push(
+      `<path class="ds-draw" pathLength="1" d="M${round(mainX + 20)} ${round(pad + 68)} L${round(mainX + mainW - 24)} ${round(pad + 68)}" fill="none" stroke="${ACCENT}" stroke-width="1.5" stroke-linecap="round"/>`,
+    );
+  }
+  /*
+   * `once`: capability names appear in the rail only. Cycling the list to fill eight rows drew
+   * the first three names twice in the same panel.
+   */
   for (let i = 0; i < 8; i += 1) {
     const y = pad + 88 + i * 52;
     if (y > H - pad - 40) break;
     const feat = items[i % Math.max(1, items.length)]!;
     parts.push(rule(mainX + 16, y - 12, mainX + mainW - 16, y - 12));
-    parts.push(text(clip(feat.title, 28), mainX + 20, y + 8, { size: 13, fill: INK, weight: 600 }));
-    const sub = wrap(feat.body || feat.title, Math.max(20, Math.round(mainW / 10)), 2);
-    sub.forEach((ln, j) => {
-      parts.push(text(ln, mainX + 20, y + 28 + j * 16, { size: FIG_MONO_PX, fill: BODY }));
-    });
+    if (opts.once) {
+      // The rail already names every capability. The panel is the lead one's queue, drawn as
+      // ranked rows rather than the same names printed a second time.
+      parts.push(text(String(i + 1).padStart(2, "0"), mainX + 20, y + 8, { size: FIG_MONO_PX, fill: i === 0 ? ACCENT : QUIET, mono: true }));
+      const barW = (mainW - 140) * (0.3 + r() * 0.55);
+      parts.push(box(mainX + 52, y - 1, barW, 10, { r: 3, fill: i === 0 ? ACCENT_FIELD : "var(--c-paper-raised)", stroke: LINE }));
+      parts.push(box(mainX + 52, y + 18, barW * 0.6, 6, { r: 3, fill: "var(--c-paper-raised)" }));
+    } else {
+      parts.push(text(clip(feat.title, 28), mainX + 20, y + 8, { size: 13, fill: INK, weight: 600 }));
+      const sub = wrap(feat.body || feat.title, Math.max(20, Math.round(mainW / 10)), 2);
+      sub.forEach((ln, j) => {
+        parts.push(text(ln, mainX + 20, y + 28 + j * 16, { size: FIG_MONO_PX, fill: BODY }));
+      });
+    }
     parts.push(
       text(`${40 + Math.floor(r() * 55)}m`, mainX + mainW - 24, y + 8, {
         size: FIG_MONO_PX,
@@ -3383,7 +3423,9 @@ export function planFigures(input: {
   const draw = (kind: Kind, role: FigureRole): string => {
     switch (kind) {
       case "interface":
-        return interfacePlate(input.productName, input.features, seed, role);
+        return interfacePlate(input.productName, input.features, seed, role, {
+          once: input.siteKind === "saas-marketing",
+        });
       case "series":
         return seriesChart(readings[0]?.label ?? "Measured outcome", periods, seed, role);
       case "flow":
@@ -3415,7 +3457,12 @@ export function planFigures(input: {
       case "pipeline-board":
         return pipelineBoard(input.productName, input.features, seed, role);
       case "queue-console":
-        return queueConsole(input.productName, input.features, seed, role);
+        return input.siteKind === "saas-marketing"
+          ? queueConsole(input.productName, input.features, seed, role, {
+              once: true,
+              heading: input.features[0]?.title,
+            })
+          : queueConsole(input.productName, input.features, seed, role);
       case "posture-grid":
         return postureGrid(input.productName, input.features, seed, role);
       case "mechanism-plate":
