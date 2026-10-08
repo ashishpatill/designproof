@@ -28,6 +28,7 @@ import {
   fintechQuestions,
   studioQuestions,
   corporateQuestions,
+  archiveQuestions,
   spoken,
   riskReversal,
   sentence,
@@ -310,7 +311,9 @@ export function buildSections(
             ? studioQuestions(brief, features)
             : brief.siteKind === "corporate-story"
               ? corporateQuestions(brief, features)
-              : questions(brief, features);
+              : brief.siteKind === "archive-index"
+                ? archiveQuestions(brief, features)
+                : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -388,7 +391,12 @@ export function buildSections(
             ...base,
             eyebrow: brief.audience,
             title: headline(brief, features),
-            body: heroLede(brief, editorial.heroLines),
+            /*
+             * Archive: the register's claim hides its lede, so the lead description sat in the page
+             * unseen and was printed again in the entry essay. The catalogue now holds every
+             * description, the lead one included, and the fold carries none.
+             */
+            body: isArchive ? "" : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             secondaryLabel: craftFold ? undefined : cta.secondary,
@@ -482,6 +490,7 @@ export function buildSections(
           brief.siteKind === "fintech-marketing" ||
           brief.siteKind === "art-directed-studio" ||
           brief.siteKind === "corporate-story" ||
+          brief.siteKind === "archive-index" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -531,7 +540,14 @@ export function buildSections(
                     kicker: undefined,
                     body: b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? "" : b.body,
                   }))
-                : rawSlice;
+                /*
+                 * Archive: every row keeps its description, because the fold prints none. Rows are
+                 * numbered the way the fold's ledger numbers them, and carry no tier word, because
+                 * the priorities section says that once.
+                 */
+                : brief.siteKind === "archive-index"
+                  ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(3, "0") }))
+                  : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -638,8 +654,9 @@ export function buildSections(
                     ? sentence(`Instruments a capital brief actually uses`)
                     : isObservatory
                       ? sentence(`Channels an on-call desk actually watches`)
+                      // Archive: the brief's own count, not a line about what "an archive index" keeps.
                       : isArchive
-                        ? sentence(`Entries an archive index actually keeps`)
+                        ? sentence(`The ${count(features.length)} ${features.length === 1 ? "entry" : "entries"} in ${brief.productName}`)
                         : isLoom
                           ? sentence(`Lines a merchandising loom actually cuts`)
                           : isField
@@ -699,8 +716,9 @@ export function buildSections(
                     ? sentence(`Each instrument is a named reading — not a dashboard dressed as research`)
                     : isObservatory
                       ? sentence(`Each channel is a named signal — not a chart dressed as a product`)
+                      // Archive: "a search box dressed as an archive" was on every archive page.
                       : isArchive
-                        ? sentence(`Each entry is a numbered stamp — not a search box dressed as an archive`)
+                        ? ""
                         : isLoom
                           ? sentence(`Each line is a woven SKU — not a product card dressed as merchandising`)
                           : isField
@@ -933,6 +951,47 @@ export function buildSections(
          * and says how many capabilities sit in it and which. With a single priority there is
          * nothing to group, so the section is left out.
          */
+        /*
+         * Archive: the entry essay printed each description a second time, under a list of the
+         * other entries' names and beside a shelf index of every name, below a line written for one
+         * award index ("hanging folio, ruled measure, and the cross-refs that keep the roll
+         * honest"). Now each entry is one priority tier from the brief: how many of the entries sit
+         * in it, and which, stamped with their catalogue numbers. With a single priority there is
+         * nothing to group, so the section is left out.
+         */
+        if (brief.siteKind === "archive-index") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({ tier, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} entries come first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // "Two of the five entries" read the same under two tiers of the same size.
+                  body: sentence(
+                    `${count(t.names.length)[0]!.toUpperCase()}${count(t.names.length).slice(1)} ${t.tier.toLowerCase()} ${t.names.length === 1 ? "entry" : "entries"}`,
+                  ),
+                  // The renderer stamps each name with its catalogue number.
+                  points: t.names,
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -977,8 +1036,6 @@ export function buildSections(
                     ? "Reading notes"
                     : brief.siteKind === "signal-observatory"
                       ? "Incident time"
-                      : brief.siteKind === "archive-index"
-                        ? "Entry notes"
                         : brief.siteKind === "commerce-loom"
                           ? "Hangtag notes"
                           : brief.siteKind === "field-guide"
@@ -1001,8 +1058,6 @@ export function buildSections(
                     ? sentence(`How a brief is actually read`)
                     : brief.siteKind === "signal-observatory"
                       ? sentence(`How a window is actually walked`)
-                      : brief.siteKind === "archive-index"
-                        ? sentence(`How a single entry is actually read`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`How a hangtag is actually cut`)
                           : brief.siteKind === "field-guide"
@@ -1033,8 +1088,6 @@ export function buildSections(
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
                     : brief.siteKind === "signal-observatory"
                       ? sentence(`Tick beads, channel notes, and the handoffs that keep calm honest`)
-                      : brief.siteKind === "archive-index"
-                        ? sentence(`Hanging folio, ruled measure, and the cross-refs that keep the roll honest`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
                           : brief.siteKind === "field-guide"
@@ -1069,8 +1122,6 @@ export function buildSections(
                 body: c.body,
                 meta: brief.siteKind === "signal-observatory"
                   ? `T+${String(i * 6).padStart(2, "0")}h`
-                  : brief.siteKind === "archive-index"
-                    ? String(i + 1).padStart(3, "0")
                     : brief.siteKind === "commerce-loom"
                       ? ["XS", "S", "M", "L", "XL", "XXL"][i % 6]
                       : brief.siteKind === "field-guide"
@@ -1085,7 +1136,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "signal-observatory" || brief.siteKind === "archive-index" || brief.siteKind === "commerce-loom" || brief.siteKind === "field-guide" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "editorial-foundry" || brief.siteKind === "research-dossier" || brief.siteKind === "signal-observatory" || brief.siteKind === "commerce-loom" || brief.siteKind === "field-guide" || brief.siteKind === "press-atelier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1420,7 +1471,12 @@ export function buildSections(
           SectionSpec.parse({
             ...base,
             eyebrow: eyebrow.faq,
-            title: sentence(`Questions ${brief.audience} ask first`),
+            // Archive: the fold's first line already names the audience, and the first answer says
+            // who keeps it, so the heading names the product rather than the audience a third time.
+            title:
+              brief.siteKind === "archive-index"
+                ? sentence(`${brief.productName}, asked and answered`)
+                : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1459,8 +1515,11 @@ export function buildSections(
                   ? `Request the next ${brief.productName} folio`
                   : brief.siteKind === "signal-observatory"
                     ? `Calibrate a ${brief.productName} window`
+                    // Archive: the close names the first and last entries the brief gives.
                     : brief.siteKind === "archive-index"
-                      ? `Request an entry in ${brief.productName}`
+                      ? features.length > 1
+                        ? `${brief.productName}, from ${lower(features[0]!.name)} to ${lower(features[features.length - 1]!.name)}`
+                        : `${brief.productName}: ${lower(features[0]?.name ?? brief.productName)}`
                       : brief.siteKind === "commerce-loom"
                         ? `Cut a sample from ${brief.productName}`
                         : brief.siteKind === "field-guide"
@@ -1501,8 +1560,13 @@ export function buildSections(
                   ? `Numbered folios, source notes, and the instruments ${brief.audience} actually open`
                   : brief.siteKind === "signal-observatory"
                     ? `Tolerance marks, channel maps, and the windows ${brief.audience} actually watch`
+                    /*
+                     * Archive: "numbered stamps, cross-refs, and the entries ... actually keep" closed
+                     * every archive page, a marina's included. The title already names the first and
+                     * last entries and the index above counts them, so the close adds no second line.
+                     */
                     : brief.siteKind === "archive-index"
-                      ? `Numbered stamps, cross-refs, and the entries ${brief.audience} actually keep`
+                      ? ""
                       : brief.siteKind === "commerce-loom"
                         ? `Size tapes, SKU cells, and the lines ${brief.audience} actually cut`
                         : brief.siteKind === "field-guide"

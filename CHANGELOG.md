@@ -8,6 +8,18 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-07 — Archive index template says each thing once
+
+- The archive index page drops the figure band (which named the first four entries twice more beside a "cost · cumulative" chart with made-up values) and the specimen strip of bare names, so it goes from nine sections to seven. The page is now first screen, one index, priorities, questions, closing, footer.
+- Each entry description is printed once, in the index. Before, the index printed only names and the entry essay printed every description a second time. The index now holds every entry, numbered 001 onward, and no drawing beside its first row names them again. Before, every brief left two entries out of the index.
+- The first-screen ledger draws each entry once, as a catalogue card with its number, its name, and its own initial. It used to fill twelve cells by cycling the entries, so a five-entry brief named its lead entry three times on the first screen, labelled the cells "Core" or "Included", and footed the plate "12 entries". The masthead and the ledger show the letters the brief's entries actually run across instead of a fixed "A–Z", and each letter of the side rail jumps to the first entry that starts with it instead of to sections the page may not have.
+- The entry essay now groups the entries by the priority the brief gives (core, supporting, additional), stamped with their index numbers, instead of reprinting every description under the names of three other entries and beside a shelf index of every name. With a single priority the section is left out.
+- The questions and the closing line are built from the brief's own names. They no longer promise cancelling anytime, a result in "one session" on your data, a comparison table, a person for procurement, or that everything ships "from day one". The page no longer says "each entry is a numbered stamp — not a search box dressed as an archive", "hanging folio, ruled measure, and the cross-refs that keep the roll honest", or "numbered stamps, cross-refs, and the entries … actually keep". The buttons read "Open the index" and "See every entry" instead of "Request an entry", which only fit one award index. The page description is the product's own tagline and audience.
+- On four sample briefs, repeated lines fell from 16–45 to 3–9, the lead entry name from 2–17 mentions to 1–4, lines that read the same on every product's page from 23 to 6, and lines copied word for word from other templates from 15–35 to 3–16. Page height on the sample fell from 9040px to 4913px.
+- New test: `packages/design-skills/src/__tests__/archive-template-once.test.ts`. The other sixteen templates render byte-for-byte the same.
+
+---
+
 ## 2026-10-05 — Corporate template says each thing once
 
 - The corporate page drops the specimen strip of bare capability names, the shared proof board, the "also included" second band, and the "what is included" table whose own lede called it "the same list as above", so it goes from ten sections (eleven on a five-capability brief) to seven. The page is now first screen, one catalogue, priorities, questions, closing, footer.

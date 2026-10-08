@@ -577,14 +577,16 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-register-masthead/.test(html)
           && /ds-alpha-rail/.test(html)
           && /data-figure="index-ledger"/.test(html)
-          && /ds-entry/.test(html)
-          && /ds-cross-stamps/.test(html)
-          && /ds-stamp-seal/.test(html)
+          // The entry essay groups the entries by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/ds-entry/.test(html) && /ds-cross-stamps/.test(html) && /ds-stamp-seal/.test(html)))
+          // No figure band or specimen strip naming the entries again under the fold's ledger.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && /Registry/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Archive offerings use register + alpha rail + index ledger + entry essay with cross-stamp seals + Registry — no pricing, no metrics theatre, no sparse feature-rows, no shared marquee-proof, zero inverse bands.",
+      "Archive offerings use register + alpha rail + index ledger + entry essay grouping the entries by priority with cross-stamp seals + Registry — no pricing, no metrics theatre, no sparse feature-rows, no shared marquee-proof, no figure band or specimen strip, zero inverse bands.",
     ),
     check(
       "kind-loom",
@@ -799,6 +801,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && spec.brief.siteKind !== "archive-index"
           && spec.brief.siteKind !== "commerce-loom"
           || /class="ds-story-fill"/.test(html)
+          // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
+          || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),

@@ -152,10 +152,17 @@ export function ctaFor(
       };
     }
     if (siteKind === "archive-index") {
+      /*
+       * No fold note: "entries ship as numbered stamps — not a demo theatre" was carried in every
+       * archive page's spec, a marina's or a pottery studio's included, though the register fold
+       * never shows it, and no brief says how anything ships.
+       * "Request an entry" fit one award index; a marina or a pottery studio has no entries to
+       * request. The buttons say what the page is: an index, and the entries in it.
+       */
       return {
-        primary: "Request an entry",
-        secondary: "Browse the registry",
-        note: "Entries ship as numbered stamps — not a demo theatre.",
+        primary: "Open the index",
+        secondary: "See every entry",
+        note: "",
       };
     }
     if (siteKind === "commerce-loom") {
@@ -786,6 +793,36 @@ export function corporateQuestions(brief: DesignBrief, features: FeatureSpec[]):
   return out;
 }
 
+/**
+ * Archive questions. Every answer is built from this brief: its product, its audience, and its
+ * entry names. The shared `questions` promised "cancel anytime", a comparison table the page never
+ * draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, and that every capability ships "from day one". No brief declares any of those. There
+ * is no question that only points back at a button: the closing band below already is that button.
+ * The approval question stays only when the brief itself declares an approval step.
+ */
+export function archiveQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who keeps ${brief.productName}?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which entry handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What is outside ${brief.productName}?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} entries`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -944,7 +981,8 @@ export function navFor(
               ? "Why work holds"
               : "Why it holds";
   const labels: Record<string, string> = {
-    features: "Capabilities",
+    // Archive: the catalogue is headed "The entries", so the menu calls it that too.
+    features: siteKind === "archive-index" ? "Entries" : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -953,7 +991,7 @@ export function navFor(
           ? "Send path"
           : siteKind === "docs-educational"
             ? "Cost path"
-            : siteKind === "corporate-story"
+            : siteKind === "corporate-story" || siteKind === "archive-index"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

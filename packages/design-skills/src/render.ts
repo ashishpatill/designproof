@@ -192,7 +192,8 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     spec.brief.siteKind === "dashboard-webapp" ||
     spec.brief.siteKind === "fintech-marketing" ||
     spec.brief.siteKind === "art-directed-studio" ||
-    spec.brief.siteKind === "corporate-story"
+    spec.brief.siteKind === "corporate-story" ||
+    spec.brief.siteKind === "archive-index"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
@@ -285,7 +286,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     <p ${enterAttr(spec, 0, "ds-brand-mark")}>${esc(spec.brief.productName)}</p>
     ${section.eyebrow ? `<p ${enterAttr(spec, 1, "ds-eyebrow")}>${esc(section.eyebrow)}</p>` : ""}
     <h1 ${enterAttr(spec, section.eyebrow ? 2 : 1, "ds-display")}>${esc(section.title)}</h1>
-    <p ${enterAttr(spec, section.eyebrow ? 3 : 2, "ds-lede")}>${esc(section.body)}</p>
+    ${section.body ? `<p ${enterAttr(spec, section.eyebrow ? 3 : 2, "ds-lede")}>${esc(section.body)}</p>` : ""}
     ${withEnter(spec, actI, actions(section))}
     ${meta}
   </div>`;
@@ -440,16 +441,35 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-register-ledger" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    /*
+     * Each letter jumps to the first entry whose name starts with it. The first six letters used
+     * to point at fixed sections (#figure, #specimen, #proof) whether or not the page had them, and
+     * "A" was lit even when no entry started with A.
+     */
+    const entries = catalogue(spec);
+    const firstAt = new Map<string, number>();
+    entries.forEach((b, i) => {
+      const L = b.title.trim()[0]?.toUpperCase() ?? "";
+      if (L && !firstAt.has(L)) firstAt.set(L, i);
+    });
+    const lit = letters.find((L) => firstAt.has(L));
     const rail = `<nav class="ds-alpha-rail" aria-label="Alphabetical index"><ol>${letters
-      .map((L, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-alpha-letter${i === 0 ? " is-active" : ""}" data-letter="${L}"><span>${L}</span></a></li>`;
+      .map((L) => {
+        const at = firstAt.get(L);
+        const href = at === undefined ? "#features" : `#entry-${String(at + 1).padStart(3, "0")}`;
+        return `<li><a href="${href}" class="ds-alpha-letter${L === lit ? " is-active" : ""}" data-letter="${L}"><span>${L}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
+    /*
+     * "A–Z" and "Archive register" were the same on every archive page. The masthead now gives the
+     * letters this brief's entries actually run across; the entry count is said once, by the index.
+     */
+    const initials = [...firstAt.keys()].sort();
+    const span = initials.length > 1 ? `${initials[0]}–${initials[initials.length - 1]}` : (initials[0] ?? "");
     const mast = `<header class="ds-register-masthead" aria-label="Register masthead">
       <span class="ds-register-vol">Index</span>
-      <span class="ds-register-issue">A–Z</span>
-      <span class="ds-register-date">Archive register</span>
+      <span class="ds-register-issue">${esc(span)}</span>
+      <span class="ds-register-date">Register</span>
       <span class="ds-register-mark">${esc(spec.brief.productName)}</span>
     </header>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-register" data-surface="${section.surface}" data-section="${esc(section.id)}">
@@ -1145,14 +1165,15 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "commerce-loom" ||
         spec.brief.siteKind === "field-guide" ||
         spec.brief.siteKind === "lantern-path" ||
-        spec.brief.siteKind === "archive-index" ||
+        // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "agent-harness";
+      const isArchive = spec.brief.siteKind === "archive-index";
       return `<ol class="ds-index">${section.blocks
         .map(
-          (b, i) => `<li class="ds-index-row" data-feature="${esc(b.title)}">
+          (b, i) => `<li class="ds-index-row"${isArchive ? ` id="entry-${esc(b.meta ?? String(i + 1).padStart(3, "0"))}"` : ""} data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
             ${!quietIndex && b.body ? `<p>${esc(b.body)}</p>` : ""}
@@ -1286,7 +1307,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     section.layout !== "feature-alternating" &&
     section.id === "features" &&
     spec.brief.siteKind !== "saas-marketing" &&
-    spec.brief.siteKind !== "dashboard-webapp"
+    spec.brief.siteKind !== "dashboard-webapp" &&
+    // Archive skips it too: the drawing named the entries again, right under the fold's ledger.
+    spec.brief.siteKind !== "archive-index"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1623,66 +1646,46 @@ function renderChrono(section: SectionSpec, figures: FigurePlan): string {
  *
  * Not chapters, marginalia, verso/recto, or chrono beads — one entry at a time with a folio
  * hanging in the margin and a ruled reading measure.
+ *
+ * Each entry is one priority tier from the brief. Its cross stamps name the catalogue entries in
+ * that tier, each with its catalogue number, so every name appears once here. The essay used to
+ * print every description a second time, stamp each with the names of three other entries, add a
+ * "Note 01" label, a drawing per entry, and a shelf index that listed every name again, under a
+ * "5 stamps · ruled measure" line.
  */
-function renderEntry(section: SectionSpec, figures: FigurePlan): string {
+function renderEntry(section: SectionSpec, spec: DesignSpec): string {
   const blocks = section.blocks;
-  const count = blocks.length || 1;
+  const numbers = new Map(catalogue(spec).map((b, i) => [b.title, b.meta ?? String(i + 1).padStart(3, "0")] as const));
   const essay = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-entry-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const folio = esc(b.meta ?? String(i + 1).padStart(3, "0"));
-      // Cross stamps — related entries that travel with this reading (archive signature, not a card grid).
-      const related = blocks
-        .map((other, j) => ({ other, j }))
-        .filter(({ j }) => j !== i)
-        .slice(0, 3);
-      const stamps =
-        related.length > 0
-          ? `<ul class="ds-cross-stamps" aria-label="Cross-referenced stamps for ${esc(b.title)}">${related
-              .map(({ other, j }) => {
-                const relFolio = esc(other.meta ?? String(j + 1).padStart(3, "0"));
-                return `<li class="ds-cross-stamp">
+      const folio = esc(b.meta ?? String(i + 1).padStart(2, "0"));
+      const stamps = b.points.length
+        ? `<ul class="ds-cross-stamps" aria-label="${esc(b.title)} entries">${b.points
+            .map(
+              (name) => `<li class="ds-cross-stamp">
                   <span class="ds-stamp-seal" aria-hidden="true"></span>
-                  <span class="ds-stamp-folio">${relFolio}</span>
-                  <span class="ds-stamp-name">${esc(other.title)}</span>
-                </li>`;
-              })
-              .join("")}</ul>`
-          : "";
+                  <span class="ds-stamp-folio">${esc(numbers.get(name) ?? "")}</span>
+                  <span class="ds-stamp-name">${esc(name)}</span>
+                </li>`,
+            )
+            .join("")}</ul>`
+        : "";
       return `<article class="ds-entry-beat" style="--i:${i}">
         <span class="ds-entry-folio" aria-hidden="true">${folio}</span>
         <div class="ds-entry-measure">
-          <p class="ds-chapter-index">${folio}</p>
           <h3>${esc(b.title)}</h3>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-entry-note">${esc(b.kicker)}</p>` : ""}
           ${stamps}
-          ${mark}
         </div>
       </article>`;
-    })
-    .join("");
-  const aside = blocks
-    .map((b, i) => {
-      const folio = esc(b.meta ?? String(i + 1).padStart(3, "0"));
-      return `<li class="ds-entry-aside-item">
-        <span class="ds-entry-aside-folio">${folio}</span>
-        <span class="ds-entry-aside-title">${esc(b.title)}</span>
-        <span class="ds-entry-aside-seal" aria-hidden="true"></span>
-      </li>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-entry" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Entry", `${count} stamps · ruled measure`)}
       ${sectionHead(section, 2, false)}
       <div class="ds-entry-grid" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "7fr 5fr"))}">
         <div class="ds-entry-essay">${essay}</div>
-        <aside class="ds-entry-aside" aria-label="Entry index">
-          <p class="ds-entry-aside-kicker">Shelf index</p>
-          <ol class="ds-entry-aside-list">${aside}</ol>
-        </aside>
         ${storyFillSlab(blocks.map((b) => b.title))}
       </div>
     </div>
@@ -2250,7 +2253,7 @@ function renderCtaBand(section: SectionSpec, figures: FigurePlan, spec?: DesignS
         ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
         ${calStrip}
         <h2 class="ds-title">${esc(section.title)}</h2>
-        <p class="ds-lede">${esc(section.body)}</p>
+        ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
         ${actions(section, "band")}
       </div>
       ${figures.closing ? `<div class="ds-closing-mark">${figures.closing}</div>` : ""}
@@ -2522,7 +2525,7 @@ function renderSection(
     case "story-chrono":
       return wrapped(renderChrono(section, figures));
     case "story-entry":
-      return wrapped(renderEntry(section, figures));
+      return wrapped(renderEntry(section, spec));
     case "story-hangtag":
       return wrapped(renderHangtag(section, figures));
     case "story-range":
@@ -2945,7 +2948,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "dashboard-webapp" ||
     spec.brief.siteKind === "fintech-marketing" ||
     spec.brief.siteKind === "art-directed-studio" ||
-    spec.brief.siteKind === "corporate-story"
+    spec.brief.siteKind === "corporate-story" ||
+    spec.brief.siteKind === "archive-index"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>
