@@ -8,6 +8,18 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-05 — Studio template says each thing once
+
+- The art-directed studio page drops the raised band of bare capability names, the specimen strip that drew them again as numbered stages, the step chart with its "cost · cumulative" axis, and the "also in practice" second band, so it goes from eleven sections to seven. The page is now first screen, one selected-work register, the order of work, questions, closing, footer.
+- Each capability description is printed once. The register holds every capability; the lead row stays a bare name because the first screen already uses its sentence. The register no longer has a second drawing beside its first row that listed every name again.
+- The first-screen work board names each capability once. Spare plates stay blank instead of naming the first capabilities a second time, and the board no longer reads "selected work · method board" or "plates · handoff-safe".
+- The method chapters now group the work by the priority the brief gives (first, next, alongside) instead of listing every name again as "Step 01" to "Step 06". With a single priority the section is left out.
+- Copy written for the sample design studio no longer lands on every studio page: "we take a few engagements at a time", "work that still holds after the launch week", "identity, product, and motion under one grid", "without the pitch theatre", and "see it against your own material". The questions and the closing line are built from the brief's own names, and no longer promise cancelling anytime, point at a comparison table the page never draws, or offer a person for procurement and security. The page description is the product's own tagline and audience.
+- On four sample briefs, repeated lines fell from 11–36 to 3–8, the lead capability name from 4–13 mentions to 2–4, and lines that read the same on every product's page from 28 to 8. Page height on the sample fell from 7745px to 4975px.
+- New test: `packages/design-skills/src/__tests__/studio-template-once.test.ts`. The other sixteen templates render byte-for-byte the same.
+
+---
+
 ## 2026-10-05 — Fintech template says each thing once
 
 - The fintech page drops the "also included" second band, the shared proof board, the send-path chapters, and the table under the lanes, so it goes from twelve sections to eight. The page is now first screen, one catalogue, product picture, lanes, questions, closing, footer.

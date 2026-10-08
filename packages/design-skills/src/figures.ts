@@ -2757,6 +2757,11 @@ export function wireLedger(
  * Selected-work wall: crop-marked plates with mono captions and a method rail. HTML flow steppers
  * do not count as drawn matter (foldFigure=0); this SVG board owns the fold the way a studio wall
  * owns a pitch room. Theme packs invent process steppers; they do not invent a crop-marked board.
+ *
+ * Each plate carries one capability, named once. When the grid has more cells than the brief has
+ * capabilities, the spare cells stay blank instead of naming the first capabilities a second time.
+ * The board used to read "SELECTED WORK · METHOD BOARD" and "N plates · handoff-safe" on every
+ * studio page, a pottery studio's included; neither came from any brief.
  */
 export function workBoard(
   productName: string,
@@ -2782,19 +2787,11 @@ export function workBoard(
   // Method rail — studio signature, not a SaaS stage strip.
   parts.push(rule(pad, pad + 10, W - pad, pad + 10));
   parts.push(
-    text("SELECTED WORK · METHOD BOARD", pad, pad + 8, {
+    text(clip(productName.toUpperCase(), 28), pad, pad + 8, {
       size: FIG_MONO_PX,
       fill: QUIET,
       mono: true,
       track: 1.2,
-    }),
-  );
-  parts.push(
-    text(clip(productName, 28), W - pad, pad + 8, {
-      size: FIG_MONO_PX,
-      fill: QUIET,
-      mono: true,
-      anchor: "end",
     }),
   );
 
@@ -2803,7 +2800,7 @@ export function workBoard(
     const row = Math.floor(i / cols);
     const x = pad + c * (cellW + gap);
     const y = gridTop + row * (cellH + gap);
-    const f = items[i % Math.max(items.length, 1)];
+    const f = items[i];
     const lead = i === 0;
     // Crop marks
     const m = 8;
@@ -2840,31 +2837,26 @@ export function workBoard(
         mono: true,
       }),
     );
-    const title = clip(f?.title ?? `Plate ${i + 1}`, role === "band" ? 22 : 14);
-    parts.push(
-      text(title, x + 12, y + cellH - 18, {
-        size: FIG_MONO_PX,
-        fill: INK,
-        mono: true,
-      }),
-    );
-    parts.push(
-      text(clip(f?.meta ?? "method", 12), x + cellW - 12, y + cellH - 18, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-        anchor: "end",
-      }),
-    );
+    if (f) {
+      parts.push(
+        text(clip(f.title, role === "band" ? 22 : 14), x + 12, y + cellH - 18, {
+          size: FIG_MONO_PX,
+          fill: INK,
+          mono: true,
+        }),
+      );
+      if (f.meta) {
+        parts.push(
+          text(clip(f.meta, 12), x + cellW - 12, y + cellH - 18, {
+            size: FIG_MONO_PX,
+            fill: QUIET,
+            mono: true,
+            anchor: "end",
+          }),
+        );
+      }
+    }
   }
-
-  parts.push(
-    text(`${Math.min(items.length, cols * rows)} plates · handoff-safe`, pad, H - 8, {
-      size: FIG_MONO_PX,
-      fill: QUIET,
-      mono: true,
-    }),
-  );
 
   return frame(parts.join(""), {
     width: W,

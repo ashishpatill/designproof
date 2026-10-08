@@ -190,7 +190,8 @@ function figuresFor(spec: DesignSpec): FigurePlan {
   const features =
     spec.brief.siteKind === "saas-marketing" ||
     spec.brief.siteKind === "dashboard-webapp" ||
-    spec.brief.siteKind === "fintech-marketing"
+    spec.brief.siteKind === "fintech-marketing" ||
+    spec.brief.siteKind === "art-directed-studio"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
@@ -1196,7 +1197,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
        * rail and a table) with made-up percentages, right under a fold ledger that had just drawn
        * the same names. Every row is name, description, mark.
        */
-      const leadFigure = spec.brief.siteKind !== "fintech-marketing";
+      // Studio likewise: the drawing beside the first piece listed every name again under the board.
+      const leadFigure =
+        spec.brief.siteKind !== "fintech-marketing" && spec.brief.siteKind !== "art-directed-studio";
       return `<div class="ds-alt">${section.blocks
         .map((b, i) => {
           if (i === 0 && leadFigure) {
@@ -1385,8 +1388,8 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
    */
   const count = section.blocks.length;
   // Titles + marks only when the same catalogue prose already runs in features/hero/proof.
+  // Studio chapters are priority groups, so the sentence naming each group's parts is the content.
   const quietChapters =
-    spec?.brief.siteKind === "art-directed-studio" ||
     spec?.brief.siteKind === "consumer-craft" ||
     spec?.brief.siteKind === "corporate-story" ||
     spec?.brief.siteKind === "press-atelier" ||
@@ -1404,7 +1407,7 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "agent-harness";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Chapters", `${count} beats · editorial order`)}
+      ${spec?.brief.siteKind === "art-directed-studio" ? "" : secMeta("Chapters", `${count} beats · editorial order`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-chapters">
         ${section.blocks
@@ -2922,7 +2925,9 @@ export function renderPreviewHtml(spec: DesignSpec): string {
    * motion" was this tool's own settings, read aloud by screen readers and shown by search results.
    */
   const pageDescription =
-    spec.brief.siteKind === "dashboard-webapp" || spec.brief.siteKind === "fintech-marketing"
+    spec.brief.siteKind === "dashboard-webapp" ||
+    spec.brief.siteKind === "fintech-marketing" ||
+    spec.brief.siteKind === "art-directed-studio"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

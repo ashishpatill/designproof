@@ -19,6 +19,7 @@ import {
   riskReversal,
   saasQuestions,
   sentence,
+  studioQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -284,7 +285,8 @@ function clampLine(text: string, max: number): string {
 /** Goal-keyed CTA note grounded in the lead feature (tone from copy.ts, product from brief). */
 function groundedCtaNote(brief: DesignBrief, goalNote: string): string {
   const lead = brief.features[0]?.name?.trim();
-  if (!lead) return goalNote;
+  // Studio has no fold note: there is nothing true to say about an engagement the brief never gave.
+  if (!lead || !goalNote.trim()) return goalNote;
   const tone = lower(goalNote.replace(/[.!?]+$/, ""));
   return clampLine(sentence(`${lead} ships first — ${tone}`), 240);
 }
@@ -318,7 +320,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
         ? workspaceQuestions(brief, brief.features)
         : brief.siteKind === "fintech-marketing"
           ? fintechQuestions(brief, brief.features)
-          : questions(brief, brief.features);
+          : brief.siteKind === "art-directed-studio"
+            ? studioQuestions(brief, brief.features)
+            : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};

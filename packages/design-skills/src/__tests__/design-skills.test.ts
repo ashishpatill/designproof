@@ -561,8 +561,9 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.brief.siteKind).toBe("art-directed-studio");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "feature-alternating")).toBe(true);
+    // The order of work stays; the step chart went, because its "cost · cumulative" axis came from no brief.
     expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
-    expect(spec.sections.some((s) => s.kind === "figure")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "figure")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBeLessThanOrEqual(1);
     expect(previewHtml).toContain('data-sitekind="art-directed-studio"');

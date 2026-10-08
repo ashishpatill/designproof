@@ -125,7 +125,8 @@ export function ctaFor(
       return {
         primary: "Start a conversation",
         secondary: "Browse the work",
-        note: "We take a few engagements at a time.",
+        // "We take a few engagements at a time" was a claim about one studio's diary on every studio page.
+        note: "",
       };
     }
     if (siteKind === "editorial-foundry") {
@@ -580,7 +581,7 @@ export function saasQuestions(brief: DesignBrief, features: FeatureSpec[]): Arra
 }
 
 /** "A, B, and C" — names joined the way a person would say them. */
-function spoken(names: string[]): string {
+export function spoken(names: string[]): string {
   if (names.length <= 1) return names[0] ?? "";
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
@@ -696,6 +697,41 @@ export function fintechQuestions(brief: DesignBrief, features: FeatureSpec[]): A
   const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
   out.push({
     title: `How do we see ${brief.productName} for ourselves?`,
+    body: sentence(`Choose "${cta}" at the top or the foot of this page`),
+  });
+  return out;
+}
+
+/**
+ * Studio questions. Every answer is built from this brief: its product, its audience, and its
+ * capability names and priority. The shared `questions` promised "cancel anytime", pointed at a
+ * comparison table no studio page draws, said "one session: we run it on your data", and offered a
+ * person who answers procurement and security. No brief declares any of those.
+ */
+export function studioQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const lead = features[0];
+  const last = features[features.length - 1];
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(features.length > 1 ? `${Audience}. The ${count(features.length)} parts above are all of it` : Audience),
+  });
+  // The order of work is its own section, so no answer here repeats which parts come first.
+  if (last && last !== lead) {
+    out.push({
+      title: `Is ${lower(last.name)} part of ${brief.productName}?`,
+      body: sentence(`Yes. It is one of the ${count(features.length)} parts on this page`),
+    });
+  }
+  out.push({
+    title: `What is not part of ${brief.productName}?`,
+    body: sentence(`Anything this page does not name`),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `How do we begin with ${brief.productName}?`,
     body: sentence(`Choose "${cta}" at the top or the foot of this page`),
   });
   return out;
