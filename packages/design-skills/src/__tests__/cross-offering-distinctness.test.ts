@@ -85,27 +85,36 @@ describe("cross-offering distinctness (ratchet — see docs/16 §1.1, §5.3, M5)
     const worst = shared[0]?.[1].length ?? 1;
 
     /*
-     * Measured 2026-10-05: 10 offerings share one skeleton, leaving 8 distinct across 17. This is
-     * `docs/16 §1.2` confirmed, not contradicted — keying on `id:layout` alone reports 17/17
-     * distinct, because the two positions that vary (the hero layout and the `story-*` variant) are
-     * in the key, which is how the claim came to look wrong before the skeleton was measured properly.
+     * Re-pinned after merging origin/master (M1 merge). The old floors were measured on this branch
+     * on 2026-10-05, *before* master's eight "template says each thing once" commits landed: 10
+     * offerings shared one skeleton, leaving 8 distinct across 17. Merging those commits removed the
+     * figure band and the specimen band from five templates and reshaped the room skeletons, so the
+     * distribution is different: 7 distinct, largest group 6. The floors below are the measured
+     * post-merge values — a ratchet pinned above reality is a gate that cannot fail, and one pinned
+     * below reality permits regression before it speaks.
      *
-     * The ten are foundry, dossier, observatory, archive, loom, herbarium, press, lantern, clinic and
-     * harness, all emitting `hero → features:feature-index → figure:figure-explainer →
-     * template:template-band → story → faq:faq-columns → cta:cta-band → footer:footer-columns`.
+     * The largest group went 10 → 6: the sharing got *less* concentrated, not more, so this is not a
+     * regression against docs/16 §1.2. Distinctness still fell 8 → 7 because two offerings that
+     * previously differed only in a band now collapse onto one tail — the same tail six others use.
+     * That is the finding docs/16 §1.2 makes, restated, not a new one.
      *
-     * So the floors are the measured values, and they are floors for a reason: a ratchet set below
-     * reality would be a test that cannot fail. The target is 2 (docs/16 M3 replaces the 15-branch
-     * switch with a program compiled from the direction, so no two offerings share a tail by
-     * default), and every offer to lower this number should say what moved it.
+     * The target is unchanged: 2 (docs/16 M3 replaces the 15-branch switch with a program compiled
+     * from the direction, so no two offerings share a tail by default), and every offer to lower this
+     * number further should say what moved it.
+     *
+     * The largest group is now six — dossier, loom, press, lantern, clinic and harness, all emitting
+     * `hero → features:feature-index → figure:figure-explainer → template:template-band → story →
+     * faq:faq-columns → cta:cta-band → footer:footer-columns`. Educational, foundry, observatory,
+     * archive and herbarium share a second, shorter tail of five; corporate and studio share a third
+     * of two. The remaining four — saas, dashboard, fintech and consumer — stand alone.
      */
     const report = {
       distinctSkeletons: bySkeleton.size,
       largestGroup: worst,
       groups: shared.map(([k, keys]) => `${keys.length}× ${keys.join(", ")} :: ${k}`),
     };
-    expect(report.largestGroup).toBeLessThanOrEqual(10);
-    expect(report.distinctSkeletons).toBeGreaterThanOrEqual(8);
+    expect(report.largestGroup).toBeLessThanOrEqual(6);
+    expect(report.distinctSkeletons).toBeGreaterThanOrEqual(7);
   });
 
   it("picks a type voice per offering rather than hashing three pools", () => {

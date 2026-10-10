@@ -8,6 +8,7 @@
  * The rule that keeps this honest: if a sentence would read the same for a different product,
  * it does not ship.
  */
+import { APPROVAL_WORKFLOW_SIGNAL } from "./analyze";
 import { payoffLine, type FeatureCopy } from "./editorial";
 import type { DesignBrief, FeatureSpec } from "./types";
 
@@ -125,14 +126,21 @@ export function ctaFor(
       return {
         primary: "Start a conversation",
         secondary: "Browse the work",
-        note: "We take a few engagements at a time.",
+        // "We take a few engagements at a time" was a claim about one studio's diary on every studio page.
+        note: "",
       };
     }
     if (siteKind === "editorial-foundry") {
+      /*
+       * No fold note: "trial files ship with the optical sizes you will actually set" sat on every
+       * foundry page, a pottery studio's included, and no brief says what ships or in which files.
+       * "Request a specimen" asked every product to post out a type specimen. The buttons say what
+       * the page is: a specimen, and the cuts in it.
+       */
       return {
-        primary: "Request a template",
-        secondary: "See the cuts",
-        note: "Trial files ship with the optical sizes you will actually set.",
+        primary: "Open the template",
+        secondary: "See every cut",
+        note: "",
       };
     }
     if (siteKind === "research-dossier") {
@@ -143,17 +151,31 @@ export function ctaFor(
       };
     }
     if (siteKind === "signal-observatory") {
+      /*
+       * No fold note: "windows ship with the channels you actually watch — not a demo theatre"
+       * reached every observatory page through the authored path, a pottery studio's included, and
+       * no brief says how anything ships. "Open a desk window" borrowed the sample's own lead
+       * channel ("Live window") for every product. The buttons say what the page is: a desk, and the
+       * channels on it.
+       */
       return {
-        primary: "Open a desk window",
-        secondary: "Read the channels",
-        note: "Windows ship with the channels you actually watch — not a demo theatre.",
+        primary: "Open the desk",
+        secondary: "See every channel",
+        note: "",
       };
     }
     if (siteKind === "archive-index") {
+      /*
+       * No fold note: "entries ship as numbered stamps — not a demo theatre" was carried in every
+       * archive page's spec, a marina's or a pottery studio's included, though the register fold
+       * never shows it, and no brief says how anything ships.
+       * "Request an entry" fit one award index; a marina or a pottery studio has no entries to
+       * request. The buttons say what the page is: an index, and the entries in it.
+       */
       return {
-        primary: "Request an entry",
-        secondary: "Browse the registry",
-        note: "Entries ship as numbered stamps — not a demo theatre.",
+        primary: "Open the index",
+        secondary: "See every entry",
+        note: "",
       };
     }
     if (siteKind === "commerce-loom") {
@@ -164,10 +186,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "field-guide") {
+      /*
+       * No fold note: "vouchers ship with pressed plates and range notes — not a demo theatre"
+       * reached every field-guide page through the authored path, a marina's included, and no brief
+       * says how anything ships. "Request a voucher" fit one herbarium; a pottery studio has no
+       * vouchers to request. The buttons say what the page is: a guide, and the traits in it.
+       */
       return {
-        primary: "Request a voucher",
-        secondary: "Open the plate",
-        note: "Vouchers ship with pressed plates and range notes — not a demo theatre.",
+        primary: "Open the guide",
+        secondary: "See every trait",
+        note: "",
       };
     }
     if (siteKind === "care-pathway") {
@@ -184,6 +212,12 @@ export function ctaFor(
         note: "Runs on your machine — no invented host, no waitlist.",
       };
     }
+    // Corporate: "Everything here is verifiable before you commit" was a promise no brief made, and
+    // it opened every corporate page, a marina's or a pottery studio's included.
+    if (siteKind === "corporate-story") return { ...GOAL_CTA[goal], note: "" };
+    // Educational: the same note ("Everything here is verifiable before you commit") reached every
+    // explainer through the authored path, a marina's and a pottery studio's included.
+    if (siteKind === "docs-educational") return { ...GOAL_CTA[goal], note: "" };
     return GOAL_CTA[goal];
   })();
   // Agency brief "one CTA" wins when set — every page repeats the same verb.
@@ -232,7 +266,8 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
                                   : "Why the argument holds";
   return {
     metrics: "What changes",
-    features: brief.siteKind === "docs-educational" ? "The mechanism" : "Capabilities",
+    // Educational: "The mechanism" headed a marina's and a garden's index too.
+    features: brief.siteKind === "docs-educational" ? "Parts" : "Capabilities",
     figure: brief.siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       brief.siteKind === "corporate-story"
@@ -278,9 +313,9 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
  * never repeats a capability the index below it is about to print.
  */
 export function featuresTitle(brief: DesignBrief, features: FeatureSpec[]): string {
-  const vocab = vocabulary(brief);
-  const noun = vocab[0] ?? "work";
-  if (brief.siteKind === "docs-educational") return `What ${brief.productName} does with ${noun}`;
+  // Educational: "What Signal Path does with cost" took the brief's most frequent word, which read
+  // "does with plot" on a garden's page. The index says what each part does, so the title does too.
+  if (brief.siteKind === "docs-educational") return `What each ${brief.productName} part does`;
   if (brief.siteKind === "corporate-story") return `How ${brief.productName} works in practice`;
   /*
    * The heading used to open with the first capability's name. That name is the first row of the
@@ -586,7 +621,7 @@ export function saasQuestions(brief: DesignBrief, features: FeatureSpec[]): Arra
 }
 
 /** "A, B, and C" — names joined the way a person would say them. */
-function spoken(names: string[]): string {
+export function spoken(names: string[]): string {
   if (names.length <= 1) return names[0] ?? "";
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
@@ -703,6 +738,232 @@ export function fintechQuestions(brief: DesignBrief, features: FeatureSpec[]): A
   out.push({
     title: `How do we see ${brief.productName} for ourselves?`,
     body: sentence(`Choose "${cta}" at the top or the foot of this page`),
+  });
+  return out;
+}
+
+/**
+ * Studio questions. Every answer is built from this brief: its product, its audience, and its
+ * capability names and priority. The shared `questions` promised "cancel anytime", pointed at a
+ * comparison table no studio page draws, said "one session: we run it on your data", and offered a
+ * person who answers procurement and security. No brief declares any of those.
+ */
+export function studioQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const lead = features[0];
+  const last = features[features.length - 1];
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(features.length > 1 ? `${Audience}. The ${count(features.length)} parts above are all of it` : Audience),
+  });
+  // The order of work is its own section, so no answer here repeats which parts come first.
+  if (last && last !== lead) {
+    out.push({
+      title: `Is ${lower(last.name)} part of ${brief.productName}?`,
+      body: sentence(`Yes. It is one of the ${count(features.length)} parts on this page`),
+    });
+  }
+  out.push({
+    title: `What is not part of ${brief.productName}?`,
+    body: sentence(`Anything this page does not name`),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `How do we begin with ${brief.productName}?`,
+    body: sentence(`Choose "${cta}" at the top or the foot of this page`),
+  });
+  return out;
+}
+
+/**
+ * Corporate questions. Every answer is built from this brief: its product, its audience, and its
+ * capability names. The shared `questions` promised "cancel anytime", a comparison table, a result
+ * in "one session" on the reader's data, a person who answers procurement and security, a named
+ * human approval gate, and a rollback path when something fails mid-flight. Those were printed on
+ * every corporate page whatever the product did. The approval question stays only when the brief
+ * itself declares an approval step, and its answer names the capability that carries it.
+ */
+export function corporateQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  const n = count(features.length);
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(
+      features.length > 1
+        ? `${Audience}. ${brief.productName} is the ${n} capabilities described above, and nothing else`
+        : Audience,
+    ),
+  });
+  // The priorities section already says which capabilities lead, so no answer here repeats it.
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: "Who approves irreversible actions?",
+      body: sentence(`${approval.name} is where that happens. Its description is in the list above`),
+    });
+  }
+  out.push({
+    title: `What does ${brief.productName} leave out?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of the ${n} capabilities above`
+        : `Anything not named above`,
+    ),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `Where do we go from here with ${brief.productName}?`,
+    body: sentence(`Use "${cta}" at the top or the bottom of this page`),
+  });
+  return out;
+}
+
+/**
+ * Archive questions. Every answer is built from this brief: its product, its audience, and its
+ * entry names. The shared `questions` promised "cancel anytime", a comparison table the page never
+ * draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, and that every capability ships "from day one". No brief declares any of those. There
+ * is no question that only points back at a button: the closing band below already is that button.
+ * The approval question stays only when the brief itself declares an approval step.
+ */
+export function archiveQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who keeps ${brief.productName}?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which entry handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What is outside ${brief.productName}?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} entries`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
+ * Educational questions. Every answer is built from this brief: its product, its audience, and its
+ * part names. The explainer had no questions before; the shared `questions` it would have used
+ * promise "cancel anytime", a comparison table, a result in "one session" on the reader's data, and
+ * a person who answers procurement. No brief declares any of those. The approval question stays
+ * only when the brief itself declares an approval step.
+ */
+export function educationalQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is ${brief.productName} written for?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which part handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What does ${brief.productName} not cover?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} parts`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
+ * Field-guide questions. Every answer is built from this brief: its product, its audience, and its
+ * trait names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement,
+ * and that every capability ships "from day one". No brief declares any of those. The approval
+ * question stays only when the brief itself declares an approval step.
+ */
+export function fieldGuideQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who uses ${brief.productName}?`, body: sentence(Audience) });
+  const approval = features.find((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (approval) {
+    out.push({
+      title: `Which trait handles approvals?`,
+      body: sentence(`${approval.name}. Its description is in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} guide?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} traits`
+        : `Anything that is not ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
+ * Observatory questions. Every answer is built from this brief: its product, its audience, and its
+ * channel names. The shared `questions` it used promised "cancel anytime", a comparison table the
+ * page never draws, a result in "one session" on the reader's data, a person who answers
+ * procurement and security, and that every capability ships "from day one". No brief declares any
+ * of those. The approval question stays only when the brief itself declares an approval step.
+ */
+export function observatoryQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} desk for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which channel handles approvals?`,
+      body: sentence(`${features[at]!.name}, channel ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} desk?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} channels`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
+ * Foundry questions. Every answer is built from this brief: its product, its audience, and its cut
+ * names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, and that every capability ships "from day one". No brief declares any of those. The
+ * approval question stays only when the brief itself declares an approval step.
+ */
+export function foundryQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} specimen for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which cut handles approvals?`,
+      body: sentence(`${features[at]!.name}, cut ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} specimen?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} cuts`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
   });
   return out;
 }
@@ -868,16 +1129,37 @@ export function navFor(
               ? "Why work holds"
               : "Why it holds";
   const labels: Record<string, string> = {
-    features: "Capabilities",
+    // Archive: the catalogue is headed "The entries", so the menu calls it that too.
+    // Educational: the index is headed "Parts", so the menu calls it that too.
+    // Field guide: the index is headed "The traits", so the menu calls it "Traits".
+    features:
+      siteKind === "archive-index"
+        ? "Entries"
+        : siteKind === "docs-educational"
+          ? "Parts"
+          : siteKind === "field-guide"
+            ? "Traits"
+            // Observatory: the index is headed "The channels", so the menu calls it "Channels".
+            : siteKind === "signal-observatory"
+              ? "Channels"
+              // Foundry: the index is headed "The cuts", so the menu calls it "Cuts".
+              : siteKind === "editorial-foundry"
+                ? "Cuts"
+                : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
         ? "Pipeline"
         : siteKind === "fintech-marketing"
           ? "Send path"
-          : siteKind === "docs-educational"
-            ? "Cost path"
-            : "Sequence",
+          : siteKind === "corporate-story" ||
+              siteKind === "archive-index" ||
+              siteKind === "docs-educational" ||
+              siteKind === "field-guide" ||
+              siteKind === "signal-observatory" ||
+              siteKind === "editorial-foundry"
+              ? "Priorities"
+              : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
     compare: "Included",
     faq: "Questions",

@@ -324,8 +324,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    */
   if (siteKind === "art-directed-studio") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-statement", surface: "paper", columns: split.hero });
-    // Capability register on raised — stakes without inventing dark-stage metrics theatre.
-    plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: "raised" });
+    /*
+     * One selected-work register, then questions and the close. The page used to add a raised band
+     * that listed the capability names as bare values, a specimen strip that drew them again as
+     * numbered "stages", a method chapter list that named them a fourth time as "steps" under a
+     * heading written for one design studio ("without the pitch theatre"), a step chart with a
+     * "cost · cumulative" axis no brief gave, and an "also in practice" band for the tail. A pottery
+     * studio's page got the same five name lists and the same studio-only lines. The fold's work
+     * board already shows every capability once, and the register holds every description once.
+     * The method chapters stay, but they now group the work by the priority the brief gives
+     * (first, next, alongside), so they say something the register does not.
+     */
     plans.push({
       id: "features",
       kind: "features",
@@ -333,8 +342,6 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.feature,
     });
-    // Quiet type-led valley — honest weight variation without empty height.
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "story",
       kind: "story",
@@ -343,19 +350,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       bond: true,
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    if (featureCount >= 4) {
-      plans.push({ id: "features-2", kind: "features", layout: "feature-index", surface: "paper" });
-    }
-    // No shared marquee-proof — selected-work figure + chapters already prove the craft.
-    // Bolting the same "Proof / declared scope" board onto every offering is the uniqueness miss.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // One controlled inverse close for tonal range — not an inverse-heavy scroll.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
@@ -405,17 +400,27 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Editorial foundry — typography spine, hard-seam fold, paper-led scroll.
+   * Editorial foundry — typography spine, hard-seam fold, one cut index, the brief's own priorities
+   * as marginalia.
    *
    * Measured type-foundry / personal-craft / editorial-longform pages sit at foldFigure ~0.97,
    * figureArea ~0.38, invertedShare ~0, display ~3.3vw, alignment axes ~6. They are not SaaS
    * conversion ladders, studio selected-work grids, or consumer product plates: the argument is
    * the type system itself. Hard seam + type ladder + marginalia + colophon are the craft that
    * generic engines do not invent from a theme pack.
+   *
+   * The page used to follow the seam fold with an index of bare names (three or four of them,
+   * whatever the brief gave) beside a "how it is put together" list that named them again, a
+   * figure band that drew the ladder a second time beside a "cost · cumulative" chart of made-up
+   * values, a specimen band of bare names, and a marginalia essay that printed every description
+   * again with the other names hung beside each one as "cut slips". A five-cut brief named its lead
+   * cut fourteen times. The fold names each cut once, on its ladder; the index holds every
+   * description once; and the marginalia now group the cuts by the priority the brief gives, so
+   * they say something the index does not.
    */
   if (siteKind === "editorial-foundry") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-seam", surface: "paper", columns: "1fr 1fr" });
-    // Cut catalogue — indexed list on a shared rail, not metric theatre.
+    // Cut index — every cut, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -423,29 +428,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    // Optical-size ladder as the teaching figure (foundry signature).
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    // Quiet sunken valley — honest weight variation without empty height.
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
-    // Marginalia essay — annotations hang in the outer column (editorial-longform craft).
+    // Marginalia — one beat per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-marginalia",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
       columns: "7fr 5fr",
     });
-    // No second feature-alternating catalogue — empty airways after marquee cut.
-    // Cut slips live inside the marginalia essay (foundry mid-page proof).
     // No shared marquee-proof — type ladder + marginalia already prove foundry craft.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // Colophon close on paper — not inverse demo-booking theatre.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
@@ -500,16 +493,22 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Signal observatory — enterprise telemetry / instrument-desk craft.
+   * Signal observatory — chronometer fold, one channel index, the brief's own priorities as a
+   * waterfall.
    *
-   * Measured enterprise-observability + enterprise-data pages sit at high figure area
-   * (~0.4–0.78), mid fold figure, moderate-to-high alignment axes, and instrument-dense
-   * matter — not SaaS conversion, foundry seams, or dossier folios. Chronometer + scrub
-   * rail + signal lattice + chrono essay + calibration are craft a theme pack will not invent.
+   * The page used to follow the chronometer fold with an index of bare names (three of them,
+   * whatever the brief gave) under "channels an on-call desk actually watches", a "how it is put
+   * together" drawing that named them again, a figure band with a "cost · cumulative" chart of
+   * made-up values under "how X reads a window", a specimen band that printed the first four
+   * descriptions, and an event waterfall that printed every description a second time against a
+   * T+00h → T+24h ruler no brief gave. A five-channel brief named its lead channel eleven times.
+   * The fold names each channel once, in its scrub rail; the index holds every description once;
+   * and the waterfall now sorts the channels by the priority the brief gives, so it says something
+   * the index does not.
    */
   if (siteKind === "signal-observatory") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-chrono", surface: "paper", columns: split.wide });
-    // Channel index — named signals, not metric theatre.
+    // Channel index — every channel, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -517,26 +516,16 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    // Teaching figure: lattice redrawn with channel callouts.
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
-    // Event waterfall — instrument-time spans (observatory signature; not essay+aside).
+    // Event waterfall — one span per priority tier the brief gives. It sits in a sunken tray where
+    // the specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-chrono",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — event waterfall is the observatory proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the event waterfall is the observatory instrument.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // Calibration close on paper — not inverse demo theatre.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
@@ -555,6 +544,15 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    */
   if (siteKind === "archive-index") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-register", surface: "paper", columns: split.wide });
+    /*
+     * One catalogue holds every entry with its description. The page used to follow it with a
+     * figure band that named the first four entries twice more beside a "cost · cumulative" chart
+     * with made-up values, a specimen strip that named them again, and an entry essay that printed
+     * each description under a list of the other names and a shelf index of every name. A
+     * five-entry brief named its lead entry up to seventeen times, and every brief left two entries
+     * with no catalogue row. The figure and specimen bands are gone, and the entry essay now groups
+     * the entries by the priority the brief gives, so it says something the catalogue does not.
+     */
     plans.push({
       id: "features",
       kind: "features",
@@ -563,25 +561,14 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
-    plans.push({
       id: "story",
       kind: "story",
       layout: "story-entry",
-      surface: "paper",
-      bond: true,
+      surface: "raised",
       columns: "7fr 5fr",
     });
-    // No second feature-rows catalogue — that left Cross stamps / Registry close as empty airways.
-    // Cross-stamp register lives inside the entry folio (concept-true mid-page proof).
-    // No shared marquee-proof — entry folio essay is Stamp Roll's proof, not a SaaS board.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the fold's index ledger is the register's proof, not a SaaS board.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "sunken", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
@@ -628,18 +615,21 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Docs / mechanism explainer — teaching surface with a real weight valley.
+   * Docs / mechanism explainer — scrub fold, one index, the brief's own priorities.
    *
-   * Generic path stacked medium-density bands (metrics + features + chapters + compare) so
-   * section-weight variation collapsed (~0.34). Dedicated plan: stackfold figure, scrub instrument,
-   * catalogue, quiet sunken template, dense chapter register, dense compare, inverse close.
-   * No metric theatre — the scrub owns the stakes.
+   * The page used to follow the scrub fold with a specimen strip that named the first four parts as
+   * bare titles, an index whose rows were bare names beside a drawing that named them again, a
+   * chapter register that printed every description a second time under "placement, preemption,
+   * backpressure, failure — the cost function in order" (a line written for one routing runtime
+   * and printed on a marina's page too), and a "what is included" table with made-up Core /
+   * Standard / Full columns whose own lede called it "the same list as above". A four-part brief
+   * named each part nine times, and a five-part brief left two parts out of the index. The fold
+   * names each part once, the index holds every description once, and the chapters now group the
+   * parts by the priority the brief gives, so they say something the index does not.
    */
   if (siteKind === "docs-educational") {
     // Scrub owns the fold — do not bury the instrument under a second stackfold hero.
     plans.push({ id: "hero", kind: "hero", layout: "hero-mechanism", surface: "paper", columns: split.hero });
-    // Quiet valley after the scrub peak — titles-only horizon (see renderTemplate).
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
     plans.push({
       id: "features",
       kind: "features",
@@ -652,11 +642,10 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       kind: "story",
       layout: "story-chapters",
       surface: "raised",
-      bond: true,
       columns: split.wide,
     });
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised", bond: true });
-    // Inverse close is the dense peak against the sunken template valley.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr" });
+    // Inverse close is the dense peak against the quiet index.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
@@ -820,12 +809,16 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Field guide — herbarium / voucher craft.
+   * Field guide — glassine fold, one index, the brief's own priorities as a key.
    *
-   * Personal-craft + brand-agency corridors favour figure-dense paper surfaces and quiet display.
-   * Soft theme packs answer with floating glass card collages. This offering invents unreplicable
-   * voucher grammar: taxon rail, template plate (pressed silhouette + free botanical photo),
-   * dichotomous voucher key (ladder + stacked sheets), Voucher close.
+   * The page used to follow the glassine fold with an index of bare names (four of them, whatever
+   * the brief gave), a "how it is put together" drawing that named them again, a figure band with
+   * a "cost · cumulative" chart of made-up values under "how X presses a voucher", a specimen strip
+   * of bare names, and a dichotomous key that printed every description a second time with invented
+   * leads ("trait holds → photo inset", "trait fails → re-key from kingdom"). A five-trait brief
+   * named its lead trait thirteen times. The fold names each trait once, in its binomial strip; the
+   * index holds every description once; and the key now sorts the traits by the priority the brief
+   * gives, so it says something the index does not.
    */
   if (siteKind === "field-guide") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-voucher", surface: "paper", columns: split.wide });
@@ -837,24 +830,50 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       columns: split.wide,
     });
     plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "template", kind: "template", layout: "template-band", surface: "sunken" });
-    plans.push({
       id: "story",
       kind: "story",
       layout: "story-range",
-      surface: "paper",
-      bond: true,
+      // The key's stacked sheets sit in a sunken tray, where the specimen strip's valley used to be.
+      surface: "sunken",
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — dichotomous voucher key is the field-guide proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — the dichotomous key is the field-guide instrument.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
+    plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
+    return plans;
+  }
+
+  /*
+   * Corporate story — diligence fold, one catalogue, the brief's own priorities.
+   *
+   * The page used to add a specimen strip that listed the capability names as bare values, a
+   * shared proof board that printed every description again (cut short in a drawing, then in full),
+   * an "also included" band for the tail, chapters that named every capability once more under
+   * "language, principles, outcomes, posture — the diligence path in order" (a line written for one
+   * sample product and printed on a marina's page too), and a "what is included" table whose own
+   * lede said it was "the same list as above". A five-capability brief named each capability up to
+   * seven times and left one with no row at all. The fold's posture grid names every capability
+   * once, the catalogue holds every description once, and the chapters now group the work by the
+   * priority the brief gives, so they say something the catalogue does not.
+   */
+  if (siteKind === "corporate-story") {
+    plans.push({ id: "hero", kind: "hero", layout: heroLayout(siteKind, lean), surface: "paper", columns: split.hero });
+    plans.push({
+      id: "features",
+      kind: "features",
+      layout: "feature-alternating",
+      surface: "paper",
+      columns: split.feature,
+    });
+    plans.push({
+      id: "story",
+      kind: "story",
+      layout: "story-chapters",
+      surface: "raised",
+      columns: split.wide,
+    });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr" });
+    plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
   }
@@ -871,8 +890,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
 
   // Catalog folds (pipeline / posture / queue / wire) already name the capabilities.
   // A metric row of the same titles under the fold reads as a paired screenshot, not stakes.
-  const foldOwnsCatalog =
-    siteKind === "saas-marketing" || siteKind === "corporate-story";
+  const foldOwnsCatalog = siteKind === "saas-marketing";
   if (!foldOwnsCatalog) {
     plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: lean === "refined-story" ? "raised" : "inverse" });
   }
@@ -914,7 +932,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   /*
    * SaaS has no chapter register. It listed every capability a fifth time in "editorial order"
    * under a heading written for one sample product, directly after the catalogue and the proof had
-   * already told each of them. Corporate keeps its chapters.
+   * already told each of them. Corporate returns earlier with its own priority chapters.
    */
   if (siteKind !== "saas-marketing") {
     plans.push({
@@ -928,7 +946,7 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     });
   }
 
-  // Fintech / studio / consumer / educational / archive return earlier — only SaaS/corporate here.
+  // Fintech / studio / corporate / consumer / educational / archive return earlier — only SaaS here.
   if (siteKind === "saas-marketing" && featureCount >= 3) {
     const lanes = goal === "sales" || goal === "leads" || goal === "demos";
     if (lanes) {
@@ -938,10 +956,6 @@ export function planSections(input: CompositionInput): SectionPlan[] {
     } else {
       plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "paper" });
     }
-  }
-
-  if (siteKind === "corporate-story") {
-    plans.push({ id: "compare", kind: "compare", layout: "compare-matrix", surface: "raised" });
   }
 
   // FAQ answers the table above it. Bonded, the compare+faq pair is the densest beat on the page —

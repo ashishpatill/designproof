@@ -204,8 +204,10 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /data-figure="mechanism-plate"/.test(html)
           && !/class="[^"]*ds-hero-stackfold/.test(html)
           && !/class="[^"]*ds-hero-overfigure/.test(html)
+          // No specimen strip of bare names or "what is included" table naming the parts again.
+          && !spec.sections.some((s) => s.kind === "template" || s.kind === "compare")
         ),
-      "Educational offerings use mechanism fold + scrub on the fold — never shared stackfold skeleton.",
+      "Educational offerings use mechanism fold + scrub on the fold — never shared stackfold skeleton, and no specimen strip or included table.",
     ),
     check(
       "kind-saas-pipeline",
@@ -518,12 +520,15 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-hero-seam/.test(html)
           && /ds-spine/.test(html)
           && /data-figure="type-ladder"/.test(html)
-          && /ds-marginalia/.test(html)
-          && /ds-cut-slips/.test(html)
+          // The marginalia group the cuts by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || /ds-marginalia/.test(html))
+          // No cut slips naming the other cuts again, and no figure band or specimen band under the index.
+          && !/class="ds-cut-slips"/.test(html)
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "template")
           && /Colophon/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Foundry offerings use hard-seam + type ladder + marginalia with cut slips + colophon — no pricing, no metrics theatre, no sparse second catalogue, zero inverse bands.",
+      "Foundry offerings use hard-seam + type ladder naming each cut once + marginalia grouping the cuts by priority + colophon — no pricing, no metrics theatre, no sparse second catalogue, no cut slips, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-dossier",
@@ -554,16 +559,20 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-scrub-rail/.test(html)
           && /data-figure="signal-lattice"/.test(html)
           && /ds-chrono/.test(html)
-          && /class="ds-chrono-desk"/.test(html)
-          && /aria-label="Event waterfall"/.test(html)
-          && /class="ds-chrono-waterfall"/.test(html)
+          // The event waterfall sorts the channels by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/class="ds-chrono-desk"/.test(html)
+              && /aria-label="Event waterfall"/.test(html)
+              && /class="ds-chrono-waterfall"/.test(html)))
+          // No figure band or specimen band naming the channels again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "template")
           && !/class="ds-chrono-aside"/.test(html)
           && !/class="ds-chrono-grid"/.test(html)
           && /Calibration/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Observatory offerings use chronometer + scrub rail + signal lattice + event waterfall + calibration — no pricing, no metrics theatre, zero inverse bands.",
+      "Observatory offerings use chronometer + scrub rail of the channels + signal lattice + event waterfall sorting the channels by priority + calibration — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
         check(
       "kind-archive",
@@ -577,14 +586,16 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-register-masthead/.test(html)
           && /ds-alpha-rail/.test(html)
           && /data-figure="index-ledger"/.test(html)
-          && /ds-entry/.test(html)
-          && /ds-cross-stamps/.test(html)
-          && /ds-stamp-seal/.test(html)
+          // The entry essay groups the entries by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/ds-entry/.test(html) && /ds-cross-stamps/.test(html) && /ds-stamp-seal/.test(html)))
+          // No figure band or specimen strip naming the entries again under the fold's ledger.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "template")
           && /Registry/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Archive offerings use register + alpha rail + index ledger + entry essay with cross-stamp seals + Registry — no pricing, no metrics theatre, no sparse feature-rows, no shared marquee-proof, zero inverse bands.",
+      "Archive offerings use register + alpha rail + index ledger + entry essay grouping the entries by priority with cross-stamp seals + Registry — no pricing, no metrics theatre, no sparse feature-rows, no shared marquee-proof, no figure band or specimen strip, zero inverse bands.",
     ),
     check(
       "kind-loom",
@@ -623,18 +634,20 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-epin/.test(html)
           && /ds-binomial-strip/.test(html)
           && /data-figure="template-plate"/.test(html)
-          && /ds-range/.test(html)
-          && /class="ds-range-ladder"/.test(html)
           && /aria-label="Dichotomous key"/.test(html)
-          && /class="ds-range-sheets"/.test(html)
+          // The voucher key sorts the traits by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2
+            || (/ds-range/.test(html) && /class="ds-range-ladder"/.test(html) && /class="ds-range-sheets"/.test(html)))
           && !/class="ds-range-aside"/.test(html)
+          // No figure band or specimen strip naming the traits again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "template")
           && !/class="ds-gather-stack"/.test(html)
           && !/class="ds-gather-forme"/.test(html)
           && /Voucher/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + template tag + binomial strip + dichotomous voucher key + Voucher — no pricing, no metrics theatre, zero inverse bands.",
+      "Field-guide offerings use dissecting tray + hinged glassine + entomology pins + template tag + binomial strip of the traits + dichotomous voucher key sorting the traits by priority + Voucher — no pricing, no metrics theatre, no figure band or specimen strip, zero inverse bands.",
     ),
     check(
       "kind-press",
@@ -799,6 +812,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && spec.brief.siteKind !== "archive-index"
           && spec.brief.siteKind !== "commerce-loom"
           || /class="ds-story-fill"/.test(html)
+          // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
+          || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),
@@ -933,12 +948,17 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
          * them printed every capability description again, cut short in a drawing and then in full.
          */
         if (kind === "fintech-marketing") return /data-figure="wire-ledger"/.test(html) && !hasBoard;
+        /*
+         * Corporate pages prove with the fold's posture grid. The shared board on them printed
+         * every description again, right after the catalogue had printed each one.
+         */
+        if (kind === "corporate-story") return /data-figure="posture-grid"/.test(html) && !hasBoard;
         if (kind === "saas-marketing") {
           return saasProofMatches(spec, html, hasBoard);
         }
         return hasBoard;
       })(),
-      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; fintech pages prove with their fold ledger; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
+      "Craft templates prove with their own story instrument; workspace pages prove with their working shell; fintech pages prove with their fold ledger; corporate pages prove with their posture grid; marketing pages keep a filled proof board or workflow stage — never a lonely quote, never one shared board on every offering.",
     ),
   ];
 

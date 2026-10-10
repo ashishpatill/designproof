@@ -192,7 +192,9 @@ describe("premium-content-custom-web engine", () => {
     expect(previewHtml).toContain("Signal Path");
     expect(previewHtml).toContain('data-instrument="scrub"');
     expect(previewHtml).toContain('data-figure="mechanism-plate"');
-    expect(previewHtml).toContain("<figcaption data-scrub-caption>");
+    expect(previewHtml).toContain("data-scrub");
+    // No caption under the range printing the active part's name again; the list beside it names it.
+    expect(previewHtml).not.toContain("<figcaption data-scrub-caption>");
   });
 
   it("covers every skill node across showcase kinds", () => {
@@ -561,8 +563,9 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.brief.siteKind).toBe("art-directed-studio");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "feature-alternating")).toBe(true);
+    // The order of work stays; the step chart went, because its "cost · cumulative" axis came from no brief.
     expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
-    expect(spec.sections.some((s) => s.kind === "figure")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "figure")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBeLessThanOrEqual(1);
     expect(previewHtml).toContain('data-sitekind="art-directed-studio"');
@@ -601,7 +604,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain("ds-spine");
     expect(previewHtml).toContain('data-figure="type-ladder"');
     expect(previewHtml).toContain("ds-marginalia");
-    expect(previewHtml).toContain("ds-cut-slips");
+    // The marginalia group the cuts by priority; no cut slips name the other cuts again.
+    expect(previewHtml).not.toContain('class="ds-cut-slips"');
     expect(previewHtml).toContain("Colophon");
     expect(previewHtml).toContain("The cuts");
     expect(spec.sections.some((s) => s.id === "features-2")).toBe(false);
@@ -1103,7 +1107,10 @@ describe("research-backed offerings + implementation basics", () => {
   });
 
   it("keeps story Note labels from sliding under capability marks", () => {
-    const noteKinds = ["observatory", "archive", "loom", "herbarium", "press", "lantern", "clinic"] as const;
+    // Archive is not here: its entry essay groups the entries by priority and carries no Note labels.
+    // Field guide neither: its voucher key sorts the traits by priority and carries no Note labels.
+    // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
+    const noteKinds = ["loom", "press", "lantern", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;
@@ -1209,8 +1216,11 @@ describe("research-backed offerings + implementation basics", () => {
     const dashboard = designFromFeatures(SHOWCASE_BRIEFS.dashboard!);
     expect(dashboard.previewHtml).toContain("ds-proof-board-stack");
 
+    // Corporate proves with its fold's posture grid; the shared board reprinted every description.
     const corporate = designFromFeatures(SHOWCASE_BRIEFS.corporate!);
-    expect(corporate.previewHtml).toContain("ds-proof-board-spine");
+    expect(hasLiveBoard(corporate.previewHtml)).toBe(false);
+    expect(corporate.spec.sections.some((s) => s.kind === "proof")).toBe(false);
+    expect(corporate.previewHtml).toContain('data-figure="posture-grid"');
   });
 
   it("does not bolt the shared marquee-proof board onto craft templates", () => {

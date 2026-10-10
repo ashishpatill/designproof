@@ -1042,13 +1042,21 @@ export function typeLadder(
   const parts: string[] = [];
   const padX = W * (role === "band" ? 0.08 : 0.1);
   const padY = H * 0.07;
-  const steps = [
-    { label: "Display", h: H * 0.2 },
-    { label: "Title", h: H * 0.12 },
-    { label: "Deck", h: H * 0.075 },
-    { label: "Text", h: H * 0.05 },
-    { label: "Caption", h: H * 0.035 },
-  ];
+  /*
+   * One rung per cut, up to eight, each stepping down in size and labelled with its index number
+   * and its own name — the fold's one list of the cuts. A short brief keeps five rungs so the ladder
+   * still steps from display to caption; the spare rungs stay unnamed. The rungs used to be fixed
+   * "Display", "Title", "Deck", "Text", and "Caption" sizes on every page, a pottery studio's
+   * included, with the first five capability names set beside them whatever they were, and the
+   * product name printed again under the ladder as "· optical sizes".
+   */
+  const SIZES = [0.2, 0.12, 0.075, 0.05, 0.035, 0.03, 0.026, 0.022];
+  const rungs = Math.max(5, Math.min(cuts.length, SIZES.length));
+  const gapAt = Math.max(10, H * 0.012) + Math.max(10, H * 0.014);
+  const room = H - padY * 2 - 8 - gapAt * (rungs - 1);
+  const want = SIZES.slice(0, rungs).reduce((a, h) => a + h * H, 0);
+  const fit = Math.min(1, room / want);
+  const steps = SIZES.slice(0, rungs).map((h) => ({ h: H * h * fit }));
   const initials = productName
     .split(/[\s-]+/)
     .filter(Boolean)
@@ -1106,12 +1114,12 @@ export function typeLadder(
       gx += glyphW + gap;
     }
     const labelY = y + glyphH * 0.55;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(s.label)}</text>`,
-    );
     if (cut) {
       parts.push(
-        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY + 14)}" font-size="${FIG_MONO_PX}" fill="var(--surface-muted)" text-anchor="end">${esc(clip(cut.title, 22))}</text>`,
+        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(cut.meta ?? String(i + 1).padStart(2, "0"))}</text>`,
+      );
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(labelY + 14)}" font-size="${FIG_MONO_PX}" fill="var(--surface-muted)" text-anchor="end">${esc(clip(cut.title, 28))}</text>`,
       );
     }
     if (i < steps.length - 1) {
@@ -1122,10 +1130,6 @@ export function typeLadder(
       y = ruleY + Math.max(10, H * 0.014);
     }
   }
-
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 28)}" y="${round(H - padY + 4)}" font-size="${FIG_MONO_PX}" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · optical sizes</text>`,
-  );
 
   return frame(parts.join(""), {
     width: W,
@@ -1272,6 +1276,11 @@ export function dossierPlate(
  * A channel grid with amplitude bars and status dots. Labels stay mono ≤11px so the type probe
  * does not treat them as display (foundry SVG-text lesson). Theme packs do not invent instrument
  * lattices from a density slider.
+ *
+ * The lattice numbers its rows the way the index does and names no channels: the scrub rail under
+ * the fold is its one list of them. It used to name them again (padding a short brief to four rows
+ * by repeating the first), beside tolerances ("±0.5", "±1.0") and a "LIVE" / "WINDOW" / "00:10"
+ * legend no brief gave, hours 00 → 12 and "UTC", and the product name a second time.
  */
 /** Corner L-brackets for a live window — instrument ticks, not a full chrome box. */
 function liveWindowCorners(x: number, y: number, w: number, h: number, arm = 10): string {
@@ -1318,23 +1327,14 @@ export function signalLattice(
     parts.push(
       `<line x1="${round(x)}" y1="${round(chronY - (tall ? 8 : 4))}" x2="${round(x)}" y2="${round(chronY + (tall ? 8 : 4))}" stroke="${tall || isNow ? ACCENT : LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
-    if (tall) {
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x)}" y="${round(chronY - 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">${String(i).padStart(2, "0")}</text>`,
-      );
-    }
     if (isNow) {
       parts.push(
         `<circle cx="${round(x)}" cy="${round(chronY)}" r="2.5" fill="var(--surface-bg, var(--c-paper))" stroke="${ACCENT}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
       );
     }
   }
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(chronY - 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">UTC</text>`,
-  );
-
   const channels = features.slice(0, 6);
-  const count = Math.max(4, channels.length);
+  const count = Math.max(1, channels.length);
   const gridTop = padY + 44;
   const gridBottom = H - padY - 28;
   const gridH = gridBottom - gridTop;
@@ -1344,11 +1344,7 @@ export function signalLattice(
   const barRight = W - padX - 24;
   const barW = barRight - barLeft;
 
-  // Tolerance ladder keyed to channel index — same values the calibration close echoes.
-  const tolerances = ["±0.5", "±1.0", "±0.5", "±1.5", "±1.0", "±2.0"];
-
   for (let i = 0; i < count; i += 1) {
-    const f = channels[i] ?? channels[i % Math.max(1, channels.length)]!;
     const y0 = gridTop + rowH * i;
     const mid = y0 + rowH / 2;
     // Row rule
@@ -1357,12 +1353,9 @@ export function signalLattice(
         `<line x1="${round(padX + 8)}" y1="${round(y0)}" x2="${round(W - padX - 8)}" y2="${round(y0)}" stroke="${LINE}" stroke-width="1" opacity="0.35" vector-effect="non-scaling-stroke"/>`,
       );
     }
-    // Channel id + title (mono only)
+    // Channel number only (mono), the way the index numbers it.
     parts.push(
-      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid - 4)}" font-size="11" fill="var(--surface-quiet)">${String(i + 1).padStart(2, "0")}</text>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid + 12)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f?.title ?? `ch-${i + 1}`, 16))}</text>`,
+      `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(mid + 4)}" font-size="11" fill="var(--surface-quiet)">${esc(channels[i]?.meta ?? String(i + 1).padStart(2, "0"))}</text>`,
     );
 
     // Amplitude bars — dense instrument matter without SVG display type.
@@ -1390,9 +1383,6 @@ export function signalLattice(
     parts.push(
       `<line x1="${round(barLeft)}" y1="${round(thrY)}" x2="${round(barRight)}" y2="${round(thrY)}" stroke="${ACCENT}" stroke-width="1" opacity="0.45" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>`,
     );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(barLeft + 4)}" y="${round(thrY - 3)}" font-size="11" fill="var(--surface-quiet)">${tolerances[i % tolerances.length]}</text>`,
-    );
 
     // Status dot
     const status = i % 3 === 0 ? ACCENT : LINE;
@@ -1401,27 +1391,13 @@ export function signalLattice(
     );
   }
 
-  // Live window — corner ticks + WINDOW / duration legend (not a full boxed chrome).
+  // Window bracket — corner ticks only, no legend.
   const winX = barLeft + barW * 0.62;
   const winW = barW * 0.16;
-  const winMin = Math.max(8, Math.round((winW / barW) * 60));
-  const duration = `00:${String(winMin).padStart(2, "0")}`;
   parts.push(liveWindowCorners(winX, gridTop, winW, gridH, role === "band" ? 12 : 8));
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + winW / 2)}" y="${round(gridTop - 6)}" font-size="11" fill="var(--c-accent)" text-anchor="middle">LIVE</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + 6)}" y="${round(gridTop + 14)}" font-size="11" fill="var(--c-accent)">WINDOW</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(winX + winW - 6)}" y="${round(gridTop + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${duration}</text>`,
-  );
 
   parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 12)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · signal lattice</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${count} channels</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 8)}" y="${round(H - padY + 14)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${count} ${count === 1 ? "channel" : "channels"}</text>`,
   );
 
   return frame(parts.join(""), {
@@ -1449,13 +1425,16 @@ export function indexLedger(
   const r = rng(`${seed}:index-ledger:${role}`);
   const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
   /*
-   * Tall plate dilutes CSS ruleDensity (rules ÷ screens). SVG strokes do not count — pack cells
-   * with dual ink + stamps, keep hairlines sparse. Shrinking H to "fill voids" raised rules/screen.
+   * Tall plate dilutes CSS ruleDensity (rules ÷ screens). SVG strokes do not count — each cell is a
+   * catalogue card with drawn matter, so the height reads as cards, not empty ruled rows.
    */
   const H = role === "band" ? 640 : role === "column" ? 520 : 480;
   const padX = role === "band" ? 44 : 28;
   const padY = role === "band" ? 36 : 28;
   const parts: string[] = [];
+  // The letters this brief's entries run across, not a fixed "A–Z".
+  const initials = [...new Set(features.map((f) => (f.title.trim()[0] ?? "").toUpperCase()).filter(Boolean))].sort();
+  const letterSpan = initials.length > 1 ? `${initials[0]}–${initials[initials.length - 1]}` : (initials[0] ?? "A–Z");
 
   // Outer rule — hairline only.
   parts.push(
@@ -1474,31 +1453,38 @@ export function indexLedger(
     `<text class="ds-fig-mono" x="${round(W / 2)}" y="${round(headY)}" font-size="11" fill="var(--surface-muted)" text-anchor="middle">${esc(clip(productName, 32))}</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">A–Z · INDEX</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(letterSpan)} · INDEX</text>`,
   );
 
-  // Build the entry list from the brief's own capabilities, then shelf marks for the rest of the roll.
-  const baseEntries = features.length ? features : [{ title: "Entry", body: "", meta: "001" } as Block];
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  /*
+   * Each entry is drawn once, in catalogue order, down two columns. The ledger used to fill a fixed
+   * twelve cells by cycling the entries, so a five-entry brief named its lead entry three times on
+   * the fold, labelled cells "Core" or "Included" (a tier word the priorities section says once),
+   * headed the columns "A" and "I" whatever the names were, and footed the plate "12 entries". The
+   * placeholder label for a cell with no tier was a made-up "A1 · shelf 001". The rows now fit the entries,
+   * each column is headed by the initial of its first entry, a spare cell stays blank, the
+   * masthead gives the letters the entries run across, and the footer counts the entries the brief
+   * gives.
+   */
+  const entries = (features.length ? features : [{ title: productName, body: "" } as Block]).slice(0, 12);
   const cols = 2;
   const gridTop = padY + 36;
   const gridBottom = H - padY - 22;
   const gridH = gridBottom - gridTop;
   const colGap = 22;
   const colW = (W - padX * 2 - colGap * (cols - 1)) / cols;
-  /*
-   * 2×6 packed cells: dual ink lines + stamps fill voids; hairline only on odd rows so the SVG
-   * stays sparse. CSS bordered rows elsewhere own the ruleDensity budget — not this drawing.
-   */
-  const rowsPerCol = role === "band" ? 6 : 5;
+  const rowsPerCol = Math.max(3, Math.ceil(entries.length / cols));
   const rowH = gridH / rowsPerCol;
+  const initial = (b: Block | undefined): string => (b?.title.trim()[0] ?? "").toUpperCase();
 
   for (let c = 0; c < cols; c += 1) {
     const x0 = padX + c * (colW + colGap);
-    const letter = letters[Math.min(c * 8, letters.length - 1)] ?? letters[c]!;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(gridTop - 4)}" font-size="11" fill="var(--c-accent)">${letter}</text>`,
-    );
+    const head = initial(entries[c * rowsPerCol]);
+    if (head) {
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(gridTop - 4)}" font-size="11" fill="var(--c-accent)">${esc(head)}</text>`,
+      );
+    }
     if (c > 0) {
       parts.push(
         `<line x1="${round(x0 - colGap / 2)}" y1="${round(gridTop)}" x2="${round(x0 - colGap / 2)}" y2="${round(gridBottom)}" stroke="${LINE}" stroke-width="1" opacity="0.4" vector-effect="non-scaling-stroke"/>`,
@@ -1508,43 +1494,54 @@ export function indexLedger(
     for (let row = 0; row < rowsPerCol; row += 1) {
       const y = gridTop + row * rowH;
       const entryIdx = c * rowsPerCol + row;
+      const f = entries[entryIdx];
+      if (!f) continue;
       const ordinal = String(entryIdx + 1).padStart(3, "0");
-      // Sparse SVG hairlines — do not flood; CSS ruleDensity ignores these strokes anyway.
-      if (row % 2 === 1 || row === rowsPerCol - 1) {
-        parts.push(
-          `<line x1="${round(x0)}" y1="${round(y + rowH)}" x2="${round(x0 + colW)}" y2="${round(y + rowH)}" stroke="${LINE}" stroke-width="1" opacity="0.38" vector-effect="non-scaling-stroke"/>`,
-        );
-      }
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="var(--surface-quiet)">${ordinal}</text>`,
-      );
       /*
-       * One name per entry. The cells used to be filled by cycling the capability list, so a roll of
-       * four entries printed every name three times inside the fold plate alone (measured
-       * 2026-10-05: `archive-index`, four names ×3 in the hero). A real index holds more lines than a
-       * brief enumerates, and the lines it has not named yet are shelf marks.
+       * A catalogue card: ordinal, name, a dotted leader to the entry's own initial, the accent
+       * rule a library card carries under its heading, typed matter drawn as bars (never the
+       * description, which the index below prints once), and the rod hole at the foot.
        */
-      const f = entryIdx < baseEntries.length ? baseEntries[entryIdx] : undefined;
-      const shelf = `${letter}${String(row + 1).padStart(2, "0")} · shelf ${ordinal}`;
-      const title = f ? clip(f.title, role === "band" ? 22 : 14) : `${letter}${String(row + 1).padStart(2, "0")}`;
+      const cx = x0 + 4;
+      const cw = colW - 8;
+      const cy = y + 6;
+      const ch = rowH - 12;
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="${f ? "var(--surface-muted)" : "var(--surface-quiet)"}">${esc(title)}</text>`,
+        `<rect x="${round(cx)}" y="${round(cy)}" width="${round(cw)}" height="${round(ch)}" fill="var(--c-paper)" stroke="${LINE}" stroke-width="1" opacity="0.98" vector-effect="non-scaling-stroke"/>`,
+      );
+      const textY = cy + 18;
+      const name = clip(f.title, role === "band" ? 30 : 18);
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(cx + 10)}" y="${round(textY)}" font-size="11" fill="var(--surface-quiet)">${ordinal}</text>`,
       );
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.72)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(f?.kicker || shelf, role === "band" ? 22 : 16))}</text>`,
+        `<text class="ds-fig-mono" x="${round(cx + 44)}" y="${round(textY)}" font-size="11" fill="var(--surface-muted)">${esc(name)}</text>`,
       );
-      // Accent stamp — filled mark, not an extra rule.
-      if (row % 2 === 0) {
+      const leaderFrom = cx + 44 + name.length * 6.8 + 10;
+      const leaderTo = cx + cw - 26;
+      if (leaderTo - leaderFrom > 24) {
         parts.push(
-          `<rect x="${round(x0 + colW - 10)}" y="${round(y + rowH * 0.28)}" width="5" height="5" fill="${ACCENT}" opacity="0.75"/>`,
+          `<line x1="${round(leaderFrom)}" y1="${round(textY - 3)}" x2="${round(leaderTo)}" y2="${round(textY - 3)}" stroke="${LINE}" stroke-width="1" stroke-dasharray="1 5" opacity="0.8" vector-effect="non-scaling-stroke"/>`,
         );
       }
-      // Pale letter watermark — ink without hairline flood.
-      if (row % 3 === 1) {
+      parts.push(
+        `<text class="ds-fig-mono" x="${round(cx + cw - 10)}" y="${round(textY)}" font-size="11" fill="${entryIdx === 0 ? ACCENT : "var(--surface-quiet)"}" text-anchor="end">${esc(initial(f))}</text>`,
+      );
+      parts.push(
+        `<line x1="${round(cx + 10)}" y1="${round(textY + 8)}" x2="${round(cx + cw - 10)}" y2="${round(textY + 8)}" stroke="${ACCENT}" stroke-width="1" opacity="${entryIdx === 0 ? 0.8 : 0.45}" vector-effect="non-scaling-stroke"/>`,
+      );
+      const barTop = textY + 20;
+      const barBottom = cy + ch - 18;
+      const bars = Math.max(1, Math.min(5, Math.floor((barBottom - barTop) / 12)));
+      for (let k = 0; k < bars; k += 1) {
+        const wMul = k === 0 ? 0.7 : 0.35 + r() * 0.45;
         parts.push(
-          `<text class="ds-fig-mono" x="${round(x0 + colW - 14)}" y="${round(y + rowH * 0.78)}" font-size="11" fill="var(--surface-quiet)" opacity="0.35" text-anchor="end">${letter}</text>`,
+          `<rect x="${round(cx + 44)}" y="${round(barTop + k * 12)}" width="${round((cw - 64) * wMul)}" height="2.2" fill="var(--surface-quiet)" opacity="${round(0.4 + (k % 2) * 0.15)}"/>`,
         );
       }
+      parts.push(
+        `<circle cx="${round(cx + cw / 2)}" cy="${round(cy + ch - 9)}" r="3" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+      );
     }
   }
 
@@ -1552,7 +1549,7 @@ export function indexLedger(
     `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 28))} · index ledger</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${cols * rowsPerCol} entries</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${features.length} ${features.length === 1 ? "entry" : "entries"}</text>`,
   );
 
   return frame(parts.join(""), {
@@ -1561,6 +1558,7 @@ export function indexLedger(
     kind: "index-ledger",
     label: `${productName} index ledger`,
     inset: role === "band" ? BLEED_INSET : 0,
+    dense: true,
   });
 }
 
@@ -2564,6 +2562,12 @@ export function queueConsole(
 
 /**
  * Posture grid — corporate diligence fold. Principles × outcomes matrix, not horizon ticks.
+ *
+ * Each cell is one capability, numbered and named once; the grid grows to three rows so a fifth or
+ * sixth capability is not left off. The grid used to read "DILIGENCE POSTURE" on every corporate
+ * page, a marina's or a pottery studio's included, print each description cut into short lines
+ * (the same sentences the fold's lede and the catalogue print in full), and label empty footers
+ * "Principle 01" to "Principle 04". None of that came from any brief.
  */
 export function postureGrid(
   productName: string,
@@ -2571,15 +2575,14 @@ export function postureGrid(
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const items = features.slice(0, 4);
+  const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 680 : 920;
   const H = role === "band" ? 720 : role === "column" ? 640 : 520;
   void seed;
   const pad = W * 0.06;
   const parts: string[] = [];
-  parts.push(text("DILIGENCE POSTURE", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }));
   parts.push(
-    text(clip(productName, 32), W - pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
+    text(clip(productName.toUpperCase(), 32), pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.4 }),
   );
   // Header hairline only — sequence lives on the 01–04 ordinals. A polyline through
   // cell centroids reads as a scribble across titles (the orange Z on Lattice).
@@ -2587,11 +2590,11 @@ export function postureGrid(
     `<path class="ds-draw" pathLength="1" d="M${round(pad)} ${round(pad + 28)} L${round(W - pad)} ${round(pad + 28)}" fill="none" stroke="${ACCENT}" stroke-width="1.5" stroke-linecap="round"/>`,
   );
   const cols = 2;
-  const rows = 2;
+  const rows = Math.max(2, Math.ceil(items.length / cols));
   const gap = 28;
   const cellW = (W - pad * 2 - gap) / cols;
-  const cellH = (H - pad * 2 - 56 - gap) / rows;
-  items.slice(0, 4).forEach((b, i) => {
+  const cellH = (H - pad * 2 - 56 - gap * (rows - 1)) / rows;
+  items.forEach((b, i) => {
     const c = i % cols;
     const row = Math.floor(i / cols);
     const x = pad + c * (cellW + gap);
@@ -2600,7 +2603,7 @@ export function postureGrid(
     parts.push(
       text(String(i + 1).padStart(2, "0"), x + 20, y + 36, {
         size: 28,
-        fill: i === 3 ? ACCENT : "var(--c-border-strong)",
+        fill: i === 0 ? ACCENT : "var(--c-border-strong)",
         mono: true,
         weight: 500,
       }),
@@ -2618,19 +2621,29 @@ export function postureGrid(
         mono: true,
       }),
     );
+    parts.push(rule(x + 20, y + cellH - 24, x + cellW - 20, y + cellH - 24));
   });
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "posture-grid",
-    label: `${productName} diligence posture`,
+    label: `${productName} capabilities`,
     inset: role === "band" ? BLEED_INSET : 0,
     dense: true,
   });
 }
 
 /**
- * Mechanism plate — educational fold instrument (scrub drives stages). Cost-axis stack, not empty flow cards.
+ * Mechanism plate — educational fold instrument. The scrub moves along it.
+ *
+ * One numbered column per part, in the brief's order, up to six. A column's height is the priority
+ * the brief gives that part (core, supporting, additional), and the plate says so in its one label.
+ * The plate used to set a "cost · cumulative" axis with values of 100, 70, 40 and 10 that no brief
+ * gave, a line rising through them, every part's name a second time above the line, and the second
+ * part's description cut mid-word. The names sit in the scrub list beside the plate, once.
+ *
+ * Nodes and stems carry `ds-scrub-node` / `ds-scrub-stem` and a `data-step`, so the fold's range
+ * input lights the part it is on. `kicker` carries the brief's priority code (p0, p1, p2).
  */
 export function mechanismPlate(
   productName: string,
@@ -2638,75 +2651,53 @@ export function mechanismPlate(
   seed: string,
   role: FigureRole = "band",
 ): string {
-  const items = features.slice(0, 4);
+  const items = features.slice(0, 6);
   const W = role === "band" ? 1440 : role === "column" ? 720 : 920;
   const H = role === "band" ? 700 : role === "column" ? 620 : 520;
   void seed;
   const pad = W * 0.06;
   const parts: string[] = [];
-  parts.push(text("COST · CUMULATIVE", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.2 }));
-  parts.push(
-    text(clip(productName, 28), W - pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
-  );
-  const axisX = pad + 48;
-  const axisY = pad + 48;
-  const axisH = H - pad * 2 - 80;
-  const axisW = W - pad * 2 - 64;
-  parts.push(rule(axisX, axisY, axisX, axisY + axisH));
-  parts.push(rule(axisX, axisY + axisH, axisX + axisW, axisY + axisH));
-  [100, 70, 40, 10].forEach((v, i) => {
-    const y = axisY + (axisH * i) / 3;
-    parts.push(rule(axisX, y, axisX + axisW, y, "var(--surface-border)"));
-    parts.push(
-      text(String(v), axisX - 12, y + 4, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "end" }),
-    );
+  const weight = (b: Block): number => (b.kicker === "p0" ? 1 : b.kicker === "p1" ? 0.64 : b.kicker === "p2" ? 0.36 : 1);
+  const weights = items.map(weight);
+  const graded = new Set(weights).size > 1;
+  // Only say what the heights mean when they differ; equal columns need no legend.
+  if (graded) parts.push(text("HEIGHT · PRIORITY", pad, pad + 8, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1.2 }));
+  const top = pad + 56;
+  const floor = H - pad - 44;
+  const span = floor - top;
+  const n = Math.max(1, items.length);
+  const colW = (W - pad * 2) / n;
+  const mid = Math.min(1, Math.max(0, items.length - 1));
+  const tops = items.map((_, i) => ({ x: pad + colW * (i + 0.5), y: floor - span * weights[i]! }));
+  items.forEach((_, i) => {
+    const { x, y } = tops[i]!;
+    const w = Math.min(colW * 0.62, 120);
+    parts.push(box(x - w / 2, y, w, floor - y, { fill: "var(--c-paper-raised)", stroke: LINE }));
+    parts.push(rule(x - w / 2, y, x + w / 2, y, "var(--c-border-strong)"));
   });
-  const n = Math.max(2, items.length);
-  items.forEach((b, i) => {
-    const x = axisX + ((i + 0.5) / n) * axisW;
-    const y = axisY + axisH * (1 - (0.25 + (i / Math.max(1, n - 1)) * 0.65));
-    if (i > 0) {
-      const px = axisX + ((i - 0.5) / n) * axisW;
-      const py = axisY + axisH * (1 - (0.25 + ((i - 1) / Math.max(1, n - 1)) * 0.65));
-      parts.push(
-        `<path class="ds-draw" pathLength="1" d="M${round(px)} ${round(py)} L${round(x)} ${round(y)}" fill="none" stroke="${ACCENT}" stroke-width="2.5" stroke-linecap="round"/>`,
-      );
-    }
-    const lead = i === 1;
+  if (tops.length > 1) {
     parts.push(
-      `<circle cx="${round(x)}" cy="${round(y)}" r="${lead ? 7 : 5}" fill="${lead ? PAPER : ACCENT}" stroke="${ACCENT}" stroke-width="2"/>`,
-    );
-    parts.push(
-      text(clip(b.title, 16), x, axisY - 4, {
-        size: FIG_MONO_PX,
-        fill: lead ? ACCENT : QUIET,
-        mono: true,
-        anchor: "middle",
-      }),
-    );
-    parts.push(
-      text(String(i + 1).padStart(2, "0"), x, axisY + axisH + 22, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-        anchor: "middle",
-      }),
-    );
-  });
-  const active = items[1] ?? items[0];
-  if (active) {
-    parts.push(
-      text(clip(active.body || active.title, 64), axisX + 12, axisY + 28, {
-        size: 13,
-        fill: BODY,
-      }),
+      `<path class="ds-draw" pathLength="1" d="${tops.map((t, i) => `${i ? "L" : "M"}${round(t.x)} ${round(t.y)}`).join(" ")}" fill="none" stroke="${ACCENT}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
     );
   }
+  parts.push(rule(pad, floor, W - pad, floor));
+  tops.forEach(({ x, y }, i) => {
+    const on = i === mid;
+    parts.push(
+      `<line class="ds-scrub-stem" data-step="${i}" x1="${round(x)}" y1="${round(y)}" x2="${round(x)}" y2="${round(floor)}" stroke="${ACCENT}" stroke-width="2" opacity="${on ? 1 : 0}"/>`,
+    );
+    parts.push(
+      `<circle class="ds-scrub-node" data-step="${i}" cx="${round(x)}" cy="${round(y)}" r="${on ? 6 : 4}" fill="${on ? PAPER : ACCENT}" stroke="${ACCENT}" stroke-width="2" opacity="${on ? 1 : 0.45}"/>`,
+    );
+    parts.push(
+      text(String(i + 1).padStart(2, "0"), x, floor + 24, { size: FIG_MONO_PX, fill: QUIET, mono: true, anchor: "middle" }),
+    );
+  });
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "mechanism-plate",
-    label: `${productName} mechanism`,
+    label: `${productName} parts${graded ? " by priority" : ""}`,
     inset: role === "band" ? BLEED_INSET : 0,
     dense: true,
   });
@@ -2789,6 +2780,11 @@ export function wireLedger(
  * Selected-work wall: crop-marked plates with mono captions and a method rail. HTML flow steppers
  * do not count as drawn matter (foldFigure=0); this SVG board owns the fold the way a studio wall
  * owns a pitch room. Theme packs invent process steppers; they do not invent a crop-marked board.
+ *
+ * Each plate carries one capability, named once. When the grid has more cells than the brief has
+ * capabilities, the spare cells stay blank instead of naming the first capabilities a second time.
+ * The board used to read "SELECTED WORK · METHOD BOARD" and "N plates · handoff-safe" on every
+ * studio page, a pottery studio's included; neither came from any brief.
  */
 export function workBoard(
   productName: string,
@@ -2814,19 +2810,11 @@ export function workBoard(
   // Method rail — studio signature, not a SaaS stage strip.
   parts.push(rule(pad, pad + 10, W - pad, pad + 10));
   parts.push(
-    text("SELECTED WORK · METHOD BOARD", pad, pad + 8, {
+    text(clip(productName.toUpperCase(), 28), pad, pad + 8, {
       size: FIG_MONO_PX,
       fill: QUIET,
       mono: true,
       track: 1.2,
-    }),
-  );
-  parts.push(
-    text(clip(productName, 28), W - pad, pad + 8, {
-      size: FIG_MONO_PX,
-      fill: QUIET,
-      mono: true,
-      anchor: "end",
     }),
   );
 
@@ -2835,7 +2823,7 @@ export function workBoard(
     const row = Math.floor(i / cols);
     const x = pad + c * (cellW + gap);
     const y = gridTop + row * (cellH + gap);
-    const f = items[i % Math.max(items.length, 1)];
+    const f = items[i];
     const lead = i === 0;
     // Crop marks
     const m = 8;
@@ -2872,31 +2860,26 @@ export function workBoard(
         mono: true,
       }),
     );
-    const title = clip(f?.title ?? `Plate ${i + 1}`, role === "band" ? 22 : 14);
-    parts.push(
-      text(title, x + 12, y + cellH - 18, {
-        size: FIG_MONO_PX,
-        fill: INK,
-        mono: true,
-      }),
-    );
-    parts.push(
-      text(clip(f?.meta ?? "method", 12), x + cellW - 12, y + cellH - 18, {
-        size: FIG_MONO_PX,
-        fill: QUIET,
-        mono: true,
-        anchor: "end",
-      }),
-    );
+    if (f) {
+      parts.push(
+        text(clip(f.title, role === "band" ? 22 : 14), x + 12, y + cellH - 18, {
+          size: FIG_MONO_PX,
+          fill: INK,
+          mono: true,
+        }),
+      );
+      if (f.meta) {
+        parts.push(
+          text(clip(f.meta, 12), x + cellW - 12, y + cellH - 18, {
+            size: FIG_MONO_PX,
+            fill: QUIET,
+            mono: true,
+            anchor: "end",
+          }),
+        );
+      }
+    }
   }
-
-  parts.push(
-    text(`${Math.min(items.length, cols * rows)} plates · handoff-safe`, pad, H - 8, {
-      size: FIG_MONO_PX,
-      fill: QUIET,
-      mono: true,
-    }),
-  );
 
   return frame(parts.join(""), {
     width: W,
@@ -3064,6 +3047,11 @@ export function loomWeave(
  * Pressed-leaf silhouette + copyright-free botanical photo inset in a voucher window, taxonomic
  * mono labels ≤11px, range ticks. Soft theme packs float glass cards; they do not invent a
  * herbarium voucher with pressed geometry and a taxon rail.
+ *
+ * The plate draws no trait names: the binomial strip under it is the fold's one list of them. It
+ * used to name the first three again beside "Voucher · herbarium", "Range · W → E", "Blot", rank
+ * letters Kingdom to Species, and the product name a second time, on every page, a marina's
+ * included. The photo window now runs the height of the pressed leaf.
  */
 export function templatePlate(
   productName: string,
@@ -3078,7 +3066,7 @@ export function templatePlate(
   const padY = role === "band" ? 36 : 24;
   const parts: string[] = [];
   const photos = [FREE_PHOTOS.botanicalA, FREE_PHOTOS.botanicalB, FREE_PHOTOS.botanicalC];
-  const ranks = ["K", "P", "C", "O", "F", "G", "S"];
+  const ticks = 7;
 
   parts.push(
     `<rect x="${round(padX)}" y="${round(padY)}" width="${round(W - padX * 2)}" height="${round(H - padY * 2)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
@@ -3086,9 +3074,6 @@ export function templatePlate(
 
   const headY = padY + 14;
   // Keep head mono on the right half — left is reserved for the absolute template tag.
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W * 0.52)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Voucher · herbarium</text>`,
-  );
   parts.push(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 22))} · Template</text>`,
   );
@@ -3100,20 +3085,17 @@ export function templatePlate(
   const rankTop = padY + 36;
   const rankBot = H - padY - 28;
   /*
-   * The absolute `.ds-template-tag` claim card covers the plate's left edge, so the plate's own mono
-   * labels own everything right of `safeX`. Measured at 1440×900: the tag spans x 169–563px and the
-   * plate paints 1025px wide from x 154 — about 0.399 of the SVG width, 511 units of 1280. "Blot"
-   * was centred at midX ≈ 0.39W and the range label sat at padX+20, both directly under the card;
-   * that is why the fold showed label text running through the claim's lede.
+   * The absolute `.ds-template-tag` claim card covers the plate's left edge. Measured at 1440×900:
+   * the tag spans x 169–563px and the plate paints 1025px wide from x 154 — about 0.399 of the SVG
+   * width, 511 units of 1280. "Blot" was centred at midX ≈ 0.39W and the range label sat at padX+20,
+   * both directly under the card; that is why the fold showed label text running through the claim's
+   * lede. Master removed both labels rather than moving them (af7d65f), so nothing needs a safe
+   * left edge here any more.
    */
-  const safeX = Math.round(W * 0.44);
-  for (let i = 0; i < ranks.length; i += 1) {
-    const y = rankTop + (i / (ranks.length - 1)) * (rankBot - rankTop);
+  for (let i = 0; i < ticks; i += 1) {
+    const y = rankTop + (i / (ticks - 1)) * (rankBot - rankTop);
     parts.push(
       `<line x1="${round(W - padX - 16)}" y1="${round(y)}" x2="${round(W - padX - 8)}" y2="${round(y)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(W - padX - 20)}" y="${round(y + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${ranks[i]}</text>`,
     );
   }
 
@@ -3154,15 +3136,12 @@ export function templatePlate(
   parts.push(
     `<ellipse cx="${round(midX + leafW * 0.08)}" cy="${round(midY + leafH * 0.12)}" rx="22" ry="14" fill="${ACCENT_FIELD}" opacity="0.35"/>`,
   );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(Math.max(midX + leafW * 0.08, safeX))}" y="${round(midY + leafH * 0.12 + 3)}" font-size="11" fill="var(--surface-quiet)">Blot</text>`,
-  );
 
   // Photo voucher window on the right.
   const winX = leafX + leafW + 16;
   const winY = leafY + 12;
   const winW = W - padX - 16 - winX;
-  const winH = leafH * 0.62;
+  const winH = leafH * 0.9;
   const clipId = "spec-photo-clip";
   parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(winX)}" y="${round(winY)}" width="${round(winW)}" height="${round(winH)}"/></clipPath></defs>`);
   parts.push(
@@ -3175,35 +3154,10 @@ export function templatePlate(
     `<text class="ds-fig-mono" x="${round(winX + 8)}" y="${round(winY + 16)}" font-size="11" fill="var(--surface-quiet)">Plate A</text>`,
   );
 
-  // Feature callouts under photo — sparse mono.
-  const base = features.length ? features : [{ title: "Trait", body: "", meta: "01" } as Block];
-  const callTop = winY + winH + 18;
-  for (let i = 0; i < Math.min(3, base.length); i += 1) {
-    const y = callTop + i * 22;
-    const f = base[i]!;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(winX + 8)}" y="${round(y)}" font-size="11" fill="var(--surface-quiet)">${String(i + 1).padStart(2, "0")}</text>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(winX + 36)}" y="${round(y)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f.title, 22))}</text>`,
-    );
-    // Tiny secondary photo chips for remaining stock — ink without card collage.
-    if (i > 0 && photos[i]) {
-      const chip = 28;
-      const cx = winX + winW - chip - 6;
-      const cy = callTop + (i - 1) * (chip + 6);
-      const cid = `spec-chip-${i}`;
-      parts.push(`<defs><clipPath id="${cid}"><rect x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}"/></clipPath></defs>`);
-      parts.push(
-        `<image href="${photos[i]}" x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})" opacity="0.85"/>`,
-      );
-      parts.push(
-        `<rect x="${round(cx)}" y="${round(cy)}" width="${chip}" height="${chip}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-    }
-  }
+  void features;
 
-  // Range ticks under leaf.
+  // Range ticks under leaf. The ticks stay; the "Range · W → E" caption does not — master deleted it
+  // in af7d65f as a label naming nothing the brief gave, and the field-guide test asserts it absent.
   const rangeY = leafY + leafH - 4;
   for (let i = 0; i < 6; i += 1) {
     const x = leafX + 20 + (i / 5) * (leafW - 40);
@@ -3211,13 +3165,9 @@ export function templatePlate(
       `<line x1="${round(x)}" y1="${round(rangeY)}" x2="${round(x)}" y2="${round(rangeY + 8)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
   }
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(Math.max(leafX + 20, safeX))}" y="${round(rangeY + 20)}" font-size="11" fill="var(--surface-quiet)">Range · W → E</text>`,
-  );
 
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(Math.max(padX + 10, safeX))}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · template plate</text>`,
-  );
+  // The foot caption naming the product a second time is gone: master deleted it in af7d65f, and
+  // the field-guide test asserts the product is named in the plate's head and not again at its foot.
   parts.push(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">free botanical stock</text>`,
   );

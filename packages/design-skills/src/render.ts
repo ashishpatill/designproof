@@ -190,9 +190,29 @@ function figuresFor(spec: DesignSpec): FigurePlan {
   const features =
     spec.brief.siteKind === "saas-marketing" ||
     spec.brief.siteKind === "dashboard-webapp" ||
-    spec.brief.siteKind === "fintech-marketing"
+    spec.brief.siteKind === "fintech-marketing" ||
+    spec.brief.siteKind === "art-directed-studio" ||
+    spec.brief.siteKind === "corporate-story" ||
+    spec.brief.siteKind === "archive-index" ||
+    // Field guide: the specimen plate draws no names or sentences; the binomial strip names them.
+    spec.brief.siteKind === "field-guide" ||
+    // Observatory: the signal lattice numbers its rows; the scrub rail names the channels.
+    spec.brief.siteKind === "signal-observatory" ||
+    // Foundry: the type ladder names each cut on its own rung, and no sentence.
+    spec.brief.siteKind === "editorial-foundry"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
-      : listed;
+      /*
+       * Educational: names only too. The mechanism plate draws each part as a numbered column
+       * whose height is the brief's priority for it, so it gets that priority and nothing else.
+       */
+      : spec.brief.siteKind === "docs-educational"
+        ? listed.map((b) => ({
+            ...b,
+            body: "",
+            points: [],
+            kicker: spec.brief.features.find((f) => f.name === b.title)?.priority,
+          }))
+        : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
   return planFigures({
     productName: spec.brief.productName,
@@ -283,7 +303,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     <p ${enterAttr(spec, 0, "ds-brand-mark")}>${esc(spec.brief.productName)}</p>
     ${section.eyebrow ? `<p ${enterAttr(spec, 1, "ds-eyebrow")}>${esc(section.eyebrow)}</p>` : ""}
     <h1 ${enterAttr(spec, section.eyebrow ? 2 : 1, "ds-display")}>${esc(section.title)}</h1>
-    <p ${enterAttr(spec, section.eyebrow ? 3 : 2, "ds-lede")}>${esc(section.body)}</p>
+    ${section.body ? `<p ${enterAttr(spec, section.eyebrow ? 3 : 2, "ds-lede")}>${esc(section.body)}</p>` : ""}
     ${withEnter(spec, actI, actions(section))}
     ${meta}
   </div>`;
@@ -398,23 +418,28 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const latticeFig = figures.hero
       ? `<figure class="ds-chrono-lattice" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
+    /*
+     * The chronometer keeps its hour ticks as a scale but prints no hours and no "UTC": the same
+     * 00 → 12 UTC ran down every observatory page, a pottery studio's included, and no brief gives a
+     * time zone or a clock.
+     */
     const ticks = Array.from({ length: 13 }, (_, i) => {
-      const label = String(i).padStart(2, "0");
       const major = i % 3 === 0;
-      return `<li class="ds-chrono-tick${major ? " is-major" : ""}" style="--tick:${i}"><span>${label}</span></li>`;
+      return `<li class="ds-chrono-tick${major ? " is-major" : ""}" style="--tick:${i}"></li>`;
     }).join("");
-    const chronometer = `<aside class="ds-chronometer" aria-hidden="true"><ol>${ticks}</ol><span class="ds-chronometer-label">UTC</span></aside>`;
-    const windows = [
-      { id: "t24", label: "T−24h", href: "#features" },
-      { id: "live", label: "Live", href: "#figure" },
-      { id: "p6", label: "+6h", href: "#story" },
-      { id: "cal", label: "Calibrate", href: "#cta" },
-    ];
-    const scrub = `<nav class="ds-scrub-rail" aria-label="Time windows"><ol>${windows
-      .map(
-        (w, i) =>
-          `<li><a href="${w.href}" class="ds-scrub-chip${i === 1 ? " is-live" : ""}" data-window="${w.id}"><span class="ds-scrub-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-scrub-label">${esc(w.label)}</span></a></li>`,
-      )
+    const chronometer = `<aside class="ds-chronometer" aria-hidden="true"><ol>${ticks}</ol></aside>`;
+    /*
+     * The scrub rail is the fold's one list of the channels: one chip per channel, numbered the way
+     * the index numbers it, each jumping to its own index row. It used to print "T−24h", "Live",
+     * "+6h", and "Calibrate" on every page, with "Live" lit and pointing at a figure band the page
+     * may not have.
+     */
+    const channels = catalogue(spec);
+    const scrub = `<nav class="ds-scrub-rail" aria-label="Channels"><ol>${channels
+      .map((b, i) => {
+        const n = b.meta ?? String(i + 1).padStart(2, "0");
+        return `<li><a href="#channel-${esc(n)}" class="ds-scrub-chip${i === 0 ? " is-live" : ""}" data-window="${esc(n)}"><span class="ds-scrub-meta">${esc(n)}</span><span class="ds-scrub-label">${esc(b.title)}</span></a></li>`;
+      })
       .join("")}</ol></nav>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-chrono" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${chronometer}
@@ -438,16 +463,35 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-register-ledger" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    /*
+     * Each letter jumps to the first entry whose name starts with it. The first six letters used
+     * to point at fixed sections (#figure, #specimen, #proof) whether or not the page had them, and
+     * "A" was lit even when no entry started with A.
+     */
+    const entries = catalogue(spec);
+    const firstAt = new Map<string, number>();
+    entries.forEach((b, i) => {
+      const L = b.title.trim()[0]?.toUpperCase() ?? "";
+      if (L && !firstAt.has(L)) firstAt.set(L, i);
+    });
+    const lit = letters.find((L) => firstAt.has(L));
     const rail = `<nav class="ds-alpha-rail" aria-label="Alphabetical index"><ol>${letters
-      .map((L, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-alpha-letter${i === 0 ? " is-active" : ""}" data-letter="${L}"><span>${L}</span></a></li>`;
+      .map((L) => {
+        const at = firstAt.get(L);
+        const href = at === undefined ? "#features" : `#entry-${String(at + 1).padStart(3, "0")}`;
+        return `<li><a href="${href}" class="ds-alpha-letter${L === lit ? " is-active" : ""}" data-letter="${L}"><span>${L}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
+    /*
+     * "A–Z" and "Archive register" were the same on every archive page. The masthead now gives the
+     * letters this brief's entries actually run across; the entry count is said once, by the index.
+     */
+    const initials = [...firstAt.keys()].sort();
+    const span = initials.length > 1 ? `${initials[0]}–${initials[initials.length - 1]}` : (initials[0] ?? "");
     const mast = `<header class="ds-register-masthead" aria-label="Register masthead">
       <span class="ds-register-vol">Index</span>
-      <span class="ds-register-issue">A–Z</span>
-      <span class="ds-register-date">Archive register</span>
+      <span class="ds-register-issue">${esc(span)}</span>
+      <span class="ds-register-date">Register</span>
       <span class="ds-register-mark">${esc(spec.brief.productName)}</span>
     </header>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-register" data-surface="${section.surface}" data-section="${esc(section.id)}">
@@ -552,21 +596,20 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-voucher-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const ranks = [
-      { id: "K", label: "Kingdom" },
-      { id: "P", label: "Phylum" },
-      { id: "C", label: "Class" },
-      { id: "O", label: "Order" },
-      { id: "F", label: "Family" },
-      { id: "G", label: "Genus" },
-      { id: "S", label: "Species" },
-    ];
-    const binomial = `<nav class="ds-taxon-rail ds-binomial-strip" aria-label="Dichotomous key"><ol>${ranks
-      .map((R, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#template", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-taxon-chip${i === 5 ? " is-active" : ""}" data-rank="${R.id}"><span class="ds-taxon-meta">${R.id}</span><span class="ds-taxon-label">${esc(R.label)}</span></a></li>`;
+    /*
+     * The binomial strip is the fold's one list of the traits: one chip per trait, numbered the way
+     * the index numbers it, each jumping to its own index row. It used to print Kingdom → Species on
+     * every page, a pottery studio's included, with the first six ranks pointing at fixed sections
+     * (#figure, #specimen, #proof) whether or not the page had them, and "Genus" always lit.
+     */
+    const traits = catalogue(spec);
+    const binomial = `<nav class="ds-taxon-rail ds-binomial-strip" aria-label="Dichotomous key"><ol>${traits
+      .map((b, i) => {
+        const n = b.meta ?? String(i + 1).padStart(2, "0");
+        return `<li><a href="#trait-${esc(n)}" class="ds-taxon-chip${i === 0 ? " is-active" : ""}" data-rank="${esc(n)}"><span class="ds-taxon-meta">${esc(n)}</span><span class="ds-taxon-label">${esc(b.title)}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
+    const many = `${count(traits.length)[0]!.toUpperCase()}${count(traits.length).slice(1)} ${traits.length === 1 ? "trait" : "traits"}`;
     const ePins = [1, 2, 3, 4]
       .map((n) => `<span class="ds-epin" style="--n:${n}" data-pin="${n}"><i>${n}</i></span>`)
       .join("");
@@ -577,8 +620,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       <div class="ds-glassine-press ds-dissecting-tray">
         <header class="ds-voucher-masthead" aria-label="Tray masthead">
           <span class="ds-voucher-vol">Tray</span>
-          <span class="ds-voucher-issue">Hinged glassine</span>
-          <span class="ds-voucher-date">Dissecting plate</span>
+          <span class="ds-voucher-issue">${esc(many)}</span>
           <span class="ds-voucher-mark">${esc(spec.brief.productName)}</span>
         </header>
         <div class="ds-press-stage ds-tray-well">
@@ -592,11 +634,10 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
           </div>
           ${tagString}
           <div class="ds-press-label ds-template-tag">
-            <p class="ds-tag-pinmeta">Pin 02 · voucher</p>
             <p class="ds-brand-mark">${esc(spec.brief.productName)}</p>
             ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
             <h1 class="ds-display">${esc(section.title)}</h1>
-            <p class="ds-lede">${esc(section.body)}</p>
+            ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
             ${actions(section)}
           </div>
         </div>
@@ -839,7 +880,16 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const grid = figures.hero
       ? `<figure class="ds-posture-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const principles = (section.aside.length ? section.aside : section.blocks).slice(0, 5);
+    /*
+     * The spine indexes this page's own sections. It used to list the first four capability names,
+     * right beside a posture grid that named the same four, above a catalogue that named them again.
+     */
+    const present = new Set(spec.sections.map((s) => s.id));
+    const principles = [
+      { id: "features", title: "Capabilities" },
+      { id: "story", title: "Priorities" },
+      { id: "faq", title: "Questions" },
+    ].filter((p) => present.has(p.id));
     const spine = `<aside class="ds-principle-spine" aria-hidden="true"><ol>${principles
       .map((b, i) => `<li class="${i === 0 ? "is-live" : ""}"><span>${String(i + 1).padStart(2, "0")}</span><b>${esc(b.title)}</b></li>`)
       .join("")}</ol></aside>`;
@@ -856,17 +906,22 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
 
   /*
    * Mechanism fold — docs-educational signature.
-   * Scrub instrument owns the fold (stage list + range + mechanism plate). Not buried mid-page.
+   * Scrub instrument owns the fold (part list + range + mechanism plate). Not buried mid-page.
+   *
+   * Each part is named once, in the list. The plate under the range used to name them all again,
+   * and a caption under it printed the active part's name a third time. The list is headed by the
+   * count the brief gives, not "The scrub", and the range steps through the parts rather than
+   * "the mechanism", which a marina or a garden does not have.
    */
   if (section.layout === "hero-mechanism") {
-    const steps = (section.aside.length ? section.aside : section.blocks).slice(0, 4);
+    const steps = (section.aside.length ? section.aside : section.blocks).slice(0, 6);
     const mid = Math.min(1, Math.max(0, steps.length - 1));
+    const many = `${count(steps.length)[0]!.toUpperCase()}${count(steps.length).slice(1)} ${steps.length === 1 ? "part" : "parts"}`;
     const plateFig = figures.hero
       ? `<figure class="ds-mechanism-plate" data-instrument="scrub" aria-label="${esc(caption)}">${figures.hero}
-          <label class="ds-scrub"><span class="ds-caption">Step through the mechanism</span>
-            <input type="range" min="0" max="${Math.max(0, steps.length - 1)}" value="${mid}" data-scrub aria-label="Step through the mechanism" />
+          <label class="ds-scrub"><span class="ds-caption">Step through the parts</span>
+            <input type="range" min="0" max="${Math.max(0, steps.length - 1)}" value="${mid}" data-scrub aria-label="Step through the parts" />
           </label>
-          <figcaption data-scrub-caption>${esc(steps[mid]?.title ?? caption)}</figcaption>
         </figure>`
       : "";
     const list = `<ol class="ds-figure-steps ds-mechanism-steps">${steps
@@ -879,7 +934,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       <div class="ds-wrap-wide ds-mechanism-fold">
         <div class="ds-mechanism-claim">${copy}
           <div class="ds-mechanism-legend">
-            <p class="ds-eyebrow">The scrub</p>
+            <p class="ds-eyebrow">${esc(many)}</p>
             ${list}
           </div>
         </div>
@@ -1139,25 +1194,42 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         });
         return `<ol class="ds-handoff-strip" aria-label="Handoff strip">${cells.join("")}</ol>`;
       }
+      // Educational rows carry their description too: the fold prints none.
       const quietIndex =
-        spec.brief.siteKind === "docs-educational" ||
         spec.brief.siteKind === "press-atelier" ||
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
-        spec.brief.siteKind === "signal-observatory" ||
-        spec.brief.siteKind === "editorial-foundry" ||
+        // Observatory rows carry their description too: the fold prints none.
+        // Foundry rows as well: the ladder on the fold names the cuts and prints no sentence.
         spec.brief.siteKind === "research-dossier" ||
         spec.brief.siteKind === "commerce-loom" ||
-        spec.brief.siteKind === "field-guide" ||
+        // Field guide rows carry their description too: the fold prints none.
         spec.brief.siteKind === "lantern-path" ||
-        spec.brief.siteKind === "archive-index" ||
+        // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "agent-harness";
+      const isArchive = spec.brief.siteKind === "archive-index";
+      // Field guide rows are the binomial strip's jump targets.
+      const isField = spec.brief.siteKind === "field-guide";
+      // Observatory rows are the scrub rail's jump targets.
+      const isObservatory = spec.brief.siteKind === "signal-observatory";
+      // Foundry rows are numbered like the ladder's rungs, and the margin points at them.
+      const isFoundry = spec.brief.siteKind === "editorial-foundry";
       return `<ol class="ds-index">${section.blocks
         .map(
-          (b, i) => `<li class="ds-index-row" data-feature="${esc(b.title)}">
+          (b, i) => `<li class="ds-index-row"${
+            isArchive
+              ? ` id="entry-${esc(b.meta ?? String(i + 1).padStart(3, "0"))}"`
+              : isField
+                ? ` id="trait-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                : isObservatory
+                  ? ` id="channel-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                  : isFoundry
+                    ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                    : ""
+          } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
             ${!quietIndex && b.body ? `<p>${esc(b.body)}</p>` : ""}
@@ -1212,7 +1284,12 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
        * rail and a table) with made-up percentages, right under a fold ledger that had just drawn
        * the same names. Every row is name, description, mark.
        */
-      const leadFigure = spec.brief.siteKind !== "fintech-marketing";
+      // Studio likewise: the drawing beside the first piece listed every name again under the board.
+      // Corporate too: the drawing beside the lead row listed every name again under the posture grid.
+      const leadFigure =
+        spec.brief.siteKind !== "fintech-marketing" &&
+        spec.brief.siteKind !== "art-directed-studio" &&
+        spec.brief.siteKind !== "corporate-story";
       return `<div class="ds-alt">${section.blocks
         .map((b, i) => {
           if (i === 0 && leadFigure) {
@@ -1286,7 +1363,17 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     section.layout !== "feature-alternating" &&
     section.id === "features" &&
     spec.brief.siteKind !== "saas-marketing" &&
-    spec.brief.siteKind !== "dashboard-webapp"
+    spec.brief.siteKind !== "dashboard-webapp" &&
+    // Archive skips it too: the drawing named the entries again, right under the fold's ledger.
+    spec.brief.siteKind !== "archive-index" &&
+    // Educational as well: a drawn interface and a "how it is put together" list named every part again.
+    spec.brief.siteKind !== "docs-educational" &&
+    // Field guide too: the list beside the drawing named every trait again, right under the index.
+    spec.brief.siteKind !== "field-guide" &&
+    // Observatory as well: the list beside the drawing named the channels again, right under the index.
+    spec.brief.siteKind !== "signal-observatory" &&
+    // Foundry too: the list beside the drawing named every cut again, right under the index.
+    spec.brief.siteKind !== "editorial-foundry"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1406,10 +1493,10 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
    */
   const count = section.blocks.length;
   // Titles + marks only when the same catalogue prose already runs in features/hero/proof.
+  // Studio chapters are priority groups, so the sentence naming each group's parts is the content.
+  // Corporate chapters are priority tiers, so the sentence naming each tier's capabilities is the content.
   const quietChapters =
-    spec?.brief.siteKind === "art-directed-studio" ||
     spec?.brief.siteKind === "consumer-craft" ||
-    spec?.brief.siteKind === "corporate-story" ||
     spec?.brief.siteKind === "press-atelier" ||
     spec?.brief.siteKind === "fintech-marketing" ||
     spec?.brief.siteKind === "saas-marketing" ||
@@ -1425,7 +1512,14 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "agent-harness";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Chapters", `${count} beats · editorial order`)}
+      ${
+        // Educational chapters are priority tiers too, not "4 beats · editorial order".
+        spec?.brief.siteKind === "art-directed-studio" ||
+        spec?.brief.siteKind === "corporate-story" ||
+        spec?.brief.siteKind === "docs-educational"
+          ? ""
+          : secMeta("Chapters", `${count} beats · editorial order`)
+      }
       ${sectionHead(section, 2, true)}
       <ol class="ds-chapters">
         ${section.blocks
@@ -1449,59 +1543,39 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
  * Reading column on the shared rail; annotations hang in the outer column as true marginalia
  * (not cards). A full-bleed hairline interrupts the measure between beats. Hard for a generic
  * theme pack to fake without inventing this layout grammar.
+ *
+ * Each beat is one priority tier from the brief and names the cuts in it once; its margin note,
+ * set beside it, says how many cuts the tier holds and where they sit in the index, by number,
+ * each number jumping to its row. The essay used to
+ * print every description a second time, hang the other cut names beside each one as "cut slips"
+ * with "Display", "Title", and "Deck" sizes no brief gave, and set a "Note 01" label and the cut's
+ * name again in the margin, under a "5 cuts · annotated" line.
  */
-function renderMarginalia(section: SectionSpec, figures: FigurePlan): string {
+function renderMarginalia(section: SectionSpec): string {
   const count = section.blocks.length;
-  /*
-   * Optical-size slips — a type specimen proofed at three sizes.
-   *
-   * The list used to name the three *other* cuts, which meant a five-beat essay set every
-   * capability title five times inside one screen (measured 2026-10-05: `editorial-foundry`,
-   * "Display cut" ×6). A slip is a proof of the cut in this beat, so the rows carry the sizes it
-   * is proofed at and the beat's own heading carries its name.
-   */
-  const OPTICAL: Array<{ size: string; note: string }> = [
-    { size: "96 / 1.32", note: "Fold specimen" },
-    { size: "64 / 1.38", note: "Body specimen" },
-    { size: "38 / 1.44", note: "Caption specimen" },
-  ];
-  const notes = section.blocks
-    .map((b, i) => {
-      const note = b.kicker || b.meta || `Cut ${String(i + 1).padStart(2, "0")}`;
-      return `<li class="ds-marginalia-note" style="--note-i:${i}">
-        <p class="ds-marginalia-meta">${esc(note)}</p>
-        <p class="ds-marginalia-title">${esc(b.title)}</p>
-      </li>`;
-    })
-    .join("");
   const essay = section.blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-marginalia-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const slips = `<ul class="ds-cut-slips" aria-label="Optical sizes ${esc(b.title)} is cut for">${OPTICAL.map(
-        (o) => `<li class="ds-cut-slip">
-                  <span class="ds-cut-size">${esc(o.size)}</span>
-                  <span class="ds-cut-name">${esc(o.note)}</span>
-                </li>`,
-      ).join("")}</ul>`;
+      const n = b.points.length;
+      // The margin note jumps to each cut's own index row.
+      const at = b.points.map((num) => `<a href="#cut-${esc(num)}">${esc(num)}</a>`).join(", ");
       return `<article class="ds-marginalia-beat">
         <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
         <h3>${esc(b.title)}</h3>
         ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${slips}
-        ${mark}
+        <aside class="ds-marginalia-note" aria-label="Where the ${esc(b.title.toLowerCase())} cuts sit in the index">
+          <p class="ds-marginalia-meta">${n} ${n === 1 ? "cut" : "cuts"}</p>
+          <p class="ds-marginalia-title">Index ${at}</p>
+        </aside>
         ${i < count - 1 ? `<hr class="ds-marginalia-rule" aria-hidden="true"/>` : ""}
       </article>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-marginalia" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-wrap-wide">
-      ${secMeta("Essay", `${count} cuts · annotated`)}
+      ${secMeta("Marginalia", `${count} tiers`)}
       ${sectionHead(section, 2, false)}
-      <div class="ds-marginalia-grid" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "7fr 5fr"))}">
+      <div class="ds-marginalia-grid">
         <div class="ds-marginalia-essay">${essay}</div>
-        <aside class="ds-marginalia-rail" aria-label="Marginal notes">
-          <ol class="ds-marginalia-notes">${notes}</ol>
-        </aside>
       </div>
     </div>
   </section>`;
@@ -1566,35 +1640,40 @@ function renderSpread(section: SectionSpec, figures: FigurePlan): string {
 /**
  * Event waterfall / span tape — signal-observatory mid-page instrument.
  *
- * Horizontal instrument-time ruler + staggered span rows (trace-desk reading).
- * Not the essay+aside list clone shared by entry/hang/ember.
+ * Channel ruler + staggered span rows (trace-desk reading). Not the essay+aside list clone shared
+ * by entry/hang/ember.
+ *
+ * Each span is one priority tier from the brief. Its track lights the channels in that tier at
+ * their place on a ruler numbered the way the index numbers them, and its body names them once.
+ * The waterfall used to print every description a second time against a T+00h → T+24h ruler and
+ * "T+06h" stamps no brief gave, with a "Note 01" label and a drawing on every span, under a
+ * "5 spans · instrument time" line.
  */
-function renderChrono(section: SectionSpec, figures: FigurePlan): string {
+function renderChrono(section: SectionSpec, spec: DesignSpec): string {
   const blocks = section.blocks;
-  const count = blocks.length || 1;
-  const hours = [0, 6, 12, 18, 24];
-  const ruler = hours
-    .map((h) => {
-      const label = `T+${String(h).padStart(2, "0")}h`;
-      return `<span class="ds-chrono-ruler-tick" style="--t:${h / 24}">${esc(label)}</span>`;
-    })
+  const channels = catalogue(spec);
+  const total = channels.length || 1;
+  const numbers = new Map(channels.map((b, i) => [b.title, i] as const));
+  const pct = (v: number) => Math.round(v * 100) / 100;
+  const ruler = channels
+    .map((b, i) => `<span class="ds-chrono-ruler-tick">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>`)
     .join("");
   const spans = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-chrono-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const t = esc(b.meta || `T+${String(i * 6).padStart(2, "0")}h`);
-      const start = Math.min(62, i * 11);
-      const width = Math.max(30, 92 - start - Math.max(0, count - 1 - i) * 3);
-      return `<li class="ds-chrono-span" style="--i:${i};--span-start:${start}%;--span-width:${width}%">
-        <div class="ds-chrono-span-track" aria-hidden="true">
-          <span class="ds-chrono-span-bar"></span>
-        </div>
+      const at = b.points.map((name) => numbers.get(name)).filter((n): n is number => n !== undefined);
+      const bars = at
+        .map(
+          (n) =>
+            `<span class="ds-chrono-span-bar" style="--span-start:${pct((n / total) * 100)}%;--span-width:${pct(100 / total)}%"></span>`,
+        )
+        .join("");
+      const start = Math.min(48, i * 12);
+      return `<li class="ds-chrono-span" style="--i:${i};--span-start:${start}%">
+        <div class="ds-chrono-span-track" aria-hidden="true">${bars}</div>
         <div class="ds-chrono-span-body">
-          <p class="ds-chrono-span-time">${t}</p>
+          <p class="ds-chrono-span-time">${b.points.length} ${b.points.length === 1 ? "channel" : "channels"}</p>
           <h3>${esc(b.title)}</h3>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-chrono-note">${esc(b.kicker)}</p>` : ""}
-          ${mark}
         </div>
       </li>`;
     })
@@ -1602,10 +1681,10 @@ function renderChrono(section: SectionSpec, figures: FigurePlan): string {
   return `<section class="ds-section ds-story ds-chrono" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Chronology", `${count} spans · instrument time`)}
+      ${secMeta("Waterfall", `${blocks.length} tiers`)}
       ${sectionHead(section, 2, true)}
       <div class="ds-chrono-desk" aria-label="Instrument desk">
-        <div class="ds-chrono-ruler" aria-label="Instrument time">${ruler}</div>
+        <div class="ds-chrono-ruler" aria-label="Channels" style="--n:${total}">${ruler}</div>
         <ol class="ds-chrono-waterfall" aria-label="Event waterfall">${spans}</ol>
       </div>
     </div>
@@ -1625,13 +1704,18 @@ function renderChrono(section: SectionSpec, figures: FigurePlan): string {
  *
  * Not chapters, marginalia, verso/recto, or chrono beads — one entry at a time with a folio
  * hanging in the margin and a ruled reading measure.
+ *
+ * Each entry is one priority tier from the brief. Its cross stamps name the catalogue entries in
+ * that tier, each with its catalogue number, so every name appears once here. The essay used to
+ * print every description a second time, stamp each with the names of three other entries, add a
+ * "Note 01" label, a drawing per entry, and a shelf index that listed every name again, under a
+ * "5 stamps · ruled measure" line.
  */
-function renderEntry(section: SectionSpec, figures: FigurePlan): string {
+function renderEntry(section: SectionSpec, spec: DesignSpec): string {
   const blocks = section.blocks;
-  const count = blocks.length || 1;
+  const numbers = new Map(catalogue(spec).map((b, i) => [b.title, b.meta ?? String(i + 1).padStart(3, "0")] as const));
   const essay = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-entry-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
       const folio = esc(b.meta ?? String(i + 1).padStart(3, "0"));
       /*
        * Cross stamps — the register trail struck with the entry.
@@ -1646,7 +1730,7 @@ function renderEntry(section: SectionSpec, figures: FigurePlan): string {
           <li class="ds-cross-stamp">
             <span class="ds-stamp-seal" aria-hidden="true"></span>
             <span class="ds-stamp-folio">${folio}</span>
-            <span class="ds-stamp-name">Entry ${i + 1} of ${count} struck on this roll</span>
+            <span class="ds-stamp-name">Entry ${i + 1} of ${count(blocks.length)} struck on this roll</span>
           </li>
           <li class="ds-cross-stamp">
             <span class="ds-stamp-seal" aria-hidden="true"></span>
@@ -1662,37 +1746,19 @@ function renderEntry(section: SectionSpec, figures: FigurePlan): string {
       return `<article class="ds-entry-beat" style="--i:${i}">
         <span class="ds-entry-folio" aria-hidden="true">${folio}</span>
         <div class="ds-entry-measure">
-          <p class="ds-chapter-index">${folio}</p>
           <h3>${esc(b.title)}</h3>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-entry-note">${esc(b.kicker)}</p>` : ""}
           ${stamps}
-          ${mark}
         </div>
       </article>`;
-    })
-    .join("");
-  const aside = blocks
-    .map((b, i) => {
-      const folio = esc(b.meta ?? String(i + 1).padStart(3, "0"));
-      return `<li class="ds-entry-aside-item">
-        <span class="ds-entry-aside-folio">${folio}</span>
-        <span class="ds-entry-aside-title">${esc(b.title)}</span>
-        <span class="ds-entry-aside-seal" aria-hidden="true"></span>
-      </li>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-entry" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Entry", `${count} stamps · ruled measure`)}
       ${sectionHead(section, 2, false)}
       <div class="ds-entry-grid" style="grid-template-columns:${esc(splitTemplate(section.columns ?? "7fr 5fr"))}">
         <div class="ds-entry-essay">${essay}</div>
-        <aside class="ds-entry-aside" aria-label="Entry index">
-          <p class="ds-entry-aside-kicker">Shelf index</p>
-          <ol class="ds-entry-aside-list">${aside}</ol>
-        </aside>
         ${storyFillSlab(blocks.map((b) => b.title))}
       </div>
     </div>
@@ -1878,57 +1944,50 @@ function renderRounds(section: SectionSpec, figures: FigurePlan): string {
 /**
  * Dichotomous voucher key — field-guide mid-page instrument.
  *
- * Horizontal taxon ladder + stacked voucher sheets with couplet forks.
- * Not the essay+aside list clone shared by gather/entry/hang/ember.
+ * Horizontal couplet ladder + stacked voucher sheets. Not the essay+aside list clone shared by
+ * gather/entry/hang/ember.
+ *
+ * Each couplet is one priority tier from the brief. Its first lead names the traits in that tier,
+ * once; its second lead sends the reader to the next couplet, the way a real key does. The key used
+ * to print every description a second time, with leads no brief gave ("trait holds → photo inset",
+ * "trait fails → re-key from kingdom"), a "Note 01" label and a drawing on every sheet, and a ladder
+ * that listed every name again under "5 couplets · voucher key".
  */
-function renderRange(section: SectionSpec, figures: FigurePlan): string {
+function renderRange(section: SectionSpec): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const ranks = ["K", "P", "C", "O", "F", "G"];
+  const number = (b: Block, i: number) => esc(b.meta ?? String(i + 1));
   const ladder = blocks
     .map((b, i) => {
-      const rank = esc(b.meta ?? ranks[i % 6]!);
+      const n = b.points.length;
       return `<li class="ds-range-step" style="--i:${i}">
-        <span class="ds-range-rank">${rank}</span>
-        <span class="ds-range-step-title">${esc(b.title)}</span>
-        <span class="ds-range-fork" aria-hidden="true">a · b</span>
+        <a class="ds-range-step-link" href="#couplet-${number(b, i)}">
+          <span class="ds-range-rank">${number(b, i)}</span>
+          <span class="ds-range-step-title">${n} ${n === 1 ? "trait" : "traits"}</span>
+          <span class="ds-range-fork" aria-hidden="true">${i < blocks.length - 1 ? "a · b" : "a"}</span>
+        </a>
       </li>`;
     })
     .join("");
   const sheets = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-range-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const rank = esc(b.meta ?? ranks[i % 6]!);
-      /*
-       * A dichotomous key sends the reader to a *couplet*, not to a name — and naming the
-       * destination meant every title was set once in the ladder, once as the sheet heading, and
-       * again in each couplet that led back to it (measured 2026-10-05: `field-guide`,
-       * "Binomial strip" ×6). The couplets now carry the step they hand off to; the ladder above
-       * is what resolves a step to its name.
-       */
-      const nextStep = i + 2;
-      const yesLead = i + 1 < blocks.length ? `couplet ${String(nextStep).padStart(2, "0")}` : "the voucher is struck";
-      const noLead = i > 0 ? "couplet 01" : "re-key from kingdom";
-      return `<article class="ds-range-sheet" style="--i:${i}">
+      const next = blocks[i + 1];
+      return `<article class="ds-range-sheet" id="couplet-${number(b, i)}" style="--i:${i}">
         <header class="ds-range-sheet-head">
-          <p class="ds-range-rank">${rank}</p>
+          <p class="ds-range-rank">${number(b, i)}</p>
           <h3>${esc(b.title)}</h3>
-          <p class="ds-range-couplet-label">Couplet ${String(i + 1).padStart(2, "0")}</p>
         </header>
-        ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${b.kicker ? `<p class="ds-range-note">${esc(b.kicker)}</p>` : ""}
-        <ol class="ds-range-couplet" aria-label="Couplet ${i + 1}">
-          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">Trait holds → ${esc(yesLead)}</span></li>
-          <li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Trait fails → ${esc(noLead)}</span></li>
+        <ol class="ds-range-couplet" aria-label="Couplet ${number(b, i)}">
+          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">${esc(b.body)}</span></li>
+          ${next ? `<li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Otherwise, go to ${number(next, i + 1)}</span></li>` : ""}
         </ol>
-        ${mark}
       </article>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-range" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Range", `${count} couplets · voucher key`)}
+      ${secMeta("Key", `${count} couplets`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-range-ladder" aria-label="Dichotomous key">${ladder}</ol>
       <div class="ds-range-sheets">${sheets}</div>
@@ -2245,33 +2304,19 @@ function renderCtaBand(section: SectionSpec, figures: FigurePlan, spec?: DesignS
   const isColophon = /Colophon|Imprint|Calibration|Registry|Care label|Voucher|Pressroom/i.test(section.eyebrow ?? "");
   const colophonClass = isColophon ? " ds-closing-colophon" : "";
   // Observatory calibration close — paper strip of tolerance numerals (not metrics theatre).
-  const isObservatoryCal =
-    Boolean(spec && spec.brief.siteKind === "signal-observatory") &&
-    /Calibration/i.test(section.eyebrow ?? "");
-  const tolLadder = ["±0.5", "±1.0", "±1.5", "±2.0"];
-  const fromCatalogue = isObservatoryCal && spec ? catalogue(spec).slice(0, 4) : [];
-  const calLabels =
-    fromCatalogue.length > 0
-      ? fromCatalogue.map((b) => b.title)
-      : isObservatoryCal && spec
-        ? spec.brief.features.slice(0, 4).map((f) => f.name)
-        : [];
-  const calStrip =
-    calLabels.length > 0
-      ? `<ol class="ds-cal-strip" aria-label="Tolerance marks">${calLabels
-          .map(
-            (name, i) =>
-              `<li class="ds-cal-mark"><span class="ds-cal-tol">${tolLadder[i % tolLadder.length]}</span><span class="ds-cal-ch">${esc(name.slice(0, 14))}</span></li>`,
-          )
-          .join("")}</ol>`
-      : "";
+  /*
+   * No tolerance strip on the observatory close: it set "±0.5", "±1.0", "±1.5", "±2.0" beside the
+   * first four channel names, cut to fourteen letters, on every page. No brief gives a tolerance,
+   * and the names were their fourth telling on the page.
+   */
+  const calStrip = "";
   return `<section class="ds-section ds-closing${colophonClass}" data-surface="${section.surface}" data-section="${esc(section.id)}" id="cta">
     <div class="ds-wrap-wide ds-closing-grid">
       <div class="ds-cta">
         ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
         ${calStrip}
         <h2 class="ds-title">${esc(section.title)}</h2>
-        <p class="ds-lede">${esc(section.body)}</p>
+        ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
         ${actions(section, "band")}
       </div>
       ${figures.closing ? `<div class="ds-closing-mark">${figures.closing}</div>` : ""}
@@ -2552,17 +2597,17 @@ function renderSection(
     case "story-chapters":
       return wrapped(renderChapters(section, figures, spec));
     case "story-marginalia":
-      return wrapped(renderMarginalia(section, figures));
+      return wrapped(renderMarginalia(section));
     case "story-spread":
       return wrapped(renderSpread(section, figures));
     case "story-chrono":
-      return wrapped(renderChrono(section, figures));
+      return wrapped(renderChrono(section, spec));
     case "story-entry":
-      return wrapped(renderEntry(section, figures));
+      return wrapped(renderEntry(section, spec));
     case "story-hangtag":
       return wrapped(renderHangtag(section, figures));
     case "story-range":
-      return wrapped(renderRange(section, figures));
+      return wrapped(renderRange(section));
     case "story-gather":
       return wrapped(renderGather(section, figures));
     case "story-ember":
@@ -2979,7 +3024,15 @@ export function renderPreviewHtml(spec: DesignSpec): string {
    * motion" was this tool's own settings, read aloud by screen readers and shown by search results.
    */
   const pageDescription =
-    spec.brief.siteKind === "dashboard-webapp" || spec.brief.siteKind === "fintech-marketing"
+    spec.brief.siteKind === "dashboard-webapp" ||
+    spec.brief.siteKind === "fintech-marketing" ||
+    spec.brief.siteKind === "art-directed-studio" ||
+    spec.brief.siteKind === "corporate-story" ||
+    spec.brief.siteKind === "archive-index" ||
+    spec.brief.siteKind === "docs-educational" ||
+    spec.brief.siteKind === "field-guide" ||
+    spec.brief.siteKind === "signal-observatory" ||
+    spec.brief.siteKind === "editorial-foundry"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

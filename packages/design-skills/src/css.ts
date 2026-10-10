@@ -329,6 +329,18 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="docs-educational"] .ds-reveal:not(.is-in){transform:translateX(-0.75rem)}
   [data-sitekind="docs-educational"] .ds-figure-steps [data-step].is-active{transform:translateX(6px)}
 }
+/* Index rows now carry their description beside the drawn mark. The minimal lean gives the mark a
+   4.5rem column, and a 9.5rem mark in it ran over the sentence. The shared rows also overlap their
+   neighbours by a negative margin, which cut the last line of a description on a phone. */
+[data-sitekind="docs-educational"] .ds-index-row{grid-template-columns:var(--align-rail) minmax(12rem,26ch) minmax(0,1fr) minmax(9rem,13rem)}
+[data-sitekind="docs-educational"] .ds-index-row:nth-child(n){margin-block:0}
+/* Each part's drawing is the index's figure now that no plate sits beside it, so it is set at a size
+   that reads as a drawing rather than an icon. */
+[data-sitekind="docs-educational"] .ds-index-mark,
+[data-sitekind="docs-educational"] .ds-chapter-mark{width:13rem}
+@media (max-width:820px){
+  [data-sitekind="docs-educational"] .ds-index-row{grid-template-columns:2rem 1fr}
+}
 `,
     "fintech-marketing": `
 @keyframes ds-fin-in{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:none}}
@@ -389,6 +401,23 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="editorial-foundry"] .ds-reveal .ds-stagger > *{animation-name:ds-foundry-mask}
   [data-sitekind="editorial-foundry"] .ds-reveal:not(.is-in){clip-path:inset(0 0 92% 0);opacity:0}
 }
+
+/* Marginalia: each priority beat carries its own margin note beside it, pointing at the cuts'
+   index numbers, instead of a separate rail under the essay. */
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,14rem);column-gap:var(--gutter);align-items:start;
+}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > *{grid-column:1}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-note{grid-column:2;grid-row:1 / span 3;align-self:center}
+[data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-rule{grid-column:1 / -1}
+[data-sitekind="editorial-foundry"] .ds-marginalia-title a{color:inherit;text-underline-offset:0.2em}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which runs the next row's rule through the last line of a description on a phone. */
+[data-sitekind="editorial-foundry"] .ds-index-row:nth-child(n){margin-block:0}
+@media (max-width:800px){
+  [data-sitekind="editorial-foundry"] .ds-marginalia-beat{grid-template-columns:1fr}
+  [data-sitekind="editorial-foundry"] .ds-marginalia-beat > .ds-marginalia-note{grid-column:1;grid-row:auto;margin-top:var(--s-sm)}
+}
 `,
     "research-dossier": `
 @keyframes ds-dossier-in{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
@@ -424,6 +453,22 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="signal-observatory"] .ds-reveal .ds-stagger > *{animation-name:ds-obs-in}
   [data-sitekind="signal-observatory"] .ds-reveal.is-in .ds-cal-tol,
   [data-sitekind="signal-observatory"] .ds-reveal.is-in .ds-index-mark{letter-spacing:0.16em}
+}
+/* The waterfall's ruler is numbered like the index, one column per channel, and each span lights
+   its channels in their own columns. */
+[data-sitekind="signal-observatory"] .ds-chrono-ruler{grid-template-columns:repeat(var(--n,5),minmax(0,1fr))}
+[data-sitekind="signal-observatory"] .ds-chrono-ruler-tick,
+[data-sitekind="signal-observatory"] .ds-chrono-ruler-tick:last-child{justify-self:center}
+[data-sitekind="signal-observatory"] .ds-chrono-span-body h3{margin-bottom:0.2rem}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which ran the next row's rule through the last line of a description on a phone. */
+[data-sitekind="signal-observatory"] .ds-index-row:nth-child(n){margin-block:0}
+/* The scrub rail now holds one chip per channel. On a phone it scrolls sideways in one row
+   instead of wrapping into a stack that covers the page. */
+@media (max-width:800px){
+  [data-sitekind="signal-observatory"] .ds-scrub-rail ol{flex-wrap:nowrap;overflow-x:auto;padding:0 var(--gutter)}
+  [data-sitekind="signal-observatory"] .ds-scrub-chip{min-width:9.5rem;border-top:0;border-left:1px solid var(--c-border)}
+  [data-sitekind="signal-observatory"] .ds-chrono-span-bar{left:var(--span-start);width:var(--span-width)}
 }
 `,
     "archive-index": `
@@ -468,6 +513,24 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="field-guide"] .ds-reveal,
   [data-sitekind="field-guide"] .ds-reveal .ds-stagger > *{animation-name:ds-field-in}
   [data-sitekind="field-guide"] .ds-reveal:not(.is-in){transform:translateY(2.1rem) scale(0.97)}
+}
+/* The key's ladder steps are links to their couplets; they keep the step's stacked layout. */
+[data-sitekind="field-guide"] .ds-range-step-link{display:flex;flex-direction:column;gap:0.35rem;color:inherit;text-decoration:none}
+[data-sitekind="field-guide"] .ds-range-step-link:hover .ds-range-step-title,
+[data-sitekind="field-guide"] .ds-range-step-link:focus-visible .ds-range-step-title{color:var(--c-accent)}
+/* Each couplet now follows its header directly: no description sits between them, so the dashed
+   rule above the leads only doubled the header's own rule. The first lead names the traits and is
+   the sheet's content, so it reads at body size. */
+[data-sitekind="field-guide"] .ds-range-couplet{margin-top:0;border-top:0;padding-top:0}
+[data-sitekind="field-guide"] .ds-range-couplet li:first-child .ds-range-lead-copy{font-size:var(--t-body-size,1rem);color:var(--c-ink)}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which ran the next row's rule through the last line of a description on a phone. */
+[data-sitekind="field-guide"] .ds-index-row:nth-child(n){margin-block:0}
+/* The trait names are short and the descriptions are the row's content, so the name column gives
+   the description the room. */
+[data-sitekind="field-guide"] .ds-index-row{grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(0,1fr) minmax(7rem,9.5rem)}
+@media (max-width:820px){
+  [data-sitekind="field-guide"] .ds-index-row{grid-template-columns:2rem 1fr}
 }
 `,
     "press-atelier": `

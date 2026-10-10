@@ -19,6 +19,13 @@ import {
   riskReversal,
   saasQuestions,
   sentence,
+  studioQuestions,
+  corporateQuestions,
+  archiveQuestions,
+  educationalQuestions,
+  fieldGuideQuestions,
+  observatoryQuestions,
+  foundryQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -284,7 +291,8 @@ function clampLine(text: string, max: number): string {
 /** Goal-keyed CTA note grounded in the lead feature (tone from copy.ts, product from brief). */
 function groundedCtaNote(brief: DesignBrief, goalNote: string): string {
   const lead = brief.features[0]?.name?.trim();
-  if (!lead) return goalNote;
+  // Studio has no fold note: there is nothing true to say about an engagement the brief never gave.
+  if (!lead || !goalNote.trim()) return goalNote;
   const tone = lower(goalNote.replace(/[.!?]+$/, ""));
   return clampLine(sentence(`${lead} ships first — ${tone}`), 240);
 }
@@ -318,7 +326,21 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
         ? workspaceQuestions(brief, brief.features)
         : brief.siteKind === "fintech-marketing"
           ? fintechQuestions(brief, brief.features)
-          : questions(brief, brief.features);
+          : brief.siteKind === "art-directed-studio"
+            ? studioQuestions(brief, brief.features)
+            : brief.siteKind === "corporate-story"
+              ? corporateQuestions(brief, brief.features)
+              : brief.siteKind === "archive-index"
+                ? archiveQuestions(brief, brief.features)
+                : brief.siteKind === "docs-educational"
+                  ? educationalQuestions(brief, brief.features)
+                  : brief.siteKind === "field-guide"
+                    ? fieldGuideQuestions(brief, brief.features)
+                    : brief.siteKind === "signal-observatory"
+                      ? observatoryQuestions(brief, brief.features)
+                      : brief.siteKind === "editorial-foundry"
+                        ? foundryQuestions(brief, brief.features)
+                        : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};
