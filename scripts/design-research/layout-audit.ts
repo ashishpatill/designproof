@@ -365,7 +365,7 @@ async function main(): Promise<void> {
     console.log(`\n${r.id} — ${count === 0 ? "clean" : `${count} defects`}`);
     for (const o of r.overflow.slice(0, 6)) console.log(`  overflow    ${o.section} ${o.el} +${o.by}px below the band`);
     for (const c of r.collision) console.log(`  collision   ${c.a} / ${c.b} overlap ${c.by}px`);
-    for (const v of r.vacancy) console.log(`  vacancy     ${v.section} ${v.height}px tall — ${v.gap}px hole inside its own content column`);
+    for (const v of r.vacancy) console.log(`  vacancy     ${v.section} ${v.height}px tall — ${v.gap}px hole inside its own content column (fill ${v.fill})`);
     for (const g of r.ghosting) console.log(`  ghosting    ${g.el} pinned at alpha ${g.alpha} with no backdrop`);
     for (const c of r.clipped.slice(0, 6)) console.log(`  clipped     ${c.el} ${c.client}px box, ${c.scroll}px content — "${c.text}"`);
     for (const s of r.starved.slice(0, 6)) console.log(`  starved     ${s.el} ${s.ch}ch — "${s.text}"`);
