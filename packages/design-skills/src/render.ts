@@ -780,13 +780,19 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-pipeline-board" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const stages = (section.blocks.length ? section.blocks : section.aside).slice(0, 5);
+    // The caption under a sticky rail reports the live stage. Printing the chip's own name there set
+    // the same capability twice on the fold; printing its *description* there would tell the
+    // catalogue sentence a second time, which is the same defect one layer down. So the caption
+    // carries the stage's own tracked label, and a position when it has none.
+    const stageNote = (b: Block | undefined, i: number, n: number): string =>
+      esc(clip(b?.kicker || b?.meta || "", 72) || `Stage ${String(i + 1).padStart(2, "0")} of ${String(n).padStart(2, "0")}`);
     const rail = `<nav class="ds-stage-rail" data-rail="stage" aria-label="Pipeline stages"><ol>${stages
       .map((b, i) => {
         const live = i === 0;
-        return `<li><button type="button" class="ds-stage-chip${live ? " is-live" : ""}" data-rail-step="${i}" data-rail-label="${esc(b.title)}" aria-pressed="${live ? "true" : "false"}"><span class="ds-stage-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-stage-label">${esc(b.title)}</span></button></li>`;
+        return `<li><button type="button" class="ds-stage-chip${live ? " is-live" : ""}" data-rail-step="${i}" data-rail-label="${esc(b.title)}" data-rail-note="${stageNote(b, i, stages.length)}" aria-pressed="${live ? "true" : "false"}"><span class="ds-stage-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-stage-label">${esc(b.title)}</span></button></li>`;
       })
       .join("")}</ol></nav>
-      <p class="ds-rail-caption ds-wrap-wide" data-rail-caption>${esc(stages[0]?.title ?? "")}</p>`;
+      <p class="ds-rail-caption ds-wrap-wide" data-rail-caption>${stageNote(stages[0], 0, stages.length)}</p>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-pipeline" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${rail}
       <div class="ds-wrap-wide ds-pipeline-fold ds-tech-brackets">
@@ -806,13 +812,15 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-queue-console" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const ranks = (section.blocks.length ? section.blocks : section.aside).slice(0, 6);
+    const rankNote = (b: Block | undefined, i: number, n: number): string =>
+      esc(clip(b?.kicker || b?.meta || "", 72) || `Rank ${String(i + 1).padStart(2, "0")} of ${String(n).padStart(2, "0")}`);
     const rail = `<nav class="ds-priority-rail" data-rail="priority" aria-label="Priority queue"><ol>${ranks
       .map((b, i) => {
         const live = i === 0;
-        return `<li><button type="button" class="ds-priority-chip${live ? " is-live" : ""}" data-rail-step="${i}" data-rail-label="${esc(b.title)}" data-view="${esc(b.title)}" aria-pressed="${live ? "true" : "false"}"><span class="ds-priority-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-priority-label">${esc(b.title)}</span></button></li>`;
+        return `<li><button type="button" class="ds-priority-chip${live ? " is-live" : ""}" data-rail-step="${i}" data-rail-label="${esc(b.title)}" data-rail-note="${rankNote(b, i, ranks.length)}" data-view="${esc(b.title)}" aria-pressed="${live ? "true" : "false"}"><span class="ds-priority-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-priority-label">${esc(b.title)}</span></button></li>`;
       })
       .join("")}</ol></nav>
-      <p class="ds-rail-caption ds-wrap-wide" data-rail-caption>${esc(ranks[0]?.title ?? "")}</p>`;
+      <p class="ds-rail-caption ds-wrap-wide" data-rail-caption>${rankNote(ranks[0], 0, ranks.length)}</p>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-queue" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${rail}
       <div class="ds-wrap-wide ds-queue-fold">
@@ -1314,7 +1322,6 @@ function renderFigure(section: SectionSpec): string {
   const points = steps.map((_, i) => ({
     x: left + (i / span) * (right - left),
     y: floor - (0.22 + (i / span) * 0.72) * (floor - top),
-    title: steps[i]?.title ?? `Step ${i + 1}`,
   }));
   const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
   const area = `${path} L${points[points.length - 1]?.x.toFixed(1) ?? left} ${floor} L${points[0]?.x.toFixed(1) ?? left} ${floor} Z`;
@@ -1327,12 +1334,17 @@ function renderFigure(section: SectionSpec): string {
     })
     .join("");
 
-  // Vertical guide + step titles — the stage must never read as an empty chart void.
+  /*
+   * Vertical guides per step. The step's *name* is not set here: the list beside the plot already
+   * names every step, and the axis below already numbers them, so a third label in the drawing only
+   * printed the same word three times on one screen (measured 2026-10-05, all twelve step-led
+   * offerings). The guide keeps the eye on which step it is; the caption below carries what it is.
+   */
   const guides = points
     .map(
       (p, i) =>
         `<line x1="${p.x.toFixed(1)}" y1="${top}" x2="${p.x.toFixed(1)}" y2="${floor}" stroke="var(--surface-border)" stroke-width="1" opacity="0.35" stroke-dasharray="2 4"/>
-         <text class="ds-fig-mono" x="${p.x.toFixed(1)}" y="${(top - 12).toFixed(1)}" font-size="11" fill="${i === mid ? "var(--c-accent)" : "var(--surface-quiet)"}" text-anchor="middle">${esc(clip(p.title, 18))}</text>`,
+         <circle class="ds-scrub-guide" data-step="${i}" cx="${p.x.toFixed(1)}" cy="${(top - 12).toFixed(1)}" r="${i === mid ? 3 : 2}" fill="${i === mid ? "var(--c-accent)" : "var(--surface-quiet)"}"/>`,
     )
     .join("");
 
@@ -1343,8 +1355,9 @@ function renderFigure(section: SectionSpec): string {
         <ol class="ds-figure-steps">${steps
           .map(
             (s, i) =>
-              // Titles only — reprinting feature prose here triples catalogue copy (layout-audit repetition).
-              `<li data-step="${i}" class="${i === mid ? "is-active" : ""}"><strong>${esc(s.title)}</strong></li>`,
+              // Titles only. The claim rides along as data so the caption can explain the step the
+              // reader is actually looking at instead of reprinting the step's name beside it.
+              `<li data-step="${i}" data-claim="${esc(clip(s.body || s.kicker || "", 90))}" class="${i === mid ? "is-active" : ""}"><strong>${esc(s.title)}</strong></li>`,
           )
           .join("")}</ol>
       </div>
@@ -1439,7 +1452,19 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
  */
 function renderMarginalia(section: SectionSpec, figures: FigurePlan): string {
   const count = section.blocks.length;
-  const cuts = ["Display", "Title", "Deck", "Text", "Caption", "Tabular"];
+  /*
+   * Optical-size slips — a type specimen proofed at three sizes.
+   *
+   * The list used to name the three *other* cuts, which meant a five-beat essay set every
+   * capability title five times inside one screen (measured 2026-10-05: `editorial-foundry`,
+   * "Display cut" ×6). A slip is a proof of the cut in this beat, so the rows carry the sizes it
+   * is proofed at and the beat's own heading carries its name.
+   */
+  const OPTICAL: Array<{ size: string; note: string }> = [
+    { size: "96 / 1.32", note: "Fold specimen" },
+    { size: "64 / 1.38", note: "Body specimen" },
+    { size: "38 / 1.44", note: "Caption specimen" },
+  ];
   const notes = section.blocks
     .map((b, i) => {
       const note = b.kicker || b.meta || `Cut ${String(i + 1).padStart(2, "0")}`;
@@ -1452,23 +1477,12 @@ function renderMarginalia(section: SectionSpec, figures: FigurePlan): string {
   const essay = section.blocks
     .map((b, i) => {
       const mark = figures.marks[i] ? `<div class="ds-marginalia-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      // Cut slips — optical-size companions that travel with the reading (foundry mid-page proof).
-      const related = section.blocks
-        .map((other, j) => ({ other, j }))
-        .filter(({ j }) => j !== i)
-        .slice(0, 3);
-      const slips =
-        related.length > 0
-          ? `<ul class="ds-cut-slips" aria-label="Optical-size slips for ${esc(b.title)}">${related
-              .map(({ other, j }) => {
-                const cut = esc(other.meta || cuts[j % cuts.length]!);
-                return `<li class="ds-cut-slip">
-                  <span class="ds-cut-size" aria-hidden="true">${cut}</span>
-                  <span class="ds-cut-name">${esc(other.title)}</span>
-                </li>`;
-              })
-              .join("")}</ul>`
-          : "";
+      const slips = `<ul class="ds-cut-slips" aria-label="Optical sizes ${esc(b.title)} is cut for">${OPTICAL.map(
+        (o) => `<li class="ds-cut-slip">
+                  <span class="ds-cut-size">${esc(o.size)}</span>
+                  <span class="ds-cut-name">${esc(o.note)}</span>
+                </li>`,
+      ).join("")}</ul>`;
       return `<article class="ds-marginalia-beat">
         <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
         <h3>${esc(b.title)}</h3>
@@ -1619,24 +1633,32 @@ function renderEntry(section: SectionSpec, figures: FigurePlan): string {
     .map((b, i) => {
       const mark = figures.marks[i] ? `<div class="ds-entry-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
       const folio = esc(b.meta ?? String(i + 1).padStart(3, "0"));
-      // Cross stamps — related entries that travel with this reading (archive signature, not a card grid).
-      const related = blocks
-        .map((other, j) => ({ other, j }))
-        .filter(({ j }) => j !== i)
-        .slice(0, 3);
-      const stamps =
-        related.length > 0
-          ? `<ul class="ds-cross-stamps" aria-label="Cross-referenced stamps for ${esc(b.title)}">${related
-              .map(({ other, j }) => {
-                const relFolio = esc(other.meta ?? String(j + 1).padStart(3, "0"));
-                return `<li class="ds-cross-stamp">
-                  <span class="ds-stamp-seal" aria-hidden="true"></span>
-                  <span class="ds-stamp-folio">${relFolio}</span>
-                  <span class="ds-stamp-name">${esc(other.title)}</span>
-                </li>`;
-              })
-              .join("")}</ul>`
-          : "";
+      /*
+       * Cross stamps — the register trail struck with the entry.
+       *
+       * The rows used to name the three *sibling* entries, so a six-entry roll set every
+       * capability title six times inside one screen (measured 2026-10-05: `archive-index`,
+       * "Alpha jump" ×6). A stamp on a real register says where the entry sits and how long it
+       * runs — not the titles of the entries printed beside it.
+       */
+      const words = (b.body.match(/\S+/g) ?? []).length;
+      const stamps = `<ul class="ds-cross-stamps" aria-label="Register stamps for ${esc(b.title)}">
+          <li class="ds-cross-stamp">
+            <span class="ds-stamp-seal" aria-hidden="true"></span>
+            <span class="ds-stamp-folio">${folio}</span>
+            <span class="ds-stamp-name">Entry ${i + 1} of ${count} struck on this roll</span>
+          </li>
+          <li class="ds-cross-stamp">
+            <span class="ds-stamp-seal" aria-hidden="true"></span>
+            <span class="ds-stamp-folio">${words}</span>
+            <span class="ds-stamp-name">words read on this folio</span>
+          </li>
+          <li class="ds-cross-stamp">
+            <span class="ds-stamp-seal" aria-hidden="true"></span>
+            <span class="ds-stamp-folio">${esc(b.kicker ?? "Note")}</span>
+            <span class="ds-stamp-name">marginal reading struck with it</span>
+          </li>
+        </ul>`;
       return `<article class="ds-entry-beat" style="--i:${i}">
         <span class="ds-entry-folio" aria-hidden="true">${folio}</span>
         <div class="ds-entry-measure">
@@ -1689,10 +1711,13 @@ function renderHangtag(section: SectionSpec, figures: FigurePlan): string {
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const tape = blocks
     .map((b, i) => {
+      // A size tape is sizes. The chip carried the hangtag's title as well, which put the same
+      // name on the tape, on the tag it points at, and again inside the tag's own prose
+      // (measured 2026-10-05: `commerce-loom`, "Size treadles" ×3).
       const size = esc(b.meta ?? sizes[i % 6]!);
       return `<li class="ds-hang-tape-chip" style="--i:${i}">
         <span class="ds-hang-size">${size}</span>
-        <span class="ds-hang-tape-title">${esc(b.title)}</span>
+        <span class="ds-hang-tape-title" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span>
       </li>`;
     })
     .join("");
@@ -1874,9 +1899,16 @@ function renderRange(section: SectionSpec, figures: FigurePlan): string {
     .map((b, i) => {
       const mark = figures.marks[i] ? `<div class="ds-range-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
       const rank = esc(b.meta ?? ranks[i % 6]!);
-      const next = blocks[i + 1];
-      const yesLead = next ? esc(next.title) : "Voucher close";
-      const noLead = i > 0 ? esc(blocks[0]!.title) : "Re-key from Kingdom";
+      /*
+       * A dichotomous key sends the reader to a *couplet*, not to a name — and naming the
+       * destination meant every title was set once in the ladder, once as the sheet heading, and
+       * again in each couplet that led back to it (measured 2026-10-05: `field-guide`,
+       * "Binomial strip" ×6). The couplets now carry the step they hand off to; the ladder above
+       * is what resolves a step to its name.
+       */
+      const nextStep = i + 2;
+      const yesLead = i + 1 < blocks.length ? `couplet ${String(nextStep).padStart(2, "0")}` : "the voucher is struck";
+      const noLead = i > 0 ? "couplet 01" : "re-key from kingdom";
       return `<article class="ds-range-sheet" style="--i:${i}">
         <header class="ds-range-sheet-head">
           <p class="ds-range-rank">${rank}</p>
@@ -1886,8 +1918,8 @@ function renderRange(section: SectionSpec, figures: FigurePlan): string {
         ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
         ${b.kicker ? `<p class="ds-range-note">${esc(b.kicker)}</p>` : ""}
         <ol class="ds-range-couplet" aria-label="Couplet ${i + 1}">
-          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">Trait holds → ${yesLead}</span></li>
-          <li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Trait fails → ${noLead}</span></li>
+          <li><span class="ds-range-lead">a</span><span class="ds-range-lead-copy">Trait holds → ${esc(yesLead)}</span></li>
+          <li><span class="ds-range-lead">b</span><span class="ds-range-lead-copy">Trait fails → ${esc(noLead)}</span></li>
         </ol>
         ${mark}
       </article>`;
@@ -1944,24 +1976,25 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
   const plateDrawing = dpOnce
     ? drawn.replace(/aria-label="[^"]*"/, 'aria-label="Evidence"')
     : drawn;
+  const plateCaption = dpOnce
+    ? ""
+    : section.quoteAttribution ??
+      (kind === "dashboard-webapp"
+        ? "Live desk"
+        : kind === "fintech-marketing"
+          ? "Treasury controls"
+          : kind === "corporate-story"
+            ? "Diligence pack"
+            : "Declared scope");
   const figure = plateDrawing
-    ? plate(
-        plateDrawing,
-        dpOnce
-          ? ""
-          : section.quoteAttribution ??
-            (kind === "dashboard-webapp"
-              ? "Live desk"
-              : kind === "fintech-marketing"
-                ? "Treasury controls"
-                : kind === "corporate-story"
-                  ? "Diligence pack"
-                  : "Declared scope"),
-        "ds-proof-figure ds-plate-lit",
-      )
+    ? plate(plateDrawing, plateCaption, "ds-proof-figure ds-plate-lit")
     : figures.field
       ? `<figure class="ds-proof-figure ds-proof-figure-field" aria-hidden="true">${figures.field}</figure>`
       : "";
+  // The attribution is printed once. It was both the plate caption and the head's foot note, so
+  // `corporate-story` set the same line — and every capability in it — twice on one screen
+  // (measured 2026-10-05: layout-audit repetition ×3).
+  const footNote = section.quoteAttribution && plateCaption !== section.quoteAttribution ? section.quoteAttribution : "";
   const metaLabel =
     kind === "dashboard-webapp"
       ? "Desk"
@@ -1986,7 +2019,7 @@ function renderProofBoard(section: SectionSpec, figures: FigurePlan, spec?: Desi
           ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
           <h2 class="ds-heading">${esc(section.title)}</h2>
           <p class="ds-proof-claim">${esc(section.body || section.quote || "")}</p>
-          ${section.quoteAttribution ? `<p class="ds-proof-foot">${esc(section.quoteAttribution)}</p>` : ""}
+          ${footNote ? `<p class="ds-proof-foot">${esc(footNote)}</p>` : ""}
         </header>
         ${figure}
       </div>
@@ -2392,7 +2425,15 @@ function renderAppShell(section: SectionSpec, spec: DesignSpec, figures: FigureP
           </aside>
           <div class="ds-app-main">
             ${lede}
-            <p class="ds-app-view-label" data-app-view-label>${esc(section.aside[0]?.title ?? "All views")}</p>
+            ${
+              /*
+               * The panel readout counts the rows the open view actually shows. It used to set the
+               * view's name, which the nav beside it already marks `is-current` and the first table
+               * row already sets as its own header — three copies of one capability in one shell
+               * (measured 2026-10-05: `dashboard-webapp`, "Priority queue" ×3).
+               */
+              `<p class="ds-app-view-label" data-app-view-label>${rows.length} views in this workspace</p>`
+            }
             <div class="ds-app-stats">
               ${section.metrics
                 .map(
@@ -2599,8 +2640,9 @@ function scripts(spec: DesignSpec): string {
       if(caption){
         var active=steps.filter(function(li){return Number(li.getAttribute('data-step'))===idx})[0];
         if(active){
-          var strong=active.querySelector('strong');
-          caption.textContent = strong ? strong.textContent : active.textContent;
+          // Say what the step is, not what it is called — the list beside the plot already sets
+          // the name, and a caption repeating it put every step's name on the screen three times.
+          caption.textContent = active.getAttribute('data-claim') || base;
         } else {
           caption.textContent = base;
         }
@@ -2674,7 +2716,7 @@ function scripts(spec: DesignSpec): string {
       el.hidden=!show;
       if(show) visible+=1;
     });
-    if(label) label.textContent=view;
+    if(label) label.textContent = visible + (visible===1 ? ' row' : ' rows') + ' in this view';
     if(empty) empty.hidden=visible>0;
   }
 
@@ -2715,7 +2757,7 @@ function scripts(spec: DesignSpec): string {
           other.classList.toggle('is-live', on);
           other.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-        var label=chip.getAttribute('data-rail-label') || '';
+        var label=chip.getAttribute('data-rail-note') || chip.getAttribute('data-rail-label') || '';
         if(caption) caption.textContent=label;
         var view=chip.getAttribute('data-view');
         if(view){

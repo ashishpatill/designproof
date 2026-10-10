@@ -144,16 +144,6 @@ const ROLE_PROOF: Record<CapabilityRole, LayoutVariant> = {
   ledger: "feature-index",
 };
 
-/** Used when the proof id would be the same shape as the fold. */
-const ROLE_PROOF_DISTINCT: Record<CapabilityRole, LayoutVariant> = {
-  sequence: "workflow-proof",
-  queue: "app-shell",
-  choice: "compare-matrix",
-  explanation: "figure-explainer",
-  evidence: "marquee-proof",
-  ledger: "feature-index",
-};
-
 export function shapesForCapabilities(cues: CapabilityCue[]): {
   first: LayoutVariant;
   proof: LayoutVariant;
@@ -173,7 +163,12 @@ export function shapesForCapabilities(cues: CapabilityCue[]): {
     : firstRole;
   const first = ROLE_FOLD[firstRole];
   let proof = ROLE_PROOF[proofRole];
-  if (proof === first) proof = ROLE_PROOF_DISTINCT[proofRole];
+  /*
+   * The proof cannot reuse the fold's shape — it would draw the first screen's own figure a second
+   * time. There was a second map, `ROLE_PROOF_DISTINCT`, holding values byte-identical to
+   * `ROLE_PROOF`, consulted here on the assumption that it differed; it did not, so the branch was a
+   * no-op that read as if a distinction were being made. The real fallback is below.
+   */
   if (proof === first) proof = first === "marquee-proof" ? "feature-index" : "marquee-proof";
   return { first, proof, firstRole, proofRole };
 }

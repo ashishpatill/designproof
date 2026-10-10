@@ -231,8 +231,16 @@ function titleNotUsed(name: string, description: string, used: Set<string>): str
   if (nameClean && !used.has(normTitle(nameClean))) return nameClean;
   const desc = description.replace(/\s+/g, " ").trim();
   if (desc && !used.has(normTitle(desc))) return desc;
-  const fallback = desc ? `${desc} — shown in proof` : `${nameClean} detail`;
-  return used.has(normTitle(fallback)) ? `${fallback} (${nameClean})` : fallback;
+  /*
+   * Both are spoken for, so the name is the last resort rather than the prose.
+   *
+   * The chain used to end by appending a suffix to the description, so a proof cell whose
+   * description was also the fold's lede reprinted that sentence a third time (measured
+   * 2026-10-05: `corporate-story`, the diligence lede painted 3×, caught by the repetition
+   * probe). A board of evidence that hides its pillars names nothing at all; naming a pillar the
+   * fold already named is a reader following an argument, which is not the same defect.
+   */
+  return nameClean || `${desc} — shown in proof`;
 }
 
 /** Clauses of a sequence, skipping any title the fold already used. */
@@ -495,18 +503,21 @@ export function buildSections(
           proofPlan?.layout === "workflow-proof" || proofPlan?.layout === "figure-explainer";
         const proofOwner = proofTellsOne ? (p0[1] ?? features[1] ?? features[0])?.name : undefined;
         /*
-         * Workspace catalogue is the one home for each description too. The only row left bare is
-         * the one whose sentence the fold already printed as its lede.
+         * The fold's lede is spent prose. Whichever kind prints it on the fold, the catalogue must
+         * not tell it again.
+         *
+         * This was a workspace and fintech rule; it is a property of the fold, not of a site kind.
+         * `corporate-story` writes its lede from the first pillar's own sentence, so the same
+         * paragraph appeared on the fold, on the catalogue row, and again as a proof cell
+         * (measured 2026-10-05: the diligence lede painted 3×).
          */
         const foldLede = normTitle(heroLede(brief, editorial.heroLines)).replace(/[.!?]+$/, "");
+        const saysWhatTheFoldSaid = (body: string): boolean =>
+          Boolean(body) && foldLede.length > 0 && foldLede.includes(normTitle(body).replace(/[.!?]+$/, ""));
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
-            : brief.siteKind === "dashboard-webapp" || brief.siteKind === "fintech-marketing"
-              ? rawSlice.map((b) =>
-                  b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
-                )
-              : rawSlice;
+            : rawSlice.map((b) => (saysWhatTheFoldSaid(b.body) ? { ...b, body: "" } : b));
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features";
@@ -943,7 +954,7 @@ export function buildSections(
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
                           : brief.siteKind === "field-guide"
-                            ? sentence(`Range beads, taxon ranks, and the notes that keep a voucher honest`)
+                            ? sentence(`A rank ladder, taxon keys, and the notes that keep a voucher honest`)
                         : brief.siteKind === "press-atelier"
                           ? sentence(`Fold ticks, plate index, and the gathers that keep a forme honest`)
                         : brief.siteKind === "lantern-path"

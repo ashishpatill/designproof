@@ -665,9 +665,9 @@ function siteKindCss(): string {
 [data-sitekind="research-dossier"] .ds-hero-folio .ds-cta-note,
 [data-sitekind="research-dossier"] .ds-hero-folio .ds-actions .ds-btn-ghost,
 [data-sitekind="research-dossier"] .ds-hero-folio .ds-actions .ds-btn-secondary,
-[data-sitekind="observatory-signal"] .ds-hero-chrono .ds-cta-note,
-[data-sitekind="observatory-signal"] .ds-hero-chrono .ds-actions .ds-btn-ghost,
-[data-sitekind="observatory-signal"] .ds-hero-chrono .ds-actions .ds-btn-secondary,
+[data-sitekind="signal-observatory"] .ds-hero-chrono .ds-cta-note,
+[data-sitekind="signal-observatory"] .ds-hero-chrono .ds-actions .ds-btn-ghost,
+[data-sitekind="signal-observatory"] .ds-hero-chrono .ds-actions .ds-btn-secondary,
 [data-sitekind="archive-index"] .ds-hero-register .ds-cta-note,
 [data-sitekind="archive-index"] .ds-hero-register .ds-actions .ds-btn-ghost,
 [data-sitekind="archive-index"] .ds-hero-register .ds-actions .ds-btn-secondary,
@@ -3559,7 +3559,11 @@ ${surfaceRules()}
 }
 .ds-helm-main{min-width:0;display:flex;flex-direction:column;gap:0}
 .ds-turn-rail{
-  height:88px;max-height:88px;overflow:hidden;
+  /* Tall enough for a three-line turn label. The rail was a hard 88px with a two-line clamp, and
+   * the longest beat — "You can redirect without starting over." — needs three lines at this cell
+   * width, so the layout audit read it as text truncated mid-sentence
+   * (measured 2026-10-05: agent-helm, span.ds-turn-label). */
+  min-height:96px;
   border:1px solid var(--c-border);border-bottom:0;
   background:var(--c-paper);
 }
@@ -3583,7 +3587,7 @@ ${surfaceRules()}
 .ds-turn-beat.is-current .ds-turn-tag{color:var(--c-accent)}
 .ds-turn-label{
   overflow:hidden;color:var(--c-ink-secondary);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
 }
 .ds-turn-beat.is-current .ds-turn-label{color:var(--c-ink)}
 .ds-helm-field{margin:0}

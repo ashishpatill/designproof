@@ -312,14 +312,31 @@ function box(
   }" stroke="${opts.stroke ?? "none"}" stroke-width="1"/>`;
 }
 
+/**
+ * A figure's own body line, or nothing.
+ *
+ * `body || title` printed the same words twice inside one drawing — once as the cell heading and
+ * again as the paragraph beneath it. For a block whose description is missing or equal to its name
+ * that is not a layout detail: the diligence fold draws a posture plate beside a sticky spine that
+ * already names every principle, so a capability ended up named three times on one screen
+ * (measured 2026-10-05: `corporate-story`, "One visual language" ×3). No body means no second copy.
+ */
+function figureBody(b: Block): string {
+  const title = (b.title ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+  const body = (b.body ?? "").replace(/\s+/g, " ").trim();
+  if (!body || body.toLowerCase() === title) return "";
+  return body;
+}
+
 /* ------------------------------------------------------------------ */
 /* interface — the product surface, drawn                              */
 /* ------------------------------------------------------------------ */
 
 /**
  * A schematic of the working surface: a rail of views, a table of the things the product tracks,
- * and one row carrying a measured state. Rows are the real capability names, so the plate is a
- * claim about this product rather than a stock dashboard.
+ * and one row carrying a measured state. The rail sets the view names — the real capability names,
+ * so the plate is a claim about this product rather than a stock dashboard — and nothing else in
+ * the drawing repeats them.
  */
 export function interfacePlate(
   productName: string,
@@ -365,14 +382,22 @@ export function interfacePlate(
     parts.push(text(clip(b.title, 17), 22, y + 4, { size: FT.small, fill: i === 0 ? INK : BODY }));
   });
 
-  // Table
+  /*
+   * Table.
+   *
+   * The rail already names every view, and the table is the open view's *entries* — a different
+   * thing from the view that contains them. Printing the same name in the rail, again as the panel
+   * heading, and again on every row is how one capability ended up four times on a single screen
+   * (measured 2026-10-05: `docs-educational`, rail + heading + rows). The panel is therefore
+   * described, and its rows are drawn as entries with their state.
+   */
   const tx = railW + 24;
   const tw = W - tx - 24;
-  parts.push(text(clip(items[0]!.title, 30), tx, 72, { size: FT.body, fill: INK, weight: 600 }));
+  parts.push(text(clip(items[0]?.kicker || "Open view", 30), tx, 72, { size: FT.body, fill: INK, weight: 600 }));
   parts.push(text("Live", W - 24, 70, { size: FT.micro, fill: QUIET, mono: true, anchor: "end", track: 0.6 }));
   parts.push(rule(tx, 88, W - 24, 88));
 
-  const cols = ["Item", "State"];
+  const cols = ["Entry", "State"];
   parts.push(text(cols[0]!, tx, 106, { size: FT.micro, fill: QUIET, mono: true, track: 0.8 }));
   parts.push(text(cols[1]!, W - 24, 106, { size: FT.micro, fill: QUIET, mono: true, anchor: "end", track: 0.8 }));
 
@@ -382,7 +407,8 @@ export function interfacePlate(
     const lead = i === 1;
     if (lead) parts.push(box(tx - 10, y - 12, tw + 20, 38, { r: 6, fill: ACCENT_FIELD }));
     parts.push(`<circle cx="${tx + 5}" cy="${y + 3}" r="3" fill="${lead ? ACCENT : LINE}"/>`);
-    parts.push(text(clip(b.title, 26), tx + 18, y + 7, { size: FT.small, fill: lead ? INK : BODY }));
+    const w = (tw - 130) * (0.34 + r() * 0.5);
+    parts.push(box(tx + 18, y - 2, Math.max(48, w), 10, { r: 3, fill: lead ? ACCENT_FIELD : "var(--c-paper-raised)", stroke: LINE }));
     parts.push(
       text(b.meta ? clip(b.meta, 12) : `${Math.round(58 + r() * 40)}%`, W - 24, y + 7, {
         size: FT.micro,
@@ -480,7 +506,7 @@ function interfaceBand(productName: string, rows: Block[], seed: string, opts: {
   // Table
   const tx = railW + 32;
   const tw = W - tx - panelW - 56;
-  parts.push(text(clip(items[0]!.title, 40), tx, 88, { size: FT.title, fill: INK, weight: 600 }));
+  parts.push(text(clip(opts.once ? (items[0]?.kicker || "Open view") : items[0]!.title, 40), tx, 88, { size: FT.title, fill: INK, weight: 600 }));
   parts.push(text("Live", tx + tw, 86, { size: FT.micro, fill: QUIET, mono: true, anchor: "end", track: 0.6 }));
   parts.push(rule(tx, 108, tx + tw, 108));
   parts.push(text("Item", tx, 132, { size: FT.micro, fill: QUIET, mono: true, track: 0.8 }));
@@ -1451,7 +1477,7 @@ export function indexLedger(
     `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">A–Z · INDEX</text>`,
   );
 
-  // Build dense entry list from features + synthetic fillers for ink variation.
+  // Build the entry list from the brief's own capabilities, then shelf marks for the rest of the roll.
   const baseEntries = features.length ? features : [{ title: "Entry", body: "", meta: "001" } as Block];
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   const cols = 2;
@@ -1482,7 +1508,6 @@ export function indexLedger(
     for (let row = 0; row < rowsPerCol; row += 1) {
       const y = gridTop + row * rowH;
       const entryIdx = c * rowsPerCol + row;
-      const f = baseEntries[entryIdx % baseEntries.length]!;
       const ordinal = String(entryIdx + 1).padStart(3, "0");
       // Sparse SVG hairlines — do not flood; CSS ruleDensity ignores these strokes anyway.
       if (row % 2 === 1 || row === rowsPerCol - 1) {
@@ -1493,16 +1518,20 @@ export function indexLedger(
       parts.push(
         `<text class="ds-fig-mono" x="${round(x0 + 4)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="var(--surface-quiet)">${ordinal}</text>`,
       );
-      const title = clip(f.title ?? `Entry ${ordinal}`, role === "band" ? 22 : 14);
+      /*
+       * One name per entry. The cells used to be filled by cycling the capability list, so a roll of
+       * four entries printed every name three times inside the fold plate alone (measured
+       * 2026-10-05: `archive-index`, four names ×3 in the hero). A real index holds more lines than a
+       * brief enumerates, and the lines it has not named yet are shelf marks.
+       */
+      const f = entryIdx < baseEntries.length ? baseEntries[entryIdx] : undefined;
+      const shelf = `${letter}${String(row + 1).padStart(2, "0")} · shelf ${ordinal}`;
+      const title = f ? clip(f.title, role === "band" ? 22 : 14) : `${letter}${String(row + 1).padStart(2, "0")}`;
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="var(--surface-muted)">${esc(title)}</text>`,
-      );
-      const sub = clip(
-        f.kicker || `${letter}${row + 1} · shelf ${ordinal}`,
-        role === "band" ? 22 : 16,
+        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.38)}" font-size="11" fill="${f ? "var(--surface-muted)" : "var(--surface-quiet)"}">${esc(title)}</text>`,
       );
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.72)}" font-size="11" fill="var(--surface-quiet)">${esc(sub)}</text>`,
+        `<text class="ds-fig-mono" x="${round(x0 + 40)}" y="${round(y + rowH * 0.72)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(f?.kicker || shelf, role === "band" ? 22 : 16))}</text>`,
       );
       // Accent stamp — filled mark, not an extra rule.
       if (row % 2 === 0) {
@@ -2439,7 +2468,7 @@ export function queueConsole(
   seed: string,
   role: FigureRole = "band",
   /** `numbers: false` drops the rank deltas and row ages, which no brief supplies. */
-  opts: { once?: boolean; heading?: string; numbers?: boolean } = {},
+  opts: { once?: boolean; numbers?: boolean } = {},
 ): string {
   const items = features.slice(0, 6);
   const numbers = opts.numbers !== false;
@@ -2479,7 +2508,10 @@ export function queueConsole(
   const mainW = W - mainX - pad;
   parts.push(box(mainX, pad, mainW, H - pad * 2, { r: 0, fill: PAPER, stroke: LINE }));
   parts.push(text(clip(productName, 24), mainX + 20, pad + 28, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 0.8 }));
-  parts.push(text(clip(opts.heading ?? "Operator console", 40), mainX + 20, pad + 56, { size: 18, fill: INK, weight: 600 }));
+  // What the panel below is, stated from the drawing itself. It used to default to the literal
+  // phrase "Operator console" — a stock tell the copy tests ban outright — and it used to be
+  // overridable with the lead capability's name, which put that name on the fold a second time.
+  parts.push(text(`${items.length} ranked`, mainX + 20, pad + 56, { size: 18, fill: INK, weight: 600 }));
   if (opts.once) {
     // The ranked rows draw in under the heading: one line of motion, the order being set.
     parts.push(
@@ -2504,7 +2536,7 @@ export function queueConsole(
       parts.push(box(mainX + 52, y + 18, barW * 0.6, 6, { r: 3, fill: "var(--c-paper-raised)" }));
     } else {
       parts.push(text(clip(feat.title, 28), mainX + 20, y + 8, { size: 13, fill: INK, weight: 600 }));
-      const sub = wrap(feat.body || feat.title, Math.max(20, Math.round(mainW / 10)), 2);
+      const sub = wrap(figureBody(feat), Math.max(20, Math.round(mainW / 10)), 2);
       sub.forEach((ln, j) => {
         parts.push(text(ln, mainX + 20, y + 28 + j * 16, { size: FIG_MONO_PX, fill: BODY }));
       });
@@ -2574,7 +2606,7 @@ export function postureGrid(
       }),
     );
     parts.push(text(clip(b.title, 28), x + 20, y + 72, { size: 18, fill: INK, weight: 600 }));
-    const lines = wrap(b.body || b.title, Math.max(18, Math.round(cellW / 11)), 4);
+    const lines = wrap(figureBody(b), Math.max(18, Math.round(cellW / 11)), 4);
     lines.forEach((ln, j) => {
       parts.push(text(ln, x + 20, y + 104 + j * 22, { size: 14, fill: BODY }));
     });
@@ -2883,6 +2915,8 @@ export function workBoard(
  * Mono SKU / size labels only (≤11px). Theme packs invent soft card grids; they do not invent a
  * warp/weft merchandising press with size-tape chrome.
  */
+const WEFT_LINES = ["Warp float", "Weft hold", "Sley check", "Selvedge", "Twill line", "Weft pick"];
+
 export function loomWeave(
   productName: string,
   features: Block[],
@@ -2970,7 +3004,14 @@ export function loomWeave(
       const x = fieldX + col * (cellW + gap);
       const y = fieldY + row * (cellH + gap);
       const idx = row * cols + col;
-      const f = base[idx % base.length]!;
+      /*
+       * One name per cell. The cells used to be filled by cycling the capability list, so a weave
+       * shorter than the brief's catalogue set the same line twice in the fold plate
+       * (measured 2026-10-05: `commerce-loom`, "Size treadles" ×2). Cells past the catalogue take
+       * loom vocabulary instead — a weave is full of structure the brief never enumerates.
+       */
+      const f = idx < base.length ? base[idx] : undefined;
+      const weftLine = WEFT_LINES[idx % WEFT_LINES.length]!;
       const photo = photos[idx % photos.length]!;
       const clipId = `loom-clip-${idx}`;
       parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}"/></clipPath></defs>`);
@@ -2989,7 +3030,7 @@ export function loomWeave(
         `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH * 0.72 + 14)}" font-size="11" fill="var(--surface-quiet)">Sku ${sku}</text>`,
       );
       parts.push(
-        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f.title ?? "Line", 18))}</text>`,
+        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="${f ? "var(--surface-muted)" : "var(--surface-quiet)"}">${esc(f ? clip(f.title, 18) : weftLine)}</text>`,
       );
       // Accent pin on lead cell.
       if (idx === 0) {
@@ -3429,9 +3470,9 @@ export function planFigures(input: {
   const draw = (kind: Kind, role: FigureRole): string => {
     switch (kind) {
       case "interface":
-        return interfacePlate(input.productName, input.features, seed, role, {
-          once: input.siteKind === "saas-marketing",
-        });
+        // `once` on every kind: a page that draws its capabilities in a plate also lists them in
+        // prose beside it, so the drawing sets each name in one place and nowhere else.
+        return interfacePlate(input.productName, input.features, seed, role, { once: true });
       case "series":
         return seriesChart(readings[0]?.label ?? "Measured outcome", periods, seed, role);
       case "flow":
@@ -3466,8 +3507,9 @@ export function planFigures(input: {
         return input.siteKind === "saas-marketing" || input.siteKind === "dashboard-webapp"
           ? queueConsole(input.productName, input.features, seed, role, {
               once: true,
-              heading: input.features[0]?.title,
-              // Workspace: no made-up rank changes or minutes beside the rows.
+              // No heading override: the rail already sets every capability name, and a panel
+              // heading repeating the live one put "Account scoring" on the fold three times.
+              // Workspace also gets no made-up rank changes or minutes beside the rows.
               numbers: input.siteKind !== "dashboard-webapp",
             })
           : queueConsole(input.productName, input.features, seed, role);

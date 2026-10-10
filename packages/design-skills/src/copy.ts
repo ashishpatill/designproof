@@ -274,15 +274,21 @@ export function eyebrows(brief: DesignBrief): Record<string, string> {
 
 /**
  * Section headline for the feature block. Uses the product's own most-repeated noun so two
- * different briefs never produce the same heading.
+ * different briefs never produce the same heading, and its own capability count so the heading
+ * never repeats a capability the index below it is about to print.
  */
 export function featuresTitle(brief: DesignBrief, features: FeatureSpec[]): string {
   const vocab = vocabulary(brief);
   const noun = vocab[0] ?? "work";
-  const lead = features[0]?.name.toLowerCase() ?? noun;
   if (brief.siteKind === "docs-educational") return `What ${brief.productName} does with ${noun}`;
   if (brief.siteKind === "corporate-story") return `How ${brief.productName} works in practice`;
-  return `Everything ${brief.productName} does, starting with ${lead}`;
+  /*
+   * The heading used to open with the first capability's name. That name is the first row of the
+   * index directly below it, and the standing plate draws it too, so one capability headed the
+   * band and then appeared twice more inside it (measured 2026-10-05: `press-atelier`,
+   * "Registration lock" ×3).
+   */
+  return `Everything ${brief.productName} does, in ${count(features.length)} parts`;
 }
 
 export function featuresLede(brief: DesignBrief, features: FeatureSpec[]): string {
@@ -741,7 +747,10 @@ export function pullQuote(brief: DesignBrief, features: FeatureSpec[]): { quote:
     },
     "corporate-story": {
       quote: `${brief.productName} holds in diligence because every claim on this page is verifiable before you commit.`,
-      attribution: `Board pack · measured outcomes · ${n} pillars`,
+      // Not "measured outcomes": that is the corporate capability name, and the attribution line
+      // sits beside the board whose cells already print it (measured 2026-10-05: "Measured
+      // outcomes" ×3 in the proof band).
+      attribution: `Board pack · ${n} pillars · every claim checked`,
     },
     "fintech-marketing": {
       quote: `Treasury teams short-list ${brief.productName} because wires, wallets, and approvals are one surface — not three portals.`,
