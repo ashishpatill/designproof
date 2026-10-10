@@ -1,6 +1,6 @@
 # Design Proof — project status
 
-Snapshot: **2026-10-05**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). Agent-nav: [`AGENTS.md`](../AGENTS.md) → [`FEATURE-MAP.md`](./FEATURE-MAP.md) → one [`features/`](./features/) file. This page is the honest Done / Pending / Stuck / Needs / Next cut.
+Snapshot: **2026-10-06**. Engineering contracts stay in [`BUILD.md`](../BUILD.md); remaining-work checklists stay in [`PLAN.md`](../PLAN.md). Agent-nav: [`AGENTS.md`](../AGENTS.md) → [`FEATURE-MAP.md`](./FEATURE-MAP.md) → one [`features/`](./features/) file. This page is the honest Done / Pending / Stuck / Needs / Next cut.
 
 **What this product is:** a Cursor / Grok Build **plugin** for world-class site and app design across many sessions — observe, name, direct, repair, prove. Agents write code; Design Proof proves the UI.
 
@@ -17,7 +17,8 @@ Snapshot: **2026-10-05**. Engineering contracts stay in [`BUILD.md`](../BUILD.md
 Closed in git (see [`CHANGELOG.md`](../CHANGELOG.md)):
 
 - Sprint MVP M1–M10 and Phases 1–6: deterministic capture → fingerprint → 14 detectors → taste → Report/seam → voice → redesign diffs → MCP → disposable proof → scenario matrix + auth harness.
-- Eleven `designproof_*` MCP tools; catalog honesty (docs ≡ code); `designproof mcp install` for Cursor, Grok Build, and other hosts. `designproof_apply` still returns patch text only.
+- **Design engine quality (the generator).** M1 of [`docs/16`](./16_DESIGN_ENGINE_QUALITY.md) landed 2026-10-06: the repo now measures its own output with two instruments instead of one, and reports what it finds. Layout audit + a cross-offering distinctness ratchet are in `pnpm test`; a capability is named at most twice per screen. M2–M7 (the actual art-direction layer) not started.
+- **Eleven `designproof_*` MCP tools; catalog honesty (docs ≡ code); `designproof mcp install` for Cursor, Grok Build, and other hosts. `designproof_apply` still returns patch text only.**
 - Design-skills engine + skill graph (research auto-trigger, craft nodes, media budgets). Agency pipeline + learn split (developer corpus vs end-user session).
 - Templates: 17 engine offerings plus Crease / Baseline matchday; Tiller hero-helm in-repo (`/showcase/harness`); Roundspool care pathway; Ember Gate path atlas; Lattice without the Z-stroke.
 - Captioned 5-beat README demo (2026-08-26). Ink-on-paper product shell.
@@ -31,13 +32,17 @@ Closed in git (see [`CHANGELOG.md`](../CHANGELOG.md)):
 
 These are open even where partial code exists:
 
-1. **Design engine quality (the generator)** — diagnosed 2026-10-05, not started.
+1. **Design engine quality (the generator)** — diagnosed 2026-10-05. **M1 landed 2026-10-06**; M2–M7 not started.
    [`docs/16_DESIGN_ENGINE_QUALITY.md`](./16_DESIGN_ENGINE_QUALITY.md) measures the 17 offerings:
    97.4% of emitted CSS lines are shared by all of them, ten share one eight-section tail, 15 of 17
-   emit no real image, the footer is byte-identical boilerplate, and the committed craft score
-   (0.989) is high while the repo's own layout audit finds a 1160×320 void inside the corporate hero.
-   The bar — stacked images, motion, artistic, unique — is unreachable by tuning; it needs the
-   `ArtDirection` + `PageProgram` + media layer (docs/16 §5) and the instrument fixes (M1).
+   emit no real image, the footer is byte-identical boilerplate, and the committed craft score was
+   high while the repo's own layout audit found a 1160×320 void inside the corporate hero.
+   **M1 closed the measuring gap, not the design gap.** Two instruments now run — craft **97.8** and
+   art-direction **85.5** (holdout 91.1 / 55.0) — the layout audit and a cross-offering distinctness
+   ratchet are in `pnpm test`, and a capability can no longer be named more than twice on one screen
+   (it was 3–6× in 50 places). What is left is the actual layer: `ArtDirection` + `PageProgram` + the
+   media system (docs/16 §5, M2–M4). Baseline in
+   [`research/LOOP_LEDGER.md`](../research/LOOP_LEDGER.md).
    **This supersedes item 2 below as the root cause.**
 
 2. **Raw design dumps → curated SFT/DPO + MCP writes sink**  
@@ -63,7 +68,7 @@ These are open even where partial code exists:
 - **Eng attention parked** on DeepHarness honesty. Design Proof work (including the pending items above) waits until Ashish unblocks.
 - **Tiller public gap** is stuck on a definition: in-repo template exists; “missing from showcase/GitHub” is not a code path we can close without Ashish naming the miss.
 - **Training sink** is stuck on a real `dp-design-data` sibling to prove curated SFT/DPO — not on more writer code in this repo.
-- **Design engine rewrite scope** is stuck on a decision: [`docs/16`](./16_DESIGN_ENGINE_QUALITY.md) M2–M4 replace the top of the generation pipeline (`planSections` → `ArtDirection` + `PageProgram` + media). M1 alone (instrument honesty + four phantom-token fixes) is small and independently useful. Confirm whether M1 lands alone or the rewrite is greenlit.
+- **Design engine rewrite scope** is stuck on a decision: [`docs/16`](./16_DESIGN_ENGINE_QUALITY.md) M2–M4 replace the top of the generation pipeline (`planSections` → `ArtDirection` + `PageProgram` + media). **M1 has now landed alone** (2026-10-06) — instrument honesty, the six reader-visible defects, and the two score instruments — so the question is now purely whether M2–M4 start.
 
 ---
 
@@ -74,7 +79,7 @@ Cannot be guessed from the repo:
 - **DeepHarness vs Design Proof:** confirm when Design Proof is allowed to take eng attention again.
 - **Tiller public gap:** what “missing” means now (GitHub README still, `/showcase` filmstrip order, name on the fold, craft reel, or all of the above).
 - **`dp-design-data`:** sibling path / access so raw → curated SFT/DPO can be verified; whether MCP sink writes are actually landing.
-- **Bar confirmation:** stacked images + motion + artistic + unique is the pass condition — not a higher critique score on a nav crop. Worst case, the engine currently cannot emit an image stack at all; confirm the bar is unchanged.
+- **Bar confirmation:** stacked images + motion + artistic + unique is the pass condition — not a higher critique score on a nav crop. M1 measured the gap and it is total on imagery: `raster-images` scores 0 on 16 of 17 offerings, against a corpus median of 42. Confirm the bar is unchanged.
 - **Design-engine scope:** M1 only (instrument honesty, days), or M1–M4 (art-direction layer, the real fix, sessions)? See [`docs/16 §8`](./16_DESIGN_ENGINE_QUALITY.md).
 - **Imagery licence:** is a committed licence-clean photographic base library acceptable in-repo, or must every asset come from the user's project?
 - **Plugin breadth:** is the first plugin release allowed to ship Codex / Claude Code / Grok Build with MCP + instruction file only, or must every host get skill files before release? See [`docs/17 §8`](./17_AGENT_PLUGIN_DISTRIBUTION.md).
@@ -87,8 +92,14 @@ Cannot be guessed from the repo:
 
 Order assumes DeepHarness honesty still owns eng attention. When Design Proof is unblocked:
 
-1. **Land [`docs/16`](./16_DESIGN_ENGINE_QUALITY.md) M1** — put the layout audit in `pnpm test` over all 17 offerings, split `craftScore` from `artDirectionScore`, stop the repeated-marks metric, fix the four phantom custom properties (`--m-ease-out`, `--nav-h`, `--content-wide`, `--t-small-size`), the loom `everySKU` concatenation, the herbarium label collision, and the hardcoded `© 2026`. Small, independently shippable, and it makes the remaining problems visible.
-2. **Then M2–M4** — `ArtDirection`, `PageProgram`, media system. This is the actual fix for "generic designs" and it is what makes the plugin worth distributing.
+1. **M2 — `ArtDirection` schema + deterministic director** ([`docs/16` §6](./16_DESIGN_ENGINE_QUALITY.md)).
+   M1 is landed, so the problem is visible and measured rather than argued. This is the first piece of
+   the layer the bar actually needs: every one of the 17 offerings gets a written thesis and a fold
+   decision naming what owns the first screen. That is also the fix for the six vacancies still open in
+   the layout-audit gate — a fold that names a dominant element is a fold with no hole in it.
+2. **Then M3–M4** — `PageProgram` compiler (breaks the ten-of-seventeen shared tail) and the media
+   system (`raster-images` scores 0 on 16 of 17; the corpus median is 42). This is the actual fix for
+   "generic designs" and it is what makes the plugin worth distributing.
 3. Prove **raw → curated SFT/DPO** with MCP writes against a real `dp-design-data` sibling (no collector in this repo).
 4. Ship [`docs/17`](./17_AGENT_PLUGIN_DISTRIBUTION.md) W1–W3 — `@designproof/pack` and the Codex / Claude Code / Grok instruction surfaces.
 5. Close the **Tiller** showcase / GitHub presentation gap.

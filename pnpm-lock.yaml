@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       playwright:
-        specifier: ^1.49.1
+        specifier: ^1.61.1
         version: 1.61.1
       vitest:
         specifier: ^2.1.9
@@ -20,18 +20,6 @@ importers:
       '@cursor/sdk':
         specifier: ^1.0.23
         version: 1.0.23
-      '@neondatabase/serverless':
-        specifier: ^1.1.0
-        version: 1.1.0
-      '@next/env':
-        specifier: 14.2.33
-        version: 14.2.33
-      '@opentelemetry/api':
-        specifier: ^1.9.1
-        version: 1.9.1
-      '@opentelemetry/exporter-trace-otlp-http':
-        specifier: ^0.220.0
-        version: 0.220.0(@opentelemetry/api@1.9.1)
       '@designproof/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -47,6 +35,18 @@ importers:
       '@designproof/taste':
         specifier: workspace:*
         version: link:../../packages/taste
+      '@neondatabase/serverless':
+        specifier: ^1.1.0
+        version: 1.1.0
+      '@next/env':
+        specifier: 14.2.33
+        version: 14.2.33
+      '@opentelemetry/api':
+        specifier: ^1.9.1
+        version: 1.9.1
+      '@opentelemetry/exporter-trace-otlp-http':
+        specifier: ^0.220.0
+        version: 0.220.0(@opentelemetry/api@1.9.1)
       '@vercel/blob':
         specifier: ^1.1.1
         version: 1.1.1
@@ -161,7 +161,7 @@ importers:
         specifier: workspace:*
         version: link:../schema
       playwright:
-        specifier: ^1.49.1
+        specifier: ^1.61.1
         version: 1.61.1
       zod:
         specifier: ^3.24.1
@@ -196,7 +196,7 @@ importers:
         specifier: ^22.10.0
         version: 22.20.0
       playwright:
-        specifier: ^1.49.1
+        specifier: ^1.61.1
         version: 1.61.1
       tsup:
         specifier: ^8.3.5
@@ -210,9 +210,6 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.3.0
-        version: 1.29.0(zod@3.25.76)
       '@designproof/core':
         specifier: workspace:*
         version: link:../core
@@ -228,6 +225,9 @@ importers:
       '@designproof/taste':
         specifier: workspace:*
         version: link:../taste
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.3.0
+        version: 1.29.0(zod@3.25.76)
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -276,12 +276,12 @@ importers:
 
   packages/taste:
     dependencies:
-      '@google/generative-ai':
-        specifier: ^0.21.0
-        version: 0.21.0
       '@designproof/schema':
         specifier: workspace:*
         version: link:../schema
+      '@google/generative-ai':
+        specifier: ^0.21.0
+        version: 0.21.0
       zod:
         specifier: ^3.24.1
         version: 3.25.76

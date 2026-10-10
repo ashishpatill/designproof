@@ -67,6 +67,16 @@ React+Tailwind diff output, or let fingerprint/detection jitter nondeterministic
   path is provided.
 - **MCP:** `@modelcontextprotocol/sdk`, stdio transport.
 - **Validation:** `zod`. **Test:** `vitest`. **Lint:** `eslint` + `prettier`.
+- **Browser (one per user, not per project):** every Playwright consumer in this repo — the three
+  manifests that declare it, all 26 launch sites, and `vitest` — resolves to the *same* chromium.
+  Browsers live in one user-scoped cache (`~/Library/Caches/ms-playwright` on macOS,
+  `~/.cache/ms-playwright` on Linux), keyed by build number, not by project directory. `pnpm` hoists a
+  single `playwright` version for the workspace, so there is exactly one build to fetch:
+  `pnpm browsers:install` (wraps `playwright install chromium`).
+  Do **not** pass `channel: "chrome"` (or any channel) to `chromium.launch()`. A channel bypasses the
+  shared cache and resolves to a separately-installed system browser, so the test suite can pass while
+  the `pnpm research:*` scripts fail on the same machine — which is how the layout-audit gate and
+  `pnpm research:audit` came to disagree about the same render in `docs/16` M1.
 
 ---
 

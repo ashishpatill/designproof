@@ -8,6 +8,84 @@ Design Proof is the **Cursor / Grok Build plugin** for world-class site and app 
 
 ---
 
+## 2026-10-06 — Design engine M1: the repo now measures itself honestly
+
+[`docs/16_DESIGN_ENGINE_QUALITY.md`](./docs/16_DESIGN_ENGINE_QUALITY.md) diagnosed the generator on
+2026-10-05 and left M1 open: make the repo report the truth about its own output before building
+anything. M1 has landed. It did not make the pages better — it made the remaining work measurable.
+
+**Two instruments instead of one.** The craft score reads populations of scalars the generator sets
+itself, so it read 0.989 on a page with a 1160×320 hole in its hero. It is still reported (as
+`overall`, unchanged for existing readers) and it is still a *compliance* number. Alongside it,
+`ART_DIRECTION_DIMENSIONS` scores eight things no token tweak can satisfy: an element that owns the
+fold, distinct matter above it, room-shape variety, the longest repeated room run, coverage change
+down the scroll, distinct matter on the page, photographs, and repeated-drawing share.
+
+> craft **97.8** · art-direction **85.5** · holdout 91.1 / **55.0** (craft gap 6.7 pts, so the harness
+> still prints OVERFIT; the direction gap is much wider, which is the honest signal that sixteen tuned
+> briefs are composed and the untuned one is not)
+
+`pnpm research:critique` prints both and `research/critique.json` carries `.instruments`,
+`.artDirection`, and per-page `artRows`. The art-direction bands are hand-set — no corpus run has
+measured them yet.
+
+**The layout audit is in `pnpm test`, and it agrees with the operator command.** It did not before:
+the gate silently dropped any vacancy whose fill was ≥ 0.6, a threshold nobody had chosen, while
+`pnpm research:audit` was reporting 6 defects. Both now use the probe's own thresholds, both scroll
+before probing, and the six open vacancies are enumerated in the gate by offering and section so the
+count cannot grow silently. They are `dashboard` hero 500×480, `corporate` 1160×320, `fintech`
+1160×260, `studio` features 960×260, `consumer` figure 540×300, `foundry` hero 440×360 — all
+fold-composition problems, which is what M2's `ArtDirection.fold` is for.
+
+**A capability is named at most twice on one screen.** It was 3–6× across 50 (offering, section)
+pairs. Every instance turned out to be **one list rendered twice**:
+
+- `interfacePlate` fed one `rows` list into both its view rail and its table rows — a working surface's
+  rail and its rows are different things, and using one list for both printed every name three times
+  inside a single plate.
+- The app shell set its view list (`aside`) and its row list (`blocks`) from the same capability names.
+- Cut slips and cross stamps listed *sibling* titles, so a five-beat essay set each title five times.
+- The index ledger and loom weave **cycled** the feature list with `idx % base.length` to fill cells.
+- `queueConsole`'s panel heading fell back to the literal phrase "Operator console" — a stock tell the
+  repo's own copy tests ban.
+
+**Six more defects a reader would have seen.** The `harness` turn tape clamped its longest label
+mid-sentence (a 2-line clamp inside a hard 88px rail, when the beat needs three lines).
+`corporate-story` painted its diligence lede three times — the fold writes it from its first pillar's
+sentence, and the catalogue/proof dedupe that prevents that was restricted to two site kinds, so it is
+now general. `featuresTitle` interpolated the first capability into the heading directly above the index
+printing that name. The features body kept reprinting its own title when no description was set. The
+`[data-sitekind="observatory-signal"]` selector never matched anything — the emitted value is
+`signal-observatory`.
+
+**Dead code deleted, one claim withdrawn.** `ROLE_PROOF_DISTINCT` was byte-identical to `ROLE_PROOF`,
+so the branch that consulted it was a no-op that read as if a distinction were being made.
+`.ds-bento` was **kept** despite §5.5 calling it dead: it is unreachable from all 17 *plans*, but
+`renderFeatures` still implements the `feature-bento` layout, so deleting it removes a capability
+rather than dead code.
+
+**One measurement did not land, and the doc overstated its premise.** The drawn-matter re-score
+fingerprints every drawing with its text stripped, so a mark differing only in its caption counts once.
+`repeatedFigureAreaRatio` comes out **0 on all seventeen pages** and distinct-matter at 100/100 —
+because `capabilityMark(b, i, seed)` is seeded per block *and* per index, the repeated stamps share
+dimensions but are structurally different drawings. §1.3 / RC5's "repeated marks earn drawn matter"
+does not survive a stricter test. The probe stays (it catches a genuine paste), and §1.3 is now marked
+as a visual observation rather than evidence that the metric is gamed.
+
+**Cross-offering distinctness, as a ratchet.** Three floors pinned to measurement: 2 772 of 3 092 CSS
+lines shared (89.7%), 10 of 17 offerings on one room skeleton, 8 of 17 type voices with the largest
+group at 5. Measuring the skeleton properly — collapsing the hero and story positions, which is where
+the two legitimate per-offering differences live — **confirms** §1.2; keying on `id:layout` reports
+17/17 distinct and is how the claim came to look wrong. The floors sit at or above the measured values
+deliberately: a ratchet pinned below reality is a test that cannot fail, and a test that cannot fail is
+how the 0.989 happened.
+
+Verification: **328 tests pass across 49 files**, `pnpm typecheck` clean, `pnpm research:audit` reports
+its 6 enumerated vacancies, `pnpm research:critique` reports both scores. Baseline and side effects
+recorded in [`research/LOOP_LEDGER.md`](./research/LOOP_LEDGER.md).
+
+---
+
 ## 2026-10-06 — Renamed to Design Proof; review workspace rebuilt around the loop
 
 **Naming.** The product is now **Design Proof**, and the gallery is **Design Templates** — everywhere a person reads or greps: UI copy, headings, page metadata, doc titles, code comments, skills, rules, filenames and paths. Under the hood the rename is complete too, so nothing is half-branded:

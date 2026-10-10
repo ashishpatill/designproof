@@ -10,12 +10,18 @@
 > commands are in §9. Nothing here is a taste claim that is not backed by a
 > measurement or a `file:line`.
 >
+> **M1 re-measured part of this on 2026-10-06 and one claim did not survive.**
+> See §6 M1: the "repeated marks earn drawn matter" argument in §1.3 / RC5 is not
+> supported once a drawing is fingerprinted with its captions stripped — the marks
+> share dimensions but are different drawings. Treat §1.3 as a visual observation,
+> not as evidence that the metric is gamed.
+>
 > Related: [`05_GENERICNESS_METHODOLOGY.md`](./05_GENERICNESS_METHODOLOGY.md) (the critic rubric) ·
 > [`10_DESIGN_EVIDENCE.md`](./10_DESIGN_EVIDENCE.md) (the calibrated corridors) ·
 > [`09_PREMIUM_DESIGN_SKILLS.md`](./09_PREMIUM_DESIGN_SKILLS.md) (the offering catalog) ·
 > [`17_AGENT_PLUGIN_DISTRIBUTION.md`](./17_AGENT_PLUGIN_DISTRIBUTION.md) (shipping it)
 
-**Status:** diagnosis closed · target architecture proposed · implementation not started
+**Status:** diagnosis closed · **M1 landed 2026-10-06** · target architecture proposed · M2–M7 not started
 **Authority:** this doc is the source of truth for *generation* quality. `docs/05` stays the source of truth for *detection*.
 
 ---
@@ -524,17 +530,62 @@ loop.
 
 ### M1 — Instrument honesty (small, do first)
 
-- [ ] Move `layout-audit` into `pnpm test` over all 17 briefs; fail on vacancy/clipped/overflow/collision/repetition.
-- [ ] Split the score: `craftScore` + `artDirectionScore`; report both in `research/critique.json`.
-- [ ] Re-score the "drawn matter" dimension so repeated `capabilityMark`s cannot earn it: count only
+**Status: landed 2026-10-06.** Baseline and side effects in
+[`research/LOOP_LEDGER.md`](../research/LOOP_LEDGER.md) under *Loop — M1 instrument honesty*.
+`pnpm test` 328 passing across 49 files, typecheck clean.
+
+- [x] Move `layout-audit` into `pnpm test` over all 17 briefs; fail on vacancy/clipped/overflow/collision/repetition.
+      Also scrolls before probing, so the gate and `pnpm research:audit` measure the same render — they did
+      not before: the gate dropped any vacancy with fill ≥ 0.6, a number nobody had chosen, while the
+      operator command reported 6 defects the gate could not see.
+- [x] Split the score: `craftScore` + `artDirectionScore`; report both in `research/critique.json`.
+      Eight composition dimensions (`ART_DIRECTION_DIMENSIONS`), none satisfiable by tuning a token.
+      **craft 97.8 · direction 85.5** over 17 pages; holdout 91.1 / 55.0, craft gap 6.7 pts so the
+      harness still prints OVERFIT. The direction bands are hand-set — no corpus run has measured them.
+- [x] Re-score the "drawn matter" dimension so repeated `capabilityMark`s cannot earn it: count only
       *distinct* figures ≥ a size floor, and count raster images separately.
-- [ ] Add a cross-template distinctness test (shared CSS lines %, room-sequence equality, type-voice equality).
-- [ ] Fix the four phantom custom properties and delete the dead selectors/maps listed in §5.5.
-- [ ] Fix the fixed defects a reader sees: the `loom` flex-`h1` whitespace loss, the herbarium label collision, the hardcoded `© 2026`, the missing mobile nav.
-- [ ] Add a "a capability may be named at most twice per screen" gate. `saas` names one capability 6× inside a single hero and 13× on the page; the engine's own copy tests count authored nodes, not rendered repeats.
+      **This one did not land, and the doc overstated its premise.** Each drawing is fingerprinted with
+      its text stripped, so a mark differing only in the words inside it counts once — and
+      `repeatedFigureAreaRatio` comes out **0 on all seventeen pages**, with distinct-matter at 100/100.
+      The reason is `capabilityMark(b, i, seed)`: seeded per block *and* per index, the stamps share
+      dimensions but are structurally different drawings. §1.3 treats them as one stamp repeated; under a
+      definition that ignores captions they are not interchangeable. The probe is kept because it catches
+      a genuine paste, but it did not recover the gaming it was built for. **§1.3 / RC5's wording should be
+      corrected before M4 cites it.**
+- [x] Add a cross-template distinctness test (shared CSS lines %, room-sequence equality, type-voice equality).
+      `packages/design-skills/src/__tests__/cross-offering-distinctness.test.ts` — three ratchets pinned to
+      measurement (2 772 of 3 092 CSS lines shared = 89.7%; 10 of 17 on one skeleton; 8 of 17 type voices,
+      largest group 5). Measuring the skeleton with the hero and story positions collapsed **confirms
+      §1.2**; keying on `id:layout` alone reports 17/17 distinct, because the two positions that vary are
+      in the key. That is how the claim came to look wrong.
+- [x] Fix the four phantom custom properties and delete the dead selectors/maps listed in §5.5.
+      All four properties are now declared in `:root`; `[data-sitekind="observatory-signal"]` corrected to
+      `signal-observatory`; `--nav-blur` gone. `ROLE_PROOF_DISTINCT` deleted — byte-identical to
+      `ROLE_PROOF`, so the branch consulting it was a no-op that read as if a distinction were being made.
+      **`.ds-bento` kept:** §5.5 calls it unreachable, and it is unreachable from all 17 *plans*, but
+      `renderFeatures` still implements the `feature-bento` layout, so deleting it removes a capability
+      rather than dead code. That is M3's call.
+- [x] Fix the fixed defects a reader sees: the `loom` flex-`h1` whitespace loss, the herbarium label
+      collision, the hardcoded `© 2026`, the missing mobile nav. The new gate also found the `harness`
+      turn label clamped mid-sentence (a 2-line clamp inside a hard 88px rail, when the longest beat needs
+      three lines) and `corporate-story`'s diligence lede painted three times.
+- [x] Add a "a capability may be named at most twice per screen" gate.
+      Was 3–6× across 50 (offering, section) pairs. Every instance was **one list rendered twice** — the
+      interface plate used one `rows` list as both its view rail and its table rows; the app shell set its
+      view list and its row list from the same names; cut slips and cross stamps listed *sibling* titles;
+      the index ledger and loom weave **cycled** the feature list with `idx % base.length`. All 17 offerings
+      now sit at 2 or fewer.
 
 **Exit:** the repo reports the truth about its own output. Baseline numbers recorded in
 `research/LOOP_LEDGER.md` with the side-effect, as the ledger requires.
+
+**What M1 did not fix, because it cannot.** Six vacancies remain, now enumerated in the gate by offering
+and section so the count cannot grow silently — `dashboard` hero 500×480, `corporate` hero 1160×320,
+`fintech` hero 1160×260, `studio` features 960×260, `consumer` figure 540×300, `foundry` hero 440×360.
+They are the same fact the art-direction score reports as `ad-fold-matter` at 91/100: the fold reserves a
+screen and fills a corner of it. That is `ArtDirection.fold` naming a dominant element — M2. And
+`raster-images` scores **0 on 16 of 17**, which is M4.
+
 
 ### M2 — `ArtDirection` schema + deterministic director
 

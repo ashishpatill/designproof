@@ -43,10 +43,11 @@
     "agency:pipeline": "pnpm -F @designproof/design-skills exec tsx ../../scripts/agency-pipeline/run.ts",
     "agency:run": "pnpm -F @designproof/design-skills exec tsx ../../scripts/agency-pipeline/orchestrate.ts",
     "agency:learn": "pnpm -F @designproof/design-skills exec tsx ../../scripts/agency-pipeline/learn.ts",
-    "verify:crease-scorecard": "node scripts/verify-crease-scorecard-align.mjs"
+    "verify:crease-scorecard": "node scripts/verify-crease-scorecard-align.mjs",
+    "browsers:install": "playwright install chromium"
   },
   "devDependencies": {
-    "playwright": "^1.49.1",
+    "playwright": "^1.61.1",
     "vitest": "^2.1.9"
   },
   "engines": {

@@ -6,6 +6,12 @@ re-measured and recorded here, including the side effect — there is always one
 Anonymisation applies to this file like everywhere else: references are `ref-0NN` and category
 buckets, never names, hosts, or URLs.
 
+**Two scores from 2026-10-06.** Entries before that date record one number. `craft` is specification
+compliance — the score this repo has always optimised. `direction` is the second instrument added
+with `docs/16` M1: does the page make a composition decision, or does it assemble bands and fill
+them? Read both columns from 2026-10-06 onward; `craft` alone stopped being a quality number when it
+reached 0.989 on a page with a 1160×320 hole in its hero.
+
 ---
 
 ## Loop 1 — build the instrument
@@ -781,3 +787,74 @@ buckets, never names, hosts, or URLs.
   now 1.0 filling the plate; remaining gap is section-coverage / body measure). Fold PNG under
   `/opt/cursor/artifacts/screenshots/ember-gate-fold.png`.
 - **Next weakest:** remaining craft templates whose signature figures still put stroke through type.
+
+---
+
+## Loop — M1 instrument honesty (2026-10-06)
+
+Not a craft loop. This is the baseline [`docs/16`](../docs/16_DESIGN_ENGINE_QUALITY.md) M1 asked for,
+recorded before any M2 work, so the remaining problem is measurable rather than argued.
+
+- **Goal:** make the repo report the truth about its own output. Split one gamed instrument into two,
+  stop repeated marks earning "drawn matter", put the layout audit and a cross-offering
+  distinctness ratchet in `pnpm test`, and fix the reader-visible defects those instruments found.
+- **Score:** craft **97.8**, direction **85.5** (17 pages). Holdout `craft 91.1 / direction 55.0`,
+  craft gap **6.7 pts → the harness still prints OVERFIT.** The direction gap is far larger: the
+  matrix briefs average 87.5 and the holdout 55.0. That is the number to watch — the second
+  instrument says the sixteen tuned briefs are composed and the untuned one is not.
+- **Closed:**
+  - Layout audit in `pnpm test` over all 17 offerings, using the probe's own thresholds and scrolling
+    before probing, so `pnpm test` and `pnpm research:audit` agree on the same render. They did not:
+    the gate passed while the operator command reported 6 defects, because the gate dropped any
+    vacancy whose fill was ≥ 0.6 and nobody had chosen that 0.6.
+  - "Drawn matter" re-scored: every drawing fingerprinted with its text stripped, so a mark that
+    differs only in the words inside it counts once. Raster images counted separately. New dimensions
+    `figure-distinct-weight`, `figure-repeats`, `raster-images`.
+  - Second instrument `artDirectionScore` — 8 composition dimensions, all unsatisfiable by tuning a
+    token. `research/critique.json` now carries `.overall` (craft, unchanged for back-compat),
+    `.instruments`, `.artDirection`, and per-page `artRows`.
+  - A capability is named at most twice on one screen. Was 3–6× in 50 (offering, section) pairs.
+  - Cross-offering distinctness ratchet: shared CSS lines, room skeletons, type voices.
+- **Side effects — and one measurement that did not land.**
+  - **The "repeated marks earn drawn matter" claim did not survive its own stricter test.**
+    `repeatedFigureAreaRatio` is **0 on all seventeen pages**, and the distinct-matter dimension
+    scores **100/100**. The reason: `capabilityMark(b, i, seed)` is seeded per block *and per index*,
+    so the five stamps on `saas` are structurally different drawings that merely share dimensions.
+    They look like one stamp; they are not one drawing. `docs/16 §1.3` treats them as interchangeable
+    because they repeat, and the re-score shows they are not interchangeable under a definition that
+    ignores captions. The fingerprinting is still worth keeping — it is what catches a genuine paste —
+    but it did **not** recover the gaming it was introduced to find, and the doc's RC5 wording is
+    stronger than the evidence supports.
+  - The six open vacancies are fold-composition problems, not copy. They are now enumerated in the
+    gate by offering and section, so the count cannot grow silently:
+    `dashboard` hero 500×480 · `corporate` hero 1160×320 · `fintech` hero 1160×260 ·
+    `studio` features 960×260 · `consumer` figure 540×300 · `foundry` hero 440×360.
+  - `corporate-story`'s diligence lede was painted three times (fold, catalogue row, proof cell),
+    because the fold writes its lede from its first pillar's sentence and the catalogue/proof dedupe
+    was restricted to two site kinds. Now general to every kind.
+  - `docs/16 §1.2` is **confirmed** once the skeleton is measured with the hero and story positions
+    collapsed: **10 of 17 offerings share one eight-section tail.** Keying on `id:layout` reports
+    17/17 distinct, because the two positions that vary are in the key.
+- **Qualitative:** the pages no longer restate themselves, which was the visible half of the problem.
+  Every one of the fixes was the same shape — *one list was being rendered twice* — so the restatement
+  work removed whole classes of defect rather than instances: the interface plate used one `rows`
+  list as both its view rail and its table rows; the app shell set its view list and its row list from
+  the same capability names; cut slips and cross stamps listed *sibling* titles; the index ledger and
+  loom weave **cycled** the feature list with `idx % base.length`.
+- **Ratchet floors, pinned to measurement (2026-10-05, after the restatement work):**
+
+  | Gate | Measured | Floor asserted | Target |
+  |---|---|---|---|
+  | CSS lines shared by all 17 | 2 772 / 3 092 = **89.7%** | < 92% | per-room rhythm, M3 |
+  | Largest shared room skeleton | **10 of 17** | ≤ 10 | 2, M3 |
+  | Distinct type voices | **8 of 17**, largest group 5 | ≥ 8, group ≤ 5 | per-brief voices, M5 |
+  | Distinct font families reachable | 13 | — | 5 files loaded, M5 |
+  | Raster images per page | **0 on 16 of 17** | ≥ 3 (scores 0) | corpus median 42, M4 |
+
+  The floors are set at or above the measured value deliberately. A ratchet pinned below reality is a
+  test that cannot fail, and a test that cannot fail is how the 0.989 happened.
+- **Next weakest:** `raster-images` and `ad-photography` at **0** across every page — the largest
+  single gap to the corpus, and it is `docs/16` M4. Then `ad-fold-matter` (91): the fold's largest
+  figure owns 0.25–0.45 of the first screen where the corpus runs 0.337–1.0, and the six vacancies
+  are the same fact seen from the layout probe's side.
+
