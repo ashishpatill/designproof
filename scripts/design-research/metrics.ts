@@ -214,10 +214,58 @@ export const CRAFT_DIMENSIONS: CraftDimension[] = [
   { id: "shape-variety", label: "Section shape variety", path: "composition.shapeVariety", band: [3, 7], tolerance: 1.5, mode: "atLeast", why: "Split, grid, list, table, media — a page that makes one shape is a page nobody composed." },
   { id: "shape-repetition", label: "Repeated shape run", path: "composition.shapeRunRatio", band: [0, 0.4], tolerance: 0.2, mode: "atMost", why: "Three card grids in a row is the single most recognisable generated-page signature." },
   { id: "figure-weight", label: "Drawn matter (share of page)", path: "composition.figureAreaRatio", band: [0.05, 0.4], tolerance: 0.08, mode: "corridor", why: "Type alone is a manuscript. Diagrams, charts, and product surfaces are what a buyer looks at." },
+  /*
+   * The re-score of "drawn matter", and the reason `figure-weight` above cannot be trusted on its
+   * own. That dimension sums the boxes of every drawn node, so pasting the same stamp down the
+   * page earns it: the engine's own pages scored 0.16–0.26 on marks repeated four to six times, and
+   * an optimisation loop closing on it converges on the paste. These count *distinct* drawings —
+   * fingerprinted with the text removed, so a mark that differs only in the words inside it is the
+   * same mark — and measure the repeats separately, so they can be spent against a page.
+   *
+   * Bands are hand-set, not corpus-calibrated: `research/measurements/ref-*.json` was collected with
+   * the old probe, which fingerprinted nothing. A new id is deliberate, so `loadBands()` cannot hand
+   * these dimensions a corridor derived from a different quantity. They calibrate on the next run.
+   */
+  { id: "figure-distinct-weight", label: "Distinct drawn matter (share of page)", path: "composition.distinctFigureAreaRatio", band: [0.05, 0.4], tolerance: 0.08, mode: "corridor", why: "Matter counts once per drawing. This is what the page shows that is not a repeat of something else on it." },
+  { id: "figure-repeats", label: "Repeated-drawing share", path: "composition.repeatedFigureAreaRatio", band: [0, 0.1], tolerance: 0.1, mode: "atMost", why: "The same stamp pasted down the page is the cheapest way to look illustrated without drawing anything new." },
+  { id: "raster-images", label: "Raster images on the page", path: "composition.rasterImages", band: [1, 400], tolerance: 2, mode: "atLeast", why: "A page with no photograph and no illustration is a manuscript with boxes. The corpus median is 42 images." },
   { id: "fold-figure", label: "Drawn matter above the fold", path: "composition.foldFigureRatio", band: [0.08, 0.9], tolerance: 0.15, mode: "atLeast", why: "The fold has to show the thing, not only describe it." },
   { id: "layering", label: "Layered elements", path: "composition.layeredElements", band: [1, 40], tolerance: 4, mode: "atLeast", why: "Overlap across a boundary is depth that costs nothing in performance." },
   { id: "accent-coverage", label: "Accent coverage", path: "composition.accentAreaRatio", band: [0.002, 0.25], tolerance: 0.05, mode: "corridor", why: "Colour has to appear somewhere beyond a button, without becoming the page." },
   { id: "rule-structure", label: "Rules per screen", path: "composition.ruleDensity", band: [0.5, 12], tolerance: 3, mode: "corridor", why: "Hairline rules are how editorial pages carry structure without boxes." },
+];
+
+/**
+ * The second instrument.
+ *
+ * `CRAFT_DIMENSIONS` asks whether a page is well made. It reads populations of scalars — type sizes,
+ * contrasts, paddings, hue counts — every one of which the generator sets directly, so a page can
+ * satisfy all of them and still be assembled rather than composed. That is not a flaw in the craft
+ * dimensions; it is what they are for. It is a flaw in reading them as a quality number, and
+ * `docs/16 §1.5` is the measurement: the engine scored 0.989 on craft while its own layout audit
+ * found a 1160×320px hole in a hero.
+ *
+ * `ART_DIRECTION_DIMENSIONS` asks the other question — did someone decide anything? Each dimension
+ * is unsatisfiable by tuning a token, because each is about what the page chose to make: whether one
+ * thing owns the fold, whether the page is a sequence of distinct rooms rather than one column of
+ * bands, whether the scroll changes density, and whether the page shows matter a reader can look at
+ * rather than matter it pasted.
+ *
+ * A page has to pass both. Craft without direction is a well-set page of boxes; direction without
+ * craft is an art-directed page that overflows.
+ *
+ * Every band here is hand-set from the evidence `docs/16 §4.1` cites (corpus p10 / median / p90 for
+ * images, coverage variation, shape variety), pending a corpus run that measures them directly.
+ */
+export const ART_DIRECTION_DIMENSIONS: CraftDimension[] = [
+  { id: "ad-fold-owner", label: "Element that owns the fold", path: "composition.foldDominantShare", band: [0.18, 1], tolerance: 0.12, mode: "atLeast", why: "One image, drawing, interface, or statement at a scale nobody would call balanced. Measured: the engine's fold figures sit at 0.23–0.45." },
+  { id: "ad-fold-matter", label: "Distinct matter above the fold", path: "composition.foldDistinctFigureRatio", band: [0.15, 0.95], tolerance: 0.1, mode: "atLeast", why: "The fold has to show the thing. Corpus drawn-matter above fold runs 0.337–1.0." },
+  { id: "ad-room-variety", label: "Distinct room shapes", path: "composition.shapeVariety", band: [3, 7], tolerance: 1.5, mode: "atLeast", why: "Split, ledger, stage, stack, index, wall, quiet. A page that makes one shape is a page nobody composed." },
+  { id: "ad-room-run", label: "Longest repeated room run", path: "composition.shapeRunRatio", band: [0, 0.4], tolerance: 0.2, mode: "atMost", why: "Three bands of the same shape in a row is the recognisable signature of a generated page." },
+  { id: "ad-room-rhythm", label: "Coverage change down the scroll", path: "bands.inkVariationCoef", band: [0.35, 1.4], tolerance: 0.3, mode: "corridor", why: "How much of each screen is painted should change as you scroll. Corpus corridor is 0.447–0.96; the engine measured 0.36–0.57, i.e. below the floor on the fold." },
+  { id: "ad-distinct-matter", label: "Distinct matter on the page", path: "composition.distinctFigureAreaRatio", band: [0.08, 0.4], tolerance: 0.08, mode: "corridor", why: "Matter a reader can look at, counted once per drawing." },
+  { id: "ad-photography", label: "Photographs and illustrations", path: "composition.rasterImages", band: [3, 400], tolerance: 2, mode: "atLeast", why: "Corpus p10 is 3 images and the median is 42. A page with zero cannot be doing this." },
+  { id: "ad-repeats", label: "Repeated-drawing share", path: "composition.repeatedFigureAreaRatio", band: [0, 0.08], tolerance: 0.08, mode: "atMost", why: "One drawing pasted down the page is the cheapest way to look illustrated." },
 ];
 
 /** Score a page's flat metrics against the craft dimensions. 0..1 per dimension. */

@@ -599,9 +599,41 @@ export const PROBE = `(() => {
 
   // Drawn matter of any kind — photography, diagrams, charts, product surfaces. Counted by
   // outermost node so a diagram built from nested SVG is one figure, not forty.
+  //
+  // The area total is kept, but it is no longer the number the score reads: five copies of the
+  // same 152×97 stamp are one drawing printed five times, and a page could earn "drawn matter" by
+  // pasting the same mark down the page (measured 2026-10-05: the engine's own pages, saas 0.16,
+  // herbarium 0.20, dashboard 0.26, all of it stamps). So the drawing is fingerprinted with its
+  // text removed — a mark that differs only in the words inside it is the same drawing — and only
+  // distinct drawings are counted. Raster images are counted separately again, because a
+  // photograph and a generated diagram are different claims.
   let figureArea = 0;
   let figureCount = 0;
   let foldFigureArea = 0;
+  let distinctFigureArea = 0;
+  let distinctFigureCount = 0;
+  let foldDistinctFigureArea = 0;
+  let rasterArea = 0;
+  let rasterImages = 0;
+  let foldDominantArea = 0;
+  const seenDrawings = new Set();
+  const drawingKey = (el) => {
+    const r = el.getBoundingClientRect();
+    const clone = el.cloneNode(true);
+    // Text is the caption, not the drawing. Two figures whose only difference is the words inside
+    // them are the same figure with a different caption.
+    for (const t of Array.from(clone.querySelectorAll("text,tspan"))) t.remove();
+    // Plain concatenation, not a template literal: this probe is itself one template literal, so an
+    // unescaped dollar-brace is interpolated by esbuild instead of reaching the page.
+    const box = Math.round(r.width) + "x" + Math.round(r.height);
+    const src = box + "|" + (clone.outerHTML || "");
+    let h = 2166136261;
+    for (let i = 0; i < src.length; i += 1) {
+      h ^= src.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return box + "#" + (h >>> 0);
+  };
   try {
     const nodes = Array.from(document.querySelectorAll("img,video,canvas,picture,svg"));
     const set = new Set(nodes);
@@ -615,11 +647,26 @@ export const PROBE = `(() => {
       if (nested) continue;
       const r = m.getBoundingClientRect();
       if (r.width < 24 || r.height < 24) continue;
-      figureArea += r.width * r.height;
+      const area = r.width * r.height;
+      figureArea += area;
       figureCount += 1;
       const top = r.top + window.scrollY;
       const overlap = Math.min(top + r.height, vh) - Math.max(top, 0);
-      if (overlap > 0) foldFigureArea += overlap * Math.min(r.width, vw);
+      if (overlap > 0) {
+        const onFold = overlap * Math.min(r.width, vw);
+        foldFigureArea += onFold;
+        if (onFold > foldDominantArea) foldDominantArea = onFold;
+      }
+      if (m.tagName.toLowerCase() !== "svg") {
+        rasterArea += area;
+        rasterImages += 1;
+      }
+      const key = drawingKey(m);
+      if (seenDrawings.has(key)) continue;
+      seenDrawings.add(key);
+      distinctFigureArea += area;
+      distinctFigureCount += 1;
+      if (overlap > 0) foldDistinctFigureArea += overlap * Math.min(r.width, vw);
     }
   } catch {}
 
@@ -645,6 +692,16 @@ export const PROBE = `(() => {
     figures: figureCount,
     figureAreaRatio: round(Math.min(1, figureArea / (vw * pageH)), 4),
     foldFigureRatio: round(Math.min(1, foldFigureArea / (vw * vh)), 4),
+    distinctFigures: distinctFigureCount,
+    distinctFigureAreaRatio: round(Math.min(1, distinctFigureArea / (vw * pageH)), 4),
+    foldDistinctFigureRatio: round(Math.min(1, foldDistinctFigureArea / (vw * vh)), 4),
+    // How much of the drawn-matter figure the score ignores because the drawing is a repeat.
+    repeatedFigureAreaRatio: round(Math.min(1, (figureArea - distinctFigureArea) / (vw * pageH)), 4),
+    rasterImages,
+    rasterAreaRatio: round(Math.min(1, rasterArea / (vw * pageH)), 4),
+    // Share of the first screen owned by one drawing. Award pages name an element that owns the
+    // fold; a page whose largest figure is a twentieth of the screen has not made that decision.
+    foldDominantShare: round(Math.min(1, foldDominantArea / (vw * vh)), 4),
   };
 
   /* ---------------- shape & depth ---------------- */
