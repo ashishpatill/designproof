@@ -62,6 +62,13 @@ export function inferSiteKind(brief: DesignBrief): SiteKind {
     return "care-pathway";
   }
   if (
+    /\b(control.?plane|steer-to-finish|terminal-first|scale 5|without the ui collapsing|keel\b)\b/.test(
+      blob,
+    )
+  ) {
+    return "control-plane-oss";
+  }
+  if (
     /\b(agent.?harness|turn tape|tool permit|steer pin|done-?when|allow once|local session|harness engineer|coding agent|tiller|eval close|mid-run redirect)\b/.test(
       blob,
     )
@@ -126,7 +133,8 @@ export function analyzeFeatures(brief: DesignBrief): FeatureAnalysis {
                         : siteKind === "press-atelier" ||
                             siteKind === "lantern-path" ||
                             siteKind === "care-pathway" ||
-                            siteKind === "agent-harness"
+                            siteKind === "agent-harness" ||
+                            siteKind === "control-plane-oss"
                           ? ["nav", "hero", "features", "figure", "specimen", "story", "proof", "cta", "footer"]
                 : saasMarketingSections;
 

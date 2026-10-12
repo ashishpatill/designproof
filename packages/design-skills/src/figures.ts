@@ -3327,6 +3327,8 @@ const ORDER: Record<string, Kind[]> = {
   "care-pathway": ["care-plate", "horizon", "flow", "stack"],
   // Agent harness: permit plate owns the fold; horizon keeps scroll rhythm.
   "agent-harness": ["permit-plate", "horizon", "flow", "stack"],
+  // Control-plane OSS: HTML terminal owns the fold; horizon keeps scroll rhythm. Never permit-plate (Tiller).
+  "control-plane-oss": ["horizon", "flow", "stack", "interface"],
 };
 
 export function planFigures(input: {
@@ -3482,6 +3484,8 @@ export function planFigures(input: {
               ? ("care-plate" as Kind)
             : input.siteKind === "agent-harness"
               ? ("permit-plate" as Kind)
+            : input.siteKind === "control-plane-oss"
+              ? ("horizon" as Kind)
             : input.siteKind === "saas-marketing"
               ? ("pipeline-board" as Kind)
             : input.siteKind === "dashboard-webapp"

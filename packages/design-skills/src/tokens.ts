@@ -5,6 +5,7 @@
  * scattered through a stylesheet are the difference between a page that can be re-themed and a
  * page that has to be rewritten, and the measurement makes that difference visible.
  */
+import { contrastHex } from "./color";
 import { buildPalette } from "./palette";
 import { buildSpaceLadder, buildTypeLadder, containerFor, proseWidth } from "./scale";
 import { bodySizeFor, displaySizeFor, typeRatioFor } from "./composition";
@@ -47,6 +48,7 @@ const FAMILIES: Record<string, Family> = {
   fraunces: { name: "Fraunces", req: (w) => `Fraunces:opsz,wght@9..144,${clampRange(w, 100, 900)}` },
   newsreader: { name: "Newsreader", req: (w) => `Newsreader:opsz,wght@6..72,${clampRange(w, 200, 800)}` },
   sourceSans: { name: "Source Sans 3", req: (w) => `Source+Sans+3:wght@${clampRange(w, 200, 900)}` },
+  plexSans: { name: "IBM Plex Sans", req: (w) => `IBM+Plex+Sans:wght@${clampRange(w, 400, 700)}` },
   plexMono: { name: "IBM Plex Mono", req: () => "IBM+Plex+Mono:wght@400;500" },
   jetbrainsMono: { name: "JetBrains Mono", req: (w) => `JetBrains+Mono:wght@${clampRange(w, 100, 800)}` },
   spaceMono: { name: "Space Mono", req: () => "Space+Mono:wght@400;700" },
@@ -191,6 +193,46 @@ function motionScale(): Record<string, string> {
   };
 }
 
+/** Locked control-plane specimen palette — cool void, not Tell terracotta. */
+function keelColors() {
+  const paper = "#0e1114";
+  const ink = "#e8eef4";
+  const accent = "#3ecfbf";
+  return {
+    color: {
+      paper,
+      paperRaised: "#151a1f",
+      paperSunken: "#1c232b",
+      inverse: "#151a1f",
+      inverseInk: ink,
+      inverseInkMuted: "#8b96a3",
+      ink,
+      inkBody: ink,
+      inkSecondary: "#8b96a3",
+      inkTertiary: "#5a6570",
+      inkQuiet: "#5a6570",
+      accent,
+      accentHover: "#2a9a8f",
+      accentInk: paper,
+      accentSurface: "#163230",
+      accentBorder: "#2a9a8f",
+      border: "rgba(232,238,244,0.10)",
+      borderStrong: "rgba(232,238,244,0.18)",
+      signal: "#3d9a6a",
+      signalSurface: "#15241c",
+    },
+    contrast: {
+      headingOnPaper: contrastHex(ink, paper),
+      bodyOnPaper: contrastHex(ink, paper),
+      secondaryOnPaper: contrastHex("#8b96a3", paper),
+      tertiaryOnPaper: contrastHex("#5a6570", paper),
+      accentOnPaper: contrastHex(accent, paper),
+      inkOnAccent: contrastHex(paper, accent),
+      inkOnInverse: contrastHex(ink, "#151a1f"),
+    },
+  };
+}
+
 export function buildTokens(
   taste: TasteControls,
   siteKind: SiteKind,
@@ -198,7 +240,7 @@ export function buildTokens(
   seed = "",
 ): DesignTokens {
   const palette = buildPalette(taste.colorMood, brandAccent, seed ? `${seed}|accent` : undefined);
-  const pairing = resolvePairing(taste.aestheticLean, taste.typographyWeight, `${seed}|${siteKind}`);
+  let pairing = resolvePairing(taste.aestheticLean, taste.typographyWeight, `${seed}|${siteKind}`);
   const displayPx = displaySizeFor(siteKind, taste.aestheticLean, taste.density);
   const bodyPx = bodySizeFor(taste.density, siteKind);
   const ladder = buildTypeLadder({
@@ -209,11 +251,28 @@ export function buildTokens(
     ratio: typeRatioFor(taste.aestheticLean, taste.density),
   });
   const space = buildSpaceLadder(taste.density);
-  const radius = radiusScale(taste.roundingDepth);
-  const shadow = shadowScale(taste.roundingDepth, palette.isDark);
+  let radius = radiusScale(taste.roundingDepth);
+  const keel = siteKind === "control-plane-oss";
+  if (keel) {
+    const plex = FAMILIES.plexSans!;
+    const mono = FAMILIES.plexMono!;
+    const w = WEIGHTS[taste.typographyWeight];
+    pairing = {
+      display: plex.name,
+      body: plex.name,
+      mono: mono.name,
+      requests: Array.from(new Set([plex.req(w.display), plex.req(w.body), mono.req([400, 500])])),
+    };
+    radius = { xs: "2px", sm: "3px", md: "4px", lg: "4px", xl: "4px", pill: "999px" };
+  }
+  const shadow = shadowScale(taste.roundingDepth, keel || palette.isDark);
   const motion = motionScale();
 
-  const { contrast, isDark, ...color } = palette;
+  const { contrast, isDark: _isDark, ...paletteColor } = palette;
+  const keelLocked = keel ? keelColors() : null;
+  const color = keelLocked ? keelLocked.color : paletteColor;
+  const contrastOut = keelLocked ? keelLocked.contrast : (contrast as unknown as Record<string, number>);
+  void _isDark;
 
   // Raw scales + the semantic component layer emitted by `css.ts`.
   const SEMANTIC_ALIASES = 30;
@@ -245,7 +304,7 @@ export function buildTokens(
     sectionY: space.sectionY,
     sectionYTight: space.sectionYTight,
     gutter: space.gutter,
-    contrast: contrast as unknown as Record<string, number>,
+    contrast: contrastOut,
     declared,
   };
 }

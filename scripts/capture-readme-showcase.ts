@@ -49,6 +49,7 @@ const TEMPLATES: Array<{ key: string; fold: string }> = [
   { key: "lantern", fold: ".ds-path-plate, .ds-hero-path, .ds-hero" },
   { key: "clinic", fold: ".ds-care-plate, .ds-hero-rounds, .ds-hero" },
   { key: "harness", fold: ".ds-helm-fold, .ds-permit-plate, .ds-hero-helm" },
+  { key: "keel", fold: ".ds-keel-fold, .ds-keel-terminal, .ds-hero-keel" },
 ];
 
 const LIVE_FOLDS: Array<{ name: string; path: string; wait: string }> = [

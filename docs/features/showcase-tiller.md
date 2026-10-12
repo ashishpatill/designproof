@@ -17,13 +17,18 @@ Public specimens must read as **distinct offerings** (stacked images, motion, ar
 
 ## Remaining
 
-**Tiller missing from showcase / GitHub is still open.** Do not treat `#74` / `#75` as closing it.
+**Tiller missing from showcase / GitHub is still open.** Do not treat `#74` / `#75` as closing it. Adding Keel (`/showcase/keel`, `control-plane-oss`) does not close this gap.
 
 In-repo page + one still exist. The public gap (name on the fold, filmstrip prominence, GitHub rendering, craft reel, or all of the above) needs Ashish to name which miss. Until then, do not claim Tiller is on the public surface.
+
+## Related in-repo offering (not this gap)
+
+**Keel** = product name on the `keel` engine template (`siteKind: control-plane-oss`). Filmstrip label is “Control plane”. Route `/showcase/keel`. Marketing claim + terminal specimen — not a Tiller helm clone.
 
 ## How to verify
 
 - Local: open `/showcase` and `/showcase/harness` — helm, turn tape, permit plate; hover reel scrolls to a craft beat (not nav-only).
+- Keel (separate offering): `/showcase/keel` — claim + terminal specimen, filmstrip “Control plane”. Does not close the Tiller public gap.
 - GitHub README: Tiller cell visible without looking like a reprint of another fold.
 - Recapture: `pnpm capture:readme-showcase` · `pnpm media:webp`.
 
