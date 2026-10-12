@@ -1690,18 +1690,19 @@ export function pressSheet(
     `<rect x="${round(padX)}" y="${round(padY)}" width="${round(W - padX * 2)}" height="${round(H - padY * 2)}" fill="var(--c-paper)" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
 
+  /*
+   * One signature cell per plate, up to the sheet's eight, each lettered and named once. The cells
+   * used to cycle through the names, so a three-plate brief drew each name two or three times, cut
+   * to fourteen characters ("Registration…", "Imposition sh…"), and the head read "SIG A–H · FORME
+   * 16" with the product name again in the middle whatever the brief gave. Spare cells keep their
+   * drawn page matter and stay unnamed, so the sheet still reads as a full forme.
+   */
+  const named = features.slice(0, 8);
+  const lastSig = "ABCDEFGH"[Math.max(0, named.length - 1)] ?? "A";
   const headY = padY + 16;
   parts.push(text("PRESS SHEET", padX + 12, headY, { size: FIG_MONO_PX, fill: QUIET, mono: true }));
   parts.push(
-    text(clip(productName, 28), W / 2, headY, {
-      size: FIG_MONO_PX,
-      fill: "var(--surface-muted)",
-      mono: true,
-      anchor: "middle",
-    }),
-  );
-  parts.push(
-    text("SIG A–H · FORME 16", W - padX - 12, headY, {
+    text(named.length > 1 ? `SIG A–${lastSig}` : "SIG A", W - padX - 12, headY, {
       size: FIG_MONO_PX,
       fill: QUIET,
       mono: true,
@@ -1730,7 +1731,6 @@ export function pressSheet(
   reg(padX + 22, H / 2);
   reg(W - padX - 22, H / 2);
 
-  const base = features.length ? features : [{ title: "Signature", body: "", meta: "A" } as Block];
   const cols = role === "band" ? 4 : 3;
   const rows = 2;
   const gridTop = padY + 42;
@@ -1748,7 +1748,7 @@ export function pressSheet(
       const i = row * cols + col;
       const x = gridX + col * cellW;
       const y = gridTop + row * cellH;
-      const f = base[i % base.length]!;
+      const f = named[i];
       const sig = sigs[i] ?? String(i + 1);
       const cellPad = 5;
       const cx = x + cellPad;
@@ -1763,14 +1763,16 @@ export function pressSheet(
         `<rect x="${round(cx)}" y="${round(cy)}" width="${round(cw)}" height="20" fill="color-mix(in srgb, var(--c-accent) 16%, var(--c-paper))" opacity="0.98"/>`,
       );
       parts.push(text(`SIG ${sig}`, cx + 6, cy + 13, { size: FIG_MONO_PX, fill: ACCENT, mono: true }));
-      parts.push(
-        text(clip(f.title ?? `Plate ${sig}`, 14), cx + cw - 6, cy + 13, {
-          size: FIG_MONO_PX,
-          fill: QUIET,
-          mono: true,
-          anchor: "end",
-        }),
-      );
+      if (f?.title) {
+        parts.push(
+          text(clip(f.title, Math.max(14, Math.floor((cw - 56) / 6.8))), cx + cw - 6, cy + 13, {
+            size: FIG_MONO_PX,
+            fill: QUIET,
+            mono: true,
+            anchor: "end",
+          }),
+        );
+      }
 
       const pageTop = cy + 24;
       const pageAreaH = ch - 30;

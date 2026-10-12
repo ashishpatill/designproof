@@ -1110,7 +1110,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Archive is not here: its entry essay groups the entries by priority and carries no Note labels.
     // Field guide neither: its voucher key sorts the traits by priority and carries no Note labels.
     // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
-    const noteKinds = ["loom", "press", "lantern", "clinic"] as const;
+    // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
+    const noteKinds = ["loom", "lantern", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;

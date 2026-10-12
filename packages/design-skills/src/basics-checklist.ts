@@ -659,19 +659,25 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-press-masthead/.test(html)
           && /ds-sig-rail/.test(html)
           && /data-figure="press-sheet"/.test(html)
-          && /ds-gather/.test(html)
-          && /class="ds-gather-stack"/.test(html)
-          && /aria-label="Signature stack"/.test(html)
-          && /class="ds-gather-forme"/.test(html)
-          && /class="ds-gather-densito"/.test(html)
+          // The gather groups the plates by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || (
+            /ds-gather/.test(html)
+            && /class="ds-gather-stack"/.test(html)
+            && /aria-label="Signature stack"/.test(html)
+            && /class="ds-gather-forme"/.test(html)
+            && /class="ds-gather-densito"/.test(html)
+          ))
           && !/class="ds-gather-aside"/.test(html)
+          // No drawing on every forme, and no figure band or specimen band under the index.
+          && !/class="ds-gather-mark"/.test(html)
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && !/class="ds-range-ladder"/.test(html)
           && !/aria-label="Dichotomous key"/.test(html)
           && /Pressroom/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Press offerings use press fold + signature rail + press sheet + overlapping forme stack + densitometer + Pressroom — no pricing, no metrics theatre, zero inverse bands.",
+      "Press offerings use press fold + signature rail + press sheet naming each plate once + overlapping forme stack grouping the plates by priority + densitometer + Pressroom — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-lantern",

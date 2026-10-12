@@ -666,9 +666,20 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    * or observatory instruments. Registration-framed fold + press-sheet owning the fold
    * + signature rail + overlapping forme stack with densitometer + Pressroom close are craft
    * a theme pack will not invent from taste controls.
+   *
+   * The page used to follow the press fold with an index of bare names (four of them on a six-plate
+   * brief, whatever the brief gave) beside a "how it is put together" list that named them again, a
+   * figure band that set the names twice more beside a "cost · cumulative" chart of made-up values,
+   * a specimen band of bare names, and a gather essay that printed every description again with the
+   * name over each one. The press sheet itself cycled the names through all eight of its cells, so
+   * a three-plate brief drew each name two or three times. A five-plate brief named its lead plate
+   * eleven times. The sheet now names each plate once, the index holds every description once, and
+   * the formes in the gather group the plates by the priority the brief gives, so they say
+   * something the index does not.
    */
   if (siteKind === "press-atelier") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-press", surface: "paper", columns: split.wide });
+    // Plate index — every plate, lettered like the press sheet's signatures, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -676,24 +687,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Gather — one forme per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-gather",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
     });
     // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
     // No shared marquee-proof — overlapping forme stack is the press proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
