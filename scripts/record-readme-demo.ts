@@ -279,6 +279,17 @@ async function loadReport(page: Page) {
   }
 }
 
+async function implicitCreateCoda(page: Page) {
+  await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+  await injectDemoChrome(page);
+  await setCaption(page, "Create", "Describe the site. Tell matches the niche, routes research, and renders a preview.");
+  await page.getByRole("button", { name: /Create a site/i }).click();
+  await page.getByLabel(/Design brief|site to create/i).fill("B2B SaaS demo landing warmer editorial");
+  await page.keyboard.press("Control+Enter");
+  await page.getByTestId("site-create-frame").waitFor({ timeout: 30_000 });
+  await pause(page, 2400);
+}
+
 async function studioCoda(page: Page) {
   await page.goto(`${BASE}/studio`, { waitUntil: "domcontentloaded" });
   await injectDemoChrome(page);
@@ -415,6 +426,7 @@ async function main() {
     await hideTitle(page);
 
     await loadReport(page);
+    await implicitCreateCoda(page);
     await studioCoda(page);
     await showcaseCoda(page);
 

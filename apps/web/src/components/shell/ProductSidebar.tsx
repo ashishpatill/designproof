@@ -1,15 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { FolderKanban, Home, Settings, Sparkles, Maximize2, Minimize2, X } from "lucide-react";
+import {
+  FolderKanban,
+  Home,
+  Settings,
+  Maximize2,
+  Minimize2,
+  Sparkles,
+  X,
+} from "lucide-react";
 import type { WorkspaceTab } from "./WorkspaceTabsBar";
 
 export type ProductNavId = "home" | "showcase" | "studio";
 
 /**
  * Single app chrome: left sidebar only.
- * Features: Diagnose (home), Showcase, Studio.
- * Specimens / templates are not listed here — they live on /showcase.
+ * Features: Home (diagnose + implicit create), Studio (authoring controls), Showcase (specimens).
+ * Home creates a site implicitly from a free-text brief; Studio stays for the explicit
+ * DesignControls surface and deep links.
  */
 export function ProductSidebar({
   active,

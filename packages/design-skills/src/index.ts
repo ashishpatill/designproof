@@ -19,6 +19,8 @@ export type {
   DesignFromFeaturesAuthorOptions,
   DesignFromFeaturesOptions,
 } from "./orchestrate";
+export { briefFromFreeText } from "./brief-from-text";
+export type { FreeTextBriefPlan } from "./brief-from-text";
 export {
   GeminiContentAuthor,
   DeterministicContentAuthor,

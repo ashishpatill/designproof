@@ -328,6 +328,37 @@ async function main() {
       if (attr !== lean) throw new Error(`lean UI mismatch: wanted ${lean}, got ${attr}`);
     }
 
+    // ── Implicit create (Home) ──────────────────────────────────────
+    // Free-text create runs implicitly from Home. Studio (above) keeps the
+    // explicit DesignControls surface; both paths hit the same API.
+    for (const query of [
+      "B2B SaaS demo landing for pipeline coaching",
+      "dashboard workspace for ops priority queue",
+      "corporate story site for clarity for teams",
+      "educational docs site for placement model",
+    ]) {
+      const res = await request.post(`${BASE}/api/design`, {
+        data: { query },
+      });
+      if (!res.ok()) throw new Error(`create query failed: ${query}`);
+      const body = await res.json();
+      if (!body.previewHtml || !body.plan?.steps?.length) {
+        throw new Error(`create query incomplete: ${query}`);
+      }
+      if (!body.spec?.routedSkills?.length) throw new Error(`create missing skills: ${query}`);
+    }
+
+    await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+    await page.getByTestId("product-sidebar").waitFor();
+    await page.getByRole("button", { name: /Create a site/i }).click();
+    await page.getByLabel(/Design brief|site to create/i).fill(
+      "B2B SaaS demo landing for pipeline — warmer editorial",
+    );
+    await page.keyboard.press("Control+Enter");
+    await page.getByTestId("create-site-steps").waitFor({ timeout: 10_000 });
+    await page.getByTestId("site-create-frame").waitFor({ timeout: 30_000 });
+    await frameHas(page, "site-create-frame", "Northstar");
+
     // Showcases pages
     for (const [path, needle, id, extra] of [
       ["/showcase/saas", "Account scoring", "showcase-saas", "ds-brand-mark"],

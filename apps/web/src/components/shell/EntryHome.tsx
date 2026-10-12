@@ -11,7 +11,7 @@ import { svgSessionThumb } from "@/lib/session-thumb";
 // (see composer-brand-denylist.ts). Starters must be Tell specimens only.
 
 const MODES: { id: ComposerMode; label: string; icon: typeof PenLine }[] = [
-  { id: "design", label: "Design brief", icon: PenLine },
+  { id: "design", label: "Create a site", icon: PenLine },
   { id: "url", label: "Live URL", icon: ImageIcon },
   { id: "github", label: "GitHub", icon: Github },
   { id: "offline", label: "Offline fixture", icon: FileCode2 },
@@ -46,7 +46,7 @@ export function EntryHome({
 }) {
   const placeholder =
     mode === "design"
-      ? "Describe what you want to design — warmer editorial booking site, less shadow…"
+      ? "Describe the site to create — B2B SaaS demo landing, warmer editorial, less shadow…"
       : mode === "github"
         ? "github.com/owner/repo"
         : mode === "offline"
@@ -64,6 +64,8 @@ export function EntryHome({
         <h1 className="tell-home__title">What do you want to design?</h1>
         <p className="tell-home__sub">
           Name the product story. Shape the surface with Tell-owned controls — never third-party brands.
+          Create a site from a brief — Tell matches niche, runs research routing, and shows a preview before you
+          touch anything. Or paste a live URL to diagnose tells.
         </p>
       </div>
 
