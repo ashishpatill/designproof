@@ -499,19 +499,22 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-folio-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const chapterHrefs = ["#features", "#figure", "#story", "#proof", "#cta"];
-    const chapters = (section.aside.length ? section.aside : section.blocks.slice(0, 5))
+    /*
+     * Chapter rail: one link per instrument, jumping to its index row. It used to point at
+     * #figure / #story / #proof bands that either reprinted every description or no longer exist,
+     * and the masthead printed "Vol. XII" / "Issue 03" on every product, a pottery studio's
+     * included.
+     */
+    const chapters = (section.aside.length ? section.aside : section.blocks)
       .map((b, i) => {
-        const href = chapterHrefs[i] ?? "#features";
-        return `<li><a href="${href}"><span class="ds-chapter-rail-num">${String(i + 1).padStart(2, "0")}</span><span class="ds-chapter-rail-label">${esc(b.title)}</span></a></li>`;
+        const n = String(i + 1).padStart(2, "0");
+        return `<li><a href="#instrument-${esc(n)}"><span class="ds-chapter-rail-num">${n}</span><span class="ds-chapter-rail-label">${esc(b.title)}</span></a></li>`;
       })
       .join("");
     const rail = chapters
       ? `<nav class="ds-chapter-rail" aria-label="Briefing chapters"><ol>${chapters}</ol></nav>`
       : "";
     const mast = `<header class="ds-folio-masthead" aria-label="Folio masthead">
-      <span class="ds-folio-vol">Vol. XII</span>
-      <span class="ds-folio-issue">Issue 03</span>
       <span class="ds-folio-date">Briefing folio</span>
       <span class="ds-folio-mark">${esc(spec.brief.productName)}</span>
     </header>`;
@@ -1306,9 +1309,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Press rows carry their description too: the press sheet names the plates and prints no sentence.
         spec.brief.siteKind === "art-directed-studio" ||
         spec.brief.siteKind === "consumer-craft" ||
-        // Observatory rows carry their description too: the fold prints none.
-        // Foundry rows as well: the ladder on the fold names the cuts and prints no sentence.
-        spec.brief.siteKind === "research-dossier" ||
+        // Dossier rows carry their description too: the fold prints none (removed from quietIndex).
         spec.brief.siteKind === "commerce-loom" ||
         // Field guide rows carry their description too: the fold prints none.
         spec.brief.siteKind === "lantern-path" ||
@@ -1328,6 +1329,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Dossier rows are the chapter rail's jump targets.
+      const isDossier = spec.brief.siteKind === "research-dossier";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,7 +1344,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
-                      : ""
+                      : isDossier
+                        ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                        : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1488,7 +1493,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Dossier too: the list beside the drawing named every instrument again, right under the index.
+    spec.brief.siteKind !== "research-dossier"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1616,7 +1623,7 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "dashboard-webapp" ||
     spec?.brief.siteKind === "archive-index" ||
     spec?.brief.siteKind === "commerce-loom" ||
-    spec?.brief.siteKind === "research-dossier" ||
+    // Dossier priorities name their instruments in the chapter body, so they are not quiet.
     spec?.brief.siteKind === "lantern-path" ||
     spec?.brief.siteKind === "signal-observatory" ||
     spec?.brief.siteKind === "editorial-foundry" ||
@@ -1628,9 +1635,11 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     <div class="ds-wrap-wide">
       ${
         // Educational chapters are priority tiers too, not "4 beats · editorial order".
+        // Dossier likewise: the chapters are priority tiers, not editorial beats.
         spec?.brief.siteKind === "art-directed-studio" ||
         spec?.brief.siteKind === "corporate-story" ||
-        spec?.brief.siteKind === "docs-educational"
+        spec?.brief.siteKind === "docs-educational" ||
+        spec?.brief.siteKind === "research-dossier"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1642,11 +1651,21 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-              ${figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : ""}
+              ${
+                // Dossier tiers are not instruments, so instrument i's drawing does not belong on tier i.
+                figures.marks[i] && spec?.brief.siteKind !== "research-dossier"
+                  ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
+                  : ""
+              }
             </li>`,
           )
           .join("")}
-      </ol>
+      </ol>${
+        spec?.brief.siteKind === "research-dossier"
+          ? `
+      ${storyFillSlab(section.blocks.map((b) => b.title))}`
+          : ""
+      }
     </div>
   </section>`;
 }
@@ -3121,7 +3140,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "research-dossier"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

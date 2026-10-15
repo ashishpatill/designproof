@@ -8,6 +8,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Research dossier template says each thing once
+
+- The research dossier page drops the figure band (a "cost · cumulative" chart with made-up values under "how X maps a briefing", which named the instruments twice more) and the specimen band, which printed every description again under "X field plate". It goes from nine sections to seven: first screen, one index, the priorities, questions, closing, footer.
+- Each instrument description is printed once, in the index. Before, the first screen printed the lead description under the headline, the index printed bare names (three or four of them, whatever the brief gave) under "instruments a capital brief actually uses" and "not a dashboard dressed as research", beside a "how it is put together" list that named them again, the specimen band printed every description, and the verso/recto spread printed them a third time as "Step 01" under "how a brief is actually read". The index now holds every instrument, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, instrument by instrument").
+- The first screen names each instrument once, on the dossier plate and in the chapter rail. The rail used to point at #figure / #story / #proof bands; it now jumps to each index row. The masthead no longer prints "Vol. XII" / "Issue 03" on every product. The plate no longer says "1 briefing unit" or "· dossier plate".
+- The priorities group the instruments by the priority the brief gives (core, supporting, additional). With a single priority the section is left out.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Start the Kilnroom brief with kiln calendar." and "Four more instruments sit in the index above." The buttons read "Open the brief" and "Read all five instruments". The menu reads Instruments, Priorities, Questions. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 309 to 100. New styles sit only in the dossier motion-signature block. New test: `packages/design-skills/src/__tests__/dossier-template-once.test.ts`.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.

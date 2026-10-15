@@ -1193,27 +1193,35 @@ export function dossierPlate(
     );
   }
 
-  const pins = features.slice(0, Math.min(5, features.length));
+  /*
+   * Pins (Design Expert, 15 Oct): the coordinate and name sat a cell up and to the right, so "H2 Thesis
+   * map" read as cell I1's label, two pins could share a cell, and labels ran over the shape edges.
+   * Now every instrument gets its own cell and one label beside its own dot, numbered like the index
+   * and the rail ("01 Thesis map"), on a paper chip so no outline runs through the text.
+   */
+  const used = new Set<string>();
+  const pins = features.slice(0, Math.min(features.length, (cols - 2) * (rows - 2)));
   pins.forEach((f, i) => {
-    const col = 1 + Math.floor(r() * (cols - 2));
-    const row = 1 + Math.floor(r() * (rows - 2));
+    let col = 1 + Math.floor(r() * (cols - 2));
+    let row = 1 + Math.floor(r() * (rows - 2));
+    // One pin per cell, and never the same row as a pin in the next column (labels would collide).
+    for (let tries = 0; tries < 40 && (used.has(`${col},${row}`) || used.has(`${col - 1},${row}`) || used.has(`${col + 1},${row}`) || used.has(`${col - 2},${row}`) || used.has(`${col + 2},${row}`)); tries++) {
+      col = 1 + Math.floor(r() * (cols - 2));
+      row = 1 + Math.floor(r() * (rows - 2));
+    }
+    used.add(`${col},${row}`);
     const x = padX + cellW * (col + 0.5);
     const y = padY + cellH * (row + 0.5);
-    const coord = `${letters[col]}${row + 1}`;
+    const label = `${String(i + 1).padStart(2, "0")} ${clip(f.title, 18)}`;
+    const tw = label.length * 6.7 + 10;
+    const right = x + 10 + tw <= W - padX;
+    const lx = right ? x + 10 : x - 10 - tw;
     parts.push(`<circle cx="${round(x)}" cy="${round(y)}" r="5" fill="${ACCENT}" stroke="var(--surface-bg)" stroke-width="1.5"/>`);
     parts.push(
-      `<line x1="${round(x)}" y1="${round(y)}" x2="${round(x + cellW * 0.85)}" y2="${round(y - cellH * 0.55)}" stroke="${ACCENT}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-    );
-    const lx = x + cellW * 0.9;
-    const ly = y - cellH * 0.6;
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(lx)}" y="${round(ly)}" font-size="11" fill="var(--surface-muted)">${esc(coord)}</text>`,
+      `<rect x="${round(lx)}" y="${round(y - 9)}" width="${round(tw)}" height="18" rx="2" fill="var(--surface-bg)" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
     parts.push(
-      `<text class="ds-fig-mono" x="${round(lx)}" y="${round(ly + 14)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(f.title, 18))}</text>`,
-    );
-    parts.push(
-      `<text class="ds-fig-mono" x="${round(x)}" y="${round(y + 18)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">${String(i + 1).padStart(2, "0")}</text>`,
+      `<text class="ds-fig-mono" x="${round(lx + 5)}" y="${round(y + 4)}" font-size="11" fill="var(--surface-muted)">${esc(label)}</text>`,
     );
   });
 
@@ -1228,18 +1236,20 @@ export function dossierPlate(
   parts.push(
     `<line x1="${round(scaleX + cellW * 1.5)}" y1="${round(scaleY - 4)}" x2="${round(scaleX + cellW * 1.5)}" y2="${round(scaleY + 4)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
+  /*
+   * No "1 briefing unit" and no "· dossier plate" foot. Both reached every dossier page, a pottery
+   * studio's included, and no brief declares a briefing unit or that this drawing is a dossier plate.
+   */
   parts.push(
-    `<text class="ds-fig-mono" x="${round(scaleX + cellW * 1.65)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)">1 briefing unit</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 28))} · dossier plate</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 28))}</text>`,
   );
 
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "dossier-plate",
-    label: `${productName} dossier plate`,
+    // Product name only. "dossier plate" reached every aria-label, a pottery studio's included.
+    label: productName,
     inset: role === "band" ? BLEED_INSET : 0,
   });
 }
