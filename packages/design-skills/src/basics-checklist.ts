@@ -606,14 +606,14 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-hero-drawloom/.test(html)
           && /ds-shed/.test(html)
           && /ds-weft-pick/.test(html)
-          && /ds-shuttle/.test(html)
-          && /ds-fell/.test(html)
-          && /ds-treadles/.test(html)
+          // No shuttle, fell label, or treadle strip: they crossed the headline or said the lines twice.
+          && !/class="[^"]*\b(ds-shuttle|ds-fell|ds-treadles|ds-weft-thread)\b/.test(html)
           && /data-figure="loom-weave"/.test(html)
           // The hangtags group the lines by priority, so a single-priority brief has none.
           && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || (
             /ds-hangtag/.test(html)
-            && /class="ds-hang-tape"/.test(html)
+            // One tier display: hangtags, no tape strip above them.
+            && !/class="ds-hang-tape"/.test(html)
             && /aria-label="Care tag stack"/.test(html)
             && /class="ds-hang-stack"/.test(html)
           ))
@@ -625,7 +625,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Loom offerings use shed-threaded weft + shuttle + fell + treadles + loom weave naming each line once + care-tag stack grouping the lines by priority + Care label — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
+      "Loom offerings use a clear weft headline (no threads through it) + photo-less loom tiles naming each line once + care-tag stack (no tier tape) grouping the lines by priority + Care label — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-field",

@@ -142,7 +142,7 @@ describe("merchandising loom template says each thing once", () => {
     }
   });
 
-  it("names each line once on the cloth, once in the index, once on its hangtag, and the lead once more in the close", async () => {
+  it("names each line once on the cloth, once in the index, and the lead once more in the close; hangtags give numbers", async () => {
     for (const brief of briefs) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         // The sample's own sentences use its names ("Bottom size treadles that land you …"), so
@@ -151,10 +151,10 @@ describe("merchandising loom template says each thing once", () => {
         for (const f of brief.features) text = text.split(f.description.toLowerCase()).join(" ");
         const cloth = clothOf(html);
         for (const [i, f] of brief.features.entries()) {
-          // Cloth, index, and hangtag, plus the close for the lead. It was up to eleven. "Care
+          // Cloth and index, plus the close for the lead; hangtags cite line numbers. It was up to eleven. "Care
           // label" is also the close's own label on every loom page.
           const label = f.name.toLowerCase() === "care label" ? 1 : 0;
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe((i === 0 ? 4 : 3) + label);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe((i === 0 ? 3 : 2) + label);
           expect(cloth.split(`>${f.name}<`).length - 1, `${brief.productName} cloth: ${f.name}`).toBe(1);
         }
       }
@@ -198,16 +198,17 @@ describe("merchandising loom template says each thing once", () => {
       const labels = [...cloth.matchAll(/<text[^>]*>([^<]+)<\/text>/g)].map((m) => m[1]!);
       const shown = brief.features.slice(0, 6);
       // Only the cells with a line carry a number and a name, in the brief's order.
-      expect(labels.filter((l) => /^Line \d\d$/.test(l))).toEqual(shown.map((_, i) => `Line ${num(i)}`));
+      // Tiles carry their number ("01") and name; no "Line 01" tab text, no photos, no spare tiles.
+      expect(labels.filter((l) => /^\d\d$/.test(l))).toEqual(shown.map((_, i) => num(i)));
+      expect(cloth).not.toContain("<image");
+      expect(labels).not.toContain("Shuttle");
       expect(labels.filter((l) => brief.features.some((f) => f.name === l))).toEqual(shown.map((f) => f.name));
       expect(labels).toContain(`Lines 01–${num(shown.length - 1)}`);
       expect(labels).not.toContain(brief.productName);
       expect(labels.some((l) => /^Sku /.test(l) || /free textile stock/.test(l) || /loom weave/.test(l))).toBe(false);
-      // The treadles and the beam count the lines the brief gives.
-      const rail = previewHtml.match(/<nav class="ds-tape-rail ds-treadles"[\s\S]*?<\/nav>/)?.[0] ?? "";
-      const hrefs = [...rail.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
-      expect(hrefs).toEqual(shown.map((_, i) => `#line-${num(i)}`));
-      expect(rail).not.toMatch(/data-size="X?X?[SML]"/);
+      // No treadle tab strip (a second "Line 01–05"), no "Fell" word, no threads through the headline.
+      expect(fold).not.toMatch(/ds-treadles|ds-fell|ds-shuttle|ds-weft-thread|<svg class="ds-shed"/);
+      expect(fold).not.toContain(">Fell<");
       const beam = previewHtml.match(/<header class="ds-loom-beam"[\s\S]*?<\/header>/)?.[0] ?? "";
       expect(beam).toContain(`Lines 01–${num(shown.length - 1)}`);
       expect(beam).not.toContain("Shed · warp × weft");
@@ -220,16 +221,17 @@ describe("merchandising loom template says each thing once", () => {
     expect(story?.eyebrow).toBe("Priorities");
     expect(story?.title).toBe("Which Kilnroom lines come first.");
     expect(story?.blocks.map((b) => [b.title, b.body, b.meta, b.points])).toEqual([
-      ["Core", "Kiln calendar and glaze library.", "I", ["01", "02"]],
-      ["Supporting", "Member shelves and clay orders.", "II", ["03", "04"]],
-      ["Additional", "Class roster.", "III", ["05"]],
+      ["Core", "Kilnroom starts here.", "I", ["01", "02"]],
+      ["Supporting", "Open these once the core lines are in use.", "II", ["03", "04"]],
+      ["Additional", "Kept on hand alongside the rest.", "III", ["05"]],
     ]);
     const html = sectionOf(previewHtml, "story");
     expect(html).toContain("3 tiers");
     const notes = [...html.matchAll(/<p class="ds-hang-note">([\s\S]*?)<\/p>/g)].map((m) => m[1]!.replace(/<[^>]+>/g, ""));
     expect(notes).toEqual(["Lines 01, 02", "Lines 03, 04", "Line 05"]);
-    const tape = [...html.matchAll(/<span class="ds-hang-tape-title">([^<]*)<\/span>/g)].map((m) => m[1]);
-    expect(tape).toEqual(["2 lines", "2 lines", "1 line"]);
+    // Hangtags only: no tier tape strip saying the tiers again.
+    expect(html).not.toContain('class="ds-hang-tape"');
+    for (const f of briefs[3]!.features) expect(html).not.toContain(`>${f.name}`);
     const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
     expect(hrefs).toEqual(["#line-01", "#line-02", "#line-03", "#line-04", "#line-05"]);
     expect(html).not.toContain('class="ds-hang-mark"');

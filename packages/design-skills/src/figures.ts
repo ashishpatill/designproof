@@ -2935,57 +2935,40 @@ export function loomWeave(
     );
   }
 
-  // Shuttle path — unreplicable loom craft (theme packs do not invent a flying shuttle).
-  const shuttleY = fieldY + fieldH * 0.48;
-  parts.push(
-    `<path d="M ${round(fieldX + 8)} ${round(shuttleY)} C ${round(fieldX + fieldW * 0.35)} ${round(shuttleY - 18)}, ${round(fieldX + fieldW * 0.65)} ${round(shuttleY + 18)}, ${round(fieldX + fieldW - 8)} ${round(shuttleY)}" fill="none" stroke="${ACCENT}" stroke-width="1" opacity="0.55" vector-effect="non-scaling-stroke"/>`,
-  );
-  parts.push(
-    `<ellipse cx="${round(fieldX + fieldW * 0.62)}" cy="${round(shuttleY + 2)}" rx="14" ry="5" fill="none" stroke="${ACCENT}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(fieldX + fieldW * 0.62)}" y="${round(shuttleY - 10)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">Shuttle</text>`,
-  );
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const x = fieldX + col * (cellW + gap);
-      const y = fieldY + row * (cellH + gap);
-      const idx = row * cols + col;
-      const f = named[idx];
-      const photo = photos[idx % photos.length]!;
-      const clipId = `loom-clip-${idx}`;
-      parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}"/></clipPath></defs>`);
-      parts.push(
-        `<image href="${photo}" x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})" opacity="0.92"/>`,
-      );
-      // Weft rule under photo.
-      parts.push(
-        `<rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-      parts.push(
-        `<line x1="${round(x)}" y1="${round(y + cellH * 0.72)}" x2="${round(x + cellW)}" y2="${round(y + cellH * 0.72)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-      if (f?.title) {
-        parts.push(
-          `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH * 0.72 + 14)}" font-size="11" fill="var(--surface-quiet)">Line ${lineNo(idx)}</text>`,
-        );
-        parts.push(
-          `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="var(--surface-muted)">${esc(
-            clip(f.title, Math.max(18, Math.floor((cellW - 12) / 6.8))),
-          )}</text>`,
-        );
-      }
-      // Accent pin on lead cell.
-      if (idx === 0) {
-        parts.push(
-          `<rect x="${round(x + cellW - 10)}" y="${round(y + 6)}" width="4" height="4" fill="${ACCENT}" opacity="0.85"/>`,
-        );
-      }
-      void r; // seed reserved for future weave jitter without rule flood
-    }
-  }
-
+  /*
+   * Tiles (Design Expert, 15 Oct): photo-less, one per line, numbered and named once. Three stock
+   * photos cycled through six cells, so tiles 01 and 04 showed the same shirt, and the third photo
+   * drew as an empty grey tile; spare cells sat empty too. The shuttle path ran through the names.
+   */
+  void photos;
+  void cols;
+  void rows;
+  const tiles = named.length;
+  const tCols = Math.min(3, Math.max(1, tiles));
+  const tRows = Math.max(1, Math.ceil(tiles / tCols));
+  const tW = (fieldW - gap * (tCols - 1)) / tCols;
+  const tH = Math.min(cellH, (fieldH - gap * (tRows - 1)) / tRows);
+  named.forEach((f, idx) => {
+    const col = idx % tCols;
+    const row = Math.floor(idx / tCols);
+    const x = fieldX + col * (tW + gap);
+    const y = fieldY + row * (tH + gap);
+    parts.push(
+      `<rect x="${round(x)}" y="${round(y)}" width="${round(tW)}" height="${round(tH)}" fill="var(--surface-bg)" stroke="${idx === 0 ? ACCENT : LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+    );
+    parts.push(
+      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + 44)}" font-size="28" fill="${idx === 0 ? ACCENT : "var(--surface-quiet)"}">${lineNo(idx)}</text>`,
+    );
+    parts.push(
+      `<line x1="${round(x)}" y1="${round(y + tH - 34)}" x2="${round(x + tW)}" y2="${round(y + tH - 34)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+    );
+    parts.push(
+      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + tH - 13)}" font-size="11" fill="var(--surface-muted)">${esc(
+        clip(f.title, Math.max(18, Math.floor((tW - 24) / 6.8))),
+      )}</text>`,
+    );
+  });
+  void r;
 
   return frame(parts.join(""), {
     width: W,

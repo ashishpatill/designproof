@@ -1396,8 +1396,15 @@ export function buildSections(
               blocks: tiers.map((t, i) =>
                 block({
                   title: t.tier,
-                  // The lines keep their own case after the first.
-                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  // Said by what the tier is for, not by its line names again (Design Expert, 15 Oct):
+                  // the index names every line once, and the note below gives their numbers.
+                  body: sentence(
+                    t.tier === "Core"
+                      ? `${brief.productName} starts here`
+                      : t.tier === "Supporting"
+                        ? `Open these once the core ${t.names.length === 1 ? "line is" : "lines are"} in use`
+                        : `Kept on hand alongside the rest`,
+                  ),
                   // The tag gives each line's number in the index, not its name again.
                   points: t.at,
                   // Tiers take roman numerals so they never read as a line number.

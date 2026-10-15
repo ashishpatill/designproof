@@ -647,7 +647,8 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     }
     if (line) picks.push(line);
     const weftPicks = picks
-      .map((p, i) => `<span class="ds-weft-pick" style="--pick:${i}"><span class="ds-weft-thread" aria-hidden="true"></span><span class="ds-weft-ink">${esc(p)}</span></span>`)
+      // No weft thread: it drew a rule through and under the headline (Design Expert, 15 Oct).
+      .map((p, i) => `<span class="ds-weft-pick" style="--pick:${i}"><span class="ds-weft-ink">${esc(p)}</span></span>`)
       .join("");
     const warpCount = 28;
     const warpEnds = Array.from({ length: warpCount }, (_, i) => {
@@ -672,6 +673,15 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       )
       .join("")}</ol></nav>`;
     const span = lines > 1 ? `Lines 01–${nums[nums.length - 1]}` : "Line 01";
+    /*
+     * No "Fell" label, no shuttle, and no treadle strip (Design Expert, 15 Oct): the label was a stray
+     * word under the button, the shuttle and weft threads ran through the headline, and the treadles
+     * were a second "Line 01–05" tab strip under the cloth's own numbered tiles.
+     */
+    void shuttle;
+    void shed;
+    void fell;
+    void treadles;
     const reed = `<div class="ds-reed" aria-hidden="true">${Array.from({ length: 32 }, (_, i) => `<span class="ds-reed-tooth" style="--i:${i}"></span>`).join("")}</div>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-loom ds-hero-drawloom" data-surface="${section.surface}" data-section="${esc(section.id)}">
       <div class="ds-drawloom">
@@ -683,7 +693,6 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
         ${reed}
         <div class="ds-drawloom-stage">
           <div class="ds-shed-stage">
-            ${shed}
             <div class="ds-weft-claim">
               <p class="ds-brand-mark">${esc(spec.brief.productName)}</p>
               ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
@@ -691,12 +700,9 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
               ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
               ${actions(section)}
             </div>
-            ${shuttle}
           </div>
-          ${fell}
           <div class="ds-drawloom-cloth">${loomFig}</div>
         </div>
-        ${treadles}
       </div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
@@ -1904,6 +1910,8 @@ function renderHangtag(section: SectionSpec): string {
       </li>`;
     })
     .join("");
+  // One tier display: the hangtags. The tape strip above them said the tiers a second time.
+  void tape;
   const tags = blocks
     .map((b, i) => {
       const num = esc(b.meta ?? String(i + 1));
@@ -1923,7 +1931,6 @@ function renderHangtag(section: SectionSpec): string {
     <div class="ds-wrap-wide">
       ${secMeta("Hangtag", `${tiers} tiers`)}
       ${sectionHead(section, 2, true)}
-      <ol class="ds-hang-tape" aria-label="Lines per tier">${tape}</ol>
       <div class="ds-hang-stack" aria-label="Care tag stack">${tags}</div>
       ${
         // One drawn page per line, numbered like the index. Three wide tier pages drew their text
