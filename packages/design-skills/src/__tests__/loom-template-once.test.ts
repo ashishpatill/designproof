@@ -318,4 +318,35 @@ describe("merchandising loom template says each thing once", () => {
     );
     expect(html).not.toMatch(/<meta name="description" content="[^"]*(commerce-loom|sections built from)/);
   });
+
+  it("draws half-height tiles with the number in big type and each line's own drawing from its index row", () => {
+    for (const brief of briefs) {
+      const html = designFromFeatures(brief).previewHtml;
+      const cloth = clothOf(html);
+      const box = cloth.match(/viewBox="[-\d.]+ 0 ([\d.]+) ([\d.]+)"/)!;
+      // Was 1280 x 720 with ~290-unit tiles; the cloth is now no taller than its two half-height rows.
+      expect(Number(box[2]), brief.productName).toBeLessThanOrEqual(440);
+      const nums = [...cloth.matchAll(/<text class="ds-fig-mono ds-loom-num"[^>]*font-size="(\d+)"[^>]*>(\d+)</g)];
+      expect(nums.map((m) => m[2])).toEqual(brief.features.slice(0, 6).map((_, i) => num(i)));
+      for (const m of nums) expect(Number(m[1])).toBeGreaterThanOrEqual(40);
+      // The 11px loom label rule must not catch the tile numbers.
+      expect(html).toMatch(/text\.ds-fig-mono:not\(\.ds-loom-num\)\{font-size:11px!important\}/);
+      expect(html).not.toMatch(/\[data-sitekind="commerce-loom"\] text\.ds-fig-mono\{font-size:11px!important\}/);
+      const features = sectionOf(html, "features");
+      const rowMarks = [...features.matchAll(/<div class="ds-index-mark" aria-hidden="true"><svg[^>]*>([\s\S]*?)<\/svg><\/div>/g)].map((m) => m[1]);
+      const tileMarks = [...cloth.matchAll(/<g class="ds-loom-mark" data-line="(\d+)"[^>]*>([\s\S]*?)<\/g>(?=<line)/g)];
+      expect(tileMarks.length, brief.productName).toBe(Math.min(6, brief.features.length));
+      for (const [i, m] of tileMarks.entries()) {
+        expect(m[1]).toBe(num(i));
+        expect(m[2], `${brief.productName} tile ${num(i)}`).toBe(rowMarks[i]);
+      }
+    }
+  });
+
+  it("leaves no forced height between the cloth and the line index", () => {
+    const html = designFromFeatures(briefs[1]!).previewHtml;
+    expect(html).toMatch(/\[data-sitekind="commerce-loom"\] \.ds-loom-plate \.ds-fig\{min-height:0\}/);
+    expect(html).toMatch(/\[data-sitekind="commerce-loom"\] \.ds-hero-loom\{min-height:0;/);
+    expect(html).toMatch(/\[data-sitekind="commerce-loom"\] \.ds-drawloom-stage\{grid-template-rows:auto auto auto;padding-bottom:0\}/);
+  });
 });

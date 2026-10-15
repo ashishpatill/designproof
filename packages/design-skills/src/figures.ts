@@ -2867,7 +2867,11 @@ export function loomWeave(
 ): string {
   const r = rng(`${seed}:loom-weave:${role}`);
   const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
-  const H = role === "band" ? 720 : role === "column" ? 520 : 480;
+  /*
+   * Half-height tiles (Design Expert, 15 Oct, round 2): the cloth is as tall as its two tile rows
+   * need, so tall empty boxes no longer read as images that failed to load.
+   */
+  const H = role === "band" ? 432 : role === "column" ? 360 : 330;
   const padX = role === "band" ? 40 : 24;
   const padY = role === "band" ? 36 : 24;
   const parts: string[] = [];
@@ -2953,17 +2957,28 @@ export function loomWeave(
     const row = Math.floor(idx / tCols);
     const x = fieldX + col * (tW + gap);
     const y = fieldY + row * (tH + gap);
+    const barY = y + tH - 30;
     parts.push(
       `<rect x="${round(x)}" y="${round(y)}" width="${round(tW)}" height="${round(tH)}" fill="var(--surface-bg)" stroke="${idx === 0 ? ACCENT : LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
+    // The number in big type: classed ds-loom-num so the loom's 11px label rule does not shrink it.
+    const numSize = Math.round(Math.min(56, (barY - y) * 0.62));
     parts.push(
-      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + 44)}" font-size="28" fill="${idx === 0 ? ACCENT : "var(--surface-quiet)"}">${lineNo(idx)}</text>`,
+      `<text class="ds-fig-mono ds-loom-num" x="${round(x + 16)}" y="${round(y + 12 + numSize * 0.8)}" font-size="${numSize}" fill="${idx === 0 ? ACCENT : "var(--surface-ink, currentColor)"}">${lineNo(idx)}</text>`,
+    );
+    // The line's own small drawing, the same one its row in "The lines" carries further down.
+    const markH = Math.max(24, barY - y - 20);
+    const markW = Math.min(markH * (220 / 140), tW * 0.45);
+    const k = markW / 220;
+    const inner = capabilityMark(f, idx, seed).replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+    parts.push(
+      `<g class="ds-loom-mark" data-line="${lineNo(idx)}" transform="translate(${round(x + tW - markW - 12)} ${round(y + (barY - y - 140 * k) / 2)}) scale(${round(k)})">${inner}</g>`,
     );
     parts.push(
-      `<line x1="${round(x)}" y1="${round(y + tH - 34)}" x2="${round(x + tW)}" y2="${round(y + tH - 34)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+      `<line x1="${round(x)}" y1="${round(barY)}" x2="${round(x + tW)}" y2="${round(barY)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
     parts.push(
-      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + tH - 13)}" font-size="11" fill="var(--surface-muted)">${esc(
+      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + tH - 11)}" font-size="11" fill="var(--surface-muted)">${esc(
         clip(f.title, Math.max(18, Math.floor((tW - 24) / 6.8))),
       )}</text>`,
     );

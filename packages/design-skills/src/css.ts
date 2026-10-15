@@ -1261,10 +1261,13 @@ body[data-sitekind="commerce-loom"]{
 [data-sitekind="commerce-loom"] .ds-hang-size{
   font-family:var(--f-mono);font-size:11px;letter-spacing:0.08em;text-transform:none;color:var(--c-accent);
 }
-[data-sitekind="commerce-loom"] .ds-fig text.ds-fig-mono,
-[data-sitekind="commerce-loom"] text.ds-fig-mono{font-size:11px!important}
-[data-sitekind="commerce-loom"] .ds-loom-plate .ds-fig{min-height:min(56vh,560px)}
-[data-sitekind="commerce-loom"] .ds-hero-loom{min-height:min(100vh,960px);padding-bottom:var(--treadle-h)}
+[data-sitekind="commerce-loom"] .ds-fig text.ds-fig-mono:not(.ds-loom-num),
+[data-sitekind="commerce-loom"] text.ds-fig-mono:not(.ds-loom-num){font-size:11px!important}
+[data-sitekind="commerce-loom"] text.ds-loom-num{letter-spacing:-0.02em}
+/* The cloth is as tall as its tiles: no forced figure, fold or treadle height (round 2 gap fix). */
+[data-sitekind="commerce-loom"] .ds-loom-plate .ds-fig{min-height:0}
+[data-sitekind="commerce-loom"] .ds-hero-loom{min-height:0;padding-bottom:var(--s-lg,2rem)}
+[data-sitekind="commerce-loom"] .ds-drawloom-stage{grid-template-rows:auto auto auto;padding-bottom:0}
 [data-sitekind="commerce-loom"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
 [data-sitekind="commerce-loom"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="commerce-loom"] .ds-closing-colophon{
