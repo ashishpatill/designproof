@@ -871,12 +871,11 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           spec.brief.siteKind !== "research-dossier"
           && spec.brief.siteKind !== "archive-index"
           && spec.brief.siteKind !== "commerce-loom"
-          && spec.brief.siteKind !== "agent-harness"
+          // Harness priorities are three short rows with no vacancy; the grey thumbnail strip that
+          // filled it said nothing and was cut.
           || /class="ds-story-fill"/.test(html)
           // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
           || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
-          // Harness likewise: priorities are left out on a single-priority brief.
-          || (spec.brief.siteKind === "agent-harness" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),

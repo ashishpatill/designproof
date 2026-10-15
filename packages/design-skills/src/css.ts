@@ -1788,7 +1788,6 @@ body[data-sitekind="agent-harness"]{
 [data-sitekind="agent-harness"] .ds-helm-claim .ds-hero-aside,
 [data-sitekind="agent-harness"] .ds-helm-claim .ds-hero-facts{display:none}
 [data-sitekind="agent-harness"] .ds-helm-field{margin-top:0}
-[data-sitekind="agent-harness"] .ds-permit-plate .ds-fig{min-height:min(58vh,640px)}
 [data-sitekind="agent-harness"] .ds-hero-helm{min-height:min(100vh,900px)}
 [data-sitekind="agent-harness"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
 [data-sitekind="agent-harness"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
@@ -1803,7 +1802,7 @@ body[data-sitekind="agent-harness"]{
   font-family:var(--f-mono);font-size:11px;letter-spacing:0.08em;
 }
 @media (max-width:900px){
-  [data-sitekind="agent-harness"] .ds-helm-fold{grid-template-columns:1fr}
+  [data-sitekind="agent-harness"] .ds-helm-body{grid-template-columns:1fr}
   [data-sitekind="agent-harness"] .ds-steer-pin{position:static}
 }
 
@@ -3652,14 +3651,17 @@ ${surfaceRules()}
 }
 .ds-helm-session,.ds-helm-locale{color:var(--c-accent)}
 .ds-helm-product{color:var(--c-ink);letter-spacing:0.08em}
-.ds-helm-claim{padding-inline:var(--gutter)}
-.ds-helm-fold{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(12rem,28%);
-  gap:0;align-items:start;padding-inline:var(--gutter);padding-bottom:var(--s-lg);
+/* Claim left, steer pin in the open space right of it; tape + plate span below. */
+.ds-helm-body{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(12rem,16rem);
+  column-gap:var(--s-lg);align-items:end;padding-inline:var(--gutter);
 }
+.ds-helm-claim{grid-column:1;min-width:0}
+.ds-helm-body > .ds-steer-pin{grid-column:2;grid-row:1}
+.ds-helm-fold{grid-column:1 / -1;min-width:0;padding-top:var(--s-sm);padding-bottom:var(--s-lg)}
 .ds-helm-main{min-width:0;display:flex;flex-direction:column;gap:0}
 .ds-turn-rail{
-  height:88px;max-height:88px;overflow:hidden;
+  min-height:88px;
   border:1px solid var(--c-border);border-bottom:0;
   background:var(--c-paper);
 }
@@ -3681,19 +3683,16 @@ ${surfaceRules()}
 .ds-turn-id{color:var(--c-accent);letter-spacing:0.1em}
 .ds-turn-tag{text-transform:uppercase;letter-spacing:0.12em;color:var(--c-ink-tertiary);font-size:11px}
 .ds-turn-beat.is-current .ds-turn-tag{color:var(--c-accent)}
-.ds-turn-label{
-  overflow:hidden;color:var(--c-ink-secondary);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-}
+/* Turn labels wrap to two lines; the tape grows to fit instead of trailing off with "…". */
+.ds-turn-label{color:var(--c-ink-secondary);overflow-wrap:anywhere}
 .ds-turn-beat.is-current .ds-turn-label{color:var(--c-ink)}
 .ds-helm-field{margin:0}
 .ds-permit-plate{margin:0;width:100%;display:block;border:1px solid var(--c-border);border-top:0}
-.ds-permit-plate .ds-fig{width:100%;min-height:min(58vh,640px);display:block}
+.ds-permit-plate .ds-fig{width:100%;height:auto;display:block}
 .ds-steer-pin{
-  position:sticky;top:calc(var(--nav-h,4.5rem) + var(--s-sm));
-  align-self:start;margin-left:var(--s-md);
-  padding:var(--s-md);border:1px solid var(--c-border);background:var(--c-paper);
-  min-height:12rem;
+  position:sticky;top:calc(var(--nav-h,4.5rem) + var(--s-sm));z-index:2;
+  align-self:start;margin:var(--s-sm) 0 0;
+  padding:var(--s-sm) var(--s-md);border:1px solid var(--c-border);background:var(--c-paper);
 }
 .ds-steer-kicker{
   margin:0 0 var(--s-sm);font-family:var(--f-mono);font-size:11px;letter-spacing:0.14em;
@@ -3709,8 +3708,8 @@ ${surfaceRules()}
   background:color-mix(in srgb,var(--c-accent) 22%,transparent);
 }
 @media (max-width:900px){
-  .ds-helm-fold{grid-template-columns:1fr;padding-inline:var(--gutter)}
-  .ds-steer-pin{position:static;margin:var(--s-md) 0 0}
+  .ds-helm-body{grid-template-columns:1fr}
+  .ds-helm-body > .ds-steer-pin{grid-column:1;grid-row:auto;position:static;margin:var(--s-md) 0 0}
   .ds-turn-rail{height:auto;max-height:none}
   .ds-turn-rail ol{grid-template-columns:1fr;height:auto}
   .ds-turn-beat{border-right:0;border-bottom:1px solid var(--c-border)}

@@ -1373,9 +1373,13 @@ export function buildSections(
           )
             .map(([priority, tier]) => ({
               tier,
-              names: features.filter((f) => f.priority === priority).map((f) => f.name),
+              // Index numbers, not names: the index above already names every instrument once.
+              nums: features
+                .map((f, i) => [f, String(i + 1).padStart(2, "0")] as const)
+                .filter(([f]) => f.priority === priority)
+                .map(([, n]) => n),
             }))
-            .filter((t) => t.names.length);
+            .filter((t) => t.nums.length);
           if (tiers.length < 2) break;
           sections.push(
             SectionSpec.parse({
@@ -1386,7 +1390,7 @@ export function buildSections(
               blocks: tiers.map((t, i) =>
                 block({
                   title: t.tier,
-                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  body: sentence(`${t.nums.length === 1 ? "Instrument" : "Instruments"} ${spoken(t.nums)}`),
                   meta: String(i + 1).padStart(2, "0"),
                 }),
               ),

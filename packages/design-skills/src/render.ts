@@ -912,15 +912,21 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
         .map((c) => `<li><span class="ds-steer-mark" aria-hidden="true"></span><span>${esc(c)}</span></li>`)
         .join("")}</ul>
     </aside>`;
+    /*
+     * The steer pin sits in the open space right of the headline, above the tape, and stays sticky
+     * from there. It used to sit on top of the turn tape and the permit plate.
+     */
     return `<section id="top" class="ds-section ds-hero ds-hero-helm" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${mast}
-      <div class="ds-helm-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-helm-fold">
-        <div class="ds-helm-main">
-          ${rail}
-          <div class="ds-bleed ds-helm-field">${plateFig}</div>
-        </div>
+      <div class="ds-helm-body">
+        <div class="ds-helm-claim">${copy}</div>
         ${pin}
+        <div class="ds-helm-fold">
+          <div class="ds-helm-main">
+            ${rail}
+            <div class="ds-helm-field">${plateFig}</div>
+          </div>
+        </div>
       </div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
@@ -1458,7 +1464,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   const rail =
     spec.taste.aestheticLean === "system-crafted" &&
     spec.brief.siteKind !== "dashboard-webapp" &&
-    spec.brief.siteKind !== "fintech-marketing"
+    spec.brief.siteKind !== "fintech-marketing" &&
+    // Harness too: radius, body size and contrast chips are design notes, not page content.
+    spec.brief.siteKind !== "agent-harness"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1649,16 +1657,17 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-              ${figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : ""}
+              ${
+                // Harness tiers are not instruments: instrument i's drawing does not belong on tier i
+                // (row 02 showed the fuel log's lines, row 03 the crew list's branches).
+                figures.marks[i] && spec?.brief.siteKind !== "agent-harness"
+                  ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
+                  : ""
+              }
             </li>`,
           )
           .join("")}
-      </ol>${
-        spec?.brief.siteKind === "agent-harness"
-          ? `
-      ${storyFillSlab(section.blocks.map((b) => b.title))}`
-          : ""
-      }
+      </ol>
     </div>
   </section>`;
 }

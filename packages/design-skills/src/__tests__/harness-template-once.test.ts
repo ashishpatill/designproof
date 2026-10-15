@@ -133,16 +133,16 @@ describe("agent harness template says each thing once", () => {
     }
   });
 
-  it("names each instrument once in the index and once in the priorities, and the lead once more in the close", async () => {
+  it("names each instrument once in the index, and the lead once more in the close (priorities cite numbers)", async () => {
     for (const brief of briefs.slice(1)) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         const text = visible(html);
         for (const [i, f] of brief.features.entries()) {
-          // Index and priorities in the page text, plus the close for the lead.
+          // Index in the page text, plus the close for the lead. Priorities cite index numbers.
           // The fold's permit plate may borrow the lead's first word as a TOOL label — that is craft,
           // not a second catalogue reprint of the instrument name as a row.
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 3 : 2);
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 5 : 3);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 2 : 1);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 4 : 2);
         }
       }
     }
@@ -192,10 +192,39 @@ describe("agent harness template says each thing once", () => {
     expect(story?.eyebrow).toBe("Priorities");
     expect(story?.title).toBe("Which Kilnroom instruments to open first.");
     expect(story?.blocks.map((b) => [b.title, b.body])).toEqual([
-      ["Core", "Kiln calendar and glaze library."],
-      ["Supporting", "Member shelves and clay orders."],
-      ["Additional", "Class roster."],
+      ["Core", "Instruments 01 and 02."],
+      ["Supporting", "Instruments 03 and 04."],
+      ["Additional", "Instrument 05."],
     ]);
+  });
+
+  it("applies the #98 design review: wrapped tape, pin beside the headline, plate fit to content, no filler", () => {
+    for (const brief of briefs) {
+      const { previewHtml } = designFromFeatures(brief);
+      const fold = sectionOf(previewHtml, "hero");
+      // FINISH WHEN pin sits in the claim row, before the tape and the plate, not over them.
+      const body = fold.indexOf('class="ds-helm-body"');
+      const pin = fold.indexOf("data-steer-pin");
+      expect(body, brief.productName).toBeGreaterThan(-1);
+      expect(pin).toBeGreaterThan(fold.indexOf('class="ds-helm-claim"'));
+      expect(pin).toBeLessThan(fold.indexOf('class="ds-helm-fold"'));
+      expect(previewHtml).toMatch(/\.ds-steer-pin\{\s*position:sticky/);
+      // Turn labels wrap: no clamp, and the tape has no fixed height that would cut them.
+      expect(previewHtml).not.toMatch(/\.ds-turn-label\{[^}]*line-clamp/);
+      expect(previewHtml).not.toMatch(/\.ds-turn-rail\{[^}]*max-height:88px/);
+      // Permit plate: no full-bleed wrapper, no bleed inset, drawn to its content height.
+      expect(fold).not.toMatch(/class="[^"]*ds-bleed ds-helm-field/);
+      const vb = plateOf(previewHtml).match(/viewBox="([-\d.]+) 0 ([\d.]+) ([\d.]+)"/);
+      expect(vb, brief.productName).toBeTruthy();
+      expect(Number(vb![1])).toBe(0);
+      expect(Number(vb![3])).toBeLessThan(520);
+      expect(previewHtml).not.toMatch(/\.ds-permit-plate \.ds-fig\{[^}]*min-height/);
+      // Token chips, priorities drawings, and the grey thumbnail strip are gone.
+      expect(previewHtml).not.toContain('class="ds-token-rail"');
+      const story = sectionOf(previewHtml, "story");
+      expect(story).not.toContain("ds-chapter-mark");
+      expect(previewHtml).not.toContain('class="ds-story-fill"');
+    }
   });
 
   it("leaves the priorities out when the brief gives a single priority, and still clears the basics", () => {
