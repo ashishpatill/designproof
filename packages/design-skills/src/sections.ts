@@ -2152,11 +2152,8 @@ export function buildSections(
                     title: "Evaluate",
                     points: ["How it works", "What is included", "Questions", "Security review", "Talk to us"],
                   }),
-                  block({ title: "Company", points: ["About", "Customers", "Careers", "Press", "Contact"] }),
-                  block({
-                    title: "Trust",
-                    points: ["Security", "Availability", "Data handling", "Subprocessors", "Status"],
-                  }),
+                  // No Company or Trust column: About, Customers, Careers, Press, Subprocessors and
+                  // Status are pages no brief gives, so the footer only links sections on this page.
                 ],
           }),
         );
