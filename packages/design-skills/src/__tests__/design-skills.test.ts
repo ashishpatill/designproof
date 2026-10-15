@@ -380,7 +380,8 @@ describe("measured craft floors", () => {
   it("gives every site kind a long enough argument and enough named parts", () => {
     for (const [name, brief] of Object.entries(SHOWCASE_BRIEFS)) {
       const { spec, previewHtml } = designFromFeatures(brief);
-      expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(7);
+      // Consumer cut its order-of-use band (detail names grouped again), so it runs one section shorter.
+      expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(name === "consumer" ? 6 : 7);
       const headings = (previewHtml.match(/<h[1-4][\s>]/g) ?? []).length;
       expect(headings, `${name} headings`).toBeGreaterThanOrEqual(16);
       expect(new Set(spec.sections.map((s) => s.surface)).size, `${name} surfaces`).toBeGreaterThanOrEqual(3);
@@ -588,8 +589,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "feature-alternating")).toBe(true);
-    // The order of use stays; the step chart and specimen went, because they reprinted every detail.
-    expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
+    // The order of use, step chart, and specimen all went, because each reprinted the detail names.
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(false);
     expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBeLessThanOrEqual(1);

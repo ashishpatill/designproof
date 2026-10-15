@@ -101,9 +101,9 @@ const INVENTED = [
 ];
 
 describe("consumer craft template says each thing once", () => {
-  it("draws the fold, one register, the order of use, questions, and the close", () => {
+  it("draws the fold, one register, questions, and the close, with no order of use", () => {
     const { spec } = designFromFeatures(sample);
-    expect(spec.sections.map((s) => s.id)).toEqual(["nav", "hero", "features", "story", "faq", "cta", "footer"]);
+    expect(spec.sections.map((s) => s.id)).toEqual(["nav", "hero", "features", "faq", "cta", "footer"]);
     expect(spec.sections.some((s) => ["specimen", "figure", "metrics", "proof"].includes(s.kind))).toBe(false);
   });
 
@@ -132,16 +132,23 @@ describe("consumer craft template says each thing once", () => {
     }
   });
 
-  it("orders use by the priority the brief gives", () => {
-    const { spec } = designFromFeatures(briefs[3]!);
-    const story = spec.sections.find((s) => s.kind === "story");
-    expect(story?.eyebrow).toBe("Order of use");
-    expect(story?.title).toBe("The order Kilnroom is used.");
-    expect(story?.blocks.map((b) => [b.title, b.body])).toEqual([
-      ["First", "Kiln calendar and glaze library."],
-      ["Next", "Member shelves and clay orders."],
-      ["Alongside", "Class roster."],
-    ]);
+  it("cuts the order of use on every brief, because its rows were only the detail names again", () => {
+    for (const brief of briefs) {
+      const { spec, previewHtml } = designFromFeatures(brief);
+      expect(spec.sections.some((s) => s.kind === "story")).toBe(false);
+      expect(visible(previewHtml)).not.toContain("order of use");
+      // Every in-page link lands on a section that exists.
+      for (const [, id] of previewHtml.matchAll(/href="#([\w-]+)"/g)) expect(previewHtml, `${brief.productName} #${id}`).toContain(`id="${id}"`);
+    }
+  });
+
+  it("gives the fold its own sentence, not the lead detail's description", () => {
+    for (const brief of briefs) {
+      const { spec } = designFromFeatures(brief);
+      const hero = spec.sections.find((s) => s.kind === "hero")!;
+      for (const f of brief.features) expect(hero.body.toLowerCase()).not.toContain(f.description.toLowerCase().slice(0, 30));
+      expect(hero.body.startsWith(`${brief.productName} is made for `)).toBe(true);
+    }
   });
 
   it("leaves the order of use out when the brief gives a single priority, and still clears the basics", () => {
@@ -176,7 +183,7 @@ describe("consumer craft template says each thing once", () => {
     expect(cta?.body).toBe("Four more details sit in the list above.");
     expect([cta?.ctaLabel, cta?.secondaryLabel]).toEqual(["Order yours", "Read all five details"]);
     const nav = spec.sections.find((s) => s.kind === "nav");
-    expect(nav?.navItems.map((n) => n.label)).toEqual(["Details", "Priorities", "Questions"]);
+    expect(nav?.navItems.map((n) => n.label)).toEqual(["Details", "Questions"]);
   });
 
   it("carries no fold note on the authored path", async () => {

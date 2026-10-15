@@ -803,6 +803,18 @@ export function studioQuestions(brief: DesignBrief, features: FeatureSpec[]): Ar
 }
 
 /**
+ * Consumer fold lede. It was the lead detail's description, so the subtitle read as one feature
+ * ("Incoming boat requests sorted by urgency…") instead of saying what the product is. Its own
+ * sentence now: the product, who it is for, and how many details the page names.
+ */
+export function consumerLede(brief: DesignBrief, features: FeatureSpec[]): string {
+  const n = features.length;
+  return sentence(
+    `${brief.productName} is made for ${lower(brief.audience)}${n > 1 ? `, and the ${count(n)} details below are the whole of it` : ""}`,
+  );
+}
+
+/**
  * Consumer questions. Every answer is built from this brief: its product, its audience, and its
  * detail names. The shared `questions` it used promised "cancel anytime", a comparison table the
  * page never draws, a result in "one session" on the reader's data, a person who answers

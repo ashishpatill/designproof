@@ -29,6 +29,7 @@ import {
   fintechQuestions,
   studioQuestions,
   consumerQuestions,
+  consumerLede,
   corporateQuestions,
   archiveQuestions,
   educationalQuestions,
@@ -345,7 +346,10 @@ export function buildSections(
   const navItems =
     packNav ??
     navFor(
-      plan.map((p) => ({ kind: p.kind, id: p.id })),
+      // Consumer draws no order-of-use band, so the menu carries no link to it.
+      plan
+        .filter((p) => !(brief.siteKind === "consumer-craft" && p.kind === "story"))
+        .map((p) => ({ kind: p.kind, id: p.id })),
       brief.siteKind,
     );
   const editorial = editorialize(features);
@@ -451,7 +455,9 @@ export function buildSections(
                 )
               : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress
                 ? ""
-                : heroLede(brief, editorial.heroLines),
+                : brief.siteKind === "consumer-craft"
+                  ? consumerLede(brief, features)
+                  : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             // Foundry: one button on the fold. "See the cuts" sat on the fold and again in the close.
@@ -597,7 +603,9 @@ export function buildSections(
          * Workspace catalogue is the one home for each description too. The only row left bare is
          * the one whose sentence the fold already printed as its lede.
          */
-        const foldLede = normTitle(heroLede(brief, editorial.heroLines)).replace(/[.!?]+$/, "");
+        const foldLede = normTitle(
+          brief.siteKind === "consumer-craft" ? consumerLede(brief, features) : heroLede(brief, editorial.heroLines),
+        ).replace(/[.!?]+$/, "");
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
@@ -1100,40 +1108,11 @@ export function buildSections(
           break;
         }
         /*
-         * Consumer: the chapters were the capability names again as "Step 01" under "A day with X"
-         * and "From morning pack to evening empty — what you actually do with it", lines written for
-         * one sample bag and printed on every consumer page. Now each chapter is one priority from
-         * the brief and names its details once. With a single priority there is no order to show,
-         * so the section is left out.
+         * Consumer: no order-of-use section. Its rows were only the detail names grouped by tier
+         * ("First: One-bag day and quiet hardware"), the same names the register and priorities
+         * already give, and a brief carries no steps to describe them with. Cut, not reworded.
          */
-        if (brief.siteKind === "consumer-craft") {
-          const groups = (
-            [
-              ["p0", "First"],
-              ["p1", "Next"],
-              ["p2", "Alongside"],
-            ] as const
-          )
-            .map(([priority, label]) => ({ label, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
-            .filter((g) => g.names.length);
-          if (groups.length < 2) break;
-          sections.push(
-            SectionSpec.parse({
-              ...base,
-              eyebrow: "Order of use",
-              title: sentence(`The order ${brief.productName} is used`),
-              body: "",
-              blocks: groups.map((g, i) =>
-                block({
-                  title: g.label,
-                  body: sentence(spoken(g.names.map((n, j) => (j === 0 ? n : lower(n))))),
-                  meta: String(i + 1).padStart(2, "0"),
-                }),
-              ),
-            }),
-          );
-          break;
-        }
+        if (brief.siteKind === "consumer-craft") break;
         /*
          * Corporate: the chapters were every capability name again under "language, principles,
          * outcomes, posture — the diligence path in order", a line written for one sample product
