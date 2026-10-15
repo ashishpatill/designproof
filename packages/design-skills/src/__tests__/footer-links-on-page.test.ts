@@ -49,7 +49,7 @@ function checkPage(html: string, siteKind: string) {
   const footer = footerOf(html);
   const body = html.replace(footer, "");
   for (const label of BANNED_LABELS) expect(footer).not.toMatch(new RegExp(`>\\s*${label}\\s*<`));
-  for (const [, label, id] of footer.matchAll(/<a [^>]*href="#([^"]+)"[^>]*>([^<]*)<\/a>/g).map((m) => [m[0], m[2]!.trim(), m[1]!] as const)) {
+  for (const [, label, id] of [...footer.matchAll(/<a [^>]*href="#([^"]+)"[^>]*>([^<]*)<\/a>/g)].map((m) => [m[0], m[2]!.trim(), m[1]!] as const)) {
     const t = target(body, id);
     expect(t, `${label} → #${id}: target id missing`).toBeTruthy();
     expect(t!.tag, `${label} → #${id}: target hidden`).not.toMatch(/\shidden[\s>=]|aria-hidden="true"|display:\s*none|visibility:\s*hidden/);
