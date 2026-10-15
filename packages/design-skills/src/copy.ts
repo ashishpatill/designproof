@@ -212,10 +212,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "care-pathway") {
+      /*
+       * No fold note. "Walkthroughs ship with stage maps and handoff beads — not a demo theatre"
+       * reached every care-pathway page through the authored path, a marina's and a pottery studio's
+       * included, and the fold already shows the care rail and care-plate. The buttons say what the
+       * page is: the chart, and the rounds on it.
+       */
       return {
-        primary: "Request a chart walkthrough",
-        secondary: "Read the pathway",
-        note: "Walkthroughs ship with stage maps and handoff beads — not a demo theatre.",
+        primary: "Chart the pathway",
+        secondary: "See every round",
+        note: "",
       };
     }
     if (siteKind === "agent-harness") {
@@ -1029,6 +1035,36 @@ export function pressQuestions(brief: DesignBrief, features: FeatureSpec[]): Arr
   return out;
 }
 
+/**
+ * Care-pathway questions. Every answer is built from this brief: its product, its audience, and its
+ * round names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, "no hidden tier", and that every capability ships "from day one". No brief declares any
+ * of those. The rounds ladder is its own section, so no answer here repeats which rounds come first.
+ * The approval question stays only when the brief itself declares an approval step.
+ */
+export function clinicQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} pathway for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which round handles approvals?`,
+      body: sentence(`${features[at]!.name}, encounter ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} pathway?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} rounds`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1218,6 +1254,13 @@ export function navFor(
   sections: Array<{ kind: string; id: string }>,
   siteKind?: string,
 ): Array<{ label: string; href: string }> {
+  if (siteKind === "care-pathway") {
+    return [
+      { label: "Pathway", href: "#top" },
+      { label: "Rounds", href: "#features" },
+      { label: "Chart", href: "#cta" },
+    ];
+  }
   if (siteKind === "agent-harness") {
     return [
       { label: "Session", href: "#top" },
@@ -1266,7 +1309,9 @@ export function navFor(
                 // Press: the index is headed "The plates", so the menu calls it "Plates".
                 : siteKind === "press-atelier"
                   ? "Plates"
-                  : "Capabilities",
+                  : siteKind === "care-pathway"
+                    ? "Rounds"
+                    : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1279,7 +1324,8 @@ export function navFor(
               siteKind === "field-guide" ||
               siteKind === "signal-observatory" ||
               siteKind === "editorial-foundry" ||
-              siteKind === "press-atelier"
+              siteKind === "press-atelier" ||
+                siteKind === "care-pathway"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

@@ -563,6 +563,16 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="care-pathway"] .ds-care-imprint{transition:opacity 420ms var(--m-ease-out),transform 420ms var(--m-ease-out)}
   [data-sitekind="care-pathway"] .ds-handoff-cell{transition:opacity 420ms var(--m-ease-out),transform 420ms var(--m-ease-out)}
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="care-pathway"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="care-pathway"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="care-pathway"] .ds-index-row > p{max-width:42ch;min-width:0}
+@media (max-width: 40rem){
+  [data-sitekind="care-pathway"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "agent-harness": `
 @keyframes ds-helm-in{from{opacity:0;transform:translateY(0.8rem)}to{opacity:1;transform:none}}

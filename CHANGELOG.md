@@ -8,6 +8,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Care pathway (clinic) template says each thing once
+
+- The care pathway page drops the figure band (a "cost · cumulative" chart with made-up values under "how X maps a care pathway", which named the rounds twice more) and the specimen band, which printed every name again under "X chart field". It goes from nine sections to seven: first screen, one index, the rounds ladder (priorities), questions, closing, footer.
+- Each round description is printed once, in the index. Before, the handoff strip printed bare names (three or four of them, whatever the brief gave) under "stages a care pathway actually keeps" and "not a SaaS pipeline dressed as care", beside a "how it is put together" list that named them again, and the round-notes essay printed every description a second time as "Enc 01 Intake" under "how a care pathway is actually walked". The index now holds every round, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, round by round").
+- The rounds fold keeps the sticky care rail (Intake→Discharge), the care-plate pathway spine, and the Chart close. The fold prints no lead description and no walkthrough/demo-theatre note.
+- The rounds ladder groups the rounds by the priority the brief gives (core, supporting, additional). Each rung names its rounds once and points at encounter numbers in the index ("2 rounds · Enc 01, 02"). With a single priority the ladder is left out; Intake→Discharge craft stays on the fold's care rail.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Chart the Kilnroom pathway with kiln calendar." and "Four more rounds sit in the index above." The buttons read "Chart the pathway" and "Read all five rounds". The menu stays Pathway / Rounds / Chart. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 299 to 116. New styles sit only in the care-pathway motion-signature block. New test: `packages/design-skills/src/__tests__/clinic-template-once.test.ts`.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.
