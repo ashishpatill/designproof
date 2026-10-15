@@ -2879,16 +2879,23 @@ export function loomWeave(
     `<rect x="${round(padX)}" y="${round(padY)}" width="${round(W - padX * 2)}" height="${round(H - padY * 2)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
 
-  // Header — LOOM + product (mono ≤11px).
+  /*
+   * One cell per line, up to the cloth's six, each numbered and named once. The cells used to cycle
+   * through the names, so a three-line brief drew each name twice, under a "Loom · warp × weft" head
+   * with the product name again in the middle, made-up SKU numbers ("Sku 100") in every cell, and a
+   * foot that named the product a third time beside "6 cells · free textile stock", whatever the
+   * brief gave. Spare cells keep their photo and stay unnamed, so the cloth still reads as woven.
+   */
+  const named = features.slice(0, 6);
+  const lineNo = (i: number) => String(i + 1).padStart(2, "0");
   const headY = padY + 14;
   parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Loom · warp × weft</text>`,
+    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Loom</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W / 2)}" y="${round(headY)}" font-size="11" fill="var(--surface-muted)" text-anchor="middle">${esc(clip(productName, 28))}</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">Size tape</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${
+      named.length > 1 ? `Lines 01–${lineNo(named.length - 1)}` : "Line 01"
+    }</text>`,
   );
   parts.push(
     `<line x1="${round(padX)}" y1="${round(headY + 8)}" x2="${round(W - padX)}" y2="${round(headY + 8)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
@@ -2918,7 +2925,6 @@ export function loomWeave(
   const gap = 10;
   const cellW = (fieldW - gap * (cols - 1)) / cols;
   const cellH = (fieldH - gap * (rows - 1)) / rows;
-  const base = features.length ? features : [{ title: "SKU", body: "", meta: "001" } as Block];
 
   // Warp threads behind cells (sparse — avoid rule flood).
   const warps = 7;
@@ -2946,7 +2952,7 @@ export function loomWeave(
       const x = fieldX + col * (cellW + gap);
       const y = fieldY + row * (cellH + gap);
       const idx = row * cols + col;
-      const f = base[idx % base.length]!;
+      const f = named[idx];
       const photo = photos[idx % photos.length]!;
       const clipId = `loom-clip-${idx}`;
       parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}"/></clipPath></defs>`);
@@ -2960,13 +2966,16 @@ export function loomWeave(
       parts.push(
         `<line x1="${round(x)}" y1="${round(y + cellH * 0.72)}" x2="${round(x + cellW)}" y2="${round(y + cellH * 0.72)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
       );
-      const sku = String(100 + idx).padStart(3, "0");
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH * 0.72 + 14)}" font-size="11" fill="var(--surface-quiet)">Sku ${sku}</text>`,
-      );
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f.title ?? "Line", 18))}</text>`,
-      );
+      if (f?.title) {
+        parts.push(
+          `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH * 0.72 + 14)}" font-size="11" fill="var(--surface-quiet)">Line ${lineNo(idx)}</text>`,
+        );
+        parts.push(
+          `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="var(--surface-muted)">${esc(
+            clip(f.title, Math.max(18, Math.floor((cellW - 12) / 6.8))),
+          )}</text>`,
+        );
+      }
       // Accent pin on lead cell.
       if (idx === 0) {
         parts.push(
@@ -2977,12 +2986,6 @@ export function loomWeave(
     }
   }
 
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · loom weave</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${cols * rows} cells · free textile stock</text>`,
-  );
 
   return frame(parts.join(""), {
     width: W,

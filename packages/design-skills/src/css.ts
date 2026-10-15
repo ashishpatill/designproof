@@ -473,6 +473,18 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="commerce-loom"] .ds-reveal:not(.is-in) .ds-stagger > *:nth-child(odd){transform:translate(-1.4rem,0.4rem)}
   [data-sitekind="commerce-loom"] .ds-reveal:not(.is-in) .ds-stagger > *:nth-child(even){transform:translate(1.4rem,0.4rem)}
 }
+
+/* Hangtags are one priority tier each now, a name list and a note, with no drawing under them.
+   The shared overlap was sized for tags that carried a description and a drawing, and on these
+   shorter tags it hid the next tag's eyelet and tier numeral under the one above. */
+[data-sitekind="commerce-loom"] .ds-hang-tag + .ds-hang-tag{margin-top:-1.6rem}
+[data-sitekind="commerce-loom"] .ds-hang-note a{color:inherit;text-underline-offset:0.2em}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which runs the next row's rule through the last line of a description on a phone. */
+[data-sitekind="commerce-loom"] .ds-index-row:nth-child(n){margin-block:0}
+@media (max-width:820px){
+  [data-sitekind="commerce-loom"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "field-guide": `
 @keyframes ds-field-in{from{opacity:0;transform:translateY(2.1rem) scale(0.97)}to{opacity:1;transform:none}}

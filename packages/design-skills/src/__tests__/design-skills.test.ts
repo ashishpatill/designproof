@@ -1257,7 +1257,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Field guide neither: its voucher key sorts the traits by priority and carries no Note labels.
     // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
     // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
-    const noteKinds = ["loom", "lantern", "clinic"] as const;
+    // Loom neither: its hangtags group the lines by priority and carry no Note labels or marks.
+    const noteKinds = ["lantern", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;

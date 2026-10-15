@@ -610,16 +610,22 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-fell/.test(html)
           && /ds-treadles/.test(html)
           && /data-figure="loom-weave"/.test(html)
-          && /ds-hangtag/.test(html)
-          && /class="ds-hang-tape"/.test(html)
-          && /aria-label="Care tag stack"/.test(html)
-          && /class="ds-hang-stack"/.test(html)
+          // The hangtags group the lines by priority, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || (
+            /ds-hangtag/.test(html)
+            && /class="ds-hang-tape"/.test(html)
+            && /aria-label="Care tag stack"/.test(html)
+            && /class="ds-hang-stack"/.test(html)
+          ))
           && !/class="ds-hang-aside"/.test(html)
+          // No drawing on every tag, and no figure band or specimen band under the index.
+          && !/class="ds-hang-mark"/.test(html)
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && /Care label/.test(html)
           && /ds-bleed-rule/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Loom offerings use shed-threaded weft + shuttle + fell + treadles + loom weave + care-tag stack + Care label — no pricing, no metrics theatre, zero inverse bands.",
+      "Loom offerings use shed-threaded weft + shuttle + fell + treadles + loom weave naming each line once + care-tag stack grouping the lines by priority + Care label — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-field",
@@ -870,6 +876,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           || /class="ds-story-fill"/.test(html)
           // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
           || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
+          // Loom likewise leaves its hangtags out on a single-priority brief.
+          || (spec.brief.siteKind === "commerce-loom" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),
