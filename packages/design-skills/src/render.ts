@@ -848,16 +848,16 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-care-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    // Stage labels come from this brand's own capabilities (or just numbers), never clinic sample words.
+    // Stages are numbered only ("Stage 01"…): capabilities are named once, in the rounds index.
     const nums = ["01", "02", "03", "04", "05"];
-    const stages = careStageLabels(spec.brief.features.map((f) => f.name));
+    const stages = careStageLabels();
     // Each stage jumps to its own round in the index; #specimen/#story are not on clinic pages.
     const featureCount = spec.brief.features.length;
     const hrefs = nums.map((n, i) => (i < featureCount ? `#encounter-${n}` : "#features"));
     const rail = `<nav class="ds-care-rail" aria-label="Care stages"><ol>${stages
       .map((label, i) => {
         const href = hrefs[i] ?? "#features";
-        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="Stage ${nums[i]}${label ? `: ${esc(label)}` : ""}"><span class="ds-care-num">${nums[i]}</span>${label ? `<span class="ds-care-label">${esc(label)}</span>` : ""}</a></li>`;
+        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="${esc(label)}"><span class="ds-care-num">${nums[i]}</span>${label ? `<span class="ds-care-label">${esc(label)}</span>` : ""}</a></li>`;
       })
       .join("")}</ol></nav>`;
     const mast = `<header class="ds-care-masthead" aria-label="Care masthead">

@@ -134,14 +134,14 @@ describe("care pathway template says each thing once", () => {
     }
   });
 
-  it("names each round once in the index and once in the priorities, and the lead once more in the close", async () => {
+  it("names each round once, in the index, and the lead once more in the close", async () => {
     for (const brief of briefs.slice(1)) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         const text = visible(html);
         for (const [i, f] of brief.features.entries()) {
-          // Index and priorities in the page text, plus the close for the lead.
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 3 : 2);
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 5 : 3);
+          // Index only (pathway and priorities use numbers), plus the close for the lead.
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 2 : 1);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 3 : 1);
         }
       }
     }
@@ -214,22 +214,26 @@ describe("care pathway template says each thing once", () => {
     }
   });
 
-  it("labels the five pathway stages from the brand's own capabilities, never the clinic sample's words", () => {
+  it("numbers the pathway stages Stage 01 to Stage 05 and names no capability in the pathway, tags or rail", () => {
+    expect(careStageLabels()).toEqual(["Stage 01", "Stage 02", "Stage 03", "Stage 04", "Stage 05"]);
     for (const brief of briefs) {
       const { previewHtml } = designFromFeatures(brief);
       const fold = sectionOf(previewHtml, "hero");
+      const plate = plateOf(previewHtml);
+      const rail = railOf(previewHtml);
       for (const w of ["Intake", "Triage", "Treat", "Follow-up", "Discharge"]) {
         expect(fold, `${brief.productName}: ${w}`).not.toMatch(new RegExp(`>\\s*${w}\\s*<|: ${w}"`));
       }
-      const labels = careStageLabels(brief.features.map((f) => f.name));
-      expect(labels).toHaveLength(5);
-      for (const [i, label] of labels.entries()) {
-        expect(brief.features[i]!.name.startsWith(label), `${brief.productName} ${label}`).toBe(true);
-        expect(railOf(previewHtml)).toContain(`<span class="ds-care-label">${label}</span>`);
+      for (const f of brief.features) {
+        const name = f.name.toLowerCase();
+        expect(plate.toLowerCase(), `${brief.productName} plate: ${f.name}`).not.toContain(name);
+        expect(rail.toLowerCase(), `${brief.productName} rail: ${f.name}`).not.toContain(name);
+      }
+      for (const n of ["01", "02", "03", "04", "05"]) {
+        expect(plate).toContain(`>STAGE ${n}<`);
+        expect(rail).toContain(`<span class="ds-care-label">Stage ${n}</span>`);
       }
     }
-    // Fewer than five capabilities: numbers only, no borrowed words.
-    expect(careStageLabels(["One", "Two", "Three"])).toEqual(["", "", "", "", ""]);
   });
 
   it("points every footer link at a section on the page, How it works at the pathway figure", () => {

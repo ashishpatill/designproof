@@ -2008,34 +2008,21 @@ export function pathPlate(
 }
 
 /**
- * Care stage labels — one per stage, from this brand's own capabilities.
+ * Care stage labels — "Stage 01" to "Stage 05", on every brand.
  *
- * The five pathway stages used to read Intake, Triage, Treat, Follow-up, Discharge on every
- * care-pathway brand, a marina's and a pottery studio's included. With five or more capabilities each
- * stage carries a short form of its capability name; with fewer, every label is empty and the stage
- * shows only its number.
+ * The stages used to read Intake…Discharge (clinic sample words) on every brand, then the brand's
+ * capability names, which named each capability a second time. Capabilities are named once, in the
+ * rounds index; the pathway only numbers its stages.
  */
-export function careStageLabels(names: string[]): string[] {
-  const clean = names.map((n) => n.replace(/\s+/g, " ").trim()).filter(Boolean);
-  if (clean.length < 5) return ["", "", "", "", ""];
-  return clean.slice(0, 5).map((t) => {
-    if (t.length <= 16) return t;
-    const words = t.split(" ");
-    let out = "";
-    for (const w of words) {
-      if ((out ? `${out} ${w}` : w).length > 16) break;
-      out = out ? `${out} ${w}` : w;
-    }
-    return out || clip(t, 16);
-  });
+export function careStageLabels(): string[] {
+  return ["01", "02", "03", "04", "05"].map((n) => `Stage ${n}`);
 }
 
 /**
  * Care plate — care-pathway signature figure.
  *
- * Horizontal pathway spine: five numbered stage nodes with dwell bars and handoff beads. When the
- * brand has five capabilities, one tag sits directly over each stage with that capability's name
- * (all five or none). The plate is sized to its content: no instrument strip or empty foot.
+ * Horizontal pathway spine: five numbered stage nodes with dwell bars and handoff beads, and one
+ * "Stage NN" tag directly over each stage (no capability names; the rounds index names them). The plate is sized to its content: no instrument strip or empty foot.
  */
 export function carePlate(
   productName: string,
@@ -2047,8 +2034,8 @@ export function carePlate(
   const padX = role === "band" ? 40 : 24;
   const padY = role === "band" ? 36 : 24;
   const n = 5;
-  const labels = careStageLabels(features.map((f) => f.title));
-  const tagged = labels.every(Boolean);
+  const labels = careStageLabels();
+  const tagged = true;
   const headY = padY + 18;
   const tagY = padY + 44;
   const tagH = 36;
@@ -2096,8 +2083,7 @@ export function carePlate(
       // Tag centred over its own stage; a tick joins it to the node.
       parts.push(
         `<g data-care-tag="${num}" data-stage-x="${round(x)}"><rect x="${round(x - tagW / 2)}" y="${round(tagY)}" width="${round(tagW)}" height="${tagH}" fill="color-mix(in srgb, var(--c-accent-surface) 55%, var(--c-paper))" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>` +
-          text(`STAGE ${num}`, x, tagY + 14, { size: FIG_MONO_PX, fill: "var(--c-accent)", mono: true, anchor: "middle" }) +
-          text(labels[i]!, x, tagY + 29, { size: FIG_MONO_PX, fill: "var(--c-ink-secondary)", mono: true, anchor: "middle" }) +
+          text(labels[i]!.toUpperCase(), x, tagY + 22, { size: FIG_MONO_PX, fill: "var(--c-accent)", mono: true, anchor: "middle" }) +
           `<line x1="${round(x)}" y1="${round(tagY + tagH)}" x2="${round(x)}" y2="${round(spineY - 30)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/></g>`,
       );
     }
