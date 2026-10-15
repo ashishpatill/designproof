@@ -784,11 +784,19 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   /*
    * Agent harness — local coding-agent session craft.
    *
-   * Turn tape + permit-plate + sticky steer pin own the fold. Not a SaaS pipeline, not a queue
-   * console, not workflow-proof. Story turn-ledger and Done close land in a later pass.
+   * The page used to follow the helm fold with a figure band that named the instruments twice more
+   * beside a "cost · cumulative" chart of made-up values under "how X permits a local tool", a
+   * specimen strip that printed every name again under "X permit field", and a turn-notes essay that
+   * reprinted every description as "T01 Turn tape" under "how a local session actually finishes" and
+   * "turn tape, tool permits, and the finish checks that keep a session honest" — lines written for
+   * one harness product and printed on every harness page, a pottery studio's included. A five-
+   * instrument brief named its lead eight times. The fold's permit plate + turn tape + steer pin and
+   * one index hold every description once; the priorities section groups the instruments by the
+   * brief's tiers.
    */
   if (siteKind === "agent-harness") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-helm", surface: "paper", columns: split.wide });
+    // Instrument index — every instrument, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -796,22 +804,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Priorities — one chapter per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-chapters",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
+      columns: split.wide,
     });
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — helm instruments + index already prove harness craft.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

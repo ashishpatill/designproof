@@ -1315,8 +1315,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
-        // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
-        spec.brief.siteKind === "agent-harness" ||
+        // Harness rows carry their description too: the fold prints none (removed from quietIndex).
         // Control-plane rows carry their description too: the index is their one home on the page.
         spec.brief.siteKind === "control-plane-oss";
       const isArchive = spec.brief.siteKind === "archive-index";
@@ -1328,6 +1327,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Harness rows are the index jump targets for Session/Permit/Finish craft.
+      const isHarness = spec.brief.siteKind === "agent-harness";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,7 +1342,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
-                      : ""
+                      : isHarness
+                        ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                        : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1488,7 +1491,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Harness too: the list beside the drawing named every instrument again, right under the index.
+    spec.brief.siteKind !== "agent-harness"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1622,15 +1627,17 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
     spec?.brief.siteKind === "care-pathway" ||
-    spec?.brief.siteKind === "agent-harness" ||
+    // Harness priorities name their instruments in the chapter body, so they are not quiet.
     spec?.brief.siteKind === "control-plane-oss";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${
         // Educational chapters are priority tiers too, not "4 beats · editorial order".
+        // Harness likewise: the chapters are priority tiers, not editorial beats.
         spec?.brief.siteKind === "art-directed-studio" ||
         spec?.brief.siteKind === "corporate-story" ||
-        spec?.brief.siteKind === "docs-educational"
+        spec?.brief.siteKind === "docs-educational" ||
+        spec?.brief.siteKind === "agent-harness"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1646,7 +1653,12 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
             </li>`,
           )
           .join("")}
-      </ol>
+      </ol>${
+        spec?.brief.siteKind === "agent-harness"
+          ? `
+      ${storyFillSlab(section.blocks.map((b) => b.title))}`
+          : ""
+      }
     </div>
   </section>`;
 }
@@ -3121,7 +3133,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "agent-harness"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

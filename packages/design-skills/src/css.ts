@@ -577,6 +577,16 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="agent-harness"] .ds-reveal:not(.is-in){transform:translateY(0.8rem)}
   [data-sitekind="agent-harness"] .ds-turn-beat.is-current{transform:translateY(-1px)}
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="agent-harness"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="agent-harness"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="agent-harness"] .ds-index-row > p{max-width:42ch;min-width:0}
+@media (max-width: 40rem){
+  [data-sitekind="agent-harness"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "control-plane-oss": `
 @keyframes ds-keel-in{from{opacity:0;transform:translateY(0.6rem)}to{opacity:1;transform:none}}

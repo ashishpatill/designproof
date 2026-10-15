@@ -219,10 +219,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "agent-harness") {
+      /*
+       * No fold note. "Runs on your machine — no invented host, no waitlist" reached every harness
+       * page through the authored path, a marina's and a pottery studio's included, and the fold
+       * already shows LOCAL on the masthead. The buttons say what the page is: the session, and the
+       * instruments on it.
+       */
       return {
         primary: "Start a local session",
-        secondary: "Read the permit",
-        note: "Runs on your machine — no invented host, no waitlist.",
+        secondary: "See every instrument",
+        note: "",
       };
     }
     // Corporate: "Everything here is verifiable before you commit" was a promise no brief made, and
@@ -982,6 +988,37 @@ export function foundryQuestions(brief: DesignBrief, features: FeatureSpec[]): A
     body: sentence(
       features.length > 1
         ? `Anything that is not one of its ${count(features.length)} cuts`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
+ * Harness questions. Every answer is built from this brief: its product, its audience, and its
+ * instrument names. The shared `questions` it used promised "cancel anytime", a comparison table
+ * the page never draws, a result in "one session" on the reader's data, a person who answers
+ * procurement and security, "no hidden tier", and that every capability ships "from day one". No
+ * brief declares any of those. The priorities section is its own section, so no answer here repeats
+ * which instruments come first. The approval question stays only when the brief itself declares an
+ * approval step.
+ */
+export function harnessQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} session for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which instrument handles approvals?`,
+      body: sentence(`${features[at]!.name}, instrument ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} session?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} instruments`
         : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
     ),
   });
