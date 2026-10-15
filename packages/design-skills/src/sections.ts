@@ -2086,7 +2086,8 @@ export function buildSections(
                   block({ title: "Capabilities", points: editorial.features.map((c) => c.name) }),
                   block({
                     title: "Evaluate",
-                    points: ["How it works", "What is included", "Questions", "Security review", "Talk to us"],
+                    // No Security review or Talk to us: no template has a security section or a contact path.
+                    points: ["How it works", "What is included", "Questions"],
                   }),
                   // No Company or Trust column: About, Customers, Careers, Press, Subprocessors and
                   // Status are pages no brief gives, so the footer only links sections on this page.
