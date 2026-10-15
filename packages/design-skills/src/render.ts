@@ -831,7 +831,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     return `<section id="top" class="ds-section ds-hero ds-hero-path" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${mast}
       <div class="ds-path-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-bleed ds-path-field"${
+      <div id="path-atlas" class="ds-bleed ds-path-field"${
         spec.taste.motion === "immersive" ? ` data-motion-instrument="field"` : ""
       }>${rail}${plateFig}${near}</div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
@@ -2478,7 +2478,8 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
      * catalogue or the closing band: "Security review" on a page with no security section, or
      * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
      */
-    "how it works": () => prefer("figure"),
+    // Lantern has no figure band: its path atlas on the fold is how it works.
+    "how it works": () => prefer("figure", "path-atlas"),
     "what is included": () => prefer("compare"),
     questions: () => prefer("faq"),
     // No template has a security section (saas "proof" is the declared sequence) or a contact path.
@@ -2505,6 +2506,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  if (spec.brief.siteKind === "lantern-path") knownIds.add("path-atlas");
   /*
    * Every footer entry is a link to a section on this page. Labels with no section here (pages no
    * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
