@@ -381,8 +381,10 @@ describe("measured craft floors", () => {
     for (const [name, brief] of Object.entries(SHOWCASE_BRIEFS)) {
       const { spec, previewHtml } = designFromFeatures(brief);
       expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(7);
-      const headings = (previewHtml.match(/<h[1-4][\s>]/g) ?? []).length;
-      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(16);
+      // Footer column titles are chrome, not parts of the argument: count headings in the body only.
+      const body = previewHtml.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, "");
+      const headings = (body.match(/<h[1-4][\s>]/g) ?? []).length;
+      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(13);
       expect(new Set(spec.sections.map((s) => s.surface)).size, `${name} surfaces`).toBeGreaterThanOrEqual(3);
       expect(new Set(spec.sections.map((s) => s.layout)).size, `${name} layouts`).toBeGreaterThanOrEqual(6);
     }
@@ -985,8 +987,12 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "hero-keel")).toBe(true);
-    expect(spec.sections.some((s) => s.layout === "story-keel-loop")).toBe(true);
-    expect(spec.sections.some((s) => s.layout === "specimen-terminal")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "features")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "faq")).toBe(true);
+    expect(spec.sections.some((s) => s.layout === "story-keel-loop")).toBe(false);
+    expect(spec.sections.some((s) => s.layout === "specimen-terminal")).toBe(false);
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "hero-helm")).toBe(false);
     expect(spec.sections.filter((s) => s.surface === "inverse")).toHaveLength(0);
     expect(previewHtml).toContain('data-sitekind="control-plane-oss"');
@@ -995,24 +1001,22 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain("ds-keel-terminal");
     expect(previewHtml).toContain("Keep every agent on course.");
     expect(previewHtml).toContain("See the session");
-    expect(previewHtml).toContain("Get started");
-    expect(previewHtml).toContain('href="#demo"');
-    expect(previewHtml).toContain('href="#get-started"');
-    expect(previewHtml).toContain(">What</");
-    expect(previewHtml).toContain(">How</");
-    expect(previewHtml).toContain(">Demo</");
-    expect(previewHtml).toContain(">Principles</");
-    expect(previewHtml).toContain(">Get started</");
-    expect(previewHtml).toContain("Ask");
-    expect(previewHtml).toContain("Permit");
-    expect(previewHtml).toContain("Check");
-    expect(previewHtml).toContain("Ship");
-    expect(previewHtml).toContain("id=\"what\"");
-    expect(previewHtml).toContain("id=\"how\"");
-    expect(previewHtml).toContain("id=\"demo\"");
-    expect(previewHtml).toContain("id=\"principles\"");
-    expect(previewHtml).toContain("id=\"get-started\"");
-    expect(previewHtml).toContain("Repository and install path coming");
+    expect(previewHtml).toContain("Read every capability");
+    expect(previewHtml).toContain('href="#features"');
+    expect(previewHtml).toContain('href="#cta"');
+    expect(previewHtml).toContain(">Session</");
+    expect(previewHtml).toContain(">Capabilities</");
+    expect(previewHtml).toContain(">Start</");
+    expect(previewHtml).toContain("id=\"features\"");
+    expect(previewHtml).toContain("id=\"story\"");
+    expect(previewHtml).toContain("id=\"faq\"");
+    expect(previewHtml).toContain("id=\"cta\"");
+    expect(previewHtml).not.toContain("id=\"what\"");
+    expect(previewHtml).not.toContain("id=\"how\"");
+    expect(previewHtml).not.toContain("id=\"demo\"");
+    expect(previewHtml).not.toContain("id=\"principles\"");
+    expect(previewHtml).not.toContain("id=\"get-started\"");
+    expect(previewHtml).not.toContain("Repository and install path coming");
     expect(previewHtml).toContain("Specimen — not a live API");
     expect(previewHtml).toContain("DONE WHEN");
     expect(previewHtml).toContain("typecheck");
@@ -1020,14 +1024,17 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain("T01");
     expect(previewHtml).toContain("T05");
     expect(previewHtml).toContain("T06");
-    expect((previewHtml.match(/class="ds-keel-turn/g) ?? []).length).toBeGreaterThanOrEqual(10);
-    expect((previewHtml.match(/data-keel-permit/g) ?? []).length).toBe(2);
-    expect((previewHtml.match(/class="ds-keel-allow"/g) ?? []).length).toBe(2);
-    expect((previewHtml.match(/class="ds-keel-deny"/g) ?? []).length).toBe(2);
+    // One terminal on the fold — not a second demo reprint. Match the <li> class only
+    // (not ds-keel-turn-id / -tag / -label).
+    expect((previewHtml.match(/class="ds-keel-turn(?:\s|")/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    expect((previewHtml.match(/class="ds-keel-turn(?:\s|")/g) ?? []).length).toBeLessThan(10);
+    expect((previewHtml.match(/data-keel-permit/g) ?? []).length).toBe(1);
+    expect((previewHtml.match(/class="ds-keel-allow"/g) ?? []).length).toBe(1);
+    expect((previewHtml.match(/class="ds-keel-deny"/g) ?? []).length).toBe(1);
     const heroChunk = previewHtml.match(/ds-hero-keel[\s\S]*?<\/section>/)?.[0] ?? "";
     expect(heroChunk).toMatch(/ds-actions/);
     expect((heroChunk.match(/data-keel-permit/g) ?? []).length).toBe(1);
-    expect((heroChunk.match(/class="ds-keel-turn/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    expect((heroChunk.match(/class="ds-keel-turn(?:\s|")/g) ?? []).length).toBeGreaterThanOrEqual(5);
     expect(previewHtml).toMatch(/IBM\+Plex\+Sans/);
     expect(previewHtml).toMatch(/IBM\+Plex\+Mono/);
     expect(previewHtml).toContain('--f-display:"IBM Plex Sans"');

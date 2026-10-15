@@ -231,11 +231,16 @@ export function ctaFor(
     // Educational: the same note ("Everything here is verifiable before you commit") reached every
     // explainer through the authored path, a marina's and a pottery studio's included.
     if (siteKind === "docs-educational") return { ...GOAL_CTA[goal], note: "" };
+    /*
+     * Keel: no fold note about an install path or repository. No brief declares either. The
+     * terminal caption already says "Specimen — not a live API". The buttons say what the page is:
+     * a session to see, and the capabilities in the index.
+     */
     if (siteKind === "control-plane-oss") {
       return {
         primary: "See the session",
-        secondary: "Get started",
-        note: "Specimen — not a live API. Repository and install path coming.",
+        secondary: "Read every capability",
+        note: "",
       };
     }
     return GOAL_CTA[goal];
@@ -1029,6 +1034,37 @@ export function pressQuestions(brief: DesignBrief, features: FeatureSpec[]): Arr
   return out;
 }
 
+/**
+ * Keel (control-plane-oss) questions. Every answer is built from this brief: its product, its
+ * audience, and its capability names. The shared `questions` it used promised "cancel anytime", a
+ * comparison table the page never draws, a result in "one session" on the reader's data, a person
+ * who answers procurement and security, "no hidden tier", and that every capability ships "from day
+ * one". No brief declares any of those. The priorities section is its own section, so no answer here
+ * repeats which capabilities come first. The approval question stays only when the brief itself
+ * declares an approval step.
+ */
+export function keelQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is ${brief.productName} for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which capability handles approvals?`,
+      body: sentence(`${features[at]!.name}, capability ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in ${brief.productName}?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} capabilities`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1167,11 +1203,24 @@ export function helmSessionTurns(): Array<{
  * Distinct from helmSessionTurns — this is a specimen of steering many agents,
  * not a helm-only catalog reprint. The tool beat is the single Allow/Deny permit.
  */
-export function keelSessionTurns(): Array<{
+export function keelSessionTurns(sample = true): Array<{
   id: string;
   tag: "user" | "agent" | "tool";
   label: string;
 }> {
+  /*
+   * typecheck / git status / twenty agents are the Keel sample's coding work; a marina's or a pottery
+   * studio's tape printed them too. Other brands get the same tape grammar with no sample words.
+   */
+  if (!sample)
+    return [
+      { id: "T01", tag: "user", label: "Pin what done means before the first step." },
+      { id: "T02", tag: "agent", label: "Open capability 01. Stay on this session." },
+      { id: "T03", tag: "tool", label: "One pending step, waiting on you." },
+      { id: "T04", tag: "agent", label: "Finish the step without leaving the run." },
+      { id: "T05", tag: "user", label: "Keep every capability on this tape." },
+      { id: "T06", tag: "agent", label: "Same finish pin. Nothing resets the session." },
+    ];
   return [
     { id: "T01", tag: "user", label: "Pin done-when: typecheck, tests, no public host." },
     { id: "T02", tag: "agent", label: "Open the failing typecheck. Stay on this session." },
@@ -1227,11 +1276,9 @@ export function navFor(
   }
   if (siteKind === "control-plane-oss") {
     return [
-      { label: "What", href: "#what" },
-      { label: "How", href: "#how" },
-      { label: "Demo", href: "#demo" },
-      { label: "Principles", href: "#principles" },
-      { label: "Get started", href: "#get-started" },
+      { label: "Session", href: "#top" },
+      { label: "Capabilities", href: "#features" },
+      { label: "Start", href: "#cta" },
     ];
   }
   const proofLabel =

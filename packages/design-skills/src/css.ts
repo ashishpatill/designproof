@@ -233,10 +233,8 @@ ${reducedInteractive}
 `;
 
   const immersiveAuthored = `
-.ds-authored-motion[data-authored-slot="empty"]{
-  position:fixed;inset:auto 1rem 1rem auto;width:4.5rem;height:4.5rem;border-radius:var(--r-md);
-  border:1px solid var(--c-border);background:var(--c-paper-raised);opacity:0.55;pointer-events:none;z-index:var(--z-overlay);
-}
+/* No runtime asset is mounted, so the slot shows nothing (it used to be an empty grey box). */
+.ds-authored-motion[data-authored-slot="empty"]{display:none}
 `;
 
   return `${interactive}${reveals}${narrative}${motion === "immersive" ? immersiveAuthored : authored}`;
@@ -579,6 +577,25 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
 }
 `,
     "control-plane-oss": `
+
+/* Tight rhythm (as on lantern): no viewport-tall hero, no 132vh chapter pin, no 100px+ bands. */
+[data-sitekind="control-plane-oss"] section.ds-hero-keel{min-height:0;padding:var(--s-lg) 0 var(--s-lg)}
+[data-sitekind="control-plane-oss"] section.ds-chapter-pin{min-height:0;padding-bottom:calc(var(--section-y) * 0.25)}
+[data-sitekind="control-plane-oss"] section .ds-chapter-pin-inner{position:static;padding-top:0}
+[data-sitekind="control-plane-oss"] section.ds-chapter-pin .ds-chapter-progress{display:none}
+[data-sitekind="control-plane-oss"] section.ds-section:not(.ds-hero):not(.ds-footer){padding-block:calc(var(--section-y) * 0.25)}
+[data-sitekind="control-plane-oss"] section .ds-section-head{margin-bottom:var(--s-md)}
+[data-sitekind="control-plane-oss"] section .ds-chapters{margin-top:var(--s-md)}
+[data-sitekind="control-plane-oss"] section .ds-chapters::before{display:none}
+[data-sitekind="control-plane-oss"] section.ds-closing{margin-top:0}
+@media (max-width:40rem){[data-sitekind="control-plane-oss"] section .ds-faq{grid-template-columns:1fr;row-gap:var(--s-sm)}}
+[data-sitekind="control-plane-oss"] section .ds-faq-item:nth-child(-n+2){margin-top:0}
+/* Priorities: tier label + chapter numbers, no index number column. */
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter{grid-template-columns:minmax(9rem,14rem) minmax(0,1fr)}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter h3{grid-column:1}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter .ds-body{grid-column:2}
+@media (max-width:40rem){[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter{grid-template-columns:1fr}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter .ds-body{grid-column:1}}
 @keyframes ds-keel-in{from{opacity:0;transform:translateY(0.6rem)}to{opacity:1;transform:none}}
 @keyframes ds-keel-cursor{0%,49%{opacity:1}50%,100%{opacity:0}}
 @keyframes ds-keel-permit{
@@ -4350,6 +4367,9 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
 
 /* Footer */
 .ds-footer{padding-block:var(--section-y-tight);border-top:1px solid var(--c-border)}
+/* Fixed side rails (chapter, alpha, sig, way, care) stop at the footer: it sits above them on an opaque ground. */
+.ds-footer{position:relative;z-index:calc(var(--z-nav) + 1);background:var(--surface-bg,var(--c-paper))}
+.ds-footer[data-surface="paper"]{background:var(--c-paper)}
 .ds-footer-grid{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1fr;gap:var(--s-xl) var(--s-lg)}
 .ds-footer-col{display:grid;gap:var(--s-2xs);align-content:start;font-size:var(--t-bodySmall-size)}
 .ds-footer-brand{gap:var(--s-sm);max-width:34ch}

@@ -8,6 +8,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Keel template says each thing once
+
+- The control-plane (keel) page drops the What figure (which restated the product under "a control plane for coding agents, not a chat wrapper"), the Ask→Permit→Check→Ship how-loop (which reprinted permit and finish copy), and the second terminal demo under "session tape". It goes from eight sections to seven: first screen, one index, the priorities, questions, closing, footer.
+- Each capability description is printed once, in the index. Before, the fold carried a stock Keel lede on every product, the What/How/Demo bands restated the same facts, and the principles index named capabilities again under "what holds when you run many agents" and "each line is a control-plane fact". The index now holds every capability, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, capability by capability").
+- The fold keeps the claim + terminal specimen craft: session tape (≥5 turns), one Allow once/Deny, done-when pin, and "Specimen — not a live API". The fold prints no lead description and no invented install/repository note.
+- The priorities section groups the capabilities by the priority the brief gives (core, supporting, additional). Each tier cites index numbers, not names again. With a single priority the section is left out; specimen craft stays on the fold.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Steer the Kilnroom course with kiln calendar." and "Four more capabilities sit in the index above." The buttons read "See the session" and "Read all five capabilities". The menu reads Session / Capabilities / Start. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 190 to 124. Lantern and clinic four-brief rep/lead/any ranges stayed the same. New styles sit only in the control-plane-oss motion-signature block. New test: `packages/design-skills/src/__tests__/keel-template-once.test.ts`.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.
