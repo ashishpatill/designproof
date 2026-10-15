@@ -180,7 +180,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
     check(
       "asymmetric-or-statement-fold",
       (() => {
-        if (/ds-hero-spanning|ds-hero-overfigure|ds-hero-claimband|ds-hero-stackfold|ds-hero-seam|ds-hero-folio|ds-hero-chrono|ds-hero-register|ds-hero-loom|ds-hero-voucher|ds-hero-press|ds-hero-drawloom|ds-hero-glassine|ds-hero-rounds|ds-hero-helm|ds-hero-path|ds-hero-pipeline|ds-hero-queue|ds-hero-diligence|ds-hero-mechanism|ds-hero-wire/.test(html)) return true;
+        if (/ds-hero-spanning|ds-hero-overfigure|ds-hero-claimband|ds-hero-stackfold|ds-hero-seam|ds-hero-folio|ds-hero-chrono|ds-hero-register|ds-hero-loom|ds-hero-voucher|ds-hero-press|ds-hero-drawloom|ds-hero-glassine|ds-hero-rounds|ds-hero-helm|ds-hero-keel|ds-hero-path|ds-hero-pipeline|ds-hero-queue|ds-hero-diligence|ds-hero-mechanism|ds-hero-wire/.test(html)) return true;
         const splits = html.match(/grid-template-columns:[^";]+/g) ?? [];
         return splits.some((s) => {
           const fr = Array.from(s.matchAll(/(\d+(?:\.\d+)?)fr/g)).map((m) => Number(m[1]));
@@ -803,8 +803,6 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           !spec.sections.some((s) => s.kind === "pricing")
           && !spec.sections.some((s) => s.kind === "metrics")
           && spec.sections.some((s) => s.layout === "hero-keel")
-          && spec.sections.some((s) => s.layout === "story-keel-loop")
-          && spec.sections.some((s) => s.layout === "specimen-terminal")
           && /ds-hero-keel/.test(html)
           && /data-keel-terminal/.test(html)
           && /data-figure="keel-terminal"/.test(html)
@@ -817,12 +815,11 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /DONE WHEN/.test(html)
           && /typecheck/.test(html)
           && /Specimen — not a live API/.test(html)
-          && /id="what"/.test(html)
-          && /id="how"/.test(html)
-          && /id="demo"/.test(html)
-          && /id="principles"/.test(html)
-          && /id="get-started"/.test(html)
-          && /Repository and install path coming/.test(html)
+          // The priorities section groups the capabilities by tier, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || spec.sections.some((s) => s.kind === "story"))
+          // No what figure, how-loop, or second terminal demo naming the capabilities again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
+          && !spec.sections.some((s) => s.layout === "story-keel-loop" || s.layout === "specimen-terminal")
           && !/waitlist/i.test(html)
           && !/<section[^>]*\bdata-workflow-proof\b/.test(html)
           && !/data-figure="permit-plate"/.test(html)
@@ -830,7 +827,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && !/class="[^"]*ds-hero-helm/.test(html)
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Control-plane-oss uses claim+terminal keel fold, how-loop, specimen terminal, honest get-started — no pricing, metrics, waitlist, helm clone, or inverse theatre.",
+      "Control-plane-oss uses claim+terminal keel fold + capability index + priorities by tier — no pricing, metrics, waitlist, what/how/demo reprint, helm clone, or inverse theatre.",
     ),
     check(
       "keel-not-helm-clone",

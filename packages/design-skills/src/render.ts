@@ -420,15 +420,15 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
    */
   if (section.layout === "hero-keel") {
     const keelActions = `<div class="ds-actions ds-hero-actions">
-      <a class="ds-btn ds-btn-primary" href="#demo">${esc(section.ctaLabel ?? "See the session")}</a>
-      ${section.secondaryLabel ? `<a class="ds-btn ds-btn-secondary" href="#get-started">${esc(section.secondaryLabel)}</a>` : ""}
+      <a class="ds-btn ds-btn-primary" href="#top">${esc(section.ctaLabel ?? "See the session")}</a>
+      ${section.secondaryLabel ? `<a class="ds-btn ds-btn-secondary" href="#features">${esc(section.secondaryLabel)}</a>` : ""}
       ${section.ctaNote ? `<span class="ds-cta-note">${esc(section.ctaNote)}</span>` : ""}
     </div>`;
     const keelCopy = `<div class="ds-hero-copy">
       <p ${enterAttr(spec, 0, "ds-brand-mark")}>${esc(spec.brief.productName)}</p>
       <h1 ${enterAttr(spec, 1, "ds-display")}>${esc(section.title)}</h1>
-      <p ${enterAttr(spec, 2, "ds-lede")}>${esc(section.body)}</p>
-      ${withEnter(spec, 3, keelActions)}
+      ${section.body ? `<p ${enterAttr(spec, 2, "ds-lede")}>${esc(section.body)}</p>` : ""}
+      ${withEnter(spec, section.body ? 3 : 2, keelActions)}
     </div>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-keel" data-surface="${section.surface}" data-section="${esc(section.id)}">
       <div class="ds-keel-fold">
@@ -1316,9 +1316,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
-        spec.brief.siteKind === "agent-harness" ||
-        // Control-plane rows carry their description too: the index is their one home on the page.
-        spec.brief.siteKind === "control-plane-oss";
+        spec.brief.siteKind === "agent-harness";
+        // Keel is not here: the fold prints none, so the index is the one home for every description.
       const isArchive = spec.brief.siteKind === "archive-index";
       // Field guide rows are the binomial strip's jump targets.
       const isField = spec.brief.siteKind === "field-guide";
@@ -1328,6 +1327,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Keel rows are the index jump targets for Session/Capabilities/Start craft.
+      const isKeel = spec.brief.siteKind === "control-plane-oss";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,6 +1342,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
+                      : isKeel
+                        ? ` id="capability-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                       : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
@@ -1455,7 +1458,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   const rail =
     spec.taste.aestheticLean === "system-crafted" &&
     spec.brief.siteKind !== "dashboard-webapp" &&
-    spec.brief.siteKind !== "fintech-marketing"
+    spec.brief.siteKind !== "fintech-marketing" &&
+    // Keel too: radius, body size and contrast chips are design notes, not page content.
+    spec.brief.siteKind !== "control-plane-oss"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1488,7 +1493,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Keel too: the list beside the drawing named every capability again, right under the index.
+    spec.brief.siteKind !== "control-plane-oss"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1622,15 +1629,16 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
     spec?.brief.siteKind === "care-pathway" ||
-    spec?.brief.siteKind === "agent-harness" ||
-    spec?.brief.siteKind === "control-plane-oss";
+    spec?.brief.siteKind === "agent-harness";
+    // Keel priorities name their capabilities in the chapter body, so they are not quiet.
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${
         // Educational chapters are priority tiers too, not "4 beats · editorial order".
         spec?.brief.siteKind === "art-directed-studio" ||
         spec?.brief.siteKind === "corporate-story" ||
-        spec?.brief.siteKind === "docs-educational"
+        spec?.brief.siteKind === "docs-educational" ||
+        spec?.brief.siteKind === "control-plane-oss"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1642,7 +1650,12 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-              ${figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : ""}
+              ${
+                // Keel tiers are not capabilities: capability i's drawing does not belong on tier i.
+                figures.marks[i] && spec?.brief.siteKind !== "control-plane-oss"
+                  ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
+                  : ""
+              }
             </li>`,
           )
           .join("")}
@@ -3121,7 +3134,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "control-plane-oss"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>
