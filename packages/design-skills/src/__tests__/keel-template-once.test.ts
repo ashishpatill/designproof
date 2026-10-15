@@ -217,11 +217,11 @@ describe("keel template says each thing once", () => {
     const { spec } = designFromFeatures(brief);
     const faq = spec.sections.find((s) => s.kind === "faq");
     expect(faq?.blocks.map((b) => b.title)).toEqual([
-      "Who is the Kilnroom course for?",
-      "What is not on the Kilnroom course?",
+      "Who is Kilnroom for?",
+      "What is not in Kilnroom?",
     ]);
     const cta = spec.sections.find((s) => s.kind === "cta");
-    expect(cta?.title).toBe("Steer the Kilnroom course with kiln calendar.");
+    expect(cta?.title).toBe("Start Kilnroom with kiln calendar.");
     expect(cta?.body).toBe("Four more capabilities sit in the index above.");
     expect([cta?.ctaLabel, cta?.secondaryLabel]).toEqual(["See the session", "Read all five capabilities"]);
     const nav = spec.sections.find((s) => s.kind === "nav");
@@ -250,5 +250,21 @@ describe("keel template says each thing once", () => {
       '<meta name="description" content="Kilnroom: Firing schedules for shared pottery studios, for studio managers at community pottery studios"/>',
     );
     expect(html).not.toMatch(/<meta name="description" content="[^"]*(control-plane-oss|sections built from)/);
+  });
+
+  it("keeps the Keel sample's coding words off other brands, and links How it works to the session tape", () => {
+    for (const brief of briefs.slice(1)) {
+      const { spec, previewHtml } = designFromFeatures(brief);
+      for (const w of ["typecheck", "git status", "no public host", "twenty agents", "course"]) {
+        expect(previewHtml.toLowerCase(), `${brief.productName}: ${w}`).not.toContain(w);
+      }
+      expect(previewHtml).toContain('id="session-tape"');
+      expect(previewHtml).toMatch(/<a [^>]*href="#session-tape"[^>]*>How it works<\/a>/);
+      expect(previewHtml).not.toMatch(/>\s*What is included\s*</);
+      const story = spec.sections.find((s) => s.kind === "story");
+      expect(story?.blocks.map((b) => b.meta)).toEqual([undefined, undefined, undefined]);
+      for (const f of brief.features) expect(story?.blocks.some((b) => b.body.includes(f.name))).toBe(false);
+    }
+    expect(designFromFeatures(briefs[0]!).previewHtml).toContain("typecheck");
   });
 });

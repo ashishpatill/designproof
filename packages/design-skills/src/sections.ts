@@ -1105,11 +1105,11 @@ export function buildSections(
               eyebrow: "Priorities",
               title: sentence(`Which ${brief.productName} capabilities to open first`),
               body: "",
-              blocks: tiers.map((t, i) =>
+              // Tier label + index numbers only: no "01 / 02 / 03" line over the tier.
+              blocks: tiers.map((t) =>
                 block({
                   title: t.tier,
                   body: sentence(`${t.nums.length === 1 ? "Capability" : "Capabilities"} ${spoken(t.nums)}`),
-                  meta: String(i + 1).padStart(2, "0"),
                 }),
               ),
             }),
@@ -1866,7 +1866,7 @@ export function buildSections(
                         : brief.siteKind === "press-atelier"
                           ? sentence(`Questions about the ${brief.productName} press sheet`)
                           : brief.siteKind === "control-plane-oss"
-                            ? sentence(`Questions about the ${brief.productName} course`)
+                            ? sentence(`Questions about ${brief.productName}`)
                           : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
@@ -1949,8 +1949,8 @@ export function buildSections(
                 // Keel: "get started with X" fit one OSS storefront; the close says where to begin.
                 : brief.siteKind === "control-plane-oss"
                   ? features[0]
-                    ? `Steer the ${brief.productName} course with ${lower(features[0].name)}`
-                    : `Steer the ${brief.productName} course`
+                    ? `Start ${brief.productName} with ${lower(features[0].name)}`
+                    : `Start ${brief.productName}`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
                   // The audience's last word is not who the reader shows a product to: "revenue

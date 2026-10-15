@@ -1046,7 +1046,7 @@ export function pressQuestions(brief: DesignBrief, features: FeatureSpec[]): Arr
 export function keelQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
   const out: Array<{ title: string; body: string }> = [];
   const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
-  out.push({ title: `Who is the ${brief.productName} course for?`, body: sentence(Audience) });
+  out.push({ title: `Who is ${brief.productName} for?`, body: sentence(Audience) });
   const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
   if (at >= 0) {
     out.push({
@@ -1055,7 +1055,7 @@ export function keelQuestions(brief: DesignBrief, features: FeatureSpec[]): Arra
     });
   }
   out.push({
-    title: `What is not on the ${brief.productName} course?`,
+    title: `What is not in ${brief.productName}?`,
     body: sentence(
       features.length > 1
         ? `Anything outside its ${count(features.length)} capabilities`
@@ -1203,11 +1203,24 @@ export function helmSessionTurns(): Array<{
  * Distinct from helmSessionTurns — this is a specimen of steering many agents,
  * not a helm-only catalog reprint. The tool beat is the single Allow/Deny permit.
  */
-export function keelSessionTurns(): Array<{
+export function keelSessionTurns(sample = true): Array<{
   id: string;
   tag: "user" | "agent" | "tool";
   label: string;
 }> {
+  /*
+   * typecheck / git status / twenty agents are the Keel sample's coding work; a marina's or a pottery
+   * studio's tape printed them too. Other brands get the same tape grammar with no sample words.
+   */
+  if (!sample)
+    return [
+      { id: "T01", tag: "user", label: "Pin what done means before the first step." },
+      { id: "T02", tag: "agent", label: "Open capability 01. Stay on this session." },
+      { id: "T03", tag: "tool", label: "One pending step, waiting on you." },
+      { id: "T04", tag: "agent", label: "Finish the step without leaving the run." },
+      { id: "T05", tag: "user", label: "Keep every capability on this tape." },
+      { id: "T06", tag: "agent", label: "Same finish pin. Nothing resets the session." },
+    ];
   return [
     { id: "T01", tag: "user", label: "Pin done-when: typecheck, tests, no public host." },
     { id: "T02", tag: "agent", label: "Open the failing typecheck. Stay on this session." },

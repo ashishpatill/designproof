@@ -282,8 +282,13 @@ function renderNav(section: SectionSpec): string {
   </header>`;
 }
 
-function renderKeelTerminal(role: "hero" | "demo"): string {
-  const turns = keelSessionTurns();
+/** The Keel sample brief keeps its coding-agent tape; every other brand gets the neutral one. */
+function isKeelSample(spec: DesignSpec): boolean {
+  return spec.brief.productName === "Keel";
+}
+
+function renderKeelTerminal(role: "hero" | "demo", sample = true): string {
+  const turns = keelSessionTurns(sample);
   const currentIdx = turns.findIndex((t) => t.tag === "tool");
   const lines = turns
     .map((t, i) => {
@@ -291,7 +296,7 @@ function renderKeelTerminal(role: "hero" | "demo"): string {
       const permit =
         live
           ? `<div class="ds-keel-permit" data-keel-permit>
-              <p class="ds-keel-permit-kicker">ONE PENDING TOOL · git status</p>
+              <p class="ds-keel-permit-kicker">${sample ? "ONE PENDING TOOL · git status" : "ONE PENDING STEP"}</p>
               <div class="ds-keel-permit-actions">
                 <span class="ds-keel-allow">Allow</span>
                 <span class="ds-keel-deny">Deny</span>
@@ -309,13 +314,11 @@ function renderKeelTerminal(role: "hero" | "demo"): string {
   const pin = `<aside class="ds-keel-pin" data-steer-pin aria-label="Done-when">
     <p class="ds-keel-pin-kicker">DONE WHEN</p>
     <ul class="ds-keel-pin-checks">
-      <li>typecheck</li>
-      <li>tests</li>
-      <li>no public host</li>
+      ${(sample ? ["typecheck", "tests", "no public host"] : ["capabilities 01 and 02", "reviewed by you", "nothing published"]).map((c) => `<li>${c}</li>`).join("")}
     </ul>
   </aside>`;
   const caption = "Specimen — not a live API";
-  return `<figure class="ds-keel-terminal" data-keel-terminal data-figure="keel-terminal" data-dense="ink" data-role="${role}" aria-label="${esc(caption)}">
+  return `<figure${role === "hero" ? ` id="session-tape"` : ""} class="ds-keel-terminal" data-keel-terminal data-figure="keel-terminal" data-dense="ink" data-role="${role}" aria-label="${esc(caption)}">
     <div class="ds-keel-term-chrome">
       <span class="ds-keel-term-dots" aria-hidden="true"></span>
       <span class="ds-keel-term-title">session tape · local</span>
@@ -433,7 +436,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     return `<section id="top" class="ds-section ds-hero ds-hero-keel" data-surface="${section.surface}" data-section="${esc(section.id)}">
       <div class="ds-keel-fold">
         <div class="ds-keel-claim">${keelCopy}</div>
-        ${renderKeelTerminal("hero")}
+        ${renderKeelTerminal("hero", isKeelSample(spec))}
       </div>
     </section>`;
   }
@@ -1647,7 +1650,7 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
         ${section.blocks
           .map(
             (b, i) => `<li class="ds-chapter${quietChapters ? " ds-chapter-quiet" : ""}">
-              <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
+              ${spec?.brief.siteKind === "control-plane-oss" && !b.meta ? "" : `<p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>`}
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
               ${
@@ -2475,7 +2478,8 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
      * catalogue or the closing band: "Security review" on a page with no security section, or
      * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
      */
-    "how it works": () => prefer("figure"),
+    // Keel has no figure band: the session tape on the fold is how it works.
+    "how it works": () => prefer("figure", "session-tape"),
     "what is included": () => prefer("compare"),
     questions: () => prefer("faq"),
     // No template has a security section (saas "proof" is the declared sequence) or a contact path.
@@ -2502,12 +2506,14 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  if (spec.brief.siteKind === "control-plane-oss") knownIds.add("session-tape");
   /*
    * Every footer entry is a link to a section on this page. Labels with no section here (pages no
    * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
    * specimen footer keeps its own plain-text columns, which describe the specimen and link nowhere.
    */
-  const linkOnly = spec.brief.siteKind !== "control-plane-oss";
+  // Keel uses the shared columns now, so its footer is link-only too.
+  const linkOnly = true;
   const footerBlocks = section.blocks
     .map((b) =>
       linkOnly ? { ...b, points: b.points.filter((p) => footerPointHref(p, knownIds, b.title)) } : b,

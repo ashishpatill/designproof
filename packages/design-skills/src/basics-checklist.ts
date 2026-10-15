@@ -813,7 +813,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /Deny/.test(html)
           && /data-steer-pin/.test(html)
           && /DONE WHEN/.test(html)
-          && /typecheck/.test(html)
+          // The sample keeps its typecheck pin; other brands pin brand-neutral checks.
+          && (spec.brief.productName === "Keel" ? /typecheck/.test(html) : !/typecheck|git status/.test(html))
           && /Specimen — not a live API/.test(html)
           // The priorities section groups the capabilities by tier, so a single-priority brief has none.
           && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || spec.sections.some((s) => s.kind === "story"))
