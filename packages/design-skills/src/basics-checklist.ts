@@ -715,7 +715,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           plate.length > 0
           && !/stroke-width="10"/.test(plate)
           && /CH I/.test(plate)
-          && /Threshold/.test(plate)
+          && !/Threshold/.test(plate)
           && /PATH ATLAS/.test(plate)
           && /class="ds-draw"/.test(plate)
         );

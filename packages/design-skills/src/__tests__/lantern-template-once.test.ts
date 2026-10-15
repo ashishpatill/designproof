@@ -134,13 +134,13 @@ describe("lantern path template says each thing once", () => {
     }
   });
 
-  it("names each chapter once in the index and once in the priorities, and the lead once more in the close", async () => {
+  it("names each chapter once in the index, the lead once more in the close, and never in the priorities", async () => {
     for (const brief of briefs.slice(1)) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         const text = visible(html);
         for (const [i, f] of brief.features.entries()) {
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 3 : 2);
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 5 : 3);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBeGreaterThanOrEqual(i === 0 ? 2 : 1);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name} cap`).toBeLessThanOrEqual(i === 0 ? 4 : 2);
         }
       }
     }
@@ -188,15 +188,29 @@ describe("lantern path template says each thing once", () => {
     expect(story?.eyebrow).toBe("Priorities");
     expect(story?.title).toBe("Which Kilnroom chapters to open first.");
     expect(story?.blocks.map((b) => [b.title, b.body, b.meta, b.points])).toEqual([
-      ["Core", "Kiln calendar and glaze library.", "Ch 01", ["01", "02"]],
-      ["Supporting", "Member shelves and clay orders.", "Ch 02", ["03", "04"]],
-      ["Additional", "Class roster.", "Ch 03", ["05"]],
+      ["Core", "Chapters 01 and 02.", undefined, []],
+      ["Supporting", "Chapters 03 and 04.", undefined, []],
+      ["Additional", "Chapter 05.", undefined, []],
     ]);
     const html = sectionOf(previewHtml, "story");
     expect(html).toContain('aria-label="Night trail"');
     expect(html).not.toContain('class="ds-ember-mark"');
     expect(html).not.toContain("Note 01");
-    expect(html).toContain("2 chapters · Ch 01, 02");
+    // Three tier cards and nothing else: no grey rest card opposite, no chapter line over the tier.
+    expect(html.match(/class="ds-ember-panel"/g)).toHaveLength(3);
+    expect(html).not.toContain("ds-ember-rest");
+    expect(html).not.toContain('class="ds-ember-ch"');
+    for (const f of briefs[3]!.features) expect(html).not.toContain(f.name);
+  });
+
+  it("labels the five night-path boxes Ch I to Ch V with no Ember Gate chapter names on any brand", () => {
+    for (const brief of briefs) {
+      const { previewHtml } = designFromFeatures(brief);
+      for (const r of ["I", "II", "III", "IV", "V"]) expect(previewHtml).toContain(`CH ${r}<`);
+      for (const word of ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight"]) {
+        expect(previewHtml, `${brief.productName}: ${word}`).not.toMatch(new RegExp(`>\\s*${word}\\s*<|Chapter [IV]+: ${word}`));
+      }
+    }
   });
 
   it("leaves the priorities out when the brief gives a single priority, and still clears the basics", () => {

@@ -557,6 +557,32 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
 @media (max-width: 40rem){
   [data-sitekind="lantern-path"] .ds-index-row{grid-template-columns:2.5rem 1fr}
 }
+
+/* Tight rhythm: no viewport-tall hero tail, no 132vh chapter pin, no 100px+ empty bands between
+   hero/path, path/index, index/priorities, questions/close. */
+[data-sitekind="lantern-path"] section.ds-hero-path{min-height:0}
+[data-sitekind="lantern-path"] section.ds-chapter-pin{min-height:0;padding-bottom:calc(var(--section-y) * 0.25)}
+[data-sitekind="lantern-path"] section .ds-chapter-pin-inner{position:static;padding-top:0}
+[data-sitekind="lantern-path"] section.ds-chapter-pin .ds-chapter-progress{display:none}
+[data-sitekind="lantern-path"] section.ds-section:not(.ds-hero):not(.ds-footer){padding-block:calc(var(--section-y) * 0.25)}
+
+[data-sitekind="lantern-path"] section.ds-ember + section.ds-section,
+[data-sitekind="lantern-path"] section#features + section.ds-section{padding-top:calc(var(--section-y) * 0.2)}
+[data-sitekind="lantern-path"] section#faq{padding-block:calc(var(--section-y) * 0.2)}
+[data-sitekind="lantern-path"] section#cta{padding-block:calc(var(--section-y) * 0.25)}
+[data-sitekind="lantern-path"] .ds-footer{padding-block:calc(var(--s-xl) + 0.5rem)}
+
+[data-sitekind="lantern-path"] section.ds-ember .ds-sec-meta{margin-bottom:var(--s-sm)}
+[data-sitekind="lantern-path"] section.ds-ember .ds-section-head{margin-bottom:var(--s-md)}
+[data-sitekind="lantern-path"] section .ds-faq-columns .ds-section-head,
+[data-sitekind="lantern-path"] section.ds-faq .ds-section-head{margin-bottom:var(--s-md)}
+/* Priorities: three tier cards in a row, nothing opposite them. */
+[data-sitekind="lantern-path"] section .ds-ember-trail{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--gutter);margin-top:var(--s-md);padding-left:0;margin-left:0;
+}
+[data-sitekind="lantern-path"] section .ds-ember-trail::before{display:none}
+[data-sitekind="lantern-path"] section .ds-ember-step{display:block}
+[data-sitekind="lantern-path"] section .ds-ember-step .ds-ember-panel{text-align:left;height:100%}
 `,
     "care-pathway": `
 @keyframes ds-care-in{from{opacity:0;transform:translateY(1.4rem) scale(0.99)}to{opacity:1;transform:none}}

@@ -1875,7 +1875,7 @@ export function pathPlate(
   parts.push(`<circle cx="${round(moonX)}" cy="${round(moonY)}" r="14" fill="color-mix(in srgb, var(--c-paper) 78%, ${ACCENT} 22%)"/>`);
   parts.push(`<circle cx="${round(moonX + 6)}" cy="${round(moonY - 3)}" r="14" fill="color-mix(in srgb, var(--c-ink) 90%, var(--c-accent) 10%)"/>`);
 
-  const chapterNames = ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight"];
+  // Boxes read Ch I–V only: chapter names were Ember Gate sample words printed on every brand.
   const romans = ["I", "II", "III", "IV", "V"];
   const n = 5;
   const walkLeft = padX + 64;
@@ -1911,13 +1911,12 @@ export function pathPlate(
     `<path class="ds-draw" pathLength="1" d="${pathD}" fill="none" stroke="${ACCENT}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`,
   );
 
-  const waypoints: { x: number; y: number; title: string; roman: string }[] = [];
+  const waypoints: { x: number; y: number; roman: string }[] = [];
   for (let i = 0; i < n; i += 1) {
     const t = i / (n - 1);
     waypoints.push({
       x: walkLeft + t * walkSpan,
       y: walkAt(t),
-      title: chapterNames[i]!,
       roman: romans[i]!,
     });
   }
@@ -1943,8 +1942,7 @@ export function pathPlate(
     parts.push(
       `<rect x="${round(w.x - chipW / 2)}" y="${round(captionY - 16)}" width="${round(chipW)}" height="36" rx="2" fill="var(--c-ink)" stroke="color-mix(in srgb, var(--c-paper) 28%, transparent)" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
     );
-    parts.push(text(`CH ${w.roman}`, w.x, captionY, { size: FIG_MONO_PX, fill: ACCENT, mono: true, anchor: "middle" }));
-    parts.push(text(clip(w.title, 12), w.x, captionY + 14, { size: FIG_MONO_PX, fill: paper, mono: true, anchor: "middle" }));
+    parts.push(text(`CH ${w.roman}`, w.x, captionY + 6, { size: FIG_MONO_PX, fill: ACCENT, mono: true, anchor: "middle" }));
   }
 
   /* Distance ridges sit below the caption register — never through type. */

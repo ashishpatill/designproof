@@ -835,13 +835,13 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toMatch(/class="ds-bleed ds-path-field"[^>]*>[\s\S]*?class="ds-way-rail"/);
     const plate = previewHtml.match(/<svg[^>]*data-figure="path-plate"[^>]*>[\s\S]*?<\/svg>/)?.[0] ?? "";
     expect(plate).toContain("CH I");
-    expect(plate).toContain("Threshold");
+    expect(plate).not.toContain("Threshold");
     expect(plate).toContain('class="ds-draw"');
     expect(plate).not.toContain('stroke-width="10"');
     const drawn = pathPlate("Ember Gate", [], "ember-gate-atlas", "band");
     expect(drawn).toContain("PATH ATLAS");
     expect(drawn).toContain("CH I");
-    expect(drawn).toContain("Threshold");
+    expect(drawn).not.toContain("Threshold");
     expect(drawn).toContain('class="ds-draw"');
     expect(drawn).not.toContain('stroke-width="10"');
     expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);

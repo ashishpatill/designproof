@@ -808,12 +808,12 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-path-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const romans = ["I", "II", "III", "IV", "V"];
-    const labels = ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    // No chapter names: those were Ember Gate's, printed on every lantern brand.
+    const hrefs = ["#features", "#features", "#story", "#faq", "#cta"];
     const rail = `<nav class="ds-way-rail" aria-label="Chapter waypoints"><ol>${romans
       .map((R, i) => {
         const href = hrefs[i] ?? "#features";
-        return `<li><a href="${href}" class="ds-way-mark${i === 0 ? " is-active" : ""}" data-way="${R}" aria-label="Chapter ${R}: ${labels[i]}"><span class="ds-way-num">Ch ${R}</span><span class="ds-way-label">${labels[i]}</span></a></li>`;
+        return `<li><a href="${href}" class="ds-way-mark${i === 0 ? " is-active" : ""}" data-way="${R}" aria-label="Chapter ${R}"><span class="ds-way-num">Ch ${R}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
     const mast = `<header class="ds-path-masthead" aria-label="Path masthead">
@@ -1996,11 +1996,10 @@ function renderEmber(section: SectionSpec, figures: FigurePlan): string {
           : b.kicker
             ? `<p class="ds-ember-note">${esc(b.kicker)}</p>`
             : "";
+      // Tier cards only: no grey rest card opposite, no chapter line over the tier label.
       return `<li class="ds-ember-step" data-side="${side}" style="--i:${i}">
-        <span class="ds-ember-bead" aria-hidden="true"></span>
-        <div class="ds-ember-rest" aria-hidden="true"></div>
-        <article class="ds-ember-panel">
-          <p class="ds-ember-ch">${ch}</p>
+        <article class="ds-ember-panel">${b.meta ? `
+          <p class="ds-ember-ch">${ch}</p>` : ""}
           <p class="ds-ember-tier">${esc(b.title)}</p>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
           ${note}

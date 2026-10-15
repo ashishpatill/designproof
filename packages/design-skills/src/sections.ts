@@ -1416,12 +1416,11 @@ export function buildSections(
               eyebrow: "Priorities",
               title: sentence(`Which ${brief.productName} chapters to open first`),
               body: "",
-              blocks: tiers.map((t, i) =>
+              blocks: tiers.map((t) =>
                 block({
                   title: t.tier,
-                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
-                  points: t.at,
-                  meta: `Ch ${String(i + 1).padStart(2, "0")}`,
+                  // Chapter numbers only: the names already sit once in the index above.
+                  body: sentence(`${t.at.length === 1 ? "Chapter" : "Chapters"} ${spoken(t.at)}`),
                 }),
               ),
             }),
