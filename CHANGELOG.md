@@ -8,6 +8,18 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Consumer craft template says each thing once
+
+- The consumer craft page drops the metrics band (which listed the capability names as bare values beside truncated descriptions), the specimen band, and the figure band (a "cost · cumulative" chart with made-up values under "how it works" / "step through the mechanism"). It goes from ten sections to seven: first screen, one register, the order of use (priorities), questions, closing, footer.
+- Each detail description is printed once, in the register. Before, the first screen printed the lead description, the register printed every description again, the fold's product surface printed truncated sentences in its table and detail panel, and the "A day with X" chapters printed them a third time under "from morning pack to evening empty" — a line written for one sample bag. The register now holds every detail, each with its sentence (the lead's sentence stays on the fold and is left blank in its row). Its title is the product's own ("The six details of Harborline") instead of "Built for the day you actually have", and the "not a lifestyle claim" lede is gone.
+- The fold's product surface names each detail once in its rail and does not reprint descriptions. A stack figure that used to sit beside the first register row (listing every name again) is gone. The fold note "Ships when the batch is ready — no waitlist theatre" is gone.
+- The order of use groups the details by the priority the brief gives (first, next, alongside). With a single priority the section is left out.
+- The questions and the closing line are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Start with kiln calendar at Kilnroom." and "Four more details sit in the list above." instead of "Put Kilnroom in front of your studios." and "Five capabilities, one conversation." The menu reads Details, Priorities, Questions. The page description is the product's own tagline and audience instead of engine words ("consumer-craft surface … 10 sections built from …").
+- On four sample briefs, repeated lines fell from 12–28 to 2–6, the lead detail name in the page text from 4–14 mentions to 1–4, lines that read the same on every product's page from 22 to 8, lines copied word for word from other templates from 18–41 to 3–18, and the most times one description is printed from 3 to 1. The template's score on this measure went from 335 to 108.
+- New test: `packages/design-skills/src/__tests__/consumer-template-once.test.ts`. The other seventeen templates render byte-for-byte the same (374 of 396 hashed pages unchanged; only the 22 consumer pages changed).
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.

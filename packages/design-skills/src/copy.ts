@@ -116,10 +116,15 @@ export function ctaFor(
   const base = ((): { primary: string; secondary: string; note: string } => {
     // Consumer craft sells a product, not a plan ladder — "Compare plans" is SaaS residue.
     if (siteKind === "consumer-craft") {
+      /*
+       * No fold note. "Ships when the batch is ready — no waitlist theatre" reached every consumer
+       * page, a marina's and a pottery studio's included, and no brief says how anything ships.
+       * The buttons say what the page is: the product, and the details on it.
+       */
       return {
         primary: "Order yours",
         secondary: "See the details",
-        note: "Ships when the batch is ready — no waitlist theatre.",
+        note: "",
       };
     }
     if (siteKind === "art-directed-studio") {
@@ -798,6 +803,54 @@ export function studioQuestions(brief: DesignBrief, features: FeatureSpec[]): Ar
 }
 
 /**
+ * Consumer fold lede. It was the lead detail's description, so the subtitle read as one feature
+ * ("Incoming boat requests sorted by urgency…") instead of saying what the product is. Its own
+ * sentence now: the product, who it is for, and how many details the page names.
+ */
+export function consumerLede(brief: DesignBrief, features: FeatureSpec[]): string {
+  const n = features.length;
+  return sentence(
+    `${brief.productName} is made for ${lower(brief.audience)}${n > 1 ? `, and the ${count(n)} details below are the whole of it` : ""}`,
+  );
+}
+
+/**
+ * Consumer questions. Every answer is built from this brief: its product, its audience, and its
+ * detail names. The shared `questions` it used promised "cancel anytime", a comparison table the
+ * page never draws, a result in "one session" on the reader's data, a person who answers
+ * procurement and security, that every capability ships "from day one", and "no hidden tier". No
+ * brief declares any of those. The order of use is its own section, so no answer here repeats which
+ * details come first.
+ */
+export function consumerQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const lead = features[0];
+  const last = features[features.length - 1];
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+
+  out.push({
+    title: `Who is ${brief.productName} for?`,
+    body: sentence(features.length > 1 ? `${Audience}. The ${count(features.length)} details above are all of it` : Audience),
+  });
+  if (last && last !== lead) {
+    out.push({
+      title: `Is ${lower(last.name)} part of ${brief.productName}?`,
+      body: sentence(`Yes. It is one of the ${count(features.length)} details on this page`),
+    });
+  }
+  out.push({
+    title: `What is not part of ${brief.productName}?`,
+    body: sentence(`Anything this page does not name`),
+  });
+  const cta = ctaFor(brief.businessGoal, brief.siteKind, brief.primaryCta).primary;
+  out.push({
+    title: `How do we begin with ${brief.productName}?`,
+    body: sentence(`Choose "${cta}" at the top or the foot of this page`),
+  });
+  return out;
+}
+
+/**
  * Corporate questions. Every answer is built from this brief: its product, its audience, and its
  * capability names. The shared `questions` promised "cancel anytime", a comparison table, a result
  * in "one session" on the reader's data, a person who answers procurement and security, a named
@@ -1266,7 +1319,9 @@ export function navFor(
                 // Press: the index is headed "The plates", so the menu calls it "Plates".
                 : siteKind === "press-atelier"
                   ? "Plates"
-                  : "Capabilities",
+                  : siteKind === "consumer-craft"
+                    ? "Details"
+                    : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1279,7 +1334,8 @@ export function navFor(
               siteKind === "field-guide" ||
               siteKind === "signal-observatory" ||
               siteKind === "editorial-foundry" ||
-              siteKind === "press-atelier"
+              siteKind === "press-atelier" ||
+              siteKind === "consumer-craft"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

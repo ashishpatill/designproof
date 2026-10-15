@@ -502,13 +502,17 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       spec.brief.siteKind !== "consumer-craft"
         || (
           !spec.sections.some((s) => s.kind === "pricing")
+          && !spec.sections.some((s) => s.kind === "metrics")
           && spec.sections.some((s) => s.layout === "feature-alternating")
           && /ds-hero-claimband/.test(html)
           && /ds-hero-stackfold/.test(html)
           && /ds-plate/.test(html)
+          // No order of use: its rows were only the detail names again. No metrics theatre, figure
+          // band, or specimen band under the register.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen" || s.kind === "story")
           && spec.sections.filter((s) => s.surface === "inverse").length <= 1
         ),
-      "Consumer craft stays figure-forward and paper-led — stack fold + solid claim, no pricing, ≤1 inverse.",
+      "Consumer craft stays figure-forward and paper-led — stack fold + solid claim, detail register naming each detail once, no order-of-use band — no pricing, no metrics theatre, no figure band or specimen band, ≤1 inverse.",
     ),
     check(
       "kind-foundry",
