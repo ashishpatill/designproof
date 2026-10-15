@@ -2197,10 +2197,18 @@ export function permitPlate(
   role: FigureRole = "band",
 ): string {
   const r = rng(`${seed}:permit-plate:${role}`);
-  const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
-  const H = role === "band" ? 720 : role === "column" ? 560 : 520;
-  const padX = role === "band" ? 36 : 24;
-  const padY = role === "band" ? 28 : 20;
+  const pathCount = 2 + (r() > 0.5 ? 1 : 0);
+  const padYc = role === "band" ? 24 : 20;
+  const plateHc = 28 + 22 + 28 + 20 + 28 + 18 + pathCount * 16 + 22 + 18 + 32 + 36 + 20;
+  const H = padYc + 48 + plateHc + 24 + padYc;
+  /*
+   * The plate is drawn to its content: tool, command, paths, blast radius, then the two buttons.
+   * It used to be a fixed 1280×720 panel with ~330px of empty field above the buttons, and a
+   * full-bleed inset that pushed "ONE PENDING TOOL" past the page edge.
+   */
+  const W = role === "band" ? 960 : role === "column" ? 560 : 720;
+  const padX = role === "band" ? 28 : 24;
+  const padY = padYc;
   const parts: string[] = [];
 
   parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="var(--c-paper)"/>`);
@@ -2242,13 +2250,13 @@ export function permitPlate(
     "./session/turns",
     "./permit/scope",
     "./finish/when",
-  ].slice(0, 2 + (r() > 0.5 ? 1 : 0));
+  ].slice(0, pathCount);
   const blast = "local write · network hold until Allow";
 
   const plateX = padX + 24;
   const plateY = padY + 48;
   const plateW = W - padX * 2 - 48;
-  const plateH = H - padY * 2 - 72;
+  const plateH = plateHc;
   parts.push(
     `<rect x="${round(plateX)}" y="${round(plateY)}" width="${round(plateW)}" height="${round(plateH)}" fill="color-mix(in srgb, ${ACCENT_FIELD} 70%, var(--c-paper))" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
@@ -2272,7 +2280,7 @@ export function permitPlate(
   y += 18;
   parts.push(text(clip(blast, 48), plateX + 20, y, { size: FIG_MONO_PX, fill: BODY, mono: true }));
 
-  const btnY = plateY + plateH - 56;
+  const btnY = y + 32;
   const btnH = 36;
   const btnGap = 16;
   const btnW = Math.min(180, (plateW - 60 - btnGap) / 2);
@@ -2316,7 +2324,8 @@ export function permitPlate(
     height: H,
     kind: "permit-plate",
     label: `${productName} tool permit`,
-    inset: role === "band" ? BLEED_INSET : 0,
+    // No bleed inset: the plate sits inside the fold column, not across the screen.
+    inset: 0,
     dense: true,
   });
 }

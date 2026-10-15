@@ -381,8 +381,10 @@ describe("measured craft floors", () => {
     for (const [name, brief] of Object.entries(SHOWCASE_BRIEFS)) {
       const { spec, previewHtml } = designFromFeatures(brief);
       expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(7);
-      const headings = (previewHtml.match(/<h[1-4][\s>]/g) ?? []).length;
-      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(16);
+      // Footer column titles are chrome, not parts of the argument: count headings in the body only.
+      const body = previewHtml.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, "");
+      const headings = (body.match(/<h[1-4][\s>]/g) ?? []).length;
+      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(13);
       expect(new Set(spec.sections.map((s) => s.surface)).size, `${name} surfaces`).toBeGreaterThanOrEqual(3);
       expect(new Set(spec.sections.map((s) => s.layout)).size, `${name} layouts`).toBeGreaterThanOrEqual(6);
     }
@@ -895,6 +897,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "hero-helm")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "workflow-proof")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBe(0);
@@ -931,7 +935,9 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).not.toMatch(/class="[^"]*ds-pipeline-board/);
     expect(previewHtml).not.toMatch(/class="[^"]*ds-queue-console/);
     expect(previewHtml).not.toMatch(/tiller\.(app|io|dev|com)/i);
-    expect(previewHtml).not.toMatch(/waitlist/i);
+    // "No invented host, no waitlist" is the Local session instrument's own brief sentence.
+    expect(previewHtml).toMatch(/No invented host, no waitlist/);
+    expect(previewHtml).not.toMatch(/waitlist theatre|join the waitlist|on the waitlist/i);
     expect(previewHtml).not.toContain('data-research-domain="sport:');
     const svgSizes = [...previewHtml.matchAll(/font-size="(\d+(?:\.\d+)?)"/g)].map((m) => Number(m[1]));
     expect(svgSizes.every((n) => n >= 11)).toBe(true);

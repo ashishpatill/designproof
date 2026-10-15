@@ -912,15 +912,21 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
         .map((c) => `<li><span class="ds-steer-mark" aria-hidden="true"></span><span>${esc(c)}</span></li>`)
         .join("")}</ul>
     </aside>`;
+    /*
+     * The steer pin sits in the open space right of the headline, above the tape, and stays sticky
+     * from there. It used to sit on top of the turn tape and the permit plate.
+     */
     return `<section id="top" class="ds-section ds-hero ds-hero-helm" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${mast}
-      <div class="ds-helm-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-helm-fold">
-        <div class="ds-helm-main">
-          ${rail}
-          <div class="ds-bleed ds-helm-field">${plateFig}</div>
-        </div>
+      <div class="ds-helm-body">
+        <div class="ds-helm-claim">${copy}</div>
         ${pin}
+        <div class="ds-helm-fold">
+          <div class="ds-helm-main">
+            ${rail}
+            <div class="ds-helm-field">${plateFig}</div>
+          </div>
+        </div>
       </div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
@@ -1315,8 +1321,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
-        // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
-        spec.brief.siteKind === "agent-harness" ||
+        // Harness rows carry their description too: the fold prints none (removed from quietIndex).
         // Control-plane rows carry their description too: the index is their one home on the page.
         spec.brief.siteKind === "control-plane-oss";
       const isArchive = spec.brief.siteKind === "archive-index";
@@ -1328,6 +1333,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Harness rows are the index jump targets for Session/Permit/Finish craft.
+      const isHarness = spec.brief.siteKind === "agent-harness";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,7 +1348,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
-                      : ""
+                      : isHarness
+                        ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                        : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1455,7 +1464,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   const rail =
     spec.taste.aestheticLean === "system-crafted" &&
     spec.brief.siteKind !== "dashboard-webapp" &&
-    spec.brief.siteKind !== "fintech-marketing"
+    spec.brief.siteKind !== "fintech-marketing" &&
+    // Harness too: radius, body size and contrast chips are design notes, not page content.
+    spec.brief.siteKind !== "agent-harness"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1488,7 +1499,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Harness too: the list beside the drawing named every instrument again, right under the index.
+    spec.brief.siteKind !== "agent-harness"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1622,15 +1635,17 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
     spec?.brief.siteKind === "care-pathway" ||
-    spec?.brief.siteKind === "agent-harness" ||
+    // Harness priorities name their instruments in the chapter body, so they are not quiet.
     spec?.brief.siteKind === "control-plane-oss";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${
         // Educational chapters are priority tiers too, not "4 beats · editorial order".
+        // Harness likewise: the chapters are priority tiers, not editorial beats.
         spec?.brief.siteKind === "art-directed-studio" ||
         spec?.brief.siteKind === "corporate-story" ||
-        spec?.brief.siteKind === "docs-educational"
+        spec?.brief.siteKind === "docs-educational" ||
+        spec?.brief.siteKind === "agent-harness"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1642,7 +1657,13 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-              ${figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : ""}
+              ${
+                // Harness tiers are not instruments: instrument i's drawing does not belong on tier i
+                // (row 02 showed the fuel log's lines, row 03 the crew list's branches).
+                figures.marks[i] && spec?.brief.siteKind !== "agent-harness"
+                  ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
+                  : ""
+              }
             </li>`,
           )
           .join("")}
@@ -2457,11 +2478,17 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
   };
 
   const map: Record<string, () => string | null> = {
-    "how it works": () => prefer("figure", "features"),
-    "what is included": () => prefer("compare", "features"),
-    questions: () => prefer("faq", "cta"),
-    "security review": () => prefer("proof", "cta"),
-    "talk to us": () => prefer("cta"),
+    /*
+     * Evaluate column: each label links only to the section it names. No fallback to the
+     * catalogue or the closing band: "Security review" on a page with no security section, or
+     * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
+     */
+    "how it works": () => prefer("figure"),
+    "what is included": () => prefer("compare"),
+    questions: () => prefer("faq"),
+    // No template has a security section (saas "proof" is the declared sequence) or a contact path.
+    "security review": () => null,
+    "talk to us": () => null,
     sequence: () => prefer("figure", "story"),
     "why it holds": () => prefer("proof"),
     workspace: () => prefer("app"),
@@ -2483,6 +2510,17 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  /*
+   * Every footer entry is a link to a section on this page. Labels with no section here (pages no
+   * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
+   * specimen footer keeps its own plain-text columns, which describe the specimen and link nowhere.
+   */
+  const linkOnly = spec.brief.siteKind !== "control-plane-oss";
+  const footerBlocks = section.blocks
+    .map((b) =>
+      linkOnly ? { ...b, points: b.points.filter((p) => footerPointHref(p, knownIds, b.title)) } : b,
+    )
+    .filter((b) => b.points.length > 0);
   return `<footer class="ds-footer" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       <div class="ds-footer-grid">
@@ -2491,7 +2529,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
           <p class="ds-caption">${esc(section.body)}</p>
           ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
         </div>
-        ${section.blocks
+        ${footerBlocks
           .map(
             (b) => `<div class="ds-footer-col">
               <h4>${esc(b.title)}</h4>
@@ -2509,10 +2547,6 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
       </div>
       <div class="ds-footer-base">
         <span>© ${year} ${esc(section.brandLabel ?? section.title)}</span>
-        <span>All capabilities listed on this page are available today</span>
-        <span>Accessibility</span>
-        <span>Privacy</span>
-        <span>Terms</span>
       </div>
     </div>
   </footer>`;
@@ -3089,6 +3123,25 @@ function scripts(spec: DesignSpec): string {
 
 /** Self-contained HTML document for iframe preview / static showcase. */
 export function renderPreviewHtml(spec: DesignSpec): string {
+  return pruneDeadFooterLinks(renderPreviewPage(spec));
+}
+
+/**
+ * Footer links point at sections of this same page. Some templates render a section under a
+ * different anchor than its spec id (or skip it), so a link is kept only when its target id is
+ * really in the finished page; a column left with no links goes with it.
+ */
+export function pruneDeadFooterLinks(html: string): string {
+  return html.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, (footer) => {
+    const body = html.replace(footer, "");
+    const pruned = footer.replace(/<a (?:class="[^"]*" )?href="#([^"]+)">[^<]*<\/a>/g, (a, id: string) =>
+      body.includes(`id="${id}"`) ? a : "",
+    );
+    return pruned.replace(/<div class="ds-footer-col">\s*<h4>[^<]*<\/h4>\s*<\/div>/g, "");
+  });
+}
+
+function renderPreviewPage(spec: DesignSpec): string {
   const fonts = spec.tokens.fontRequests.map((f) => `family=${f}`).join("&");
   const figures = figuresFor(spec);
   const needsHtmx = spec.sections.some((s) => s.layout === "workflow-proof");
@@ -3121,7 +3174,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "agent-harness"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

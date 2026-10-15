@@ -8,6 +8,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Agent harness template says each thing once
+
+- The agent harness page drops the figure band (a "cost · cumulative" chart with made-up values under "how X permits a local tool", which named the instruments twice more) and the specimen band, which printed every name again under "X permit field". It goes from nine sections to seven: first screen, one index, the priorities, questions, closing, footer.
+- Each instrument description is printed once, in the index. Before, the first screen printed the lead description under the headline, the index printed bare names (three or four of them, whatever the brief gave) under "permits a local session actually keeps" and "not a workflow approve stamp dressed as trust", beside a "how it is put together" list that named them again, and the turn-notes essay printed every description a second time as "T01 Turn tape" under "how a local session actually finishes". The index now holds every instrument, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, instrument by instrument").
+- The helm fold keeps turn tape (T01–Tn), the permit plate (Allow once / Deny), and the sticky FINISH WHEN pin on a paper-led LOCAL session. The fold prints no lead description and no waitlist note.
+- The priorities group the instruments by the priority the brief gives (core, supporting, additional). With a single priority the section is left out.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Start the Kilnroom session with kiln calendar." and "Four more instruments sit in the index above." The buttons read "Start a local session" and "Read all five instruments". The menu stays Session / Permit / Finish. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 307 to 134. New styles sit only in the harness motion-signature block. New test: `packages/design-skills/src/__tests__/harness-template-once.test.ts`.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.
