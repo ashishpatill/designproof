@@ -2459,13 +2459,14 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
   const map: Record<string, () => string | null> = {
     /*
      * Evaluate column: each label links only to the section it names. No fallback to the
-     * catalogue or the closing band: "Security review" on a page with no proof section, or
+     * catalogue or the closing band: "Security review" on a page with no security section, or
      * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
      */
     "how it works": () => prefer("figure"),
     "what is included": () => prefer("compare"),
     questions: () => prefer("faq"),
-    "security review": () => prefer("proof"),
+    // No template has a security section (saas "proof" is the declared sequence) or a contact path.
+    "security review": () => null,
     "talk to us": () => null,
     sequence: () => prefer("figure", "story"),
     "why it holds": () => prefer("proof"),

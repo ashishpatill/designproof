@@ -8,14 +8,13 @@ import { designFromFeatures } from "../orchestrate";
 import { DESIGN_TEMPLATES } from "../templates";
 import { DesignBrief } from "../types";
 
-const BANNED_LABELS = ["About", "Customers", "Careers", "Press", "Contact", "Security", "Availability", "Data handling", "Subprocessors", "Status", "Accessibility", "Privacy", "Terms", "Talk to us"];
+const BANNED_LABELS = ["About", "Customers", "Careers", "Press", "Contact", "Security", "Availability", "Data handling", "Subprocessors", "Status", "Accessibility", "Privacy", "Terms", "Talk to us", "Security review"];
 const CLAIM = "All capabilities listed on this page are available today";
 /** Evaluate labels may only point at the section they name. */
 const EVALUATE_TARGET: Record<string, string> = {
   "How it works": "figure",
   "What is included": "compare",
   Questions: "faq",
-  "Security review": "proof",
 };
 
 const SAMPLE_BRANDS: [string, string, string, string[]][] = [
