@@ -7,7 +7,7 @@
  */
 import { count, helmSessionTurns, PRESS_SIGS, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
-import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
+import { careStageLabels, horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -848,13 +848,16 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-care-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const stages = ["Intake", "Triage", "Treat", "Follow-up", "Discharge"];
+    // Stage labels come from this brand's own capabilities (or just numbers), never clinic sample words.
     const nums = ["01", "02", "03", "04", "05"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    const stages = careStageLabels(spec.brief.features.map((f) => f.name));
+    // Each stage jumps to its own round in the index; #specimen/#story are not on clinic pages.
+    const featureCount = spec.brief.features.length;
+    const hrefs = nums.map((n, i) => (i < featureCount ? `#encounter-${n}` : "#features"));
     const rail = `<nav class="ds-care-rail" aria-label="Care stages"><ol>${stages
       .map((label, i) => {
         const href = hrefs[i] ?? "#features";
-        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="Stage ${nums[i]}: ${label}"><span class="ds-care-num">${nums[i]}</span><span class="ds-care-label">${label}</span></a></li>`;
+        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="Stage ${nums[i]}${label ? `: ${esc(label)}` : ""}"><span class="ds-care-num">${nums[i]}</span>${label ? `<span class="ds-care-label">${esc(label)}</span>` : ""}</a></li>`;
       })
       .join("")}</ol></nav>`;
     const mast = `<header class="ds-care-masthead" aria-label="Care masthead">
@@ -872,7 +875,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ${rail}
       ${mast}
       <div class="ds-care-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-bleed ds-care-field">${plateFig}${imprint}</div>
+      <div class="ds-bleed ds-care-field"${plateFig ? ' id="figure"' : ""}>${plateFig}${imprint}</div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
   }
@@ -2000,19 +2003,13 @@ function renderRounds(section: SectionSpec, figures: FigurePlan): string {
   const count = blocks.length || 1;
   const steps = blocks
     .map((b, i) => {
-      const enc = esc(b.meta ?? `Enc ${String(i + 1).padStart(2, "0")}`);
-      const at = b.points.length ? b.points.join(", ") : "";
-      const n = b.points.length || 0;
-      const note =
-        n > 0
-          ? `<p class="ds-rounds-note">${n} ${n === 1 ? "round" : "rounds"} · Enc ${esc(at)}</p>`
-          : b.kicker
-            ? `<p class="ds-rounds-note">${esc(b.kicker)}</p>`
-            : "";
+      // Tiers are named Core / Supporting / Additional; no "Enc 01" counter to clash with round numbers.
+      const enc = b.meta ? `<p class="ds-rounds-enc">${esc(b.meta)}</p>` : "";
+      const note = !b.body && b.kicker ? `<p class="ds-rounds-note">${esc(b.kicker)}</p>` : "";
       return `<li class="ds-rounds-step" style="--i:${i}">
         <span class="ds-rounds-bead" aria-hidden="true"></span>
         <article class="ds-rounds-panel">
-          <p class="ds-rounds-enc">${enc}</p>
+          ${enc}
           <p class="ds-rounds-stage">${esc(b.title)}</p>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
           ${note}
@@ -2480,6 +2477,11 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  // The care-pathway fold carries the pathway figure as id="figure" (How it works lands on it).
+  if (spec.sections.some((s) => s.layout === "hero-rounds")) knownIds.add("figure");
+  // Clinic's footer button reads "See every round": it lands on the rounds index, not the closing band.
+  const footerCtaHref =
+    spec.brief.siteKind === "care-pathway" && knownIds.has("features") ? "#features" : "#cta";
   /*
    * Every footer entry is a link to a section on this page. Labels with no section here (pages no
    * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
@@ -2497,7 +2499,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
         <div class="ds-footer-col ds-footer-brand">
           <p class="ds-wordmark">${esc(section.brandLabel ?? section.title)}</p>
           <p class="ds-caption">${esc(section.body)}</p>
-          ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
+          ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="${footerCtaHref}">${esc(section.ctaLabel)}</a>` : ""}
         </div>
         ${footerBlocks
           .map(

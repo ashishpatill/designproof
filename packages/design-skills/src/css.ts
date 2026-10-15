@@ -1630,8 +1630,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
   margin-top:0;position:relative;z-index:1;
   padding-left:0;
 }
-[data-sitekind="care-pathway"] .ds-care-plate .ds-fig{min-height:min(78vh,820px)}
-[data-sitekind="care-pathway"] .ds-hero-rounds{min-height:min(100vh,900px)}
+[data-sitekind="care-pathway"] .ds-care-plate .ds-fig{min-height:0;height:auto}
+[data-sitekind="care-pathway"] .ds-hero-rounds{min-height:0;padding-bottom:var(--s-lg)}
 /* Sticky nav is in-flow — do NOT add --nav-h again or the care-plate starves below y≈360. */
 [data-sitekind="care-pathway"] .ds-care-masthead{
   padding-top:var(--s-xs,0.35rem);
@@ -1661,6 +1661,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
   padding-left:var(--gutter);
   box-sizing:border-box;
 }
+/* The rail offset must not push a full-width head past the cards under it (FAQ box ran ~30px over). */
+[data-sitekind="care-pathway"] .ds-section-head{width:auto;max-width:calc(100% - var(--care-rail))}
 [data-sitekind="care-pathway"] .ds-closing-colophon{
   border-top:1px solid var(--c-border);padding-top:var(--s-xl);
 }
@@ -1695,7 +1697,7 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
 [data-sitekind="care-pathway"] .ds-closing-colophon{border-top:1px solid var(--c-border)}
 /* Chart imprint — layered over plate foot; paper/teal surface, never near-black silhouettes. */
 [data-sitekind="care-pathway"] .ds-care-imprint{
-  position:relative;z-index:3;margin:-4.5rem var(--gutter) 0 var(--care-inset);
+  position:relative;z-index:3;margin:var(--s-sm) var(--gutter) 0 var(--care-inset);
   max-width:36rem;padding:var(--s-sm) var(--s-md);
   background:color-mix(in srgb,var(--c-paper) 92%,var(--c-accent) 8%);
   border:1px solid var(--c-border);
@@ -3556,7 +3558,7 @@ ${surfaceRules()}
 .ds-care-claim .ds-hero-copy{max-width:30rem;gap:0.45rem}
 .ds-care-field{margin-top:0;position:relative}
 .ds-care-plate{margin:0;width:100%;display:block}
-.ds-care-plate .ds-fig{width:100%;min-height:min(80vh,840px);display:block}
+.ds-care-plate .ds-fig{width:100%;height:auto;display:block}
 .ds-care-rail{
   position:fixed;left:0;top:calc(var(--nav-h,4.5rem) + var(--s-sm));bottom:var(--s-sm);
   width:var(--care-rail,3.5rem);z-index:var(--z-nav);pointer-events:none;

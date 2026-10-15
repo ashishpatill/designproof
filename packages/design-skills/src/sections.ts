@@ -1418,12 +1418,12 @@ export function buildSections(
               eyebrow: "Priorities",
               title: sentence(`Which ${brief.productName} rounds to open first`),
               body: "",
-              blocks: tiers.map((t, i) =>
+              blocks: tiers.map((t) =>
                 block({
                   title: t.tier,
-                  body: sentence(spoken([t.names[0]!, ...t.names.slice(1).map((n) => lower(n))])),
+                  // Name the rounds by number (dossier/harness fix): the index already prints each name.
+                  body: `${t.at.length === 1 ? "Round" : "Rounds"} ${spoken(t.at)}.`,
                   points: t.at,
-                  meta: `Enc ${String(i + 1).padStart(2, "0")}`,
                 }),
               ),
             }),

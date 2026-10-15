@@ -20,6 +20,7 @@ import { designFromFeatures, designFromFeaturesAuthored } from "../orchestrate";
 import { SHOWCASE_BRIEFS } from "../templates";
 import { DesignBrief } from "../types";
 import { assertBasics } from "../basics-checklist";
+import { careStageLabels } from "../figures";
 
 const sample = SHOWCASE_BRIEFS.clinic!;
 
@@ -178,8 +179,6 @@ describe("care pathway template says each thing once", () => {
       expect(railOf(previewHtml), brief.productName).not.toBe("");
       expect(plateOf(previewHtml), brief.productName).not.toBe("");
       expect(previewHtml).toContain("PATHWAY");
-      expect(previewHtml).toContain("Intake");
-      expect(previewHtml).toContain("Discharge");
       expect(previewHtml).toContain("Chart");
     }
   });
@@ -189,16 +188,75 @@ describe("care pathway template says each thing once", () => {
     const story = spec.sections.find((s) => s.kind === "story");
     expect(story?.eyebrow).toBe("Priorities");
     expect(story?.title).toBe("Which Kilnroom rounds to open first.");
+    // Rounds by number (dossier/harness fix), tiers by name: no capability names, no "Enc 01-03".
     expect(story?.blocks.map((b) => [b.title, b.body, b.meta, b.points])).toEqual([
-      ["Core", "Kiln calendar and glaze library.", "Enc 01", ["01", "02"]],
-      ["Supporting", "Member shelves and clay orders.", "Enc 02", ["03", "04"]],
-      ["Additional", "Class roster.", "Enc 03", ["05"]],
+      ["Core", "Rounds 01 and 02.", undefined, ["01", "02"]],
+      ["Supporting", "Rounds 03 and 04.", undefined, ["03", "04"]],
+      ["Additional", "Round 05.", undefined, ["05"]],
     ]);
     const html = sectionOf(previewHtml, "story");
     expect(html).toContain('aria-label="Rounds ladder"');
     expect(html).not.toContain('class="ds-rounds-mark"');
     expect(html).not.toContain("Note 01");
-    expect(html).toContain("2 rounds · Enc 01, 02");
+    expect(html).not.toMatch(/Enc\s*0\d/);
+    expect(html).not.toContain('class="ds-rounds-enc"');
+    for (const tier of ["Core", "Supporting", "Additional"]) expect(html).toContain(`<p class="ds-rounds-stage">${tier}</p>`);
+  });
+
+  it("never repeats capability names in the priorities, on any brief", () => {
+    for (const brief of briefs) {
+      const story = designFromFeatures(brief).spec.sections.find((s) => s.kind === "story");
+      if (!story) continue;
+      for (const b of story.blocks) {
+        expect(b.body, `${brief.productName} ${b.title}`).toMatch(/^Rounds? \d\d( and \d\d|(, \d\d)+,? and \d\d)?\.$/);
+        for (const f of brief.features) expect(b.body.toLowerCase()).not.toContain(f.name.toLowerCase());
+      }
+    }
+  });
+
+  it("labels the five pathway stages from the brand's own capabilities, never the clinic sample's words", () => {
+    for (const brief of briefs) {
+      const { previewHtml } = designFromFeatures(brief);
+      const fold = sectionOf(previewHtml, "hero");
+      for (const w of ["Intake", "Triage", "Treat", "Follow-up", "Discharge"]) {
+        expect(fold, `${brief.productName}: ${w}`).not.toMatch(new RegExp(`>\\s*${w}\\s*<|: ${w}"`));
+      }
+      const labels = careStageLabels(brief.features.map((f) => f.name));
+      expect(labels).toHaveLength(5);
+      for (const [i, label] of labels.entries()) {
+        expect(brief.features[i]!.name.startsWith(label), `${brief.productName} ${label}`).toBe(true);
+        expect(railOf(previewHtml)).toContain(`<span class="ds-care-label">${label}</span>`);
+      }
+    }
+    // Fewer than five capabilities: numbers only, no borrowed words.
+    expect(careStageLabels(["One", "Two", "Three"])).toEqual(["", "", "", "", ""]);
+  });
+
+  it("points every footer link at a section on the page, How it works at the pathway figure", () => {
+    for (const brief of briefs) {
+      const html = designFromFeatures(brief).previewHtml;
+      const footer = html.slice(html.indexOf('<footer class="ds-footer"'));
+      const hrefs = [...footer.matchAll(/href="#([a-z0-9-]+)"/g)].map((m) => m[1]!);
+      expect(hrefs.length).toBeGreaterThan(0);
+      for (const id of hrefs) expect(html, `${brief.productName} #${id}`).toContain(`id="${id}"`);
+      expect(footer).toContain('<a href="#figure">How it works</a>');
+      expect(footer).toContain('href="#features">See every round</a>');
+    }
+  });
+
+  it("puts all five tags above the line, each centred over its own stage", () => {
+    for (const brief of briefs) {
+      const plate = plateOf(designFromFeatures(brief).previewHtml);
+      const tags = [...plate.matchAll(/data-care-tag="(\d\d)" data-stage-x="([\d.]+)"/g)];
+      expect(tags.map((t) => t[1]), brief.productName).toEqual(["01", "02", "03", "04", "05"]);
+      const xs = tags.map((t) => Number(t[2]));
+      for (let i = 1; i < xs.length; i += 1) expect(xs[i]!).toBeGreaterThan(xs[i - 1]!);
+      // Each tag's x is a stage disc's centre (r=8 disc on the spine).
+      for (const x of xs) expect(plate).toContain(`<circle cx="${x}"`);
+      // No instrument strip (clipboard/vial/cuff oval) in the panel foot.
+      expect(plate).not.toContain("<ellipse");
+      expect(plate).not.toContain("NEAR PLANE");
+    }
   });
 
   it("leaves the priorities out when the brief gives a single priority, and still clears the basics", () => {
