@@ -233,10 +233,8 @@ ${reducedInteractive}
 `;
 
   const immersiveAuthored = `
-.ds-authored-motion[data-authored-slot="empty"]{
-  position:fixed;inset:auto 1rem 1rem auto;width:4.5rem;height:4.5rem;border-radius:var(--r-md);
-  border:1px solid var(--c-border);background:var(--c-paper-raised);opacity:0.55;pointer-events:none;z-index:var(--z-overlay);
-}
+/* No runtime asset is mounted, so the slot shows nothing (it used to be an empty grey box). */
+.ds-authored-motion[data-authored-slot="empty"]{display:none}
 `;
 
   return `${interactive}${reveals}${narrative}${motion === "immersive" ? immersiveAuthored : authored}`;
@@ -562,6 +560,16 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="care-pathway"] .ds-care-mark.is-active{transform:translateX(4px)}
   [data-sitekind="care-pathway"] .ds-care-imprint{transition:opacity 420ms var(--m-ease-out),transform 420ms var(--m-ease-out)}
   [data-sitekind="care-pathway"] .ds-handoff-cell{transition:opacity 420ms var(--m-ease-out),transform 420ms var(--m-ease-out)}
+}
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="care-pathway"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="care-pathway"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="care-pathway"] .ds-index-row > p{max-width:42ch;min-width:0}
+@media (max-width: 40rem){
+  [data-sitekind="care-pathway"] .ds-index-row{grid-template-columns:2.5rem 1fr}
 }
 `,
     "agent-harness": `
@@ -1622,8 +1630,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
   margin-top:0;position:relative;z-index:1;
   padding-left:0;
 }
-[data-sitekind="care-pathway"] .ds-care-plate .ds-fig{min-height:min(78vh,820px)}
-[data-sitekind="care-pathway"] .ds-hero-rounds{min-height:min(100vh,900px)}
+[data-sitekind="care-pathway"] .ds-care-plate .ds-fig{min-height:0;height:auto}
+[data-sitekind="care-pathway"] .ds-hero-rounds{min-height:0;padding-bottom:var(--s-lg)}
 /* Sticky nav is in-flow — do NOT add --nav-h again or the care-plate starves below y≈360. */
 [data-sitekind="care-pathway"] .ds-care-masthead{
   padding-top:var(--s-xs,0.35rem);
@@ -1653,6 +1661,8 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
   padding-left:var(--gutter);
   box-sizing:border-box;
 }
+/* The rail offset must not push a full-width head past the cards under it (FAQ box ran ~30px over). */
+[data-sitekind="care-pathway"] .ds-section-head{width:auto;max-width:calc(100% - var(--care-rail))}
 [data-sitekind="care-pathway"] .ds-closing-colophon{
   border-top:1px solid var(--c-border);padding-top:var(--s-xl);
 }
@@ -1687,7 +1697,7 @@ body[data-sitekind="care-pathway"][data-frame="paper-technical"] #main{
 [data-sitekind="care-pathway"] .ds-closing-colophon{border-top:1px solid var(--c-border)}
 /* Chart imprint — layered over plate foot; paper/teal surface, never near-black silhouettes. */
 [data-sitekind="care-pathway"] .ds-care-imprint{
-  position:relative;z-index:3;margin:-4.5rem var(--gutter) 0 var(--care-inset);
+  position:relative;z-index:3;margin:var(--s-sm) var(--gutter) 0 var(--care-inset);
   max-width:36rem;padding:var(--s-sm) var(--s-md);
   background:color-mix(in srgb,var(--c-paper) 92%,var(--c-accent) 8%);
   border:1px solid var(--c-border);
@@ -3548,7 +3558,7 @@ ${surfaceRules()}
 .ds-care-claim .ds-hero-copy{max-width:30rem;gap:0.45rem}
 .ds-care-field{margin-top:0;position:relative}
 .ds-care-plate{margin:0;width:100%;display:block}
-.ds-care-plate .ds-fig{width:100%;min-height:min(80vh,840px);display:block}
+.ds-care-plate .ds-fig{width:100%;height:auto;display:block}
 .ds-care-rail{
   position:fixed;left:0;top:calc(var(--nav-h,4.5rem) + var(--s-sm));bottom:var(--s-sm);
   width:var(--care-rail,3.5rem);z-index:var(--z-nav);pointer-events:none;
@@ -4350,6 +4360,9 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
 
 /* Footer */
 .ds-footer{padding-block:var(--section-y-tight);border-top:1px solid var(--c-border)}
+/* Fixed side rails (chapter, alpha, sig, way, care) stop at the footer: it sits above them on an opaque ground. */
+.ds-footer{position:relative;z-index:calc(var(--z-nav) + 1);background:var(--surface-bg,var(--c-paper))}
+.ds-footer[data-surface="paper"]{background:var(--c-paper)}
 .ds-footer-grid{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1fr;gap:var(--s-xl) var(--s-lg)}
 .ds-footer-col{display:grid;gap:var(--s-2xs);align-content:start;font-size:var(--t-bodySmall-size)}
 .ds-footer-brand{gap:var(--s-sm);max-width:34ch}

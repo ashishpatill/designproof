@@ -7,7 +7,7 @@
  */
 import { count, helmSessionTurns, PRESS_SIGS, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
-import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
+import { careStageLabels, horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -848,13 +848,16 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const plateFig = figures.hero
       ? `<figure class="ds-care-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
-    const stages = ["Intake", "Triage", "Treat", "Follow-up", "Discharge"];
+    // Stages are numbered only ("Stage 01"…): capabilities are named once, in the rounds index.
     const nums = ["01", "02", "03", "04", "05"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    const stages = careStageLabels();
+    // Each stage jumps to its own round in the index; #specimen/#story are not on clinic pages.
+    const featureCount = spec.brief.features.length;
+    const hrefs = nums.map((n, i) => (i < featureCount ? `#encounter-${n}` : "#features"));
     const rail = `<nav class="ds-care-rail" aria-label="Care stages"><ol>${stages
       .map((label, i) => {
         const href = hrefs[i] ?? "#features";
-        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="Stage ${nums[i]}: ${label}"><span class="ds-care-num">${nums[i]}</span><span class="ds-care-label">${label}</span></a></li>`;
+        return `<li><a href="${href}" class="ds-care-mark${i === 0 ? " is-active" : ""}" data-care="${nums[i]}" aria-label="${esc(label)}"><span class="ds-care-num">${nums[i]}</span>${label ? `<span class="ds-care-label">${esc(label)}</span>` : ""}</a></li>`;
       })
       .join("")}</ol></nav>`;
     const mast = `<header class="ds-care-masthead" aria-label="Care masthead">
@@ -872,7 +875,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ${rail}
       ${mast}
       <div class="ds-care-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-bleed ds-care-field">${plateFig}${imprint}</div>
+      <div class="ds-bleed ds-care-field"${plateFig ? ' id="figure"' : ""}>${plateFig}${imprint}</div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
   }
@@ -1280,27 +1283,6 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         .join("")}</ul>`;
     }
     if (section.layout === "feature-index") {
-      /*
-       * Care pathway: horizontal handoff strip (grid archetype) — not another vertical index
-       * list that twins the rounds ladder and inflates shape-run.
-       */
-      if (spec.brief.siteKind === "care-pathway") {
-        const stages = ["Intake", "Triage", "Treat", "Follow-up", "Discharge"];
-        const cells = section.blocks.slice(0, 5).map((b, i) => {
-          const stage = stages[i] ?? `Stage ${i + 1}`;
-          const handoff =
-            i < Math.min(4, section.blocks.length - 1)
-              ? `<span class="ds-handoff-diamond" aria-hidden="true"></span>`
-              : "";
-          return `<li class="ds-handoff-cell" style="--i:${i}">
-            <p class="ds-handoff-stage">${esc(stage)}</p>
-            <p class="ds-handoff-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
-            <h3>${esc(b.title)}</h3>
-            ${handoff}
-          </li>`;
-        });
-        return `<ol class="ds-handoff-strip" aria-label="Handoff strip">${cells.join("")}</ol>`;
-      }
       // Educational rows carry their description too: the fold prints none.
       const quietIndex =
         // Press rows carry their description too: the press sheet names the plates and prints no sentence.
@@ -1318,6 +1300,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
         spec.brief.siteKind === "agent-harness" ||
         // Control-plane rows carry their description too: the index is their one home on the page.
+        // Clinic is not here: the fold prints none, so the index is the one home for every description.
         spec.brief.siteKind === "control-plane-oss";
       const isArchive = spec.brief.siteKind === "archive-index";
       // Field guide rows are the binomial strip's jump targets.
@@ -1328,6 +1311,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Clinic rows are the index jump targets for Pathway/Rounds/Chart craft.
+      const isClinic = spec.brief.siteKind === "care-pathway";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,6 +1326,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
+                      : isClinic
+                        ? ` id="encounter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                       : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
@@ -1488,7 +1475,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Clinic too: the list beside the drawing named every round again, right under the index.
+    spec.brief.siteKind !== "care-pathway"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -2004,27 +1993,26 @@ function renderEmber(section: SectionSpec, figures: FigurePlan): string {
 /**
  * Rounds ladder — care-pathway mid-page instrument.
  *
- * Vertical stage ladder with encounter beads and panels along a left spine.
- * Not the ember zigzag, essay+aside list, or gather signature stack.
+ * Vertical priority ladder with encounter beads and panels along a left spine.
+ * Each rung is one priority tier from the brief; its note points at encounter numbers in the
+ * index. Not the ember zigzag, essay+aside list that reprinted every description, or a figure
+ * mark on every rung. Intake→Discharge stage names stay on the fold's care rail.
  */
 function renderRounds(section: SectionSpec, figures: FigurePlan): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const stages = ["Intake", "Triage", "Treat", "Follow-up", "Discharge", "Chart"];
   const steps = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-rounds-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const enc = esc(b.meta ?? `Enc ${String(i + 1).padStart(2, "0")}`);
-      const stage = stages[i] ?? `Stage ${i + 1}`;
+      // Tiers are named Core / Supporting / Additional; no "Enc 01" counter to clash with round numbers.
+      const enc = b.meta ? `<p class="ds-rounds-enc">${esc(b.meta)}</p>` : "";
+      const note = !b.body && b.kicker ? `<p class="ds-rounds-note">${esc(b.kicker)}</p>` : "";
       return `<li class="ds-rounds-step" style="--i:${i}">
         <span class="ds-rounds-bead" aria-hidden="true"></span>
         <article class="ds-rounds-panel">
-          <p class="ds-rounds-enc">${enc}</p>
-          <p class="ds-rounds-stage">${esc(stage)}</p>
-          <h3>${esc(b.title)}</h3>
+          ${enc}
+          <p class="ds-rounds-stage">${esc(b.title)}</p>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-rounds-note">${esc(b.kicker)}</p>` : ""}
-          ${mark}
+          ${note}
         </article>
       </li>`;
     })
@@ -2032,7 +2020,7 @@ function renderRounds(section: SectionSpec, figures: FigurePlan): string {
   return `<section class="ds-section ds-story ds-rounds" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Rounds", `${count} encounters · ladder`)}
+      ${secMeta("Rounds", `${count} priorities · ladder`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-rounds-ladder" aria-label="Rounds ladder">${steps}</ol>
     </div>
@@ -2457,11 +2445,17 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
   };
 
   const map: Record<string, () => string | null> = {
-    "how it works": () => prefer("figure", "features"),
-    "what is included": () => prefer("compare", "features"),
-    questions: () => prefer("faq", "cta"),
-    "security review": () => prefer("proof", "cta"),
-    "talk to us": () => prefer("cta"),
+    /*
+     * Evaluate column: each label links only to the section it names. No fallback to the
+     * catalogue or the closing band: "Security review" on a page with no security section, or
+     * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
+     */
+    "how it works": () => prefer("figure"),
+    "what is included": () => prefer("compare"),
+    questions: () => prefer("faq"),
+    // No template has a security section (saas "proof" is the declared sequence) or a contact path.
+    "security review": () => null,
+    "talk to us": () => null,
     sequence: () => prefer("figure", "story"),
     "why it holds": () => prefer("proof"),
     workspace: () => prefer("app"),
@@ -2483,15 +2477,31 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  // The care-pathway fold carries the pathway figure as id="figure" (How it works lands on it).
+  if (spec.sections.some((s) => s.layout === "hero-rounds")) knownIds.add("figure");
+  // Clinic's footer button reads "See every round": it lands on the rounds index, not the closing band.
+  const footerCtaHref =
+    spec.brief.siteKind === "care-pathway" && knownIds.has("features") ? "#features" : "#cta";
+  /*
+   * Every footer entry is a link to a section on this page. Labels with no section here (pages no
+   * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
+   * specimen footer keeps its own plain-text columns, which describe the specimen and link nowhere.
+   */
+  const linkOnly = spec.brief.siteKind !== "control-plane-oss";
+  const footerBlocks = section.blocks
+    .map((b) =>
+      linkOnly ? { ...b, points: b.points.filter((p) => footerPointHref(p, knownIds, b.title)) } : b,
+    )
+    .filter((b) => b.points.length > 0);
   return `<footer class="ds-footer" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       <div class="ds-footer-grid">
         <div class="ds-footer-col ds-footer-brand">
           <p class="ds-wordmark">${esc(section.brandLabel ?? section.title)}</p>
           <p class="ds-caption">${esc(section.body)}</p>
-          ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
+          ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="${footerCtaHref}">${esc(section.ctaLabel)}</a>` : ""}
         </div>
-        ${section.blocks
+        ${footerBlocks
           .map(
             (b) => `<div class="ds-footer-col">
               <h4>${esc(b.title)}</h4>
@@ -2509,10 +2519,6 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
       </div>
       <div class="ds-footer-base">
         <span>© ${year} ${esc(section.brandLabel ?? section.title)}</span>
-        <span>All capabilities listed on this page are available today</span>
-        <span>Accessibility</span>
-        <span>Privacy</span>
-        <span>Terms</span>
       </div>
     </div>
   </footer>`;
@@ -3089,6 +3095,25 @@ function scripts(spec: DesignSpec): string {
 
 /** Self-contained HTML document for iframe preview / static showcase. */
 export function renderPreviewHtml(spec: DesignSpec): string {
+  return pruneDeadFooterLinks(renderPreviewPage(spec));
+}
+
+/**
+ * Footer links point at sections of this same page. Some templates render a section under a
+ * different anchor than its spec id (or skip it), so a link is kept only when its target id is
+ * really in the finished page; a column left with no links goes with it.
+ */
+export function pruneDeadFooterLinks(html: string): string {
+  return html.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, (footer) => {
+    const body = html.replace(footer, "");
+    const pruned = footer.replace(/<a (?:class="[^"]*" )?href="#([^"]+)">[^<]*<\/a>/g, (a, id: string) =>
+      body.includes(`id="${id}"`) ? a : "",
+    );
+    return pruned.replace(/<div class="ds-footer-col">\s*<h4>[^<]*<\/h4>\s*<\/div>/g, "");
+  });
+}
+
+function renderPreviewPage(spec: DesignSpec): string {
   const fonts = spec.tokens.fontRequests.map((f) => `family=${f}`).join("&");
   const figures = figuresFor(spec);
   const needsHtmx = spec.sections.some((s) => s.layout === "workflow-proof");
@@ -3121,7 +3146,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "care-pathway"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>
