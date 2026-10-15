@@ -211,6 +211,19 @@ export function ctaFor(
         note: "",
       };
     }
+    if (siteKind === "lantern-path") {
+      /*
+       * No fold note. Trust-goal "Everything here is verifiable before you commit" and the sample's
+       * "See the approach" / "Read the detail" reached every lantern page through the authored path,
+       * a marina's and a pottery studio's included, and the fold already shows the way rail and
+       * path-plate. The buttons say what the page is: the path, and the chapters on it.
+       */
+      return {
+        primary: "Walk the path",
+        secondary: "See every chapter",
+        note: "",
+      };
+    }
     if (siteKind === "care-pathway") {
       return {
         primary: "Request a chart walkthrough",
@@ -1029,6 +1042,36 @@ export function pressQuestions(brief: DesignBrief, features: FeatureSpec[]): Arr
   return out;
 }
 
+/**
+ * Lantern-path questions. Every answer is built from this brief: its product, its audience, and its
+ * chapter names. The shared `questions` it used promised "cancel anytime", a comparison table the
+ * page never draws, a result in "one session" on the reader's data, a person who answers procurement
+ * and security, "no hidden tier", and that every capability ships "from day one". No brief declares
+ * any of those. The night trail is its own section, so no answer here repeats which chapters come
+ * first. The approval question stays only when the brief itself declares an approval step.
+ */
+export function lanternQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} path for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which chapter handles approvals?`,
+      body: sentence(`${features[at]!.name}, chapter ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} path?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} chapters`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Honest risk-reversal line for CTA bands — never invents guarantees the brief did not support. */
 export function riskReversal(brief: DesignBrief): string {
   switch (brief.businessGoal) {
@@ -1218,6 +1261,13 @@ export function navFor(
   sections: Array<{ kind: string; id: string }>,
   siteKind?: string,
 ): Array<{ label: string; href: string }> {
+  if (siteKind === "lantern-path") {
+    return [
+      { label: "Path", href: "#top" },
+      { label: "Chapters", href: "#features" },
+      { label: "Ember", href: "#cta" },
+    ];
+  }
   if (siteKind === "agent-harness") {
     return [
       { label: "Session", href: "#top" },

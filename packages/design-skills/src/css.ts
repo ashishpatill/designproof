@@ -233,10 +233,8 @@ ${reducedInteractive}
 `;
 
   const immersiveAuthored = `
-.ds-authored-motion[data-authored-slot="empty"]{
-  position:fixed;inset:auto 1rem 1rem auto;width:4.5rem;height:4.5rem;border-radius:var(--r-md);
-  border:1px solid var(--c-border);background:var(--c-paper-raised);opacity:0.55;pointer-events:none;z-index:var(--z-overlay);
-}
+/* No runtime asset is mounted, so the slot shows nothing (it used to be an empty grey box). */
+.ds-authored-motion[data-authored-slot="empty"]{display:none}
 `;
 
   return `${interactive}${reveals}${narrative}${motion === "immersive" ? immersiveAuthored : authored}`;
@@ -546,6 +544,45 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="lantern-path"] .ds-way-mark.is-active{transform:translateX(4px)}
   [data-sitekind="lantern-path"] .ds-path-near .ds-sil{transition:opacity 480ms var(--m-ease-out)}
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="lantern-path"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="lantern-path"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="lantern-path"] .ds-index-row > p{max-width:42ch;min-width:0}
+[data-sitekind="lantern-path"] .ds-ember-tier{
+  font-family:var(--f-mono);font-size:var(--t-caption-size);letter-spacing:0.12em;text-transform:uppercase;margin:0 0 0.35rem;
+}
+@media (max-width: 40rem){
+  [data-sitekind="lantern-path"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
+
+/* Tight rhythm: no viewport-tall hero tail, no 132vh chapter pin, no 100px+ empty bands between
+   hero/path, path/index, index/priorities, questions/close. */
+[data-sitekind="lantern-path"] section.ds-hero-path{min-height:0}
+[data-sitekind="lantern-path"] section.ds-chapter-pin{min-height:0;padding-bottom:calc(var(--section-y) * 0.25)}
+[data-sitekind="lantern-path"] section .ds-chapter-pin-inner{position:static;padding-top:0}
+[data-sitekind="lantern-path"] section.ds-chapter-pin .ds-chapter-progress{display:none}
+[data-sitekind="lantern-path"] section.ds-section:not(.ds-hero):not(.ds-footer){padding-block:calc(var(--section-y) * 0.25)}
+
+[data-sitekind="lantern-path"] section.ds-ember + section.ds-section,
+[data-sitekind="lantern-path"] section#features + section.ds-section{padding-top:calc(var(--section-y) * 0.2)}
+[data-sitekind="lantern-path"] section#faq{padding-block:calc(var(--section-y) * 0.2)}
+[data-sitekind="lantern-path"] section#cta{padding-block:calc(var(--section-y) * 0.25)}
+[data-sitekind="lantern-path"] .ds-footer{padding-block:calc(var(--s-xl) + 0.5rem)}
+
+[data-sitekind="lantern-path"] section.ds-ember .ds-sec-meta{margin-bottom:var(--s-sm)}
+[data-sitekind="lantern-path"] section.ds-ember .ds-section-head{margin-bottom:var(--s-md)}
+[data-sitekind="lantern-path"] section .ds-faq-columns .ds-section-head,
+[data-sitekind="lantern-path"] section.ds-faq .ds-section-head{margin-bottom:var(--s-md)}
+/* Priorities: three tier cards in a row, nothing opposite them. */
+[data-sitekind="lantern-path"] section .ds-ember-trail{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--gutter);margin-top:var(--s-md);padding-left:0;margin-left:0;
+}
+[data-sitekind="lantern-path"] section .ds-ember-trail::before{display:none}
+[data-sitekind="lantern-path"] section .ds-ember-step{display:block}
+[data-sitekind="lantern-path"] section .ds-ember-step .ds-ember-panel{text-align:left;height:100%}
 `,
     "care-pathway": `
 @keyframes ds-care-in{from{opacity:0;transform:translateY(1.4rem) scale(0.99)}to{opacity:1;transform:none}}
@@ -4350,6 +4387,9 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
 
 /* Footer */
 .ds-footer{padding-block:var(--section-y-tight);border-top:1px solid var(--c-border)}
+/* Fixed side rails (chapter, alpha, sig, way, care) stop at the footer: it sits above them on an opaque ground. */
+.ds-footer{position:relative;z-index:calc(var(--z-nav) + 1);background:var(--surface-bg,var(--c-paper))}
+.ds-footer[data-surface="paper"]{background:var(--c-paper)}
 .ds-footer-grid{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1fr;gap:var(--s-xl) var(--s-lg)}
 .ds-footer-col{display:grid;gap:var(--s-2xs);align-content:start;font-size:var(--t-bodySmall-size)}
 .ds-footer-brand{gap:var(--s-sm);max-width:34ch}
