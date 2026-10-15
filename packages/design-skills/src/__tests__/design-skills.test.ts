@@ -586,13 +586,17 @@ describe("research-backed offerings + implementation basics", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.consumer!);
     expect(spec.brief.siteKind).toBe("consumer-craft");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
+    expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "feature-alternating")).toBe(true);
+    // The order of use stays; the step chart and specimen went, because they reprinted every detail.
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBeLessThanOrEqual(1);
     expect(previewHtml).toContain('data-sitekind="consumer-craft"');
     expect(previewHtml).toContain("ds-hero-claimband");
     expect(previewHtml).toContain("ds-hero-stackfold");
-    expect(previewHtml).toContain("In hand");
+    expect(previewHtml).toContain("The details");
   });
 
   it("gives editorial foundry a hard-seam + type-ladder plan distinct from studio and SaaS", () => {

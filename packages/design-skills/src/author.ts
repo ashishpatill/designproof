@@ -20,6 +20,7 @@ import {
   saasQuestions,
   sentence,
   studioQuestions,
+  consumerQuestions,
   corporateQuestions,
   archiveQuestions,
   educationalQuestions,
@@ -329,8 +330,10 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
           ? fintechQuestions(brief, brief.features)
           : brief.siteKind === "art-directed-studio"
             ? studioQuestions(brief, brief.features)
-            : brief.siteKind === "corporate-story"
-              ? corporateQuestions(brief, brief.features)
+            : brief.siteKind === "consumer-craft"
+              ? consumerQuestions(brief, brief.features)
+              : brief.siteKind === "corporate-story"
+                ? corporateQuestions(brief, brief.features)
               : brief.siteKind === "archive-index"
                 ? archiveQuestions(brief, brief.features)
                 : brief.siteKind === "docs-educational"

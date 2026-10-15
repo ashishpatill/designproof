@@ -28,6 +28,7 @@ import {
   workspaceQuestions,
   fintechQuestions,
   studioQuestions,
+  consumerQuestions,
   corporateQuestions,
   archiveQuestions,
   educationalQuestions,
@@ -316,8 +317,10 @@ export function buildSections(
           ? fintechQuestions(brief, features)
           : brief.siteKind === "art-directed-studio"
             ? studioQuestions(brief, features)
-            : brief.siteKind === "corporate-story"
-              ? corporateQuestions(brief, features)
+            : brief.siteKind === "consumer-craft"
+              ? consumerQuestions(brief, features)
+              : brief.siteKind === "corporate-story"
+                ? corporateQuestions(brief, features)
               : brief.siteKind === "archive-index"
                 ? archiveQuestions(brief, features)
                 : brief.siteKind === "docs-educational"
@@ -553,6 +556,7 @@ export function buildSections(
           brief.siteKind === "dashboard-webapp" ||
           brief.siteKind === "fintech-marketing" ||
           brief.siteKind === "art-directed-studio" ||
+          brief.siteKind === "consumer-craft" ||
           brief.siteKind === "corporate-story" ||
           brief.siteKind === "archive-index" ||
           // Educational too: a five-part brief left its last two parts out of the index.
@@ -599,7 +603,8 @@ export function buildSections(
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
             : brief.siteKind === "dashboard-webapp" ||
                 brief.siteKind === "fintech-marketing" ||
-                brief.siteKind === "art-directed-studio"
+                brief.siteKind === "art-directed-studio" ||
+                brief.siteKind === "consumer-craft"
               ? rawSlice.map((b) =>
                   b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
                 )
@@ -707,7 +712,7 @@ export function buildSections(
               : isStudio
                 ? "Selected work"
                 : isConsumer
-                  ? "In hand"
+                  ? "The details"
                   : isFoundry
                     ? "The cuts"
                     : isDossier
@@ -762,8 +767,9 @@ export function buildSections(
               : isStudio
                 // The launch-week line was written for one design studio and sat on every studio page.
                 ? sentence(`The ${count(features.length)} parts of ${brief.productName}`)
+                // Consumer: "Built for the day you actually have" sat on every consumer page.
                 : isConsumer
-                  ? sentence(`Built for the day you actually have`)
+                  ? sentence(`The ${count(features.length)} details of ${brief.productName}`)
                   // Foundry: "cuts drawn for real reading sizes" was on a pottery studio's page too.
                   : isFoundry
                     ? sentence(`${brief.productName}, cut by cut`)
@@ -834,8 +840,9 @@ export function buildSections(
               : isStudio
                 // "Identity, product, and motion under one grid" described one sample studio's work.
                 ? ""
+                // Consumer: "not a lifestyle claim" sat on every consumer page, a pottery studio's included.
                 : isConsumer
-                  ? sentence(`Each capability is something you can point at on the product — not a lifestyle claim`)
+                  ? ""
                   // Foundry: "a style picker dressed as a product" was on every foundry page.
                   : isFoundry
                     ? ""
@@ -1080,6 +1087,41 @@ export function buildSections(
               ...base,
               eyebrow: "Order of work",
               title: sentence(`The order ${brief.productName} works in`),
+              body: "",
+              blocks: groups.map((g, i) =>
+                block({
+                  title: g.label,
+                  body: sentence(spoken(g.names.map((n, j) => (j === 0 ? n : lower(n))))),
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
+        /*
+         * Consumer: the chapters were the capability names again as "Step 01" under "A day with X"
+         * and "From morning pack to evening empty — what you actually do with it", lines written for
+         * one sample bag and printed on every consumer page. Now each chapter is one priority from
+         * the brief and names its details once. With a single priority there is no order to show,
+         * so the section is left out.
+         */
+        if (brief.siteKind === "consumer-craft") {
+          const groups = (
+            [
+              ["p0", "First"],
+              ["p1", "Next"],
+              ["p2", "Alongside"],
+            ] as const
+          )
+            .map(([priority, label]) => ({ label, names: features.filter((f) => f.priority === priority).map((f) => f.name) }))
+            .filter((g) => g.names.length);
+          if (groups.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Order of use",
+              title: sentence(`The order ${brief.productName} is used`),
               body: "",
               blocks: groups.map((g, i) =>
                 block({
@@ -1377,9 +1419,7 @@ export function buildSections(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "consumer-craft"
-                  ? "In use"
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? "Reading notes"
                         : brief.siteKind === "commerce-loom"
                           ? "Hangtag notes"
@@ -1393,9 +1433,7 @@ export function buildSections(
                           ? "How it works"
                   : eyebrow.story,
             title:
-              brief.siteKind === "consumer-craft"
-                  ? sentence(`A day with ${brief.productName}`)
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? sentence(`How a brief is actually read`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`How a hangtag is actually cut`)
@@ -1415,9 +1453,7 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "consumer-craft"
-                  ? sentence(`From morning pack to evening empty — what you actually do with it`)
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
                         : brief.siteKind === "commerce-loom"
                           ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
@@ -1895,6 +1931,9 @@ export function buildSections(
                 // Studio: "your own material" closed every studio page, a pottery studio's included.
                 : brief.siteKind === "art-directed-studio" && features[0]
                   ? `Start with ${lower(features[0].name)} at ${brief.productName}`
+                // Consumer: "in front of your bag" closed from the audience's last word on every page.
+                : brief.siteKind === "consumer-craft" && features[0]
+                  ? `Start with ${lower(features[0].name)} at ${brief.productName}`
                 // Corporate: "your own material" closed every corporate page, a marina's included.
                 : brief.siteKind === "corporate-story" && features[0]
                   ? `${brief.productName} starts with ${lower(features[0].name)}`
@@ -1985,6 +2024,11 @@ export function buildSections(
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                       features.length === 2 ? "part sits" : "parts sit"
                     } in the list above`
+                // Consumer: the count the brief gives, not "six capabilities, one conversation".
+                : brief.siteKind === "consumer-craft" && features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "detail sits" : "details sit"
+                    } in the list above`
                 // Educational: the count the brief gives, not "four capabilities, one conversation".
                 : brief.siteKind === "docs-educational"
                   ? features.length > 1
@@ -2039,6 +2083,9 @@ export function buildSections(
                         // Observatory likewise: the button leads back to the index.
                         : brief.siteKind === "signal-observatory" && features.length > 1
                           ? `Read all ${count(features.length)} channels`
+                          // Consumer likewise: the button leads back to the register.
+                          : brief.siteKind === "consumer-craft" && features.length > 1
+                            ? `Read all ${count(features.length)} details`
                           : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote:
