@@ -8,6 +8,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-15 — Lantern path template says each thing once
+
+- The lantern path page drops the figure band (a "cost · cumulative" chart with made-up values under "how X charts a night walk", which named the chapters twice more) and the specimen band, which printed every name again under "X path field". It goes from nine sections to seven: first screen, one index, the night trail (priorities), questions, closing, footer.
+- Each chapter description is printed once, in the index. Before, the index printed bare names (three or four of them, whatever the brief gave) under "chapters a night walk actually keeps" and "not a dark glow page dressed as cinema", beside a "how it is put together" list that named them again, and the ember-notes essay printed every description a second time as "Ch I Threshold" under "how a night walk is actually read". The index now holds every chapter, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, chapter by chapter").
+- The path fold keeps the sticky way rail (Ch I–V), the path-plate night cartograph, and the Ember close. The fold prints no lead description and no trust-goal verifiable/approach note.
+- The night trail groups the chapters by the priority the brief gives (core, supporting, additional). Each rung names its chapters once and points at chapter numbers in the index ("2 chapters · Ch 01, 02"). With a single priority the trail is left out; Ch I–V craft stays on the fold's way rail.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Walk the Kilnroom path with kiln calendar." and "Four more chapters sit in the index above." The buttons read "Walk the path" and "Read all five chapters". The menu stays Path / Chapters / Ember. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 289 to 99. New styles sit only in the lantern-path motion-signature block. New test: `packages/design-skills/src/__tests__/lantern-template-once.test.ts`.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.

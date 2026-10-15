@@ -842,6 +842,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(drawn).toContain("Threshold");
     expect(drawn).toContain('class="ds-draw"');
     expect(drawn).not.toContain('stroke-width="10"');
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
+    expect(previewHtml).toContain('class="ds-index"');
     const basics = assertBasics(spec, previewHtml);
     expect(basics.findings.filter((f) => !f.ok).map((f) => f.id)).not.toContain("path-plate-walk-not-scribble");
   });
@@ -1257,7 +1259,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Field guide neither: its voucher key sorts the traits by priority and carries no Note labels.
     // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
     // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
-    const noteKinds = ["loom", "lantern", "clinic"] as const;
+    // Lantern neither: its night trail groups the chapters by priority and carries no Note labels or marks.
+    const noteKinds = ["loom", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;
@@ -1272,8 +1275,6 @@ describe("research-backed offerings + implementation basics", () => {
     expect(rounds).toMatch(/\.ds-rounds-note \+ \.ds-rounds-mark\{[^}]*margin-top:var\(--s-lg\)/);
     const { previewHtml: chrono } = designFromFeatures(SHOWCASE_BRIEFS.observatory!);
     expect(chrono).toMatch(/\.ds-chrono-note \+ \.ds-chrono-mark\{[^}]*margin-top:var\(--s-lg\)/);
-    const { previewHtml: ember } = designFromFeatures(SHOWCASE_BRIEFS.lantern!);
-    expect(ember).toMatch(/\.ds-ember-note \+ \.ds-ember-mark\{[^}]*margin-top:var\(--s-lg\)/);
   });
 
   it("clears the implementation basics gate on every offering", () => {

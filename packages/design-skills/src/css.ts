@@ -546,6 +546,19 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="lantern-path"] .ds-way-mark.is-active{transform:translateX(4px)}
   [data-sitekind="lantern-path"] .ds-path-near .ds-sil{transition:opacity 480ms var(--m-ease-out)}
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="lantern-path"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="lantern-path"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="lantern-path"] .ds-index-row > p{max-width:42ch;min-width:0}
+[data-sitekind="lantern-path"] .ds-ember-tier{
+  font-family:var(--f-mono);font-size:var(--t-caption-size);letter-spacing:0.12em;text-transform:uppercase;margin:0 0 0.35rem;
+}
+@media (max-width: 40rem){
+  [data-sitekind="lantern-path"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "care-pathway": `
 @keyframes ds-care-in{from{opacity:0;transform:translateY(1.4rem) scale(0.99)}to{opacity:1;transform:none}}

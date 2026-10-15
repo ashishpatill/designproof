@@ -1310,9 +1310,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Foundry rows as well: the ladder on the fold names the cuts and prints no sentence.
         spec.brief.siteKind === "research-dossier" ||
         spec.brief.siteKind === "commerce-loom" ||
-        // Field guide rows carry their description too: the fold prints none.
-        spec.brief.siteKind === "lantern-path" ||
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
+        // Lantern is not here: the fold prints none, so the index is the one home for every description.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
         // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
@@ -1328,6 +1327,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Lantern rows are the index jump targets for Path/Chapters/Ember craft.
+      const isLantern = spec.brief.siteKind === "lantern-path";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,6 +1342,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
+                      : isLantern
+                        ? ` id="chapter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                       : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
@@ -1488,7 +1491,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Lantern too: the list beside the drawing named every chapter again, right under the index.
+    spec.brief.siteKind !== "lantern-path"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1969,24 +1974,36 @@ function renderGather(section: SectionSpec): string {
  * Center path spine with chapters zigzagging left/right (night-walk reading).
  * Not the essay+aside list clone shared by hang/entry.
  */
+/**
+ * Night trail — lantern-path mid-page instrument.
+ *
+ * Zigzag priority trail with chapter beads and panels. Each rung is one priority tier from the
+ * brief; its note points at chapter numbers in the index. Not the essay+aside list that reprinted
+ * every description, or a figure mark on every rung. Ch I–V chapter names stay on the fold's way rail.
+ */
 function renderEmber(section: SectionSpec, figures: FigurePlan): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const romans = ["I", "II", "III", "IV", "V", "VI"];
   const steps = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-ember-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const ch = esc(b.meta ?? `Ch ${romans[i] ?? String(i + 1)}`);
+      const ch = esc(b.meta ?? `Ch ${String(i + 1).padStart(2, "0")}`);
       const side = i % 2 === 0 ? "left" : "right";
+      const at = b.points.length ? b.points.join(", ") : "";
+      const n = b.points.length || 0;
+      const note =
+        n > 0
+          ? `<p class="ds-ember-note">${n} ${n === 1 ? "chapter" : "chapters"} · Ch ${esc(at)}</p>`
+          : b.kicker
+            ? `<p class="ds-ember-note">${esc(b.kicker)}</p>`
+            : "";
       return `<li class="ds-ember-step" data-side="${side}" style="--i:${i}">
         <span class="ds-ember-bead" aria-hidden="true"></span>
         <div class="ds-ember-rest" aria-hidden="true"></div>
         <article class="ds-ember-panel">
           <p class="ds-ember-ch">${ch}</p>
-          <h3>${esc(b.title)}</h3>
+          <p class="ds-ember-tier">${esc(b.title)}</p>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-ember-note">${esc(b.kicker)}</p>` : ""}
-          ${mark}
+          ${note}
         </article>
       </li>`;
     })
@@ -1994,7 +2011,7 @@ function renderEmber(section: SectionSpec, figures: FigurePlan): string {
   return `<section class="ds-section ds-story ds-ember" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Ember", `${count} waypoints · night trail`)}
+      ${secMeta("Ember", `${count} priorities · night trail`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-ember-trail" aria-label="Night trail">${steps}</ol>
     </div>
@@ -3121,7 +3138,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "lantern-path"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

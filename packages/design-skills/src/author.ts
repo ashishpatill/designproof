@@ -27,6 +27,7 @@ import {
   observatoryQuestions,
   foundryQuestions,
   pressQuestions,
+  lanternQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -343,7 +344,9 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
                         ? foundryQuestions(brief, brief.features)
                         : brief.siteKind === "press-atelier"
                           ? pressQuestions(brief, brief.features)
-                          : questions(brief, brief.features);
+                          : brief.siteKind === "lantern-path"
+                            ? lanternQuestions(brief, brief.features)
+                            : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 
   const proof: AuthoredProof = {};
