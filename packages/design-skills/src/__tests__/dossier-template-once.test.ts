@@ -141,16 +141,16 @@ describe("research dossier template says each thing once", () => {
     }
   });
 
-  it("names each instrument once on the plate, once in the index, once in the priorities, and the lead once more in the close", async () => {
+  it("names each instrument once on the plate, once in the index, and the lead once more in the close; the priorities give index numbers", async () => {
     for (const brief of briefs.slice(1)) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         const text = visible(html);
         const plate = plateOf(html);
         for (const [i, f] of brief.features.entries()) {
-          // Plate (drawn text), index, and priorities in the page text, plus the close for the lead.
+          // Plate (drawn text) and index in the page text, plus the close for the lead. Priorities cite numbers.
           // Plate names are inside the SVG so they count in visible() after tag strip.
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 4 : 3);
-          expect(plate.split(`>${f.name}<`).length - 1 + plate.split(`>${f.name.slice(0, 18)}`).length - 1, `${brief.productName} plate: ${f.name}`).toBeGreaterThanOrEqual(1);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 3 : 2);
+          expect(plate.split(`>${nn(i)} ${f.name.slice(0, 17)}`).length - 1, `${brief.productName} plate: ${f.name}`).toBe(1);
         }
       }
     }
@@ -201,10 +201,22 @@ describe("research dossier template says each thing once", () => {
     expect(story?.eyebrow).toBe("Priorities");
     expect(story?.title).toBe("Which Kilnroom instruments to open first.");
     expect(story?.blocks.map((b) => [b.title, b.body])).toEqual([
-      ["Core", "Kiln calendar and glaze library."],
-      ["Supporting", "Member shelves and clay orders."],
-      ["Additional", "Class roster."],
+      ["Core", "Instruments 01 and 02."],
+      ["Supporting", "Instruments 03 and 04."],
+      ["Additional", "Instrument 05."],
     ]);
+    // Tiers carry no instrument drawing: tier i is not instrument i.
+    expect(sectionOf(designFromFeatures(briefs[3]!).previewHtml, "story")).not.toContain("ds-chapter-mark");
+  });
+
+  it("labels every plate pin beside its own dot, numbered like the index, one pin per cell", () => {
+    for (const brief of briefs) {
+      const plate = plateOf(designFromFeatures(brief).previewHtml);
+      const n = Math.min(brief.features.length, 40);
+      for (const [i, f] of brief.features.slice(0, n).entries()) expect(plate).toContain(`>${nn(i)} ${f.name.slice(0, 17)}`);
+      const dots = [...plate.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="5"/g)].map((m) => `${m[1]},${m[2]}`);
+      expect(new Set(dots).size).toBe(dots.length);
+    }
   });
 
   it("leaves the priorities out when the brief gives a single priority, and still clears the basics", () => {
