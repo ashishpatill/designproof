@@ -412,6 +412,16 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
     [data-sitekind="research-dossier"] .ds-chapter-progress{animation-name:ds-chapter-fill-y}
   }
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="research-dossier"] .ds-index-row:nth-child(n){margin-block:0}
+[data-sitekind="research-dossier"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(9rem,18ch) minmax(20rem,1fr) minmax(5rem,7rem);
+}
+[data-sitekind="research-dossier"] .ds-index-row > p{max-width:42ch;min-width:0}
+@media (max-width: 40rem){
+  [data-sitekind="research-dossier"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "signal-observatory": `
 @keyframes ds-obs-in{from{opacity:0;transform:translateY(0.35rem) scale(0.98)}to{opacity:1;transform:none}}

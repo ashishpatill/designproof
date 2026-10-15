@@ -157,10 +157,15 @@ export function ctaFor(
       };
     }
     if (siteKind === "research-dossier") {
+      /*
+       * No fold note. "Briefings ship as numbered folios — not a demo theatre" reached every
+       * dossier page, a marina's and a pottery studio's included, and no brief says how anything
+       * ships. The buttons say what the page is: the brief, and the instruments on it.
+       */
       return {
-        primary: "Request the brief",
-        secondary: "Read the method",
-        note: "Briefings ship as numbered folios — not a demo theatre.",
+        primary: "Open the brief",
+        secondary: "See every instrument",
+        note: "",
       };
     }
     if (siteKind === "signal-observatory") {
@@ -960,6 +965,37 @@ export function observatoryQuestions(brief: DesignBrief, features: FeatureSpec[]
 }
 
 /**
+ * Dossier questions. Every answer is built from this brief: its product, its audience, and its
+ * instrument names. The shared `questions` it used promised "cancel anytime", a comparison table
+ * the page never draws, a result in "one session" on the reader's data, a person who answers
+ * procurement and security, "no hidden tier", and that every capability ships "from day one". No
+ * brief declares any of those. The priorities section is its own section, so no answer here repeats
+ * which instruments come first. The approval question stays only when the brief itself declares an
+ * approval step.
+ */
+export function dossierQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} brief for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => APPROVAL_WORKFLOW_SIGNAL.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which instrument handles approvals?`,
+      body: sentence(`${features[at]!.name}, instrument ${String(at + 1).padStart(2, "0")} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not in the ${brief.productName} brief?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything outside its ${count(features.length)} instruments`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
+/**
  * Foundry questions. Every answer is built from this brief: its product, its audience, and its cut
  * names. The shared `questions` it used promised "cancel anytime", a comparison table the page
  * never draws, a result in "one session" on the reader's data, a person who answers procurement and
@@ -1266,7 +1302,9 @@ export function navFor(
                 // Press: the index is headed "The plates", so the menu calls it "Plates".
                 : siteKind === "press-atelier"
                   ? "Plates"
-                  : "Capabilities",
+                  : siteKind === "research-dossier"
+                    ? "Instruments"
+                    : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1279,7 +1317,8 @@ export function navFor(
               siteKind === "field-guide" ||
               siteKind === "signal-observatory" ||
               siteKind === "editorial-foundry" ||
-              siteKind === "press-atelier"
+              siteKind === "press-atelier" ||
+              siteKind === "research-dossier"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",
