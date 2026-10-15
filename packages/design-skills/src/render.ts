@@ -2457,11 +2457,16 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
   };
 
   const map: Record<string, () => string | null> = {
-    "how it works": () => prefer("figure", "features"),
-    "what is included": () => prefer("compare", "features"),
-    questions: () => prefer("faq", "cta"),
-    "security review": () => prefer("proof", "cta"),
-    "talk to us": () => prefer("cta"),
+    /*
+     * Evaluate column: each label links only to the section it names. No fallback to the
+     * catalogue or the closing band: "Security review" on a page with no proof section, or
+     * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
+     */
+    "how it works": () => prefer("figure"),
+    "what is included": () => prefer("compare"),
+    questions: () => prefer("faq"),
+    "security review": () => prefer("proof"),
+    "talk to us": () => null,
     sequence: () => prefer("figure", "story"),
     "why it holds": () => prefer("proof"),
     workspace: () => prefer("app"),
