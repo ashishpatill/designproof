@@ -586,9 +586,20 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    * moderate display and almost no inverse theatre. Soft theme packs answer with card grids and
    * glass heroes. This offering invents unreplicable loom grammar: size-tape rail, warp/weft SKU
    * loom owning the fold (with free textile photos), hangtag essay, Care label close.
+   *
+   * The page used to follow the drawloom fold with an index of bare names (four of them on a
+   * six-line brief, whatever the brief gave) beside a "how it is put together" list that named them
+   * again, a figure band that set the names twice more beside a "cost · cumulative" chart of made-up
+   * values, a specimen band of bare names, and a hangtag essay that printed every description again
+   * with the name over each one and a size tape that named every line once more. The cloth on the
+   * fold cycled the names through all six of its cells, so a three-line brief drew each name twice.
+   * A five-line brief named its lead line eleven times. The cloth now names each line once, the
+   * index holds every description once, and the hangtags group the lines by the priority the brief
+   * gives, so they say something the index does not.
    */
   if (siteKind === "commerce-loom") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-loom", surface: "paper", columns: split.wide });
+    // Line index — every line, numbered like the cloth's cells and the treadles, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -596,24 +607,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Hangtags — one tag per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-hangtag",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
     });
     // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
     // No shared marquee-proof — care-tag stack is the loom proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

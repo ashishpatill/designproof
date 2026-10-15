@@ -36,6 +36,8 @@ import {
   foundryQuestions,
   pressQuestions,
   PRESS_SIGS,
+  loomQuestions,
+  loomLine,
   spoken,
   riskReversal,
   sentence,
@@ -330,7 +332,9 @@ export function buildSections(
                         ? foundryQuestions(brief, features)
                         : brief.siteKind === "press-atelier"
                           ? pressQuestions(brief, features)
-                          : questions(brief, features);
+                          : brief.siteKind === "commerce-loom"
+                            ? loomQuestions(brief, features)
+                            : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
     brief.siteKind !== "agent-harness" &&
@@ -413,7 +417,11 @@ export function buildSections(
              * Press: the claim hides its eyebrow, so the audience sat in the page unseen; the first
              * answer says who the press sheet is for.
              */
-            eyebrow: isPress ? "" : brief.audience,
+            /*
+             * Loom: the audience sat over the claim and again in the first answer; the first answer
+             * says who the loom is for.
+             */
+            eyebrow: isPress || isLoom ? "" : brief.audience,
             title: headline(brief, features),
             /*
              * Archive: the register's claim hides its lede, so the lead description sat in the page
@@ -446,7 +454,11 @@ export function buildSections(
               ? sentence(
                   "Keel is an open harness that runs many coding agents without the UI collapsing — honest permits, local run data, finish conditions you can see",
                 )
-              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress
+              /*
+               * Loom: same rule. The lead description sat under the claim and was printed again in
+               * the hangtag essay; the index now holds every description.
+               */
+              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom
                 ? ""
                 : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
@@ -565,6 +577,8 @@ export function buildSections(
           brief.siteKind === "editorial-foundry" ||
           // Press too: its index stopped at four plates on a six-plate brief.
           brief.siteKind === "press-atelier" ||
+          // Loom as well: its index stopped at four lines on a six-line brief.
+          brief.siteKind === "commerce-loom" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -656,7 +670,14 @@ export function buildSections(
                            */
                           : brief.siteKind === "press-atelier"
                             ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: `Sig ${PRESS_SIGS[i] ?? String(i + 1)}` }))
-                            : rawSlice;
+                            /*
+                             * Loom: every row keeps its description, because the fold prints none.
+                             * Rows are numbered the way the cloth and the treadles number the lines,
+                             * and carry no tier word, because the hangtags say that once.
+                             */
+                            : brief.siteKind === "commerce-loom"
+                              ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: loomLine(i) }))
+                              : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
         const isSecond = p.id !== "features" && p.id !== "principles";
@@ -775,8 +796,9 @@ export function buildSections(
                       // Archive: the brief's own count, not a line about what "an archive index" keeps.
                       : isArchive
                         ? sentence(`The ${count(features.length)} ${features.length === 1 ? "entry" : "entries"} in ${brief.productName}`)
+                        // Loom: "lines a merchandising loom actually cuts" was on a pottery studio's page too.
                         : isLoom
-                          ? sentence(`Lines a merchandising loom actually cuts`)
+                          ? sentence(`${brief.productName}, line by line`)
                           // Field guide: "traits a field voucher actually keeps" was on a marina's page too.
                           : isField
                             ? sentence(`${brief.productName}, trait by trait`)
@@ -847,8 +869,9 @@ export function buildSections(
                       // Archive: "a search box dressed as an archive" was on every archive page.
                       : isArchive
                         ? ""
+                        // Loom: "a product card dressed as merchandising" was on every loom page.
                         : isLoom
-                          ? sentence(`Each line is a woven SKU — not a product card dressed as merchandising`)
+                          ? ""
                           // Field guide: "a nature photo dressed as science" was on every field-guide page.
                           : isField
                             ? ""
@@ -1341,6 +1364,57 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Loom: the hangtag essay printed every description a second time, right under the index,
+         * with the name over each one, a size tape that named every line again, "Note 01" labels,
+         * and a drawing on every tag, under "how a hangtag is actually cut" and "eyelet, size tape,
+         * and the notes that keep a cut honest", lines printed on every loom page. Now each tag is
+         * one priority tier from the brief and names the lines in it once. With a single priority
+         * there is nothing to group, so the section is left out.
+         */
+        if (brief.siteKind === "commerce-loom") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              names: features.filter((f) => f.priority === priority).map((f) => f.name),
+              at: features.flatMap((f, i) => (f.priority === priority ? [loomLine(i)] : [])),
+            }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} lines come first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  // Said by what the tier is for, not by its line names again (Design Expert, 15 Oct):
+                  // the index names every line once, and the note below gives their numbers.
+                  body: sentence(
+                    t.tier === "Core"
+                      ? `${brief.productName} starts here`
+                      : t.tier === "Supporting"
+                        ? `Open these once the core ${t.names.length === 1 ? "line is" : "lines are"} in use`
+                        : `Kept on hand alongside the rest`,
+                  ),
+                  // The tag gives each line's number in the index, not its name again.
+                  points: t.at,
+                  // Tiers take roman numerals so they never read as a line number.
+                  meta: ["I", "II", "III"][i] ?? String(i + 1),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1381,8 +1455,6 @@ export function buildSections(
                   ? "In use"
                   : brief.siteKind === "research-dossier"
                     ? "Reading notes"
-                        : brief.siteKind === "commerce-loom"
-                          ? "Hangtag notes"
                         : brief.siteKind === "lantern-path"
                           ? "Ember notes"
                         : brief.siteKind === "care-pathway"
@@ -1397,8 +1469,6 @@ export function buildSections(
                   ? sentence(`A day with ${brief.productName}`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`How a brief is actually read`)
-                        : brief.siteKind === "commerce-loom"
-                          ? sentence(`How a hangtag is actually cut`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`How a night walk is actually read`)
                         : brief.siteKind === "care-pathway"
@@ -1419,8 +1489,6 @@ export function buildSections(
                   ? sentence(`From morning pack to evening empty — what you actually do with it`)
                   : brief.siteKind === "research-dossier"
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
-                        : brief.siteKind === "commerce-loom"
-                          ? sentence(`Eyelet, size tape, and the notes that keep a cut honest`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
                         : brief.siteKind === "care-pathway"
@@ -1457,9 +1525,7 @@ export function buildSections(
                       ? ["Turn tape", "Tool permit", "Steer pin", "Mid-run redirect", "Eval close", "Local session"][i] ?? c.title
                     : c.title,
                 body: c.body,
-                meta: brief.siteKind === "commerce-loom"
-                      ? ["XS", "S", "M", "L", "XL", "XXL"][i % 6]
-                        : brief.siteKind === "lantern-path"
+                meta: brief.siteKind === "lantern-path"
                           ? `Ch ${["I","II","III","IV","V","VI"][i] ?? String(i + 1)}`
                         : brief.siteKind === "care-pathway"
                           ? `Enc ${String(i + 1).padStart(2, "0")}`
@@ -1467,7 +1533,7 @@ export function buildSections(
                           ? `T${String(i + 1).padStart(2, "0")}`
                   : c.meta,
                 kicker:
-                  brief.siteKind === "research-dossier" || brief.siteKind === "commerce-loom" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
+                  brief.siteKind === "research-dossier" || brief.siteKind === "lantern-path" || brief.siteKind === "care-pathway" || brief.siteKind === "agent-harness"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -1822,7 +1888,10 @@ export function buildSections(
                         // Press likewise: the first answer names the audience.
                         : brief.siteKind === "press-atelier"
                           ? sentence(`Questions about the ${brief.productName} press sheet`)
-                          : sentence(`Questions ${brief.audience} ask first`),
+                          // Loom likewise: the first answer names the audience.
+                          : brief.siteKind === "commerce-loom"
+                            ? sentence(`Questions about the ${brief.productName} loom`)
+                            : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
         );
@@ -1874,8 +1943,11 @@ export function buildSections(
                       ? features.length > 1
                         ? `${brief.productName}, from ${lower(features[0]!.name)} to ${lower(features[features.length - 1]!.name)}`
                         : `${brief.productName}: ${lower(features[0]?.name ?? brief.productName)}`
+                      // Loom: "cut a sample" fit one merchandising press; the close says where to begin.
                       : brief.siteKind === "commerce-loom"
-                        ? `Cut a sample from ${brief.productName}`
+                        ? features[0]
+                          ? `Start the ${brief.productName} loom with ${lower(features[0].name)}`
+                          : `Start the ${brief.productName} loom`
                         // Field guide: "request a voucher" fit one herbarium; the close says where to begin.
                         : brief.siteKind === "field-guide"
                           ? features[0]
@@ -1950,8 +2022,17 @@ export function buildSections(
                      */
                     : brief.siteKind === "archive-index"
                       ? ""
+                      /*
+                       * Loom: "size tapes, SKU cells, and the lines ... actually cut" closed every
+                       * loom page, a pottery studio's included. The close gives the count the brief
+                       * gives instead.
+                       */
                       : brief.siteKind === "commerce-loom"
-                        ? `Size tapes, SKU cells, and the lines ${brief.audience} actually cut`
+                        ? features.length > 1
+                          ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                              features.length === 2 ? "line is" : "lines are"
+                            } woven into the index above`
+                          : ""
                         /*
                          * Field guide: "pressed plates, range notes, and the vouchers ... actually
                          * keep" closed every field-guide page, a pottery studio's included. The close
@@ -2036,6 +2117,9 @@ export function buildSections(
                         // Press likewise: the button leads back to the index.
                         : brief.siteKind === "press-atelier" && features.length > 1
                           ? `Read all ${count(features.length)} plates`
+                        // Loom likewise: the button leads back to the index.
+                        : brief.siteKind === "commerce-loom" && features.length > 1
+                          ? `Read all ${count(features.length)} lines`
                         // Observatory likewise: the button leads back to the index.
                         : brief.siteKind === "signal-observatory" && features.length > 1
                           ? `Read all ${count(features.length)} channels`

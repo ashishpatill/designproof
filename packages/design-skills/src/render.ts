@@ -5,7 +5,7 @@
  * what keeps the emitted page consistent with the design system it declares, and it is what makes
  * the generated markup safe to hand to a developer as a starting point.
  */
-import { count, helmSessionTurns, PRESS_SIGS, keelSessionTurns } from "./copy";
+import { count, helmSessionTurns, loomLine, PRESS_SIGS, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
 import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
@@ -201,7 +201,9 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     // Foundry: the type ladder names each cut on its own rung, and no sentence.
     spec.brief.siteKind === "editorial-foundry" ||
     // Press: the press sheet names each plate on its own signature, and no sentence.
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    // Loom: the cloth names each line in its own cell, and no sentence.
+    spec.brief.siteKind === "commerce-loom"
       ? listed.map((b) => ({ ...b, body: "", points: [] }))
       /*
        * Educational: names only too. The mechanism plate draws each part as a numbered column
@@ -645,7 +647,8 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     }
     if (line) picks.push(line);
     const weftPicks = picks
-      .map((p, i) => `<span class="ds-weft-pick" style="--pick:${i}"><span class="ds-weft-thread" aria-hidden="true"></span><span class="ds-weft-ink">${esc(p)}</span></span>`)
+      // No weft thread: it drew a rule through and under the headline (Design Expert, 15 Oct).
+      .map((p, i) => `<span class="ds-weft-pick" style="--pick:${i}"><span class="ds-weft-ink">${esc(p)}</span></span>`)
       .join("");
     const warpCount = 28;
     const warpEnds = Array.from({ length: warpCount }, (_, i) => {
@@ -655,38 +658,51 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     const shed = `<svg class="ds-shed" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${warpEnds}</svg>`;
     const shuttle = `<div class="ds-shuttle" aria-hidden="true"><span class="ds-shuttle-body"></span><span class="ds-shuttle-tip"></span><span class="ds-shuttle-meta">Shuttle</span></div>`;
     const fell = `<div class="ds-fell" aria-hidden="true"><span class="ds-fell-label">Fell</span></div>`;
-    const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
-    const treadles = `<nav class="ds-tape-rail ds-treadles" aria-label="Size treadles"><ol>${sizes
-      .map((S, i) => {
-        const href = i < 6 ? ["#features", "#figure", "#specimen", "#story", "#proof", "#cta"][i] : "#features";
-        return `<li><a href="${href}" class="ds-tape-chip${i === 2 ? " is-active" : ""}" data-size="${S}"><span class="ds-tape-meta">${String(i + 1).padStart(2, "0")}</span><span class="ds-tape-label">${S}</span></a></li>`;
-      })
+    /*
+     * One treadle per line, up to the cloth's six cells, each jumping to its row in the index. The
+     * treadles used to be XS to XXL on every page whatever the brief gave, pointing at a figure
+     * band, a specimen band, and a proof section the page did not always have, and the beam read
+     * "Shed · warp × weft" over a cloth of three lines.
+     */
+    const lines = Math.max(1, Math.min(6, spec.sections.find((s) => s.kind === "features")?.blocks.length ?? 0));
+    const nums = Array.from({ length: lines }, (_, i) => loomLine(i));
+    const treadles = `<nav class="ds-tape-rail ds-treadles" aria-label="Line treadles"><ol>${nums
+      .map(
+        (n, i) =>
+          `<li><a href="#line-${n}" class="ds-tape-chip${i === 0 ? " is-active" : ""}" data-line="${n}"><span class="ds-tape-meta">Line</span><span class="ds-tape-label">${n}</span></a></li>`,
+      )
       .join("")}</ol></nav>`;
+    const span = lines > 1 ? `Lines 01–${nums[nums.length - 1]}` : "Line 01";
+    /*
+     * No "Fell" label, no shuttle, and no treadle strip (Design Expert, 15 Oct): the label was a stray
+     * word under the button, the shuttle and weft threads ran through the headline, and the treadles
+     * were a second "Line 01–05" tab strip under the cloth's own numbered tiles.
+     */
+    void shuttle;
+    void shed;
+    void fell;
+    void treadles;
     const reed = `<div class="ds-reed" aria-hidden="true">${Array.from({ length: 32 }, (_, i) => `<span class="ds-reed-tooth" style="--i:${i}"></span>`).join("")}</div>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-loom ds-hero-drawloom" data-surface="${section.surface}" data-section="${esc(section.id)}">
       <div class="ds-drawloom">
         <header class="ds-loom-beam" aria-label="Loom beam">
           <span class="ds-loom-vol">Drawloom</span>
-          <span class="ds-loom-issue">Shed · warp × weft</span>
+          <span class="ds-loom-issue">${span}</span>
           <span class="ds-loom-mark">${esc(spec.brief.productName)}</span>
         </header>
         ${reed}
         <div class="ds-drawloom-stage">
           <div class="ds-shed-stage">
-            ${shed}
             <div class="ds-weft-claim">
               <p class="ds-brand-mark">${esc(spec.brief.productName)}</p>
               ${section.eyebrow ? `<p class="ds-eyebrow">${esc(section.eyebrow)}</p>` : ""}
               <h1 class="ds-display ds-weft-display">${weftPicks}</h1>
-              <p class="ds-lede">${esc(section.body)}</p>
+              ${section.body ? `<p class="ds-lede">${esc(section.body)}</p>` : ""}
               ${actions(section)}
             </div>
-            ${shuttle}
           </div>
-          ${fell}
           <div class="ds-drawloom-cloth">${loomFig}</div>
         </div>
-        ${treadles}
       </div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
@@ -1309,7 +1325,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Observatory rows carry their description too: the fold prints none.
         // Foundry rows as well: the ladder on the fold names the cuts and prints no sentence.
         spec.brief.siteKind === "research-dossier" ||
-        spec.brief.siteKind === "commerce-loom" ||
+        // Loom rows carry their description too: the cloth names the lines and prints no sentence.
         // Field guide rows carry their description too: the fold prints none.
         spec.brief.siteKind === "lantern-path" ||
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
@@ -1328,6 +1344,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isFoundry = spec.brief.siteKind === "editorial-foundry";
       // Press rows are lettered like the sheet's signatures; the rail and the gather point at them.
       const isPress = spec.brief.siteKind === "press-atelier";
+      // Loom rows are numbered like the cloth's cells; the treadles and the hangtags point at them.
+      const isLoom = spec.brief.siteKind === "commerce-loom";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1341,7 +1359,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                     ? ` id="cut-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                     : isPress
                       ? ` id="plate-${esc((PRESS_SIGS[i] ?? String(i + 1)).toLowerCase())}"`
-                      : ""
+                      : isLoom
+                        ? ` id="line-${esc(loomLine(i))}"`
+                        : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
             <h3>${esc(b.title)}</h3>
@@ -1488,7 +1508,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Foundry too: the list beside the drawing named every cut again, right under the index.
     spec.brief.siteKind !== "editorial-foundry" &&
     // Press as well: the list beside the drawing named every plate again, right under the index.
-    spec.brief.siteKind !== "press-atelier"
+    spec.brief.siteKind !== "press-atelier" &&
+    // Loom too: the list beside the drawing named every line again, right under the index.
+    spec.brief.siteKind !== "commerce-loom"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1869,43 +1891,52 @@ function renderEntry(section: SectionSpec, spec: DesignSpec): string {
  *
  * Horizontal size tape + overlapping swing tags with eyelets.
  * Not the essay+aside list clone shared by entry.
+ *
+ * Each tag is one priority tier from the brief and names the lines in it once; its note gives each
+ * line's number in the index. The tape counts the lines per tier. The stack used to reprint every
+ * description with the name over it, a tape that named every line again, a "Note 01" label, and a
+ * drawing on every tag, under "5 tags · size tape".
  */
-function renderHangtag(section: SectionSpec, figures: FigurePlan): string {
+function renderHangtag(section: SectionSpec): string {
   const blocks = section.blocks;
-  const count = blocks.length || 1;
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const tiers = blocks.length || 1;
   const tape = blocks
     .map((b, i) => {
-      const size = esc(b.meta ?? sizes[i % 6]!);
+      const num = esc(b.meta ?? String(i + 1));
+      const n = b.points.length;
       return `<li class="ds-hang-tape-chip" style="--i:${i}">
-        <span class="ds-hang-size">${size}</span>
-        <span class="ds-hang-tape-title">${esc(b.title)}</span>
+        <span class="ds-hang-size">${num}</span>
+        <span class="ds-hang-tape-title">${n} ${n === 1 ? "line" : "lines"}</span>
       </li>`;
     })
     .join("");
+  // One tier display: the hangtags. The tape strip above them said the tiers a second time.
+  void tape;
   const tags = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-hang-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const size = esc(b.meta ?? sizes[i % 6]!);
+      const num = esc(b.meta ?? String(i + 1));
+      const at = b.points.map((n) => `<a href="#line-${esc(n)}">${esc(n)}</a>`).join(", ");
       return `<article class="ds-hang-tag" style="--i:${i}">
         <span class="ds-hang-string" aria-hidden="true"></span>
         <span class="ds-hang-eyelet" aria-hidden="true"></span>
-        <p class="ds-hang-size">${size}</p>
+        <p class="ds-hang-size" aria-hidden="true">${num}</p>
         <h3>${esc(b.title)}</h3>
         ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-        ${b.kicker ? `<p class="ds-hang-note">${esc(b.kicker)}</p>` : ""}
-        ${mark}
+        <p class="ds-hang-note">${b.points.length === 1 ? "Line" : "Lines"} ${at}</p>
       </article>`;
     })
     .join("");
   return `<section class="ds-section ds-story ds-hangtag" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Hangtag", `${count} tags · size tape`)}
+      ${secMeta("Hangtag", `${tiers} tiers`)}
       ${sectionHead(section, 2, true)}
-      <ol class="ds-hang-tape" aria-label="Size tape">${tape}</ol>
       <div class="ds-hang-stack" aria-label="Care tag stack">${tags}</div>
-      ${storyFillSlab(blocks.map((b) => b.title))}
+      ${
+        // One drawn page per line, numbered like the index. Three wide tier pages drew their text
+        // bars wide enough to read as page rules.
+        storyFillSlab(blocks.flatMap((b) => (b.points.length ? b.points : [b.title])))
+      }
     </div>
   </section>`;
 }
@@ -2692,7 +2723,7 @@ function renderSection(
     case "story-entry":
       return wrapped(renderEntry(section, spec));
     case "story-hangtag":
-      return wrapped(renderHangtag(section, figures));
+      return wrapped(renderHangtag(section));
     case "story-range":
       return wrapped(renderRange(section));
     case "story-gather":
@@ -3121,7 +3152,8 @@ export function renderPreviewHtml(spec: DesignSpec): string {
     spec.brief.siteKind === "field-guide" ||
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
-    spec.brief.siteKind === "press-atelier"
+    spec.brief.siteKind === "press-atelier" ||
+    spec.brief.siteKind === "commerce-loom"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

@@ -691,7 +691,7 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).not.toContain('class="ds-chronometer"');
   });
 
-  it("gives commerce loom a drawloom weft + treadles + hangtag plan distinct from soft card grids", () => {
+  it("gives commerce loom a drawloom weft + hangtag plan distinct from soft card grids", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.loom!);
     expect(spec.brief.siteKind).toBe("commerce-loom");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
@@ -703,13 +703,12 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain('data-sitekind="commerce-loom"');
     expect(previewHtml).toContain("ds-hero-drawloom");
     expect(previewHtml).toContain("ds-shed");
-    expect(previewHtml).toContain("ds-shuttle");
-    expect(previewHtml).toContain("ds-fell");
+    // Shuttle, fell label, weft threads, and treadles went: they crossed the headline or repeated the lines.
+    expect(previewHtml).not.toMatch(/class="[^"]*\b(ds-shuttle|ds-fell|ds-treadles|ds-weft-thread)\b/);
     expect(previewHtml).toContain("ds-weft-pick");
-    expect(previewHtml).toContain("ds-treadles");
     expect(previewHtml).toContain('data-figure="loom-weave"');
     expect(previewHtml).toContain("ds-hangtag");
-    expect(previewHtml).toContain('class="ds-hang-tape"');
+    expect(previewHtml).not.toContain('class="ds-hang-tape"');
     expect(previewHtml).toContain('aria-label="Care tag stack"');
     expect(previewHtml).toContain('class="ds-hang-stack"');
     expect(previewHtml).not.toContain('class="ds-hang-aside"');
@@ -1257,7 +1256,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Field guide neither: its voucher key sorts the traits by priority and carries no Note labels.
     // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
     // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
-    const noteKinds = ["loom", "lantern", "clinic"] as const;
+    // Loom neither: its hangtags group the lines by priority and carry no Note labels or marks.
+    const noteKinds = ["lantern", "clinic"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;

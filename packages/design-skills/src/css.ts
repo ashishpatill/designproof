@@ -473,6 +473,18 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
   [data-sitekind="commerce-loom"] .ds-reveal:not(.is-in) .ds-stagger > *:nth-child(odd){transform:translate(-1.4rem,0.4rem)}
   [data-sitekind="commerce-loom"] .ds-reveal:not(.is-in) .ds-stagger > *:nth-child(even){transform:translate(1.4rem,0.4rem)}
 }
+
+/* Hangtags are one priority tier each now, a name list and a note, with no drawing under them.
+   The shared overlap was sized for tags that carried a description and a drawing, and on these
+   shorter tags it hid the next tag's eyelet and tier numeral under the one above. */
+[data-sitekind="commerce-loom"] .ds-hang-tag + .ds-hang-tag{margin-top:-1.6rem}
+[data-sitekind="commerce-loom"] .ds-hang-note a{color:inherit;text-underline-offset:0.2em}
+/* Index rows now carry their description. The shared rows overlap their neighbours by a negative
+   margin, which runs the next row's rule through the last line of a description on a phone. */
+[data-sitekind="commerce-loom"] .ds-index-row:nth-child(n){margin-block:0}
+@media (max-width:820px){
+  [data-sitekind="commerce-loom"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+}
 `,
     "field-guide": `
 @keyframes ds-field-in{from{opacity:0;transform:translateY(2.1rem) scale(0.97)}to{opacity:1;transform:none}}
@@ -1249,10 +1261,13 @@ body[data-sitekind="commerce-loom"]{
 [data-sitekind="commerce-loom"] .ds-hang-size{
   font-family:var(--f-mono);font-size:11px;letter-spacing:0.08em;text-transform:none;color:var(--c-accent);
 }
-[data-sitekind="commerce-loom"] .ds-fig text.ds-fig-mono,
-[data-sitekind="commerce-loom"] text.ds-fig-mono{font-size:11px!important}
-[data-sitekind="commerce-loom"] .ds-loom-plate .ds-fig{min-height:min(56vh,560px)}
-[data-sitekind="commerce-loom"] .ds-hero-loom{min-height:min(100vh,960px);padding-bottom:var(--treadle-h)}
+[data-sitekind="commerce-loom"] .ds-fig text.ds-fig-mono:not(.ds-loom-num),
+[data-sitekind="commerce-loom"] text.ds-fig-mono:not(.ds-loom-num){font-size:11px!important}
+[data-sitekind="commerce-loom"] text.ds-loom-num{letter-spacing:-0.02em}
+/* The cloth is as tall as its tiles: no forced figure, fold or treadle height (round 2 gap fix). */
+[data-sitekind="commerce-loom"] .ds-loom-plate .ds-fig{min-height:0}
+[data-sitekind="commerce-loom"] .ds-hero-loom{min-height:0;padding-bottom:var(--s-lg,2rem)}
+[data-sitekind="commerce-loom"] .ds-drawloom-stage{grid-template-rows:auto auto auto;padding-bottom:0}
 [data-sitekind="commerce-loom"] .ds-specimen{padding-block:var(--s-2xl) var(--s-3xl,var(--s-2xl))}
 [data-sitekind="commerce-loom"] .ds-specimen-head .ds-heading{font-size:var(--t-title-size);max-width:16ch}
 [data-sitekind="commerce-loom"] .ds-closing-colophon{
