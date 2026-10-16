@@ -11,6 +11,8 @@ Use when Taste `motion` is `subtle-micro` (or as the micro layer under stronger 
 - Animate only things the user touches: links, buttons, inputs, chips, tabs
 - Duration 150–300ms (token `--motion-base` / `--motion-fast`); one dominant easing
 - Prefer `opacity`, `transform`, `color`, `border-color` — never layout props for hover
+
+- Under the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) (proposed, Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the)), animate only `transform` and `opacity`. Colour and border changes on hover switch instantly or fade via an `opacity` overlay. Keep INP (Interaction to Next Paint, how fast the page responds to a tap or click) at or under 200 ms.
 - Focus-visible must remain clearer than hover
 
 ## Avoid

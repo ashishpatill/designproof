@@ -13,6 +13,9 @@ description: Once-only scroll reveals without blur spectacle. Wired when Taste m
 - Run once; unobserve / fill-mode forwards after enter
 - Reduced motion: final state immediately (CSS + JS paths)
 
+- Firefox: stable Firefox doesn't yet support `animation-timeline`, so the IntersectionObserver fallback is required, not optional. The page must read complete with neither path running.
+- Under the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) (proposed, Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the)), reveals are part of the separate motion stage and use its motion tokens; they're not added in the same pass as the page.
+
 ## Avoid
 - Replaying reveals on every scroll
 - Large travel distances or filter blur

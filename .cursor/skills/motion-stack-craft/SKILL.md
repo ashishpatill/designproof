@@ -5,7 +5,9 @@ description: Learn and apply Three.js, D3.js, GSAP-class timelines, free OSS mot
 
 # motion-stack-craft
 
-> **Plan link (proposed, not shipped):** Motion becomes its own reviewed stage, never generated in the same pass as the page: concept → one-sentence motion idea → motion tokens → prototype one key interaction → roll out section by section, with automatic checks (no layout-property animation, reduced motion, `@supports` fallbacks, no long frames, lab INP ≤ 200 ms, heavy bundles lazy-loaded). See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+> **Plan link (proposed, not shipped):** Motion becomes its own reviewed stage, after art direction and before refinement, never generated in the same pass as the page: concept → one-sentence motion idea → motion tokens → prototype one key interaction → roll out section by section, with automatic checks (no layout-property animation, reduced motion, `@supports` fallbacks, no long frames, lab INP (Interaction to Next Paint) ≤ 200 ms, heavy bundles lazy-loaded, every duration and easing from the motion tokens, GSAP from the public npm package; full list of 7 in docs/15). See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
+> Apply now: animate only `transform` and `opacity`; replace motion under `prefers-reduced-motion` (for example with a cross-fade), don't just remove it. GSAP (GreenSock Animation Platform) has been free for commercial use since 30 April 2025. Firefox lacks page-to-page View Transitions and scroll-driven animations, so give both a fallback.
 
 Full playbook: `agent-skills/web-design/premium-content-custom-web/motion-stack-craft/SKILL.md`
 

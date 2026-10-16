@@ -10,6 +10,8 @@ Snapshot: **2026-09-30**. Engineering contracts stay in [`BUILD.md`](../BUILD.md
 
 **Quality bar (Tell Proof):** stacked images, motion, artistic, unique. Not one-shot AI generate.
 
+**Redesign plan (16 Oct 2026, proposed, waiting on Ashish in BIM-203):** Ashish rejected the current templates: changing the test brand only changed the colours, and none of them reach the bar set by Open Design and other top templates. The [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) proposes changing DesignProof first (a design process in reviewed stages with an imagery stage, one plugin tool per stage, a colour theme setting instead of colour taken from the product name, and an automated swap test), then rebuilding research dossier as the first test. Nothing is built, merged or closed until Ashish decides.
+
 ---
 
 ## Done
@@ -26,6 +28,8 @@ Closed in git (see [`CHANGELOG.md`](../CHANGELOG.md)):
 ---
 
 ## Pending
+
+- **Template pull requests #95 to #102 are on hold, not finished.** Section 5 of the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) proposes: drop #95 merchandising loom and #99 clinic; fold #96 consumer craft into a future physical-product concept and keep #101 lantern only as a visual direction; keep and rebuild #97 research dossier, then one developer-tool concept with #102 keel as its base and #98 agent harness folded in. The #100 footer fix is a separate merge decision (BIM-186). Decisions: BIM-203.
 
 These are open even where partial code exists:
 
@@ -50,6 +54,8 @@ These are open even where partial code exists:
 ---
 
 ## Needs from Ashish
+
+- Decide the redesign plan in BIM-203: whether DesignProof's own process changes come first, the seven template calls, and whether to keep or remove the old training rows (BIM-187).
 
 Cannot be guessed from the repo:
 

@@ -8,6 +8,8 @@
 > Tell docs and the measured corpus (`docs/10`, `research/measurements/`) stay anonymised;
 > seed URLs for measurement live only in gitignored `research/motion-corpus.local.json`.
 
+> **Update, 16 Oct 2026.** The October motion research behind the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) (section 1) builds on this survey. It adds verified award-site case studies, a staged motion process, and seven proposed automatic checks; see `docs/15_MOTION_ANIMATION_PLAN.md`. Two facts to read with this survey: GSAP (GreenSock Animation Platform) became free for commercial use on 30 April 2025, and stable Firefox still lacks cross-document View Transitions and CSS scroll-driven animations, so those need a fallback. The plan is proposed, waiting on Ashish in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 ---
 
 ## 0. How this survey was conducted

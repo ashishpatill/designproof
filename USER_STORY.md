@@ -2,6 +2,8 @@
 
 > Viewers should feel Ashish's problem before they see the pipeline. Lead demos with his journey.
 
+> **Redesign plan (proposed, pending decision):** DesignProof is moving to a concept-first, step-by-step design process: eight reviewed stages (brief, concepts, mood board, art direction, imagery, one key screen, section by section, refinement), colour from a theme setting, an automatic swap test, and Awwwards-weighted review with Open Design as the bar. Plan: [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) · Decision: [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the). Template keep, merge or drop calls are **proposals** until Ashish decides in BIM-203; nothing has been dropped.
+
 ---
 
 ## Persona: Ashish
@@ -95,6 +97,19 @@ journey
 **Feels:** Closed loop. Still in his workflow. No export, no handoff.
 
 ---
+### Scene 8 — Design a new site, step by step (proposed, see the redesign plan)
+**Ashish starts from a brief, not a template.** DesignProof doesn't produce a whole site in one pass. It works in reviewed stages, and he approves or rejects each one before the next starts:
+1. **Brief:** real facts, audience, goal, and the one thing only this business has.
+2. **Concept:** two or three one-line ideas, each with a metaphor or material, what it rejects, and three tests that show it on the page. He picks one.
+3. **Mood board:** credited references from the concept's world, not from competitors.
+4. **Art direction:** type, colour theme (a named theme setting, never derived from the product name), spacing, a signature device, and a one-line motion idea.
+5. **Imagery:** real or generated photos, artefacts or 3D that carry the concept, in modern formats (WebP, AVIF, WebM).
+6. **Key screen:** one hero screen on desktop and mobile, kept or thrown away.
+7. **Section by section:** each section rendered and reviewed on its own.
+8. **Refine and polish:** a removal pass, motion, performance, and an Awwwards-weighted review (design 40%, usability 30%, creativity 20%, content 10%).
+
+An automatic **swap test** runs at every stage: the same stage is rendered with an unrelated brand, and if the idea and copy don't change, it fails.
+**Feels:** "This was designed for us," not "this is a template with our name on it."
 
 ## Success metrics (user-centric)
 
@@ -106,6 +121,8 @@ journey
 | "This is grounded" moment | Contrast floor and token changes visible in reconciliation table |
 | "Shipped the fix" moment | Diff applied in Cursor without leaving IDE |
 | Emotional outcome | Ashish would share Tell in Cursor Discord |
+| "Designed for us" moment | Concept approved at stage 2; swap test passes on key screen |
+| Quality bar | Awwwards-weighted self-review at or above Open Design level on the final stage (bar defined in the redesign plan) |
 
 ---
 
@@ -115,6 +132,8 @@ journey
 - Not a Figma token differ (saturated space)
 - Not a dashboard of KPIs (disqualifying pattern)
 - Not auto-apply without human review
+
+- Not one-pass "generate the whole site" — every stage is reviewed before the next (proposed, pending BIM-203)
 
 ---
 
