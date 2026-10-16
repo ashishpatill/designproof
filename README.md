@@ -86,7 +86,7 @@ The authoring agent proposes. Tell measures, critiques, redesigns, and verifies.
 
 ### Why this is a higher bar than "generate a pretty page"
 
-> **Design process and quality:** see the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3). It proposes concept-first, staged and reviewed generation instead of today's one-pass `tell_design_from_features`, plus motion as its own stage, performance budgets, explicit colour themes and a swap test. It also makes keep / rework / drop calls on the templates, so the specimens below are work in progress, not finished. Proposed, waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the); nothing below is built yet.
+> **Design process and quality:** see the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3). It proposes concept-first, staged and reviewed generation instead of today's one-pass `tell_design_from_features`, plus its own review for motion between art direction and refinement (not a separate stage), performance budgets, explicit colour themes and a swap test. It also makes keep / rework / drop calls on the templates, so the specimens below are work in progress, not finished. Proposed, waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the); nothing below is built yet.
 
 | Prompt-only / generic kit | Tell |
 |---|---|

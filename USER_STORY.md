@@ -106,7 +106,7 @@ journey
 5. **Imagery:** real or generated photos, artefacts or 3D that carry the concept, in modern formats (WebP, AVIF, WebM).
 6. **Key screen:** one hero screen on desktop and mobile, kept or thrown away.
 7. **Section by section:** each section rendered and reviewed on its own.
-8. **Refine and polish:** a removal pass, motion, performance, and an Awwwards-weighted review (design 40%, usability 30%, creativity 20%, content 10%).
+8. Refine and polish: a removal pass, performance, and an Awwwards-weighted review. Motion is checked separately before this stage, using the review tool, and builds on the motion idea set during art direction.
 
 An automatic **swap test** runs at every stage: the same stage is rendered with an unrelated brand, and if the idea and copy don't change, it fails.
 **Feels:** "This was designed for us," not "this is a template with our name on it."

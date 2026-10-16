@@ -22,7 +22,7 @@ description: Sub-skill — CSS sticky scroll chapter + progress for motion=scrol
 ## Plan (proposed)
 - The progress rule must scale with `transform: scaleX()`, not `width`, so only `transform` and `opacity` animate.
 - `animation-timeline` isn't in stable Firefox yet: put it inside `@supports` and show a static progress state otherwise.
-- Pinned chapters belong to the separate motion stage in the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3), after art direction and before refinement; waiting on Ashish in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+- Pinned chapters belong to the motion review in the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3), after art direction and before refinement; waiting on Ashish in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
 
 ## Related
 - `docs/15_MOTION_ANIMATION_PLAN.md`
