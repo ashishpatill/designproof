@@ -5,7 +5,7 @@ description: Implements and uses Tell MCP tools for Cursor integration. Use when
 
 # Tell MCP tools
 
-> **Plan link (proposed, not shipped):** The plan proposes replacing `tell_design_from_features` (one-call generation) with one tool per reviewed stage plus `tell_review` (11 → 18 tools), and an optional colour `theme`. The eleven tools below remain the real catalog. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+> **Plan link (proposed, not shipped):** The plan proposes replacing `tell_design_from_features` (one-call generation) with one tool for each of the eight reviewed stages (brief, concepts, mood board, art direction, imagery, one key screen, section by section, refinement) plus `tell_review` (11 → 19 tools), and an optional colour `theme`. The eleven tools below remain the real catalog. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
 
 ## Scope
 

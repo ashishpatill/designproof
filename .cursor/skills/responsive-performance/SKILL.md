@@ -13,6 +13,14 @@ description: >-
 
 > Motion budget: animate only `transform` and `opacity`, and keep no long animation frame over 50 ms. See the proposed motion checks in `docs/15_MOTION_ANIMATION_PLAN.md`.
 
+> **Also proposed (plan section 3):**
+> - **3D and charts:** three.js, WebGPU (the browser's newer way to use the graphics chip) and d3.js only when they are the concept itself, and never in the first load. Show a sized still image first, then load the code with a dynamic `import()` when the section comes into view or the visitor taps. Skip it when the device asks to save data or its graphics chip can't handle it. Charts with fixed numbers are made as static SVG when the site is built.
+> - **Video:** WebM with an MP4 fallback and a poster frame. AV1 (a newer video format) doesn't play on Safari without hardware support for it.
+> - **Third-party scripts:** pinned copies we host ourselves, not loaded from an outside CDN (content delivery network). Today `render.ts` (around line 3140) loads HTMX from unpkg, and that would fail this check.
+> - **WebMCP** (a proposed way for web pages to offer tools to AI agents): off in generated sites. See plan section 4.
+> - **shadcn/ui:** only for product screens such as dashboards and forms, not marketing pages.
+> - **Fallbacks:** anchor positioning (a CSS way to place one element relative to another) needs a fallback for Firefox.
+
 **Always-on for every site build.** Parent: `premium-content-custom-web`. Engine always
 routes this node via `routeSkills`. Agents must execute it — not only list it.
 
