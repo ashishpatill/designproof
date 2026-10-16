@@ -10,7 +10,7 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ## 2026-10-16 — Docs point to the redesign plan (proposed, nothing built)
 
-- Docs across the repo now link the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) and mark its changes as proposed, waiting on Ashish in BIM-203: a design process in reviewed stages with an imagery stage, one plugin tool per stage (11 tools to 18, not built), a colour theme setting, and an automated swap test.
+- Docs across the repo now link the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) and mark its changes as proposed, waiting on Ashish in BIM-203: a design process in reviewed stages with an imagery stage, one plugin tool per stage (11 tools to 19, not built), a colour theme setting, and an automated swap test.
 - The template pull requests #95 to #102 stay open and on hold. No code changed in this entry.
 
 ---
