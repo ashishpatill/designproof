@@ -5,6 +5,8 @@ description: Cursor-native agency marketing-site pipeline — autonomous agency:
 
 # agency-quality-site
 
+> **Plan link (proposed, not shipped):** The phased pipeline below is the closest thing in the repo today. The plan's staged process starts earlier, with a brief, concepts and a mood board approved before any build, and gives motion its own review between art direction and refinement (it is not a separate stage) and sets performance budgets at every stage. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 Full playbook: `agent-skills/web-design/premium-content-custom-web/agency-quality-site/SKILL.md`  
 Copy/paste prompts: `…/agency-quality-site/PROMPTS.md`  
 Design rigor: `…/agency-quality-site/DESIGN_RIGOR.md`  

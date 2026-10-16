@@ -1,5 +1,20 @@
 # Tell — Motion & Animation Capability Plan
 
+> **Plan link (proposed, not shipped):** This doc's motion research is superseded in process by the plan's motion review: motion gets its own review between art direction and refinement; it is not a separate stage. It starts from one prototyped key interaction. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
+> **Rules (apply now):** animate only `transform` and `opacity`; add `will-change` only after profiling; keep INP (Interaction to Next Paint, how fast the page responds to a tap or click) at or under 200 ms, with no long animation frame over 50 ms; respect `prefers-reduced-motion` by replacing motion (for example with a cross-fade), not just removing it. GSAP (GreenSock Animation Platform), including ScrollTrigger and SplitText, has been free for commercial use since 30 April 2025. Firefox doesn't yet support page-to-page (cross-document) View Transitions or CSS scroll-driven animations, so both go inside `@supports` or have a fallback and the page must read without them.
+>
+> **Proposed automatic motion checks (not built):**
+> 1. Static scan: fail if keyframes or transitions animate layout properties (`top`, `left`, `width`, `height`, `margin`, `padding`).
+> 2. Reduced motion: render with `prefers-reduced-motion: reduce` emulated and confirm non-essential animation stops or is replaced.
+> 3. Progressive enhancement: `animation-timeline` and cross-document view transitions sit inside `@supports` or have a fallback, and the page still reads with them off (Firefox).
+> 4. Runtime trace (Playwright plus Chrome performance tracing): no Layout or Paint during scroll animation, no long animation frames over 50 ms, lab INP ≤ 200 ms.
+> 5. Token adherence: every duration and easing comes from the motion token set.
+> 6. Weight budget: WebGL, three.js and Rive or Lottie bundles aren't in the initial load; they load on visibility or interaction.
+> 7. Library hygiene: GSAP installs from the public `gsap` npm package with no private registry token.
+>
+> Whether the motion actually expresses the concept can't be automated. It stays a human review at the motion-idea, prototype and roll-out steps.
+
 > **Research → product plan.**  
 > **Survey (named experts + stacks):** [`research/MOTION_ANIMATION_SURVEY.md`](../research/MOTION_ANIMATION_SURVEY.md)  
 > **Measured corridors:** [`docs/10_DESIGN_EVIDENCE.md`](./10_DESIGN_EVIDENCE.md) (anonymised)  

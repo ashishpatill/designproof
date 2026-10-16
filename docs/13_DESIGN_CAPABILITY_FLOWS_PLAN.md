@@ -112,6 +112,8 @@
 3. Copy HTML / viewport matrix
 4. Optional handoff to diagnose on preview
 
+> **Proposed change (not built, pending BIM-203):** today this flow builds a whole site design in one call. The [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) replaces that single pass with eight reviewed stages (brief, concepts, mood board, art direction, imagery, one key screen, section by section, refinement), each approved before the next, plus an explicit colour theme setting and an automatic swap test. Waiting on Ashish's decision in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 **Gaps**
 
 - [ ] Unified intent: “make a fintech landing from these features” → Studio defaults + offering key

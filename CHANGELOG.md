@@ -8,6 +8,13 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 
 ---
 
+## 2026-10-16 — Docs point to the redesign plan (proposed, nothing built)
+
+- Docs across the repo now link the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) and mark its changes as proposed, waiting on Ashish in BIM-203: a design process in reviewed stages with an imagery stage, one plugin tool per stage (11 tools to 19, not built), a colour theme setting, and an automated swap test.
+- The template pull requests #95 to #102 stay open and on hold. No code changed in this entry.
+
+---
+
 ## 2026-10-08 — Press atelier template says each thing once
 
 - The press atelier page drops the figure band (which set the plate names twice more beside a "cost · cumulative" chart with made-up values under "how X locks a forme") and the specimen band, which printed the names again under "X forme field". It goes from nine sections to seven: first screen, one index, the gather (priorities), questions, closing, footer.

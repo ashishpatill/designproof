@@ -128,6 +128,8 @@ Spacing only → --reshoot → --mark-pass 3b-spacing
 
 See `docs/15_MOTION_ANIMATION_PLAN.md` §6 for the full contract.
 
+Proposed change to this phase (not built): the [redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) turns it into its own motion review between art direction and refinement (not a separate stage), with motion tokens, one prototyped key interaction and seven automatic checks, listed at the top of `docs/15_MOTION_ANIMATION_PLAN.md`. Waiting on Ashish in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 **Goal**
 
 ```

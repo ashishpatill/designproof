@@ -86,6 +86,8 @@ The authoring agent proposes. Tell measures, critiques, redesigns, and verifies.
 
 ### Why this is a higher bar than "generate a pretty page"
 
+> **Design process and quality:** see the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3). It proposes concept-first, staged and reviewed generation instead of today's one-pass `tell_design_from_features`, plus its own review for motion between art direction and refinement (not a separate stage), performance budgets, explicit colour themes and a swap test. It also makes keep / rework / drop calls on the templates, so the specimens below are work in progress, not finished. Proposed, waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the); nothing below is built yet.
+
 | Prompt-only / generic kit | Tell |
 |---|---|
 | One layout grammar restyled per product | **Nineteen offerings** with distinct fold grammar (press sheet, ledger, lattice, path atlas, session helm, …) |
@@ -274,6 +276,8 @@ tell mcp print-config               # all agent snippets + deeplink
 | `tell_resolve_intent` | Route a free-text request to diagnose, redesign, or Studio authoring. |
 
 Catalog must stay at **eleven** tools. `tell_apply` returns patch text only.
+
+> **Planned, not built: staged design tools.** Today `tell_design_from_features` builds a whole site design in one call. The [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) proposes replacing it with one MCP (Model Context Protocol) tool for each of the eight reviewed design stages (brief, concepts, mood board, art direction, imagery, one key screen, section by section, and refinement), plus a review tool. Motion has its own review, after art direction and before refinement, through that same review tool. A stage can't run until the one before it is approved, and rejecting a stage reruns only that stage. Under the plan the catalog would go from 11 to 19 tools, and a colour `theme` setting would replace colour picked from the product name. None of this exists yet. It's waiting for Ashish's decision in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the). Until then the eleven tools listed here are the real catalog.
 
 ---
 
