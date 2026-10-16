@@ -489,6 +489,8 @@ MCP tools to expose (must match `@tell/schema` `MCP_TOOL_NAMES` / `REGISTERED_MC
 | `tell_install_info` | `{ launch?: "pnpm" \| "tell-mcp" }` | `InstallInfo` |
 | `tell_resolve_intent` | `{ text: string, fixtureUrl?: string }` | `ResolvedIntent` |
 
+> **Planned, not built: staged design tools.** Today `tell_design_from_features` builds a whole site design in one call. The [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) proposes replacing it with one MCP (Model Context Protocol) tool per reviewed design stage (brief, concepts, mood board, art direction, key screen, sections, refine and motion), plus a review tool. A stage can't run until the one before it is approved, and rejecting a stage reruns only that stage. Under the plan the catalog would go from 11 to 18 tools, and a colour `theme` setting would replace colour picked from the product name. None of this exists yet. It's waiting for Ashish's decision in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the). Until then the eleven tools listed here are the real catalog.
+
 Each returns schema-validated JSON. Keep tool descriptions crisp so the Cursor agent calls them
 correctly. `tell_apply` never writes files — it returns the patch for the human/agent to apply.
 

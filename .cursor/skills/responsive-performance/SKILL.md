@@ -9,6 +9,8 @@ description: >-
 
 # responsive-performance
 
+> **Plan link (proposed, not shipped):** The plan proposes budgets checked at every stage: LCP ≤ 2.5 s, CLS ≤ 0.1, INP ≤ 200 ms, initial script ≤ 170 KB compressed, initial transfer ≤ 2.0 MiB, AVIF/WebP in `<picture>`, and a declared tech tier (static / enhanced / immersive). The budget numbers are adapted from sources and not yet measured on our templates. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 **Always-on for every site build.** Parent: `premium-content-custom-web`. Engine always
 routes this node via `routeSkills`. Agents must execute it — not only list it.
 

@@ -5,6 +5,8 @@ description: Implements Tell taste verdicts and voice art-direction parsing in p
 
 # Tell taste and voice direction
 
+> **Plan link (proposed, not shipped):** Presets here change art direction on an existing page. Under the plan, colour comes from an explicit `theme` chosen at the art-direction stage, not from a hash of the product name, and a theme change only swaps colour variables. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 ## Scope
 
 - `packages/taste/src/engine.ts` — Gemini + deterministic fallback

@@ -5,6 +5,8 @@ description: Run one evidence-driven design research iteration — measure real 
 
 # Design research loop
 
+> **Plan link (proposed, not shipped):** Corridor scores and `assertBasics` stay floors only. Under the plan, quality is judged by a person at each design stage (concept, key screen, motion) plus the swap test, not by a passing checklist or score. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 The design engine is only allowed to get better in one way: by measuring pages that real buyers
 already paid for, turning those measurements into corridors, and then closing the distance between
 our output and those corridors. Opinions do not move the engine. Numbers do.

@@ -1,5 +1,7 @@
 # Tell — Motion & Animation Capability Plan
 
+> **Plan link (proposed, not shipped):** This doc's motion research is superseded in process by the plan's motion stage: motion is reviewed on its own after the page concept, starting from one prototyped key interaction. See the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3); waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the).
+
 > **Research → product plan.**  
 > **Survey (named experts + stacks):** [`research/MOTION_ANIMATION_SURVEY.md`](../research/MOTION_ANIMATION_SURVEY.md)  
 > **Measured corridors:** [`docs/10_DESIGN_EVIDENCE.md`](./10_DESIGN_EVIDENCE.md) (anonymised)  

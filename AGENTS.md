@@ -14,6 +14,8 @@ Registry: [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md) · [`docs/TOOLS-AND-SKI
 ## Standing rules
 
 - **Ship bar:** stacked images, motion, artistic, unique. Not one-shot AI generate.
+
+- **Design process (proposed):** the [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) replaces one-pass generation with seven reviewed stages (brief → concepts → mood board → art direction → key screen → sections → refine), an imagery step, motion as its own reviewed stage, performance budgets at every stage, an explicit colour `theme` instead of colour hashed from the product name, and an automatic swap test (a stranger's brand name on the page shouldn't still work). Proposed, waiting on Ashish's decision in [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the); nothing below is built yet.
 - **Park:** secondary to DeepHarness honesty — do not pull eng attention here while that is open.
 - **Local CI only:** never wait on or re-run GitHub Actions. Gate on `pnpm test` / `pnpm typecheck`.
 - **Deterministic core** (`packages/core`): zero LLM. Zod at every boundary (`@tell/schema`).
@@ -43,6 +45,8 @@ Persona / copy: [`USER_STORY.md`](./USER_STORY.md). Engineering contracts: [`BUI
 | Design dogfood loop | [`docs/features/design-dogfood-loop.md`](./docs/features/design-dogfood-loop.md) | Tell’s own UI, Studio bar, multi-session craft |
 | Training-data / MCP sink | [`docs/features/training-data-mcp-sink.md`](./docs/features/training-data-mcp-sink.md) | `tell-design-data`, SFT/DPO, episode writes |
 | Showcase / Tiller | [`docs/features/showcase-tiller.md`](./docs/features/showcase-tiller.md) | Specimens, GitHub README stills, Tiller gap |
+
+> **Planned, not built: staged design tools.** Today `tell_design_from_features` builds a whole site design in one call. The [DesignProof redesign plan](https://linear.app/bimlabz/document/designproof-redesign-plan-concept-first-step-by-step-design-7f1f65ec2bc3) proposes replacing it with one MCP (Model Context Protocol) tool per reviewed design stage (brief, concepts, mood board, art direction, key screen, sections, refine and motion), plus a review tool. A stage can't run until the one before it is approved, and rejecting a stage reruns only that stage. Under the plan the catalog would go from 11 to 18 tools, and a colour `theme` setting would replace colour picked from the product name. None of this exists yet. It's waiting for Ashish's decision in Linear issue [BIM-203](https://linear.app/bimlabz/issue/BIM-203/decide-designproof-redesign-plan-concept-first-step-by-step-and-the). Until then the eleven tools listed here are the real catalog.
 
 Full table (status, code paths, skills): [`docs/FEATURE-MAP.md`](./docs/FEATURE-MAP.md).
 
