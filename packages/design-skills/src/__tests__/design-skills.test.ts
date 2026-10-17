@@ -381,8 +381,10 @@ describe("measured craft floors", () => {
     for (const [name, brief] of Object.entries(SHOWCASE_BRIEFS)) {
       const { spec, previewHtml } = designFromFeatures(brief);
       expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(7);
-      const headings = (previewHtml.match(/<h[1-4][\s>]/g) ?? []).length;
-      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(16);
+      // Footer column titles are chrome, not parts of the argument: count headings in the body only.
+      const body = previewHtml.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, "");
+      const headings = (body.match(/<h[1-4][\s>]/g) ?? []).length;
+      expect(headings, `${name} headings`).toBeGreaterThanOrEqual(13);
       expect(new Set(spec.sections.map((s) => s.surface)).size, `${name} surfaces`).toBeGreaterThanOrEqual(3);
       expect(new Set(spec.sections.map((s) => s.layout)).size, `${name} layouts`).toBeGreaterThanOrEqual(6);
     }
