@@ -23,6 +23,40 @@ export function parseDesignDoc(content: string): DesignDocSpec {
   return { fonts: [...fonts], colors: [...colors], source: "DESIGN.md" };
 }
 
+/**
+ * Parse machine-readable design tokens (design-tokens.json) for declared fonts
+ * and hex colors. Never throws: invalid JSON or shape yields an empty spec.
+ */
+export function parseDesignTokens(content: string, source = "design-tokens.json"): DesignDocSpec {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return { fonts: [], colors: [], source };
+  }
+  if (typeof parsed !== "object" || parsed === null) {
+    return { fonts: [], colors: [], source };
+  }
+  const record = parsed as { fonts?: unknown; colors?: unknown };
+  return {
+    fonts: keepStrings(record.fonts),
+    colors: keepColors(record.colors),
+    source,
+  };
+}
+
+function keepStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === "string");
+}
+
+function keepColors(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is string => typeof entry === "string" && /^#[0-9A-Fa-f]{3,8}$/.test(entry))
+    .map((hex) => hex.toUpperCase());
+}
+
 export function detectDesignSystemDrift(
   fingerprint: DesignFingerprint,
   spec: DesignDocSpec | null | undefined,

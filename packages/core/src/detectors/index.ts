@@ -2,7 +2,7 @@ import { CapturePayload, DesignFingerprint, Finding } from "@tell/schema";
 import { hexToRgb, saturation } from "../fingerprint/build-fingerprint";
 import { detectDesignSystemDrift, parseDesignDoc, type DesignDocSpec } from "./design-system-drift";
 
-export { parseDesignDoc, type DesignDocSpec } from "./design-system-drift";
+export { parseDesignDoc, parseDesignTokens, type DesignDocSpec } from "./design-system-drift";
 
 const evidence = (label: string, value: string, selector?: string) => [{ kind: "computed" as const, label, value, selector }];
 

@@ -1,9 +1,13 @@
 import { BrandDNA, CapturePayload, TellReport } from "@tell/schema";
 import { computeMeasures } from "@tell/redesign";
 import { buildFingerprint } from "./fingerprint/build-fingerprint";
-import { detectFindings } from "./detectors";
+import { detectFindings, type DesignDocSpec } from "./detectors";
 
-export function diagnoseCapture(capture: CapturePayload, dna?: BrandDNA, designDoc?: string): TellReport {
+export function diagnoseCapture(
+  capture: CapturePayload,
+  dna?: BrandDNA,
+  designDoc?: string | DesignDocSpec,
+): TellReport {
   const fingerprint = buildFingerprint(capture);
   const findings = detectFindings(fingerprint, capture, { designDoc });
   const measures = computeMeasures(capture, fingerprint, dna);

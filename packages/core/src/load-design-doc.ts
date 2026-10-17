@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseDesignDoc, parseDesignTokens, type DesignDocSpec } from "./detectors/design-system-drift";
 
 const defaultRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
@@ -18,20 +19,40 @@ export function shouldApplyDesignDoc(url: string): boolean {
   }
 }
 
-/** Best-effort read of DESIGN.md from repo root or cwd (local scans only). */
-export async function loadDesignDoc(repoRoot = defaultRepoRoot): Promise<string | undefined> {
-  const candidates = [
+/**
+ * Best-effort read of design tokens for local scans: prefers a machine-readable
+ * `design-tokens.json` (repo root or cwd-relative) and falls back to DESIGN.md
+ * parsing when no tokens file exists.
+ */
+export async function loadDesignDoc(repoRoot = defaultRepoRoot): Promise<DesignDocSpec | undefined> {
+  const tokenCandidates = [
+    path.join(repoRoot, "design-tokens.json"),
+    path.join(process.cwd(), "design-tokens.json"),
+    path.join(process.cwd(), "..", "design-tokens.json"),
+    path.join(process.cwd(), "..", "..", "design-tokens.json"),
+  ];
+  for (const candidate of [...new Set(tokenCandidates)]) {
+    try {
+      const spec = parseDesignTokens(await readFile(candidate, "utf8"), "design-tokens.json");
+      if (spec.fonts.length > 0 || spec.colors.length > 0) return spec;
+    } catch {
+      /* try next candidate */
+    }
+  }
+
+  const docCandidates = [
     path.join(repoRoot, "DESIGN.md"),
     path.join(process.cwd(), "DESIGN.md"),
     path.join(process.cwd(), "..", "DESIGN.md"),
     path.join(process.cwd(), "..", "..", "DESIGN.md"),
   ];
-  for (const candidate of [...new Set(candidates)]) {
+  for (const candidate of [...new Set(docCandidates)]) {
     try {
-      return await readFile(candidate, "utf8");
+      return parseDesignDoc(await readFile(candidate, "utf8"));
     } catch {
       /* try next candidate */
     }
   }
+
   return undefined;
 }
