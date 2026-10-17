@@ -283,7 +283,7 @@ Catalog must stay at **eleven** tools. `tell_apply` returns patch text only.
 
 ## Platform Compatibility
 
-Tell ships as **skills, a CLI, and an MCP server** that mainstream coding agents consume natively. Once the monorepo is installed, a single `tell mcp install <platform>` wires the MCP server into that agent's config - same tools from inside any host.
+Tell ships as **a CLI and an MCP server** that mainstream coding agents consume natively. Once the monorepo is installed, a single `tell mcp install <platform>` wires the MCP server into that agent's config - same tools from inside any host.
 
 | Coding agent / platform | Status | One-line MCP install |
 |---|:---:|---|

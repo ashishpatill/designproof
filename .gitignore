@@ -85,3 +85,9 @@ developer-drop/
 # tracked so a fresh clone can connect to the local tell_* tools.
 .cursor/*
 !.cursor/mcp.json
+agent-skills/
+docs/PROJECT-STATUS.md
+USER_STORY.md
+OPEN_TELL_DESIGN_DATA.md
+TELL_DESIGN_DATA_HERE.md
+DESIGN.md
