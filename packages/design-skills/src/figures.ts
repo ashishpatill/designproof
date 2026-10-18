@@ -1128,8 +1128,10 @@ export function dossierPlate(
   role: FigureRole = "band",
 ): string {
   const r = rng(`${seed}:dossier`);
+  // Band role: wide, shallow coordinate space so the plate fills a 1280x800 fold at
+  // <=36vh without letterboxing or stretching the drawing (uniform scale).
   const W = role === "band" ? 1440 : role === "column" ? 640 : 920;
-  const H = role === "band" ? 820 : role === "column" ? 720 : 560;
+  const H = role === "band" ? 320 : role === "column" ? 720 : 560;
   const padX = role === "band" ? W * 0.06 : W * 0.08;
   const padY = role === "band" ? H * 0.08 : H * 0.09;
   const parts: string[] = [];
@@ -1242,7 +1244,7 @@ export function dossierPlate(
     kind: "dossier-plate",
     // Product name only. "dossier plate" reached every aria-label, a pottery studio's included.
     label: productName,
-    inset: role === "band" ? BLEED_INSET : 0,
+    inset: 0,
   });
 }
 

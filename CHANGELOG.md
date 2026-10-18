@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18 — Research-dossier plate visual full-width fix
+
+- Desktop (min-width 801px): widened the dossier-plate coordinate space (1440×320) and removed the bleed inset so the plate fills the fold width at a uniform scale with capped height <=36vh instead of letterboxing; mobile 390 and other templates unchanged.
+
 ## 2026-10-18 — Research-dossier desktop plate full-width fix
 
 - Desktop (min-width 801px): `.ds-folio-plate .ds-fig` now spans full content width (`width:100%`) with capped height (`max-height:36vh`) instead of shrinking to its intrinsic aspect; SVG preserveAspectRatio keeps the drawing legible.
