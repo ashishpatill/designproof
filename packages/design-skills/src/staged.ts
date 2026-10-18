@@ -11,12 +11,12 @@
  *   - a motion review (between art-direction and refinement, not a ninth stage)
  *   - an Awwwards-weighted review score
  */
-import { z } from "zod";
 import {
   DesignBrief,
   SiteKind,
   TasteControls,
   ColorMood,
+  ConceptSpec,
 } from "./types";
 import type { DesignBrief as DesignBriefType, TasteControls as TasteControlsType } from "./types";
 
@@ -202,18 +202,19 @@ export function applyTheme(taste: TasteControlsType, theme: Theme): TasteControl
   return TasteControls.parse({ ...taste, colorMood: theme.colorMood });
 }
 
+export function applyThemeToBrief(brief: DesignBriefType, theme: Theme): DesignBriefType {
+  const parsed = DesignBrief.parse(brief);
+  const taste = { ...(parsed.taste ?? {}), colorMood: theme.colorMood };
+  return DesignBrief.parse({
+    ...parsed,
+    brandAccent: theme.brandAccent,
+    taste,
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Concept derivation                                                  */
 /* ------------------------------------------------------------------ */
-
-export const ConceptSpec = z.object({
-  oneLiner: z.string().min(1),
-  metaphor: z.string().min(1),
-  rejects: z.array(z.string()).min(2),
-  visibleTests: z.array(z.string()).min(3),
-  siteKind: SiteKind,
-});
-export type ConceptSpec = z.infer<typeof ConceptSpec>;
 
 interface ConceptRow {
   metaphor: string;
@@ -419,9 +420,9 @@ export interface BudgetReport {
 }
 
 export function checkPreviewBudgets(previewHtml: string): BudgetReport {
-  const bytes = Buffer.byteLength(previewHtml, "utf8");
+  const bytes = new TextEncoder().encode(previewHtml).length;
   const scriptCount = (previewHtml.match(/<script\b/gi) ?? []).length;
-  const insecure = /http:\/\//i.test(previewHtml);
+  const insecure = /(src|href)=["']http:\/\/(?!www\.w3\.org)/i.test(previewHtml);
   const viewport =
     /<meta[^>]*name=["']viewport["']/i.test(previewHtml) ||
     /name=["']viewport["'][^>]*content/i.test(previewHtml);

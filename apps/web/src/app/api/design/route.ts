@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     if (typeof body.query === "string" && body.query.trim()) {
       const { brief, plan } = briefFromFreeText(body.query);
-      const result = designFromFeatures(brief);
+      const result = designFromFeatures(brief, { theme: typeof body.theme === "string" ? body.theme : undefined });
       recordDesignResult(result, {
         via: "api.design.post.query",
         siteKind: brief.siteKind,
@@ -68,6 +68,7 @@ export async function POST(req: Request) {
     const result = await designFromFeaturesAuthored(parsed.brief, {
       redesignFrom: parsed.redesignFrom,
       apiKey,
+      theme: parsed.theme,
     });
     recordDesignResult(result, {
       via: "api.design.post",

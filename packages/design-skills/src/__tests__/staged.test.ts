@@ -9,6 +9,7 @@ import {
   getTheme,
   listThemes,
   applyTheme,
+  applyThemeToBrief,
   deriveConcept,
   swapTest,
   buildSwappedBrief,
@@ -17,6 +18,7 @@ import {
   motionReviewFor,
   weightedReview,
   ConceptSpec,
+  designFromFeatures,
 } from "../index";
 import { DesignBrief, TasteControls } from "../types";
 
@@ -207,6 +209,18 @@ describe("budgets", () => {
     const r = checkPreviewBudgets(html);
     expect(r.findings.find((f) => f.id === "script-tags")?.ok).toBe(false);
   });
+
+  it("svg xmlns does not count as insecure asset", () => {
+    const html = `<svg xmlns='http://www.w3.org/2000/svg'><rect/></svg><meta name="viewport" content="w">`;
+    const r = checkPreviewBudgets(html);
+    expect(r.findings.find((f) => f.id === "no-insecure-assets")?.ok).toBe(true);
+  });
+
+  it("http src fails insecure check", () => {
+    const html = `<img src='http://x'><meta name="viewport" content="w">`;
+    const r = checkPreviewBudgets(html);
+    expect(r.findings.find((f) => f.id === "no-insecure-assets")?.ok).toBe(false);
+  });
 });
 
 describe("motion review", () => {
@@ -234,5 +248,36 @@ describe("weighted review", () => {
     expect(weightedReview({ design: 70, usability: 70, creativity: 70, content: 70 }).band).toBe("at-bar");
     expect(weightedReview({ design: 55, usability: 55, creativity: 55, content: 55 }).band).toBe("approaching");
     expect(weightedReview({ design: 10, usability: 10, creativity: 10, content: 10 }).band).toBe("below-bar");
+  });
+});
+
+
+describe("applyThemeToBrief", () => {
+  it("sets brandAccent and colorMood, preserves taste", () => {
+    const brief = makeBrief("saas-marketing", "Acme");
+    const b = DesignBrief.parse({ ...brief, taste: { density: "sparse", motion: "none" } });
+    const theme = getTheme("nocturne-brass")!;
+    const next = applyThemeToBrief(b, theme);
+    expect(next.brandAccent).toBe(theme.brandAccent);
+    expect(next.taste?.colorMood).toBe(theme.colorMood);
+    expect(next.taste?.density).toBe("sparse");
+    expect(next.taste?.motion).toBe("none");
+    expect(b.brandAccent).toBeUndefined();
+  });
+});
+
+describe("designFromFeatures concept/theme", () => {
+  it("attaches concept and themeId when theme passed", () => {
+    const brief = makeBrief("saas-marketing", "Freightlane");
+    const res = designFromFeatures(brief, { theme: "ink-paper" });
+    expect(res.spec.concept).toBeDefined();
+    expect(res.spec.themeId).toBe("ink-paper");
+    expect(res.spec.brief.brandAccent).toBe(getTheme("ink-paper")!.brandAccent);
+  });
+  it("attaches concept without theme", () => {
+    const brief = makeBrief("saas-marketing", "Freightlane");
+    const res = designFromFeatures(brief);
+    expect(res.spec.concept).toBeDefined();
+    expect(res.spec.themeId).toBeUndefined();
   });
 });

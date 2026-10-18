@@ -2,8 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  DesignBrief,
   DesignFromFeaturesResponse,
   templateToStudioPreset,
+  STAGED_STAGES,
+  createStagedRun,
+  approveStage,
+  rejectStage,
+  listThemes,
+  getTheme,
+  applyThemeToBrief,
+  deriveConcept,
+  swapTest,
+  buildSwappedBrief,
+  checkPreviewBudgets,
+  motionReviewFor,
   type AestheticLean,
   type ColorMood,
   type Density,
@@ -62,6 +75,17 @@ function parseFeatures(text: string) {
     });
 }
 
+const STAGE_DESCRIPTIONS: Record<string, string> = {
+  brief: "What are we making and for whom",
+  concepts: "One-line idea + metaphor, before pixels",
+  moodboard: "Reference qualities, not copied layouts",
+  "art-direction": "Type, colour theme, spacing discipline",
+  imagery: "Real product imagery plan",
+  "key-screen": "One hero screen proved first",
+  sections: "Build section by section from the key screen",
+  refinement: "Polish, budgets, swap test",
+};
+
 export default function StudioPage() {
   const [productName, setProductName] = useState(DEFAULT_BRIEF.productName);
   const [tagline, setTagline] = useState(DEFAULT_BRIEF.tagline);
@@ -74,6 +98,11 @@ export default function StudioPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<DesignResponse | null>(null);
   const [generation, setGeneration] = useState(0);
+  const [theme, setTheme] = useState("ink-paper");
+  const [stagedRun, setStagedRun] = useState(() => createStagedRun());
+  const [swapResult, setSwapResult] = useState<ReturnType<typeof swapTest> | null>(null);
+  const [swapError, setSwapError] = useState<string | null>(null);
+  const [swapLoading, setSwapLoading] = useState(false);
   const [viewport, setViewport] = useState<ViewportWidth>("1280");
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const lastSpecRef = useRef<DesignSpec | null>(null);
@@ -95,21 +124,38 @@ export default function StudioPage() {
 
   const brief = useMemo(() => {
     const fields = designControlsToBriefFields(controls);
-    return {
+    const selectedTheme = getTheme(theme);
+    const base = {
       productName,
       tagline,
       audience,
       businessGoal: fields.businessGoal,
       siteKind: fields.siteKind,
       lockSiteKind,
-      brandAccent: fields.brandAccent,
+      brandAccent: selectedTheme?.brandAccent ?? fields.brandAccent,
       craftNodes: fields.craftNodes,
       features: parseFeatures(featuresText),
-      taste: fields.taste,
+      taste: selectedTheme
+        ? { ...fields.taste, colorMood: selectedTheme.colorMood }
+        : fields.taste,
     };
-  }, [productName, tagline, audience, lockSiteKind, featuresText, controls]);
+    return base;
+  }, [productName, tagline, audience, lockSiteKind, featuresText, controls, theme]);
 
-  const generateWith = useCallback(async (nextBrief: typeof brief, mode: GenerateMode = "create") => {
+  const currentConcept = useMemo(() => {
+    try {
+      return deriveConcept(DesignBrief.parse(brief));
+    } catch {
+      return null;
+    }
+  }, [brief]);
+
+  useEffect(() => {
+    setStagedRun(createStagedRun());
+  }, [generation]);
+
+  const themes = useMemo(() => listThemes(), []);
+  const generateWith = useCallback(async (nextBrief: typeof brief, mode: GenerateMode = "create", themeId: string = theme) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -121,7 +167,7 @@ export default function StudioPage() {
       const res = await fetch("/api/design", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ brief: nextBrief, redesignFrom }),
+        body: JSON.stringify({ brief: nextBrief, redesignFrom, theme: themeId }),
         signal: controller.signal,
       });
       const raw = await res.json();
@@ -137,8 +183,7 @@ export default function StudioPage() {
     } finally {
       if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, []);
-
+  }, [theme]);
   const generate = useCallback(async () => {
     await generateWith(brief, lastSpecRef.current ? "redesign" : "create");
   }, [brief, generateWith]);
@@ -547,6 +592,7 @@ export default function StudioPage() {
               </ul>
             </div>
           ) : null}
+
         </aside>
 
         <section className="overflow-hidden rounded-card border border-border bg-surface" data-testid="studio-canvas">
@@ -591,6 +637,246 @@ export default function StudioPage() {
           )}
         </section>
       </div>
+
+      <div className="mx-auto max-w-[1600px] px-4 pb-6 md:px-6">
+        <div className="rounded-card border border-border bg-surface p-4 md:p-5" data-testid="staged-panel">
+          <h2 className="font-display text-base font-semibold tracking-tight">Concept-first staged run</h2>
+          <p className="mt-1 text-sm text-secondary">Approve each stage before the next runs.</p>
+          <div className="mt-4 grid gap-5 text-sm md:grid-cols-3">
+            {/* col1: Theme picker + concept card */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm">
+                  <span className="mb-1 block font-medium">Theme</span>
+                  <select
+                    className="w-full rounded border border-border bg-bg px-3 py-2 text-text outline-none focus-visible:border-accent"
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    data-testid="theme-select"
+                  >
+                    {themes.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className="mt-1 text-secondary">{getTheme(theme)?.description}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {themes.map((t) => (
+                    <span
+                      key={t.id}
+                      className="inline-flex items-center gap-1 rounded border border-border px-2 py-1"
+                      title={t.label}
+                    >
+                      <span className="h-3 w-3 rounded-full" style={{ background: t.paper }} />
+                      <span className="h-3 w-3 rounded-full" style={{ background: t.ink }} />
+                      <span className="h-3 w-3 rounded-full" style={{ background: t.brandAccent }} />
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {result?.spec?.concept || currentConcept ? (
+                <div className="space-y-1" data-testid="concept-card">
+                  <p>
+                    <strong className="text-text">One-liner:</strong> {(result?.spec?.concept ?? currentConcept)!.oneLiner}
+                  </p>
+                  <p>
+                    <strong className="text-text">Metaphor:</strong> {(result?.spec?.concept ?? currentConcept)!.metaphor}
+                  </p>
+                  <p className="font-medium text-text">Rejects</p>
+                  <ul className="list-disc pl-4">
+                    {(result?.spec?.concept ?? currentConcept)!.rejects.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                  <p className="font-medium text-text">Visible tests</p>
+                  <ul className="list-disc pl-4">
+                    {(result?.spec?.concept ?? currentConcept)!.visibleTests.map((v) => (
+                      <li key={v}>{v}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+
+            {/* col2: Staged run stepper */}
+            <div className="space-y-2">
+              <p className="font-medium text-text">Staged run</p>
+              <ul className="space-y-2">
+                {stagedRun.stages.map((s) => {
+                  const isCurrent = s.status === "in-review";
+                  const desc = STAGE_DESCRIPTIONS[s.id] ?? "";
+                  const pillClass =
+                    s.status === "approved"
+                      ? "bg-accent text-white"
+                      : s.status === "in-review"
+                      ? "border border-accent text-accent"
+                      : "text-muted border border-border";
+                  return (
+                    <li
+                      key={s.id}
+                      className={`flex items-center justify-between gap-2 rounded border p-2 ${
+                        isCurrent ? "border-accent" : "border-border"
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-medium text-text">{s.id}</p>
+                        <p className="text-xs text-secondary">{desc}</p>
+                      </div>
+                      <span className={`shrink-0 rounded px-2 py-0.5 text-xs font-mono ${pillClass}`}>
+                        {s.status}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              {(() => {
+                const current = stagedRun.stages.find((s) => s.status === "in-review")?.id;
+                const allApproved = stagedRun.stages.every((s) => s.status === "approved");
+                if (allApproved) {
+                  return <p className="text-text">All stages approved</p>;
+                }
+                return (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="rounded border border-border px-2 py-1 text-xs font-semibold disabled:opacity-50"
+                      data-testid="stage-approve"
+                      disabled={!current}
+                      onClick={() => {
+                        if (!current) return;
+                        try {
+                          setStagedRun(approveStage(stagedRun, current));
+                        } catch {
+                          /* ignore */
+                        }
+                      }}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded border border-border px-2 py-1 text-xs font-semibold disabled:opacity-50"
+                      data-testid="stage-reject"
+                      disabled={!current}
+                      onClick={() => {
+                        if (!current) return;
+                        try {
+                          setStagedRun(rejectStage(stagedRun, current));
+                        } catch {
+                          /* ignore */
+                        }
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* col3: Swap test + budgets + motion review */}
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <button
+                  type="button"
+                  className="rounded border border-border px-2 py-1 text-xs font-semibold disabled:opacity-50"
+                  data-testid="btn-swap-test"
+                  disabled={swapLoading || !result?.spec}
+                  onClick={async () => {
+                    if (!result?.spec) return;
+                    setSwapLoading(true);
+                    setSwapError(null);
+                    try {
+                      const swappedBrief = buildSwappedBrief(result.spec.brief);
+                      const res = await fetch("/api/design", {
+                        method: "POST",
+                        headers: { "content-type": "application/json" },
+                        body: JSON.stringify({ brief: swappedBrief, theme }),
+                      });
+                      const raw = await res.json();
+                      if (!res.ok) throw new Error((raw as { error?: string }).error || "Swap failed");
+                      const data = DesignFromFeaturesResponse.parse(raw);
+                      const original = {
+                        concept: result.spec.concept!,
+                        heroTitle: result.spec.sections[0]?.title ?? "",
+                        bodyCopy: result.spec.sections.map((s) => s.title + " " + s.body),
+                      };
+                      const swappedConcept = (data.spec.concept ?? {
+                        oneLiner: "",
+                        metaphor: "",
+                        rejects: [],
+                        visibleTests: [],
+                        siteKind: data.spec.brief.siteKind,
+                      }) as any;
+                      const swapped = {
+                        concept: swappedConcept,
+                        heroTitle: data.spec.sections[0]?.title ?? "",
+                        bodyCopy: data.spec.sections.map((s) => s.title + " " + s.body),
+                      };
+                      const r = swapTest(original, swapped);
+                      setSwapResult(r);
+                    } catch (e) {
+                      setSwapError(e instanceof Error ? e.message : "Swap failed");
+                    } finally {
+                      setSwapLoading(false);
+                    }
+                  }}
+                >
+                  {swapLoading ? "Running…" : "Swap test"}
+                </button>
+                {swapError ? <p className="text-drift">{swapError}</p> : null}
+                {swapResult ? (
+                  <div data-testid="swap-result">
+                    <p>{swapResult.passed ? "passed" : "failed"}</p>
+                    <p>{Math.round(swapResult.changedRatio * 100)}%</p>
+                  </div>
+                ) : null}
+              </div>
+
+              {result?.previewHtml ? (
+                <div data-testid="budget-result">
+                  {(() => {
+                    const report = checkPreviewBudgets(result.previewHtml);
+                    return (
+                      <>
+                        <p>Overall: {report.passed ? "passed" : "failed"}</p>
+                        <ul className="list-disc pl-4">
+                          {report.findings.map((f) => (
+                            <li key={f.id}>
+                              {f.id}: {f.ok ? "ok" : "fail"} — {f.detail}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    );
+                  })()}
+                </div>
+              ) : null}
+
+              {result?.spec?.concept ? (
+                <div data-testid="motion-review">
+                  {(() => {
+                    const mr = motionReviewFor(result.spec.concept, result.spec.taste);
+                    return (
+                      <>
+                        <p>{mr.idea}</p>
+                        <p>
+                          {mr.after} → {mr.before}
+                        </p>
+                        <p>{mr.keyInteraction}</p>
+                      </>
+                    );
+                  })()}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     </ProductShell>
   );
