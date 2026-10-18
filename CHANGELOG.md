@@ -2,6 +2,13 @@
 
 Notable Tell Proof work, newest first. Dates follow `git log`. This is not a semver release log.
 
+## 2026-10-18 — Studio first-screen staged panel + SaaS rail labels
+
+- Moved the Studio concept-first staged-run panel directly under the page header so theme picker, concept card, and stage Approve controls are visible without scrolling at 1280 and 390.
+- Improved staged panel spacing and responsive stacking (no tiny 3-column squeeze on mobile).
+- SaaS specimen queue console no longer clips rail labels (Account scoring, Pipeline coaching, Territory modelling render in full).
+- Swap result now states the ≥50% pass threshold and 0% for identical input; removed unsupported 83% wording.
+
 Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app design across many sessions — an independent critic and craft layer beside the coding agent. It is not a Studio web app as the product.
 
 **Quality bar:** stacked images, motion, artistic, unique. Not one-shot AI generate.

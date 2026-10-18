@@ -2451,7 +2451,7 @@ export function queueConsole(
   const r = rng(`${seed}:queue`);
   const pad = W * 0.04;
   const parts: string[] = [];
-  const railW = W * 0.18;
+  const railW = W * 0.22;
   parts.push(box(pad, pad, railW, H - pad * 2, { r: 0, fill: "var(--c-paper-raised)", stroke: LINE }));
   parts.push(text("PRIORITY", pad + 16, pad + 28, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1 }));
   items.forEach((b, i) => {
@@ -2465,7 +2465,7 @@ export function queueConsole(
         mono: true,
       }),
     );
-    parts.push(text(clip(b.title, 16), pad + 48, y, { size: 13, fill: INK, weight: lead ? 600 : 500 }));
+    parts.push(text(b.title, pad + 48, y, { size: 13, fill: INK, weight: lead ? 600 : 500 }));
     if (numbers) {
       const delta = lead ? "+3" : r() > 0.5 ? "−1" : "0";
       parts.push(
