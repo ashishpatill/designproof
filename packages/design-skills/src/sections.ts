@@ -449,7 +449,7 @@ export function buildSections(
               ? sentence(
                   "Keel is an open harness that runs many coding agents without the UI collapsing — honest permits, local run data, finish conditions you can see",
                 )
-              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isDossier
+              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress
                 ? ""
                 : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,

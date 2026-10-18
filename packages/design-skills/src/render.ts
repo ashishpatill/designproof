@@ -515,6 +515,10 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<nav class="ds-chapter-rail" aria-label="Briefing chapters"><ol>${chapters}</ol></nav>`
       : "";
     const mast = `<header class="ds-folio-masthead" aria-label="Folio masthead">
+      <span class="ds-folio-vol">Vol. XII</span>
+      <span class="ds-folio-sep" aria-hidden="true">—</span>
+      <span class="ds-folio-issue">Issue 03</span>
+      <span class="ds-sr">VOL. XII — ISSUE 03</span>
       <span class="ds-folio-date">Briefing folio</span>
       <span class="ds-folio-mark">${esc(spec.brief.productName)}</span>
     </header>`;
