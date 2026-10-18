@@ -2618,6 +2618,11 @@ ${surfaceRules()}
   [data-sitekind="research-dossier"] .ds-hero-folio .ds-lede{margin:0.25rem 0 0}
   [data-sitekind="research-dossier"] .ds-hero-folio .ds-actions{margin-top:0.4rem}
 }
+@media (min-width:801px){
+  [data-sitekind="research-dossier"] .ds-folio-plate .ds-fig{min-height:0 !important;height:auto;max-height:36vh;width:100%;max-width:100%}
+  [data-sitekind="research-dossier"] .ds-folio-claim{padding:var(--s-xs) 0 var(--s-xs)}
+  [data-sitekind="research-dossier"] .ds-hero-folio{min-height:auto !important}
+}
 /* Verso/recto spread + footnote register. */
 .ds-spread-grid{
   display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);gap:0 var(--gutter);

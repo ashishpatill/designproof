@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-18 — Research-dossier desktop plate full-width fix
+
+- Desktop (min-width 801px): `.ds-folio-plate .ds-fig` now spans full content width (`width:100%`) with capped height (`max-height:36vh`) instead of shrinking to its intrinsic aspect; SVG preserveAspectRatio keeps the drawing legible.
+
+## 2026-10-18 — Research-dossier desktop first-screen fix
+
+- Desktop (min-width 801px): capped the dossier thesis-map plate figure height (max-height 36vh) and tightened the folio claim padding so masthead, headline, lede, CTA and the full plate fit within the first screen at 1280x800; hero min-height no longer forces the plate below the fold. Dossier-gated only.
+- Kept chapter-rail calc fix, mobile 390 first-screen behaviour, and typographic Priorities (no grey bars).
+
 ## 2026-10-18 — Research-dossier specimen polish
 
 - Chapter rail: widened `--chapter-rail` by the gutter so the numbered rail (numbers + vertical labels) sits fully inside the desktop viewport instead of clipping at the right edge.
