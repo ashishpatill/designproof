@@ -196,7 +196,7 @@ function frame(body: string, o: FrameOptions): string {
  *  - `band`   — spanning the viewport, so wide and shallow enough to leave the fold readable
  *  - `plate`  — inside a container, between paragraphs
  */
-export type FigureRole = "column" | "band" | "plate";
+export type FigureRole = "column" | "band" | "plate" | "mobile";
 
 /**
  * How far a full-bleed drawing holds off the screen edge, as a share of its own width.
@@ -1130,8 +1130,8 @@ export function dossierPlate(
   const r = rng(`${seed}:dossier`);
   // Band role: wide, shallow coordinate space so the plate fills a 1280x800 fold at
   // <=36vh without letterboxing or stretching the drawing (uniform scale).
-  const W = role === "band" ? 1440 : role === "column" ? 640 : 920;
-  const H = role === "band" ? 320 : role === "column" ? 720 : 560;
+  const W = role === "band" ? 1440 : role === "mobile" ? 640 : role === "column" ? 640 : 920;
+  const H = role === "band" ? 320 : role === "mobile" ? 480 : role === "column" ? 720 : 560;
   const padX = role === "band" ? W * 0.06 : W * 0.08;
   const padY = role === "band" ? H * 0.08 : H * 0.09;
   const parts: string[] = [];

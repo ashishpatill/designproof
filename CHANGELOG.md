@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18 — Research-dossier responsive plate fix
+
+- Mobile (max-width:800px): emit a second taller dossier-plate variant (640x480, 4:3) shown only on mobile, with legible labels at 390px; desktop 1440x320 wide-shallow plate and CSS unchanged.
+
 ## 2026-10-18 — Research-dossier plate visual full-width fix
 
 - Desktop (min-width 801px): widened the dossier-plate coordinate space (1440×320) and removed the bleed inset so the plate fills the fold width at a uniform scale with capped height <=36vh instead of letterboxing; mobile 390 and other templates unchanged.

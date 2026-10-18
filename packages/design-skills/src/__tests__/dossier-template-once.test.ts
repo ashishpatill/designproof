@@ -148,7 +148,7 @@ describe("research dossier template says each thing once", () => {
         for (const [i, f] of brief.features.entries()) {
           // Plate (drawn text), index, and priorities in the page text, plus the close for the lead.
           // Plate names are inside the SVG so they count in visible() after tag strip.
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 4 : 3);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 5 : 4);
           expect(plate.split(`>${f.name}<`).length - 1 + plate.split(`>${f.name.slice(0, 18)}`).length - 1, `${brief.productName} plate: ${f.name}`).toBeGreaterThanOrEqual(1);
         }
       }

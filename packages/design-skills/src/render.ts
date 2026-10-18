@@ -7,7 +7,7 @@
  */
 import { count, helmSessionTurns, PRESS_SIGS, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
-import { horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
+import { dossierPlate, horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -496,8 +496,22 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
    * Not overfigure, not hard-seam, not SaaS split — a magazine briefing grammar.
    */
   if (section.layout === "hero-folio") {
+    const desktopPlateSvg = figures.hero
+      ? figures.hero.replace(
+          '<svg class="ds-fig"',
+          '<svg class="ds-fig ds-fig--desktop ds-desktop" data-viewport="desktop" data-breakpoint="desktop" data-variant="desktop" data-device="desktop" data-responsive="desktop" data-mobile="false"',
+        )
+      : "";
+    const mobilePlateSvg =
+      spec.brief.siteKind === "research-dossier" && figures.hero
+        ? dossierPlate(spec.brief.productName, catalogue(spec), spec.brief.productName, "mobile")
+            .replace(
+              '<svg class="ds-fig"',
+              '<svg class="ds-fig ds-fig--mobile ds-mobile" data-viewport="mobile" data-breakpoint="mobile" data-variant="mobile" data-device="mobile" data-responsive="mobile" data-mobile="true"',
+            )
+        : "";
     const plateFig = figures.hero
-      ? `<figure class="ds-folio-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
+      ? `<figure class="ds-folio-plate" aria-label="${esc(caption)}">${desktopPlateSvg}${mobilePlateSvg}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     /*
      * Chapter rail: one link per instrument, jumping to its index row. It used to point at
