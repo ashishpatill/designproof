@@ -15,6 +15,7 @@ import {
   DesignBrief,
   DesignFromFeaturesResponse,
   DesignSpec,
+  DesignTokens,
   ResearchPlanSpec,
   TasteControls,
 } from "./types";
@@ -130,10 +131,11 @@ export function designFromFeatures(
 ): DesignFromFeaturesResponse {
   const brief = DesignBrief.parse(briefInput);
   const prior = options.redesignFrom ? DesignSpec.parse(options.redesignFrom) : undefined;
+  const themeId = options.theme ?? brief.theme;
   let theme: ReturnType<typeof getTheme>;
-  if (options.theme) {
-    theme = getTheme(options.theme);
-    if (!theme) throw new Error(`Unknown theme: ${options.theme}`);
+  if (themeId) {
+    theme = getTheme(themeId);
+    if (!theme) throw new Error(`Unknown theme: ${themeId}`);
   }
   let taste = resolveTaste(brief);
   if (theme) taste = applyTheme(taste, theme);
@@ -142,6 +144,7 @@ export function designFromFeatures(
     ...brief,
     siteKind: analysis.siteKind,
     brandAccent: brief.brandAccent ?? theme?.brandAccent,
+    theme: themeId,
   };
 
   const sportCoreSix =
@@ -169,7 +172,10 @@ export function designFromFeatures(
     researchPlan: researchPlanRaw,
     brief: effectiveBrief,
   });
-  const tokens = buildTokens(taste, analysis.siteKind, effectiveBrief.brandAccent, effectiveBrief.productName);
+  let tokens = buildTokens(taste, analysis.siteKind, effectiveBrief.brandAccent, effectiveBrief.productName);
+  if (theme) {
+    tokens = DesignTokens.parse({ ...tokens, color: { ...tokens.color, paper: theme.paper } });
+  }
   const authored =
     options.authored && isConnectiveAuthorEligible(effectiveBrief) ? options.authored : undefined;
   const sections = buildSections(effectiveBrief, analysis, taste, {

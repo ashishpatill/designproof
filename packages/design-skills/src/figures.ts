@@ -1228,18 +1228,20 @@ export function dossierPlate(
   parts.push(
     `<line x1="${round(scaleX + cellW * 1.5)}" y1="${round(scaleY - 4)}" x2="${round(scaleX + cellW * 1.5)}" y2="${round(scaleY + 4)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
+  /*
+   * No "1 briefing unit" and no "· dossier plate" foot. Both reached every dossier page, a pottery
+   * studio's included, and no brief declares a briefing unit or that this drawing is a dossier plate.
+   */
   parts.push(
-    `<text class="ds-fig-mono" x="${round(scaleX + cellW * 1.65)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)">1 briefing unit</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 28))} · dossier plate</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX)}" y="${round(scaleY + 3)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${esc(clip(productName, 28))}</text>`,
   );
 
   return frame(parts.join(""), {
     width: W,
     height: H,
     kind: "dossier-plate",
-    label: `${productName} dossier plate`,
+    // Product name only. "dossier plate" reached every aria-label, a pottery studio's included.
+    label: productName,
     inset: role === "band" ? BLEED_INSET : 0,
   });
 }

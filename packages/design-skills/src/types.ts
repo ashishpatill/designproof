@@ -310,6 +310,11 @@ export const DesignBrief = z.object({
    * via `resolveRequestedCraft` in route.ts.
    */
   craftNodes: z.array(z.string()).default([]),
+  /**
+   * Optional theme id from `THEMES` (staged flow). When set, colour comes from the
+   * explicit theme, never from a product-name hash.
+   */
+  theme: z.string().optional(),
 });
 export type DesignBrief = z.infer<typeof DesignBrief>;
 

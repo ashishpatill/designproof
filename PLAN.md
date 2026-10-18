@@ -289,12 +289,12 @@ concept until eye + critique clear — one template per loop, never a new shared
 - [x] Craft kinds — strip remaining `features-2` feature-rows (dossier/observatory/loom/herbarium/press/lantern/consumer)
 - [x] Observatory (Nightglass) — event waterfall (not essay+aside clone)
 - [x] Press (Forme Desk) — forme stack + densitometer (not essay+aside clone)
-- [ ] Dossier (Meridian Atlas) — spread citeability
+- [x] Dossier (Meridian Atlas) — spread replaced by priority chapters; chapter rail links to #instrument-01..n; folio masthead stripped of stock volume/issue; plate foot trimmed; index carries every description once
 - [x] Lantern (Ember Gate) — night trail zigzag (not essay+aside clone)
 - [x] Herbarium — dichotomous voucher key (not essay+aside clone)
 - [x] Loom — care-tag stack (not essay+aside clone)
 - [ ] Consumer — polish only if eye miss
-- [ ] Dossier — spread citeability deepen if eye still fails
+- [x] Dossier — spread citeability resolved by priority chapters (see above)
 - [ ] Marketing kinds — stack/wire/spine/workflow stay distinct; no craft marquee return
 - [x] LEARNINGS + LOOP_LEDGER updated for loops 26–32
 - [x] Essay+aside mid-page clones cleared: field, press, observatory, lantern, loom

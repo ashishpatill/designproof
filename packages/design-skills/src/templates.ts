@@ -50,6 +50,8 @@ export interface DesignTemplate {
    */
   researchBasis: string;
   brief: DesignBrief;
+  /** Optional theme id from THEMES driving this specimen. */
+  theme?: string;
 }
 
 export const DESIGN_TEMPLATES: DesignTemplate[] = [
@@ -516,6 +518,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
     marketJob:
       "Capital / research briefing landing — folio masthead, chapter rail, dossier plate, verso/recto footnotes, imprint.",
     siteKind: "research-dossier",
+    theme: "ink-paper",
     researchBasis:
       "Calibrated against capital-brand + research-editorial + editorial-brand corridors (alignment axes ~6–8, spineConformity ~0.5–0.75, quiet display, dense bleeds, layered matter). Distinct craft theme packs miss: folio volume/issue masthead, sticky chapter rail, dossier-plate cartographic figure with pin callouts, verso/recto spread with footnote register, full-bleed accent rules, paper imprint — no pricing, no metrics theatre, zero inverse bands.",
     brief: DesignBrief.parse({
@@ -525,8 +528,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
       businessGoal: "trust",
       siteKind: "research-dossier",
       lockSiteKind: true,
-      // Cool ink-led stock — escapes cream/terracotta and violet AI clusters.
-      brandAccent: "#243B55",
+      theme: "ink-paper",
       features: [
         {
           id: "m1",
@@ -569,7 +571,7 @@ export const DESIGN_TEMPLATES: DesignTemplate[] = [
         aestheticLean: "refined-story",
         density: "sparse",
         motion: "light-scroll-reveals",
-        colorMood: "light-airy",
+        colorMood: "neutral-professional",
         typographyWeight: "light-elegant",
         roundingDepth: "sharp",
       },

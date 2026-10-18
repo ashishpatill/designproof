@@ -111,7 +111,7 @@ export async function GET(req: Request) {
     if (!template) {
       return NextResponse.json({ error: `Unknown showcase "${key}"` }, { status: 404 });
     }
-    const result = designFromFeatures(template.brief);
+    const result = designFromFeatures(template.brief, { theme: template.theme });
     recordDesignResult(result, {
       via: "api.design.get",
       showcaseKey: key,
