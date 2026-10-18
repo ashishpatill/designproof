@@ -1655,16 +1655,11 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-              ${figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : ""}
+              ${spec?.brief.siteKind === "research-dossier" ? "" : (figures.marks[i] ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>` : "")}
             </li>`,
           )
           .join("")}
-      </ol>${
-        spec?.brief.siteKind === "research-dossier"
-          ? `
-      ${storyFillSlab(section.blocks.map((b) => b.title))}`
-          : ""
-      }
+      </ol>
     </div>
   </section>`;
 }

@@ -956,7 +956,8 @@ body[data-sitekind="editorial-foundry"]{
 /* Research dossier — folio masthead, chapter rail, dossier plate, verso/recto, imprint. */
 [data-sitekind="research-dossier"]{
   --align-rail:5.5rem;
-  --chapter-rail:4.25rem;
+  /* Keep the vertical chapter rail (numbers + labels) inside the viewport with a gutter of air on its right. */
+  --chapter-rail:calc(4.25rem + var(--gutter));
 }
 body[data-sitekind="research-dossier"]{
   background:
@@ -2609,7 +2610,13 @@ ${surfaceRules()}
 @media (max-width:800px){
   .ds-chapter-rail{display:none}
   .ds-folio-masthead,.ds-folio-claim{padding-right:var(--gutter)}
-  .ds-folio-plate .ds-fig{min-height:min(58vh,560px)}
+  [data-sitekind="research-dossier"] .ds-folio-plate .ds-fig{min-height:0 !important;height:auto;max-height:52vh}
+  .ds-hero-folio{min-height:auto !important}
+  [data-sitekind="research-dossier"] .ds-folio-masthead{padding-top:var(--s-2xs);padding-bottom:var(--s-2xs)}
+  [data-sitekind="research-dossier"] .ds-folio-claim{padding:var(--s-xs) 0 var(--s-xs)}
+  [data-sitekind="research-dossier"] .ds-folio-claim .ds-hero-copy{gap:0.4rem}
+  [data-sitekind="research-dossier"] .ds-hero-folio .ds-lede{margin:0.25rem 0 0}
+  [data-sitekind="research-dossier"] .ds-hero-folio .ds-actions{margin-top:0.4rem}
 }
 /* Verso/recto spread + footnote register. */
 .ds-spread-grid{

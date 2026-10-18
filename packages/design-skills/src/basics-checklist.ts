@@ -866,14 +866,11 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       !/ds-entry-shelf-rule/.test(html)
         && !/ds-spread-fill-rule/.test(html)
         && (
-          spec.brief.siteKind !== "research-dossier"
-          && spec.brief.siteKind !== "archive-index"
+          spec.brief.siteKind !== "archive-index"
           && spec.brief.siteKind !== "commerce-loom"
           || /class="ds-story-fill"/.test(html)
           // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
           || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
-          // Dossier likewise: priorities are left out on a single-priority brief.
-          || (spec.brief.siteKind === "research-dossier" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),

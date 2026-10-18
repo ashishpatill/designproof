@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-18 — Research-dossier specimen polish
+
+- Chapter rail: widened `--chapter-rail` by the gutter so the numbered rail (numbers + vertical labels) sits fully inside the desktop viewport instead of clipping at the right edge.
+- Mobile (390): tightened folio hero spacing and let the dossier plate use its natural aspect (no forced min-height) so headline, lede, CTA and the plate show in the first screen without shrinking text.
+- Priorities: removed grey placeholder thumbnail bars/marks from the dossier priorities section, leaving typographic rows; dossier-gated only.
+
 ## 2026-10-18 — Dossier rebuild through staged concept-first flow
 
 - Rebuilt the research-dossier template/specimen around the `research-dossier` concept (folio masthead with chapter rail) using the staged primitives: explicit `ink-paper` theme from `THEMES`, concept attached to the spec, theme accent/paper driving tokens.
