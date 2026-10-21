@@ -192,10 +192,16 @@ export function ctaFor(
       };
     }
     if (siteKind === "commerce-loom") {
+      /*
+       * No fold note. "Samples ship with size tape and SKU cells — not a demo theatre" reached every
+       * loom page, a marina's and a pottery studio's included, and no brief says how anything ships.
+       * "Request a cut" fit one merchandising press; a garden has no cuts to request. The buttons say
+       * what the page is: a loom, and the lines on it.
+       */
       return {
-        primary: "Request a cut",
-        secondary: "Walk the loom",
-        note: "Samples ship with size tape and SKU cells — not a demo theatre.",
+        primary: "Open the loom",
+        secondary: "See every line",
+        note: "",
       };
     }
     if (siteKind === "field-guide") {
@@ -988,6 +994,43 @@ export function foundryQuestions(brief: DesignBrief, features: FeatureSpec[]): A
   return out;
 }
 
+/** A line that does the approving: approve, approval(s), approving, or sign-off. */
+const LOOM_APPROVAL_STEP = /\b(?:approv(?:e|es|al|als|ing)|sign-?offs?)\b/i;
+
+/** Loom line numbers: the cloth, the treadles, the index, and the hangtags all number a line the same way. */
+export function loomLine(i: number): string {
+  return String(i + 1).padStart(2, "0");
+}
+
+/**
+ * Loom questions. Every answer is built from this brief: its product, its audience, and its line
+ * names. The shared `questions` it used promised "cancel anytime", a comparison table the page
+ * never draws, a result in "one session" on the reader's data, a person who answers procurement and
+ * security, that every capability ships "from day one", and "no hidden tier". No brief declares any
+ * of those. The approval question stays only when the brief itself declares an approval step.
+ */
+export function loomQuestions(brief: DesignBrief, features: FeatureSpec[]): Array<{ title: string; body: string }> {
+  const out: Array<{ title: string; body: string }> = [];
+  const Audience = `${brief.audience[0]?.toUpperCase() ?? ""}${brief.audience.slice(1)}`;
+  out.push({ title: `Who is the ${brief.productName} loom for?`, body: sentence(Audience) });
+  const at = features.findIndex((f) => LOOM_APPROVAL_STEP.test(`${f.name} ${f.description}`));
+  if (at >= 0) {
+    out.push({
+      title: `Which line handles approvals?`,
+      body: sentence(`${features[at]!.name}, line ${loomLine(at)} in the index above`),
+    });
+  }
+  out.push({
+    title: `What is not on the ${brief.productName} loom?`,
+    body: sentence(
+      features.length > 1
+        ? `Anything that is not one of its ${count(features.length)} lines`
+        : `Anything other than ${lower(features[0]?.name ?? brief.productName)}`,
+    ),
+  });
+  return out;
+}
+
 /** Press signature letters: the sheet, the rail, the index, and the gather all letter a plate the same way. */
 export const PRESS_SIGS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -1266,7 +1309,10 @@ export function navFor(
                 // Press: the index is headed "The plates", so the menu calls it "Plates".
                 : siteKind === "press-atelier"
                   ? "Plates"
-                  : "Capabilities",
+                  // Loom: the index is headed "The lines", so the menu calls it "Lines".
+                  : siteKind === "commerce-loom"
+                    ? "Lines"
+                    : "Capabilities",
     figure: siteKind === "docs-educational" ? "The scrub" : "How it works",
     story:
       siteKind === "saas-marketing"
@@ -1279,7 +1325,8 @@ export function navFor(
               siteKind === "field-guide" ||
               siteKind === "signal-observatory" ||
               siteKind === "editorial-foundry" ||
-              siteKind === "press-atelier"
+              siteKind === "press-atelier" ||
+              siteKind === "commerce-loom"
               ? "Priorities"
               : "Sequence",
     pricing: siteKind === "fintech-marketing" ? "Lanes" : "Plans",

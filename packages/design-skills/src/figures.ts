@@ -2867,7 +2867,11 @@ export function loomWeave(
 ): string {
   const r = rng(`${seed}:loom-weave:${role}`);
   const W = role === "band" ? 1280 : role === "column" ? 560 : 720;
-  const H = role === "band" ? 720 : role === "column" ? 520 : 480;
+  /*
+   * Half-height tiles (Design Expert, 15 Oct, round 2): the cloth is as tall as its two tile rows
+   * need, so tall empty boxes no longer read as images that failed to load.
+   */
+  const H = role === "band" ? 432 : role === "column" ? 360 : 330;
   const padX = role === "band" ? 40 : 24;
   const padY = role === "band" ? 36 : 24;
   const parts: string[] = [];
@@ -2879,16 +2883,23 @@ export function loomWeave(
     `<rect x="${round(padX)}" y="${round(padY)}" width="${round(W - padX * 2)}" height="${round(H - padY * 2)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
   );
 
-  // Header — LOOM + product (mono ≤11px).
+  /*
+   * One cell per line, up to the cloth's six, each numbered and named once. The cells used to cycle
+   * through the names, so a three-line brief drew each name twice, under a "Loom · warp × weft" head
+   * with the product name again in the middle, made-up SKU numbers ("Sku 100") in every cell, and a
+   * foot that named the product a third time beside "6 cells · free textile stock", whatever the
+   * brief gave. Spare cells keep their photo and stay unnamed, so the cloth still reads as woven.
+   */
+  const named = features.slice(0, 6);
+  const lineNo = (i: number) => String(i + 1).padStart(2, "0");
   const headY = padY + 14;
   parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Loom · warp × weft</text>`,
+    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)">Loom</text>`,
   );
   parts.push(
-    `<text class="ds-fig-mono" x="${round(W / 2)}" y="${round(headY)}" font-size="11" fill="var(--surface-muted)" text-anchor="middle">${esc(clip(productName, 28))}</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">Size tape</text>`,
+    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(headY)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${
+      named.length > 1 ? `Lines 01–${lineNo(named.length - 1)}` : "Line 01"
+    }</text>`,
   );
   parts.push(
     `<line x1="${round(padX)}" y1="${round(headY + 8)}" x2="${round(W - padX)}" y2="${round(headY + 8)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
@@ -2918,7 +2929,6 @@ export function loomWeave(
   const gap = 10;
   const cellW = (fieldW - gap * (cols - 1)) / cols;
   const cellH = (fieldH - gap * (rows - 1)) / rows;
-  const base = features.length ? features : [{ title: "SKU", body: "", meta: "001" } as Block];
 
   // Warp threads behind cells (sparse — avoid rule flood).
   const warps = 7;
@@ -2929,60 +2939,51 @@ export function loomWeave(
     );
   }
 
-  // Shuttle path — unreplicable loom craft (theme packs do not invent a flying shuttle).
-  const shuttleY = fieldY + fieldH * 0.48;
-  parts.push(
-    `<path d="M ${round(fieldX + 8)} ${round(shuttleY)} C ${round(fieldX + fieldW * 0.35)} ${round(shuttleY - 18)}, ${round(fieldX + fieldW * 0.65)} ${round(shuttleY + 18)}, ${round(fieldX + fieldW - 8)} ${round(shuttleY)}" fill="none" stroke="${ACCENT}" stroke-width="1" opacity="0.55" vector-effect="non-scaling-stroke"/>`,
-  );
-  parts.push(
-    `<ellipse cx="${round(fieldX + fieldW * 0.62)}" cy="${round(shuttleY + 2)}" rx="14" ry="5" fill="none" stroke="${ACCENT}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(fieldX + fieldW * 0.62)}" y="${round(shuttleY - 10)}" font-size="11" fill="var(--surface-quiet)" text-anchor="middle">Shuttle</text>`,
-  );
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const x = fieldX + col * (cellW + gap);
-      const y = fieldY + row * (cellH + gap);
-      const idx = row * cols + col;
-      const f = base[idx % base.length]!;
-      const photo = photos[idx % photos.length]!;
-      const clipId = `loom-clip-${idx}`;
-      parts.push(`<defs><clipPath id="${clipId}"><rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}"/></clipPath></defs>`);
-      parts.push(
-        `<image href="${photo}" x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH * 0.72)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})" opacity="0.92"/>`,
-      );
-      // Weft rule under photo.
-      parts.push(
-        `<rect x="${round(x)}" y="${round(y)}" width="${round(cellW)}" height="${round(cellH)}" fill="none" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-      parts.push(
-        `<line x1="${round(x)}" y1="${round(y + cellH * 0.72)}" x2="${round(x + cellW)}" y2="${round(y + cellH * 0.72)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
-      );
-      const sku = String(100 + idx).padStart(3, "0");
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH * 0.72 + 14)}" font-size="11" fill="var(--surface-quiet)">Sku ${sku}</text>`,
-      );
-      parts.push(
-        `<text class="ds-fig-mono" x="${round(x + 6)}" y="${round(y + cellH - 8)}" font-size="11" fill="var(--surface-muted)">${esc(clip(f.title ?? "Line", 18))}</text>`,
-      );
-      // Accent pin on lead cell.
-      if (idx === 0) {
-        parts.push(
-          `<rect x="${round(x + cellW - 10)}" y="${round(y + 6)}" width="4" height="4" fill="${ACCENT}" opacity="0.85"/>`,
-        );
-      }
-      void r; // seed reserved for future weave jitter without rule flood
-    }
-  }
-
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(padX + 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)">${esc(clip(productName, 24))} · loom weave</text>`,
-  );
-  parts.push(
-    `<text class="ds-fig-mono" x="${round(W - padX - 10)}" y="${round(H - padY + 12)}" font-size="11" fill="var(--surface-quiet)" text-anchor="end">${cols * rows} cells · free textile stock</text>`,
-  );
+  /*
+   * Tiles (Design Expert, 15 Oct): photo-less, one per line, numbered and named once. Three stock
+   * photos cycled through six cells, so tiles 01 and 04 showed the same shirt, and the third photo
+   * drew as an empty grey tile; spare cells sat empty too. The shuttle path ran through the names.
+   */
+  void photos;
+  void cols;
+  void rows;
+  const tiles = named.length;
+  const tCols = Math.min(3, Math.max(1, tiles));
+  const tRows = Math.max(1, Math.ceil(tiles / tCols));
+  const tW = (fieldW - gap * (tCols - 1)) / tCols;
+  const tH = Math.min(cellH, (fieldH - gap * (tRows - 1)) / tRows);
+  named.forEach((f, idx) => {
+    const col = idx % tCols;
+    const row = Math.floor(idx / tCols);
+    const x = fieldX + col * (tW + gap);
+    const y = fieldY + row * (tH + gap);
+    const barY = y + tH - 30;
+    parts.push(
+      `<rect x="${round(x)}" y="${round(y)}" width="${round(tW)}" height="${round(tH)}" fill="var(--surface-bg)" stroke="${idx === 0 ? ACCENT : LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+    );
+    // The number in big type: classed ds-loom-num so the loom's 11px label rule does not shrink it.
+    const numSize = Math.round(Math.min(56, (barY - y) * 0.62));
+    parts.push(
+      `<text class="ds-fig-mono ds-loom-num" x="${round(x + 16)}" y="${round(y + 12 + numSize * 0.8)}" font-size="${numSize}" fill="${idx === 0 ? ACCENT : "var(--surface-ink, currentColor)"}">${lineNo(idx)}</text>`,
+    );
+    // The line's own small drawing, the same one its row in "The lines" carries further down.
+    const markH = Math.max(24, barY - y - 20);
+    const markW = Math.min(markH * (220 / 140), tW * 0.45);
+    const k = markW / 220;
+    const inner = capabilityMark(f, idx, seed).replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+    parts.push(
+      `<g class="ds-loom-mark" data-line="${lineNo(idx)}" transform="translate(${round(x + tW - markW - 12)} ${round(y + (barY - y - 140 * k) / 2)}) scale(${round(k)})">${inner}</g>`,
+    );
+    parts.push(
+      `<line x1="${round(x)}" y1="${round(barY)}" x2="${round(x + tW)}" y2="${round(barY)}" stroke="${LINE}" stroke-width="1" vector-effect="non-scaling-stroke"/>`,
+    );
+    parts.push(
+      `<text class="ds-fig-mono" x="${round(x + 16)}" y="${round(y + tH - 11)}" font-size="11" fill="var(--surface-muted)">${esc(
+        clip(f.title, Math.max(18, Math.floor((tW - 24) / 6.8))),
+      )}</text>`,
+    );
+  });
+  void r;
 
   return frame(parts.join(""), {
     width: W,
