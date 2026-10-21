@@ -623,13 +623,14 @@ describe("research-backed offerings + implementation basics", () => {
     expect(spec.sections.some((s) => s.id === "features-2")).toBe(false);
   });
 
-  it("gives research dossier a folio + plate + spread plan distinct from foundry and SaaS", () => {
+  it("gives research dossier a folio + plate + priorities plan distinct from foundry and SaaS", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.dossier!);
     expect(spec.brief.siteKind).toBe("research-dossier");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
     expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "hero-folio")).toBe(true);
-    expect(spec.sections.some((s) => s.layout === "story-spread")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(true);
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBe(0);
     expect(previewHtml).toContain('data-sitekind="research-dossier"');
@@ -637,8 +638,6 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toContain("ds-folio-masthead");
     expect(previewHtml).toContain("ds-chapter-rail");
     expect(previewHtml).toContain('data-figure="dossier-plate"');
-    expect(previewHtml).toContain("ds-spread");
-    expect(previewHtml).toContain("ds-footnote-register");
     expect(previewHtml).toContain("ds-bleed-rule");
     expect(previewHtml).toContain("Imprint");
     expect(previewHtml).toContain("The instruments");

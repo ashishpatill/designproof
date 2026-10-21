@@ -544,13 +544,15 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-folio-masthead/.test(html)
           && /ds-chapter-rail/.test(html)
           && /data-figure="dossier-plate"/.test(html)
-          && /ds-spread/.test(html)
-          && /ds-footnote-register/.test(html)
           && /Imprint/.test(html)
           && /ds-bleed-rule/.test(html)
+          // The priorities section groups the instruments by tier, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || spec.sections.some((s) => s.kind === "story"))
+          // No figure band or specimen band naming the instruments again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Dossier offerings use folio + chapter rail + dossier plate + spread footnotes + imprint — no pricing, no metrics theatre, zero inverse bands.",
+      "Dossier offerings use folio + chapter rail + dossier plate naming each instrument once + priorities grouping by tier + imprint — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-observatory",
@@ -882,6 +884,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
           // Loom likewise leaves its hangtags out on a single-priority brief.
           || (spec.brief.siteKind === "commerce-loom" && !spec.sections.some((s) => s.kind === "story"))
+          // Dossier likewise: priorities are left out on a single-priority brief.
+          || (spec.brief.siteKind === "research-dossier" && !spec.sections.some((s) => s.kind === "story"))
         ),
       "Vacancy fills must be opaque ds-story-fill slabs — not dozens of CSS-bordered shelf rows that blow ruleDensity.",
     ),

@@ -410,6 +410,29 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
     [data-sitekind="research-dossier"] .ds-chapter-progress{animation-name:ds-chapter-fill-y}
   }
 }
+
+/* Index now carries every description: real prose measure, no stacked bare-name margins. */
+[data-sitekind="research-dossier"] .ds-index-row:nth-child(n){margin-block:0}
+/* Priorities band (Design Expert, 15 Oct): no spine through the text, and the lead tier's accent
+ * bar sits in its own inset so "01" is never clipped. */
+[data-sitekind="research-dossier"] .ds-chapters::before{display:none}
+[data-sitekind="research-dossier"] .ds-chapter{padding-left:var(--chapter-inset,1.15rem);grid-template-columns:var(--align-rail) minmax(0,1fr)}
+[data-sitekind="research-dossier"] .ds-chapter > .ds-chapter-index{grid-column:1;grid-row:1 / span 2;align-self:start}
+[data-sitekind="research-dossier"] .ds-chapter > h3{grid-column:2}
+[data-sitekind="research-dossier"] .ds-chapter > .ds-body{grid-column:2;max-width:35rem;margin:0}
+/* Number | name over a ~560px description | drawing on the right (Design Expert, 15 Oct). */
+[data-sitekind="research-dossier"] .ds-index-row{
+  grid-template-columns:var(--align-rail) minmax(0,1fr) 7rem;
+  grid-template-rows:auto auto;column-gap:var(--s-5,1.5rem);align-items:start;
+}
+[data-sitekind="research-dossier"] .ds-index-row > .ds-index-num{grid-column:1;grid-row:1 / span 2}
+[data-sitekind="research-dossier"] .ds-index-row > h3{grid-column:2;grid-row:1}
+[data-sitekind="research-dossier"] .ds-index-row > p{grid-column:2;grid-row:2;width:100%;max-width:35rem;min-width:0;margin-top:0.5rem}
+[data-sitekind="research-dossier"] .ds-index-row > .ds-index-mark{grid-column:3;grid-row:1 / span 2;align-self:center;justify-self:end;width:7rem;margin:0}
+@media (max-width: 40rem){
+  [data-sitekind="research-dossier"] .ds-index-row{grid-template-columns:2.5rem 1fr}
+  [data-sitekind="research-dossier"] .ds-index-row > .ds-index-mark{grid-column:2;grid-row:3;justify-self:start}
+}
 `,
     "signal-observatory": `
 @keyframes ds-obs-in{from{opacity:0;transform:translateY(0.35rem) scale(0.98)}to{opacity:1;transform:none}}

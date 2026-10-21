@@ -463,8 +463,18 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    * invent from taste controls.
    */
   if (siteKind === "research-dossier") {
+    /*
+     * The page used to follow the folio fold with a figure band that named the instruments twice
+     * more beside a "cost · cumulative" chart of made-up values under "how X maps a briefing", a
+     * specimen strip that printed every description again under "X field plate", and a verso/recto
+     * spread that reprinted every description as "Step 01" under "how a brief is actually read" and
+     * "verso claim, recto evidence, footnotes that keep conviction honest" — lines written for one
+     * capital brief and printed on every dossier page, a pottery studio's included. A five-instrument
+     * brief named its lead ten times. The fold's plate and one index hold every description once;
+     * the priorities section groups the instruments by the brief's tiers.
+     */
     plans.push({ id: "hero", kind: "hero", layout: "hero-folio", surface: "paper", columns: split.wide });
-    // Briefing index — catalog of instruments, not metric theatre.
+    // Instrument index — every instrument, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -472,28 +482,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    // Teaching figure: the dossier plate redrawn with pin callouts (body slot).
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    // Quiet sunken valley — third surface + honest weight variation.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    // Verso/recto spread with footnote register (dossier signature essay).
+    // Priorities — one chapter per priority tier the brief gives. It sits in a sunken tray where the
+    // specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
-      layout: "story-spread",
-      surface: "paper",
-      bond: true,
-      columns: "1fr 1fr",
+      layout: "story-chapters",
+      surface: "sunken",
+      columns: split.wide,
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — verso/recto spread is the dossier proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — folio plate + instrument index already prove dossier craft.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     // Imprint close on paper — not inverse demo theatre.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });

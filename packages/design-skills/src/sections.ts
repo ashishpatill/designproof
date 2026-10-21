@@ -37,6 +37,7 @@ import {
   observatoryQuestions,
   foundryQuestions,
   pressQuestions,
+  dossierQuestions,
   PRESS_SIGS,
   loomQuestions,
   loomLine,
@@ -338,6 +339,8 @@ export function buildSections(
                           ? pressQuestions(brief, features)
                           : brief.siteKind === "commerce-loom"
                             ? loomQuestions(brief, features)
+                          : brief.siteKind === "research-dossier"
+                            ? dossierQuestions(brief, features)
                             : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
@@ -465,7 +468,7 @@ export function buildSections(
                * Loom: same rule. The lead description sat under the claim and was printed again in
                * the hangtag essay; the index now holds every description.
                */
-              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom
+              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom || isDossier
                 ? ""
                 : brief.siteKind === "consumer-craft"
                   ? consumerLede(brief, features)
@@ -522,7 +525,9 @@ export function buildSections(
              * each one does.
              */
             aside: editorial.features
-              .slice(0, isMechanism ? 6 : 4)
+              // Dossier chapter rail lists every instrument; it used to stop at four and point at
+              // figure/story bands that reprinted descriptions.
+              .slice(0, isDossier ? editorial.features.length : isMechanism ? 6 : 4)
               .map((c, i) =>
                 block({
                   title: c.name,
@@ -589,6 +594,8 @@ export function buildSections(
           brief.siteKind === "press-atelier" ||
           // Loom as well: its index stopped at four lines on a six-line brief.
           brief.siteKind === "commerce-loom" ||
+          // Dossier too: its index stopped at three or four instruments, whatever the brief gave.
+          brief.siteKind === "research-dossier" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -687,9 +694,14 @@ export function buildSections(
                              * Loom: every row keeps its description, because the fold prints none.
                              * Rows are numbered the way the cloth and the treadles number the lines,
                              * and carry no tier word, because the hangtags say that once.
+                             * Dossier: every row keeps its description, because the fold prints none.
+                             * Rows are numbered the way the fold's chapter rail numbers them, and
+                             * carry no tier word, because the priorities section says that once.
                              */
                             : brief.siteKind === "commerce-loom"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: loomLine(i) }))
+                            : brief.siteKind === "research-dossier"
+                              ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
                               : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
         if (!slice.length) break;
@@ -802,8 +814,9 @@ export function buildSections(
                   // Foundry: "cuts drawn for real reading sizes" was on a pottery studio's page too.
                   : isFoundry
                     ? sentence(`${brief.productName}, cut by cut`)
+                  // Dossier: "instruments a capital brief actually uses" was on a pottery studio's page too.
                   : isDossier
-                    ? sentence(`Instruments a capital brief actually uses`)
+                    ? sentence(`${brief.productName}, instrument by instrument`)
                     // Observatory: "channels an on-call desk actually watches" was on a pottery studio's page too.
                     : isObservatory
                       ? sentence(`${brief.productName}, channel by channel`)
@@ -876,8 +889,9 @@ export function buildSections(
                   // Foundry: "a style picker dressed as a product" was on every foundry page.
                   : isFoundry
                     ? ""
+                  // Dossier: "not a dashboard dressed as research" sat on every dossier page.
                   : isDossier
-                    ? sentence(`Each instrument is a named reading — not a dashboard dressed as research`)
+                    ? ""
                     // Observatory: "a chart dressed as a product" was on every observatory page.
                     : isObservatory
                       ? ""
@@ -1436,6 +1450,49 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Dossier: the verso/recto spread printed every description a second time as "Step 01"
+         * under "how a brief is actually read" and "verso claim, recto evidence, footnotes that
+         * keep conviction honest", lines written for one capital brief and printed on every dossier
+         * page, a pottery studio's included. Now each chapter is one priority tier from the brief
+         * and names the instruments in it once. With a single priority there is nothing to group,
+         * so the section is left out.
+         */
+        if (brief.siteKind === "research-dossier") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              // Index numbers, not names: the index above already names every instrument once.
+              nums: features
+                .map((f, i) => [f, String(i + 1).padStart(2, "0")] as const)
+                .filter(([f]) => f.priority === priority)
+                .map(([, n]) => n),
+            }))
+            .filter((t) => t.nums.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} instruments to open first`),
+              body: "",
+              blocks: tiers.map((t, i) =>
+                block({
+                  title: t.tier,
+                  body: sentence(`${t.nums.length === 1 ? "Instrument" : "Instruments"} ${spoken(t.nums)}`),
+                  meta: String(i + 1).padStart(2, "0"),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         if (brief.siteKind === "corporate-story") {
           const tiers = (
             [
@@ -1472,10 +1529,8 @@ export function buildSections(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "research-dossier"
-                    ? "Reading notes"
-                        : brief.siteKind === "lantern-path"
-                          ? "Ember notes"
+              brief.siteKind === "lantern-path"
+                    ? "Ember notes"
                         : brief.siteKind === "care-pathway"
                           ? "Round notes"
                         : brief.siteKind === "agent-harness"
@@ -1484,10 +1539,8 @@ export function buildSections(
                           ? "How it works"
                   : eyebrow.story,
             title:
-              brief.siteKind === "research-dossier"
-                    ? sentence(`How a brief is actually read`)
-                        : brief.siteKind === "lantern-path"
-                          ? sentence(`How a night walk is actually read`)
+              brief.siteKind === "lantern-path"
+                    ? sentence(`How a night walk is actually read`)
                         : brief.siteKind === "care-pathway"
                           ? sentence(`How a care pathway is actually walked`)
                         : brief.siteKind === "agent-harness"
@@ -1502,10 +1555,8 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "research-dossier"
-                    ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
-                        : brief.siteKind === "lantern-path"
-                          ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
+              brief.siteKind === "lantern-path"
+                    ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
                         : brief.siteKind === "care-pathway"
                           ? sentence(`Handoff beads, encounter index, and the rounds that keep a pathway honest`)
                         : brief.siteKind === "agent-harness"
@@ -1906,6 +1957,8 @@ export function buildSections(
                           // Loom likewise: the first answer names the audience.
                           : brief.siteKind === "commerce-loom"
                             ? sentence(`Questions about the ${brief.productName} loom`)
+                          : brief.siteKind === "research-dossier"
+                            ? sentence(`Questions about the ${brief.productName} brief`)
                             : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
@@ -1946,8 +1999,11 @@ export function buildSections(
                 ? features[0]
                   ? `Start the ${brief.productName} specimen with ${lower(features[0].name)}`
                   : `Start the ${brief.productName} specimen`
+                // Dossier: "request the next folio" fit one capital brief; the close says where to begin.
                 : brief.siteKind === "research-dossier"
-                  ? `Request the next ${brief.productName} folio`
+                  ? features[0]
+                    ? `Start the ${brief.productName} brief with ${lower(features[0].name)}`
+                    : `Start the ${brief.productName} brief`
                   // Observatory: "calibrate a window" fit one on-call desk; the close says where to begin.
                   : brief.siteKind === "signal-observatory"
                     ? features[0]
@@ -2020,8 +2076,17 @@ export function buildSections(
                       features.length === 2 ? "cut is" : "cuts are"
                     } set in the index above`
                   : ""
+                /*
+                 * Dossier: "numbered folios, source notes, and the instruments ... actually open"
+                 * closed every dossier page, a pottery studio's included. The close gives the count
+                 * the brief gives instead.
+                 */
                 : brief.siteKind === "research-dossier"
-                  ? `Numbered folios, source notes, and the instruments ${brief.audience} actually open`
+                  ? features.length > 1
+                    ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                        features.length === 2 ? "instrument sits" : "instruments sit"
+                      } in the index above`
+                    : ""
                   /*
                    * Observatory: "tolerance marks, channel maps, and the windows ... actually watch"
                    * closed every observatory page, a pottery studio's included. The close gives the
@@ -2149,7 +2214,9 @@ export function buildSections(
                           // Consumer likewise: the button leads back to the register.
                           : brief.siteKind === "consumer-craft" && features.length > 1
                             ? `Read all ${count(features.length)} details`
-                          : cta.secondary,
+                          : brief.siteKind === "research-dossier" && features.length > 1
+                            ? `Read all ${count(features.length)} instruments`
+                            : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote:
               brief.siteKind === "control-plane-oss"
