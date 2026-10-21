@@ -66,3 +66,28 @@ research/training.local/
 
 # Sibling design-data checkout must never be committed into Tell.
 tell-design-data/
+
+# Internal docs and agent-instruction files: kept on disk, never tracked.
+# Only code and user-facing output are tracked.
+AGENTS.md
+CLAUDE.md
+PLAN.md
+BUILD.md
+ORCHESTRATION.md
+PITCH.md
+research/
+docs/features/design-dogfood-loop.md
+docs/features/showcase-tiller.md
+docs/*_PLAN.md
+developer-drop/
+.verification-screenshots/
+# Agent rules, skills, hooks and roles are internal; the MCP config stays
+# tracked so a fresh clone can connect to the local tell_* tools.
+.cursor/*
+!.cursor/mcp.json
+agent-skills/
+docs/PROJECT-STATUS.md
+USER_STORY.md
+OPEN_TELL_DESIGN_DATA.md
+TELL_DESIGN_DATA_HERE.md
+DESIGN.md

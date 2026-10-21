@@ -1,0 +1,5 @@
+{
+  "$comment": "Design tokens read by the design-system drift check (packages/core). Fonts and hex colours only.",
+  "fonts": ["Instrument Serif", "Source Sans 3", "IBM Plex Mono"],
+  "colors": ["#D4714A", "#E8926F", "#181614", "#221F1C", "#2E2A26", "#F3EDE4", "#D4C9BA", "#B8AA98", "#3A6358", "#C4A035", "#574E45", "#FFFFFF"]
+}
