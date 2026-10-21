@@ -739,17 +739,22 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-care-masthead/.test(html)
           && /ds-care-rail/.test(html)
           && /data-figure="care-plate"/.test(html)
-          && /ds-rounds/.test(html)
-          && /class="ds-rounds-ladder"/.test(html)
-          && /aria-label="Rounds ladder"/.test(html)
+          // The rounds ladder groups encounters by tier, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || (
+            /ds-rounds/.test(html)
+            && /class="ds-rounds-ladder"/.test(html)
+            && /aria-label="Rounds ladder"/.test(html)
+          ))
           && !/class="ds-rounds-aside"/.test(html)
           && !/class="ds-ember-trail"/.test(html)
           && /Chart/.test(html)
           && /ds-bleed-rule/.test(html)
           && /ds-care-imprint/.test(html)
+          // No figure band or specimen band naming the rounds again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Care-pathway offerings use rounds fold + care rail + care plate + rounds ladder + Chart — no pricing, no metrics theatre, zero inverse bands.",
+      "Care-pathway offerings use rounds fold + care rail + care plate + rounds ladder (when the brief has more than one priority) + Chart — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "kind-harness",

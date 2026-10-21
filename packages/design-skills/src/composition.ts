@@ -749,14 +749,20 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Care pathway — clinical rounds craft.
+   * Care pathway — clinical handoff craft.
    *
-   * Health-pathway corridors favour figure-owned folds and quiet display on cool paper.
-   * SaaS deal pipelines answer with stage chips. This offering invents an unreplicable
-   * clinical atlas: care stage rail, care-plate pathway spine owning the fold, rounds ladder, Chart close.
+   * The page used to follow the rounds fold with a figure band that named the stages twice more
+   * beside a "cost · cumulative" chart of made-up values under "how X charts a pathway", a specimen
+   * strip that printed every name again under "X pathway field", and a round-notes essay that
+   * reprinted every description as "Enc 01 Intake" under "how a care pathway is actually walked"
+   * and "handoff beads, encounter index, and the rounds that keep a pathway honest" — lines written
+   * for one clinic product and printed on every care-pathway page, a pottery studio's included. A
+   * five-round brief named its lead eight times. The fold's care rail + care-plate and one index
+   * hold every description once; the rounds ladder groups the rounds by the brief's priority tiers.
    */
   if (siteKind === "care-pathway") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-rounds", surface: "paper", columns: split.wide });
+    // Encounter index — every round, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -764,24 +770,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Rounds ladder — one encounter tier per priority the brief gives. It sits in a sunken tray
+    // where the specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-rounds",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
+      columns: split.wide,
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — rounds ladder is the care proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — care rail + care-plate + rounds ladder already prove pathway craft.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

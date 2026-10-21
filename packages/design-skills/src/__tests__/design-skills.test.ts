@@ -877,7 +877,8 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).not.toContain('class="ds-way-rail"');
     expect(previewHtml).not.toContain('data-figure="path-plate"');
     expect(previewHtml).toContain("ds-care-imprint");
-    expect(previewHtml).toContain("ds-handoff-strip");
+    expect(previewHtml).toContain('class="ds-index"');
+    expect(previewHtml).not.toContain('aria-label="Handoff strip"');
     expect(previewHtml).not.toContain("ds-care-near");
     expect(previewHtml).not.toContain("ds-chart-clip");
     expect(previewHtml).toContain("ds-bleed-rule");
@@ -886,7 +887,7 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).not.toContain('class="ds-alpha-rail"');
     expect(previewHtml).not.toContain('class="ds-stage-rail"');
     expect(previewHtml).not.toContain('class="ds-pipeline-board"');
-    expect(previewHtml).not.toContain('class="ds-index"');
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     const svgSizes = [...previewHtml.matchAll(/font-size="(\d+(?:\.\d+)?)"/g)].map((m) => Number(m[1]));
     expect(svgSizes.every((n) => n >= 11)).toBe(true);
     const report = assertBasics(spec, previewHtml);
@@ -1267,7 +1268,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Observatory neither: its event waterfall sorts the channels by priority and carries no Note labels.
     // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
     // Loom neither: its hangtags group the lines by priority and carry no Note labels or marks.
-    const noteKinds = ["lantern", "clinic"] as const;
+    // Clinic neither: its rounds ladder groups the rounds by priority and carries no Note labels or marks.
+    const noteKinds = ["lantern"] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;
@@ -1277,9 +1279,6 @@ describe("research-backed offerings + implementation basics", () => {
         /\.ds-(?:chrono|entry|hang|range|gather|ember|spread|marginalia|rounds)-mark\{[^}]*margin-top:calc\(var\(--s-(?:sm|xs|md)\) \* -1\)/,
       );
     }
-    const { previewHtml: rounds } = designFromFeatures(SHOWCASE_BRIEFS.clinic!);
-    expect(rounds).toMatch(/Note 0\d/);
-    expect(rounds).toMatch(/\.ds-rounds-note \+ \.ds-rounds-mark\{[^}]*margin-top:var\(--s-lg\)/);
     const { previewHtml: chrono } = designFromFeatures(SHOWCASE_BRIEFS.observatory!);
     expect(chrono).toMatch(/\.ds-chrono-note \+ \.ds-chrono-mark\{[^}]*margin-top:var\(--s-lg\)/);
     const { previewHtml: ember } = designFromFeatures(SHOWCASE_BRIEFS.lantern!);
