@@ -1419,10 +1419,13 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
        */
       // Studio likewise: the drawing beside the first piece listed every name again under the board.
       // Corporate too: the drawing beside the lead row listed every name again under the posture grid.
+      // Consumer likewise: the fold's product surface already names every detail; a stack beside the
+      // lead row listed them again with truncated descriptions.
       const leadFigure =
         spec.brief.siteKind !== "fintech-marketing" &&
         spec.brief.siteKind !== "art-directed-studio" &&
-        spec.brief.siteKind !== "corporate-story";
+        spec.brief.siteKind !== "corporate-story" &&
+        spec.brief.siteKind !== "consumer-craft";
       return `<div class="ds-alt">${section.blocks
         .map((b, i) => {
           if (i === 0 && leadFigure) {
@@ -3185,7 +3188,8 @@ function renderPreviewPage(spec: DesignSpec): string {
     spec.brief.siteKind === "signal-observatory" ||
     spec.brief.siteKind === "editorial-foundry" ||
     spec.brief.siteKind === "press-atelier" ||
-    spec.brief.siteKind === "commerce-loom"
+    spec.brief.siteKind === "commerce-loom" ||
+    spec.brief.siteKind === "consumer-craft"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

@@ -3364,9 +3364,19 @@ export function planFigures(input: {
   const draw = (kind: Kind, role: FigureRole): string => {
     switch (kind) {
       case "interface":
-        return interfacePlate(input.productName, input.features, seed, role, {
-          once: input.siteKind === "saas-marketing",
-        });
+        return interfacePlate(
+          input.productName,
+          // Consumer: names only. The register holds every description; the surface must not print
+          // truncated sentences in its table or detail panel (saas `once` still allows a detail body).
+          input.siteKind === "consumer-craft"
+            ? input.features.map((f) => ({ ...f, body: "", points: [] as string[] }))
+            : input.features,
+          seed,
+          role,
+          {
+            once: input.siteKind === "saas-marketing" || input.siteKind === "consumer-craft",
+          },
+        );
       case "series":
         return seriesChart(readings[0]?.label ?? "Measured outcome", periods, seed, role);
       case "flow":

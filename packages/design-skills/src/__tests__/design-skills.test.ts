@@ -380,7 +380,8 @@ describe("measured craft floors", () => {
   it("gives every site kind a long enough argument and enough named parts", () => {
     for (const [name, brief] of Object.entries(SHOWCASE_BRIEFS)) {
       const { spec, previewHtml } = designFromFeatures(brief);
-      expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(7);
+      // Consumer cut its order-of-use band (detail names grouped again), so it runs one section shorter.
+      expect(spec.sections.length, `${name} sections`).toBeGreaterThanOrEqual(name === "consumer" ? 6 : 7);
       // Footer column titles are chrome, not parts of the argument: count headings in the body only.
       const body = previewHtml.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, "");
       const headings = (body.match(/<h[1-4][\s>]/g) ?? []).length;
@@ -588,13 +589,17 @@ describe("research-backed offerings + implementation basics", () => {
     const { spec, previewHtml } = designFromFeatures(SHOWCASE_BRIEFS.consumer!);
     expect(spec.brief.siteKind).toBe("consumer-craft");
     expect(spec.sections.some((s) => s.kind === "pricing")).toBe(false);
+    expect(spec.sections.some((s) => s.kind === "metrics")).toBe(false);
     expect(spec.sections.some((s) => s.layout === "feature-alternating")).toBe(true);
+    // The order of use, step chart, and specimen all went, because each reprinted the detail names.
+    expect(spec.sections.some((s) => s.kind === "story")).toBe(false);
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
     const inverse = spec.sections.filter((s) => s.surface === "inverse");
     expect(inverse.length).toBeLessThanOrEqual(1);
     expect(previewHtml).toContain('data-sitekind="consumer-craft"');
     expect(previewHtml).toContain("ds-hero-claimband");
     expect(previewHtml).toContain("ds-hero-stackfold");
-    expect(previewHtml).toContain("In hand");
+    expect(previewHtml).toContain("The details");
   });
 
   it("gives editorial foundry a hard-seam + type-ladder plan distinct from studio and SaaS", () => {

@@ -28,6 +28,8 @@ import {
   workspaceQuestions,
   fintechQuestions,
   studioQuestions,
+  consumerQuestions,
+  consumerLede,
   corporateQuestions,
   archiveQuestions,
   educationalQuestions,
@@ -318,8 +320,10 @@ export function buildSections(
           ? fintechQuestions(brief, features)
           : brief.siteKind === "art-directed-studio"
             ? studioQuestions(brief, features)
-            : brief.siteKind === "corporate-story"
-              ? corporateQuestions(brief, features)
+            : brief.siteKind === "consumer-craft"
+              ? consumerQuestions(brief, features)
+              : brief.siteKind === "corporate-story"
+                ? corporateQuestions(brief, features)
               : brief.siteKind === "archive-index"
                 ? archiveQuestions(brief, features)
                 : brief.siteKind === "docs-educational"
@@ -346,7 +350,10 @@ export function buildSections(
   const navItems =
     packNav ??
     navFor(
-      plan.map((p) => ({ kind: p.kind, id: p.id })),
+      // Consumer draws no order-of-use band, so the menu carries no link to it.
+      plan
+        .filter((p) => !(brief.siteKind === "consumer-craft" && p.kind === "story"))
+        .map((p) => ({ kind: p.kind, id: p.id })),
       brief.siteKind,
     );
   const editorial = editorialize(features);
@@ -460,7 +467,9 @@ export function buildSections(
                */
               : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom
                 ? ""
-                : heroLede(brief, editorial.heroLines),
+                : brief.siteKind === "consumer-craft"
+                  ? consumerLede(brief, features)
+                  : heroLede(brief, editorial.heroLines),
             brandLabel: brief.productName,
             ctaLabel: cta.primary,
             // Foundry: one button on the fold. "See the cuts" sat on the fold and again in the close.
@@ -565,6 +574,7 @@ export function buildSections(
           brief.siteKind === "dashboard-webapp" ||
           brief.siteKind === "fintech-marketing" ||
           brief.siteKind === "art-directed-studio" ||
+          brief.siteKind === "consumer-craft" ||
           brief.siteKind === "corporate-story" ||
           brief.siteKind === "archive-index" ||
           // Educational too: a five-part brief left its last two parts out of the index.
@@ -607,13 +617,16 @@ export function buildSections(
          * Workspace catalogue is the one home for each description too. The only row left bare is
          * the one whose sentence the fold already printed as its lede.
          */
-        const foldLede = normTitle(heroLede(brief, editorial.heroLines)).replace(/[.!?]+$/, "");
+        const foldLede = normTitle(
+          brief.siteKind === "consumer-craft" ? consumerLede(brief, features) : heroLede(brief, editorial.heroLines),
+        ).replace(/[.!?]+$/, "");
         const slice =
           brief.siteKind === "saas-marketing"
             ? rawSlice.map((b) => (proofTellsAll || b.title === proofOwner ? { ...b, body: "" } : b))
             : brief.siteKind === "dashboard-webapp" ||
                 brief.siteKind === "fintech-marketing" ||
-                brief.siteKind === "art-directed-studio"
+                brief.siteKind === "art-directed-studio" ||
+                brief.siteKind === "consumer-craft"
               ? rawSlice.map((b) =>
                   b.body && foldLede.includes(normTitle(b.body).replace(/[.!?]+$/, "")) ? { ...b, body: "" } : b,
                 )
@@ -728,7 +741,7 @@ export function buildSections(
               : isStudio
                 ? "Selected work"
                 : isConsumer
-                  ? "In hand"
+                  ? "The details"
                   : isFoundry
                     ? "The cuts"
                     : isDossier
@@ -783,8 +796,9 @@ export function buildSections(
               : isStudio
                 // The launch-week line was written for one design studio and sat on every studio page.
                 ? sentence(`The ${count(features.length)} parts of ${brief.productName}`)
+                // Consumer: "Built for the day you actually have" sat on every consumer page.
                 : isConsumer
-                  ? sentence(`Built for the day you actually have`)
+                  ? sentence(`The ${count(features.length)} details of ${brief.productName}`)
                   // Foundry: "cuts drawn for real reading sizes" was on a pottery studio's page too.
                   : isFoundry
                     ? sentence(`${brief.productName}, cut by cut`)
@@ -856,8 +870,9 @@ export function buildSections(
               : isStudio
                 // "Identity, product, and motion under one grid" described one sample studio's work.
                 ? ""
+                // Consumer: "not a lifestyle claim" sat on every consumer page, a pottery studio's included.
                 : isConsumer
-                  ? sentence(`Each capability is something you can point at on the product — not a lifestyle claim`)
+                  ? ""
                   // Foundry: "a style picker dressed as a product" was on every foundry page.
                   : isFoundry
                     ? ""
@@ -1115,6 +1130,12 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Consumer: no order-of-use section. Its rows were only the detail names grouped by tier
+         * ("First: One-bag day and quiet hardware"), the same names the register and priorities
+         * already give, and a brief carries no steps to describe them with. Cut, not reworded.
+         */
+        if (brief.siteKind === "consumer-craft") break;
         /*
          * Corporate: the chapters were every capability name again under "language, principles,
          * outcomes, posture — the diligence path in order", a line written for one sample product
@@ -1451,9 +1472,7 @@ export function buildSections(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "consumer-craft"
-                  ? "In use"
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? "Reading notes"
                         : brief.siteKind === "lantern-path"
                           ? "Ember notes"
@@ -1465,9 +1484,7 @@ export function buildSections(
                           ? "How it works"
                   : eyebrow.story,
             title:
-              brief.siteKind === "consumer-craft"
-                  ? sentence(`A day with ${brief.productName}`)
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? sentence(`How a brief is actually read`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`How a night walk is actually read`)
@@ -1485,9 +1502,7 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "consumer-craft"
-                  ? sentence(`From morning pack to evening empty — what you actually do with it`)
-                  : brief.siteKind === "research-dossier"
+              brief.siteKind === "research-dossier"
                     ? sentence(`Verso claim, recto evidence, footnotes that keep conviction honest`)
                         : brief.siteKind === "lantern-path"
                           ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
@@ -1967,6 +1982,9 @@ export function buildSections(
                 // Studio: "your own material" closed every studio page, a pottery studio's included.
                 : brief.siteKind === "art-directed-studio" && features[0]
                   ? `Start with ${lower(features[0].name)} at ${brief.productName}`
+                // Consumer: "in front of your bag" closed from the audience's last word on every page.
+                : brief.siteKind === "consumer-craft" && features[0]
+                  ? `Start with ${lower(features[0].name)} at ${brief.productName}`
                 // Corporate: "your own material" closed every corporate page, a marina's included.
                 : brief.siteKind === "corporate-story" && features[0]
                   ? `${brief.productName} starts with ${lower(features[0].name)}`
@@ -2066,6 +2084,11 @@ export function buildSections(
                   ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                       features.length === 2 ? "part sits" : "parts sit"
                     } in the list above`
+                // Consumer: the count the brief gives, not "six capabilities, one conversation".
+                : brief.siteKind === "consumer-craft" && features.length > 1
+                  ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                      features.length === 2 ? "detail sits" : "details sit"
+                    } in the list above`
                 // Educational: the count the brief gives, not "four capabilities, one conversation".
                 : brief.siteKind === "docs-educational"
                   ? features.length > 1
@@ -2123,6 +2146,9 @@ export function buildSections(
                         // Observatory likewise: the button leads back to the index.
                         : brief.siteKind === "signal-observatory" && features.length > 1
                           ? `Read all ${count(features.length)} channels`
+                          // Consumer likewise: the button leads back to the register.
+                          : brief.siteKind === "consumer-craft" && features.length > 1
+                            ? `Read all ${count(features.length)} details`
                           : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote:

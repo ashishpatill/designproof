@@ -368,10 +368,23 @@ export function planSections(input: CompositionInput): SectionPlan[] {
    * Measured consumer-craft pages sit at figureArea ~0.68, foldFigure ~0.73, invertedShare ~0,
    * and moderate display (~3.2vw). They show the thing often; they do not run a SaaS pricing
    * ladder or an inverse-heavy money-product stage set.
+   *
+   * The page used to follow the stack fold with a raised metrics band that listed the capability
+   * names as bare values beside truncated descriptions, a specimen strip that drew them again, a
+   * figure band that set the names twice more beside a "cost · cumulative" chart of made-up values
+   * under "how it works" / "step through the mechanism", and a "day with X" chapter list that
+   * reprinted every description under "from morning pack to evening empty" — a line written for one
+   * sample bag and printed on every consumer page, a pottery studio's included. A five-detail brief
+   * named its lead detail fourteen times. The fold's product plate and the register hold every
+   * description once; the order chapters stay, but they now group the details by the priority the
+   * brief gives (first, next, alongside), so they say something the register does not.
    */
   if (siteKind === "consumer-craft") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-statement", surface: "paper", columns: split.hero });
-    plans.push({ id: "metrics", kind: "metrics", layout: "metric-band", surface: "raised" });
+    /*
+     * One detail register, then the order of use, questions, and the close. No metrics theatre, no
+     * specimen strip, no step chart.
+     */
     plans.push({
       id: "features",
       kind: "features",
@@ -379,17 +392,6 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.feature,
     });
-    // Quiet drawn valley — honest weight variation against the dense product registers.
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — product figure + chapters are the proof for consumer craft.
     plans.push({
       id: "story",
       kind: "story",
@@ -398,7 +400,8 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       bond: true,
       columns: split.wide,
     });
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
+    // One controlled inverse close for tonal range — not an inverse-heavy scroll.
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "inverse" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
