@@ -825,36 +825,38 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   }
 
   /*
-   * Control-plane OSS — marketing claim + terminal specimen, not a session helm.
+   * Control-plane OSS — marketing claim + terminal specimen fold, not a session helm.
    *
-   * IA: nav → hero → what → how → demo → principles → get-started → footer.
-   * No pricing, no metrics theatre, no waitlist, no inverse bands.
+   * The page used to follow the claim+terminal fold with a "what it is" figure that restated the
+   * product, a four-beat Ask→Permit→Check→Ship loop that reprinted permit/finish copy, a second
+   * terminal demo under "session tape", and a principles index that named every capability again —
+   * lines written for one control-plane product and printed on every keel page, a pottery studio's
+   * included. A six-capability brief still scored 190 on the four-brief repeat measure. The fold's
+   * terminal specimen (session tape ≥5 turns, one Allow/Deny, done-when pin, "Specimen — not a live
+   * API") and one index hold every description once; the priorities section groups the capabilities
+   * by the brief's tiers. No what/how/demo reprint, no waitlist, no invented install URL.
    */
   if (siteKind === "control-plane-oss") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-keel", surface: "paper", columns: split.hero });
+    // Capability index — every capability, numbered, each with its description.
     plans.push({
-      id: "what",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({
-      id: "how",
-      kind: "story",
-      layout: "story-keel-loop",
-      surface: "paper",
-      bond: true,
-    });
-    plans.push({ id: "demo", kind: "specimen", layout: "specimen-terminal", surface: "sunken" });
-    plans.push({
-      id: "principles",
+      id: "features",
       kind: "features",
       layout: "feature-index",
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({ id: "get-started", kind: "cta", layout: "cta-band", surface: "paper" });
+    // Priorities — one chapter per priority tier the brief gives. It sits in a sunken tray where the
+    // demo terminal's valley used to be.
+    plans.push({
+      id: "story",
+      kind: "story",
+      layout: "story-chapters",
+      surface: "sunken",
+      columns: split.wide,
+    });
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
+    plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;
   }

@@ -671,6 +671,25 @@ function motionSignatureCss(siteKind: DesignSpec["brief"]["siteKind"]): string {
 }
 `,
     "control-plane-oss": `
+
+/* Tight rhythm (as on lantern): no viewport-tall hero, no 132vh chapter pin, no 100px+ bands. */
+[data-sitekind="control-plane-oss"] section.ds-hero-keel{min-height:0;padding:var(--s-lg) 0 var(--s-lg)}
+[data-sitekind="control-plane-oss"] section.ds-chapter-pin{min-height:0;padding-bottom:calc(var(--section-y) * 0.25)}
+[data-sitekind="control-plane-oss"] section .ds-chapter-pin-inner{position:static;padding-top:0}
+[data-sitekind="control-plane-oss"] section.ds-chapter-pin .ds-chapter-progress{display:none}
+[data-sitekind="control-plane-oss"] section.ds-section:not(.ds-hero):not(.ds-footer){padding-block:calc(var(--section-y) * 0.25)}
+[data-sitekind="control-plane-oss"] section .ds-section-head{margin-bottom:var(--s-md)}
+[data-sitekind="control-plane-oss"] section .ds-chapters{margin-top:var(--s-md)}
+[data-sitekind="control-plane-oss"] section .ds-chapters::before{display:none}
+[data-sitekind="control-plane-oss"] section.ds-closing{margin-top:0}
+@media (max-width:40rem){[data-sitekind="control-plane-oss"] section .ds-faq{grid-template-columns:1fr;row-gap:var(--s-sm)}}
+[data-sitekind="control-plane-oss"] section .ds-faq-item:nth-child(-n+2){margin-top:0}
+/* Priorities: tier label + chapter numbers, no index number column. */
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter{grid-template-columns:minmax(9rem,14rem) minmax(0,1fr)}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter h3{grid-column:1}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter .ds-body{grid-column:2}
+@media (max-width:40rem){[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter{grid-template-columns:1fr}
+[data-sitekind="control-plane-oss"] section .ds-chapters .ds-chapter .ds-body{grid-column:1}}
 @keyframes ds-keel-in{from{opacity:0;transform:translateY(0.6rem)}to{opacity:1;transform:none}}
 @keyframes ds-keel-cursor{0%,49%{opacity:1}50%,100%{opacity:0}}
 @keyframes ds-keel-permit{

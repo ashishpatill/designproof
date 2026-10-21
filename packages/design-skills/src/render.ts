@@ -284,8 +284,13 @@ function renderNav(section: SectionSpec): string {
   </header>`;
 }
 
-function renderKeelTerminal(role: "hero" | "demo"): string {
-  const turns = keelSessionTurns();
+/** The Keel sample brief keeps its coding-agent tape; every other brand gets the neutral one. */
+function isKeelSample(spec: DesignSpec): boolean {
+  return spec.brief.productName === "Keel";
+}
+
+function renderKeelTerminal(role: "hero" | "demo", sample = true): string {
+  const turns = keelSessionTurns(sample);
   const currentIdx = turns.findIndex((t) => t.tag === "tool");
   const lines = turns
     .map((t, i) => {
@@ -293,7 +298,7 @@ function renderKeelTerminal(role: "hero" | "demo"): string {
       const permit =
         live
           ? `<div class="ds-keel-permit" data-keel-permit>
-              <p class="ds-keel-permit-kicker">ONE PENDING TOOL · git status</p>
+              <p class="ds-keel-permit-kicker">${sample ? "ONE PENDING TOOL · git status" : "ONE PENDING STEP"}</p>
               <div class="ds-keel-permit-actions">
                 <span class="ds-keel-allow">Allow</span>
                 <span class="ds-keel-deny">Deny</span>
@@ -311,13 +316,11 @@ function renderKeelTerminal(role: "hero" | "demo"): string {
   const pin = `<aside class="ds-keel-pin" data-steer-pin aria-label="Done-when">
     <p class="ds-keel-pin-kicker">DONE WHEN</p>
     <ul class="ds-keel-pin-checks">
-      <li>typecheck</li>
-      <li>tests</li>
-      <li>no public host</li>
+      ${(sample ? ["typecheck", "tests", "no public host"] : ["capabilities 01 and 02", "reviewed by you", "nothing published"]).map((c) => `<li>${c}</li>`).join("")}
     </ul>
   </aside>`;
   const caption = "Specimen — not a live API";
-  return `<figure class="ds-keel-terminal" data-keel-terminal data-figure="keel-terminal" data-dense="ink" data-role="${role}" aria-label="${esc(caption)}">
+  return `<figure${role === "hero" ? ` id="session-tape"` : ""} class="ds-keel-terminal" data-keel-terminal data-figure="keel-terminal" data-dense="ink" data-role="${role}" aria-label="${esc(caption)}">
     <div class="ds-keel-term-chrome">
       <span class="ds-keel-term-dots" aria-hidden="true"></span>
       <span class="ds-keel-term-title">session tape · local</span>
@@ -422,20 +425,20 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
    */
   if (section.layout === "hero-keel") {
     const keelActions = `<div class="ds-actions ds-hero-actions">
-      <a class="ds-btn ds-btn-primary" href="#demo">${esc(section.ctaLabel ?? "See the session")}</a>
-      ${section.secondaryLabel ? `<a class="ds-btn ds-btn-secondary" href="#get-started">${esc(section.secondaryLabel)}</a>` : ""}
+      <a class="ds-btn ds-btn-primary" href="#top">${esc(section.ctaLabel ?? "See the session")}</a>
+      ${section.secondaryLabel ? `<a class="ds-btn ds-btn-secondary" href="#features">${esc(section.secondaryLabel)}</a>` : ""}
       ${section.ctaNote ? `<span class="ds-cta-note">${esc(section.ctaNote)}</span>` : ""}
     </div>`;
     const keelCopy = `<div class="ds-hero-copy">
       <p ${enterAttr(spec, 0, "ds-brand-mark")}>${esc(spec.brief.productName)}</p>
       <h1 ${enterAttr(spec, 1, "ds-display")}>${esc(section.title)}</h1>
-      <p ${enterAttr(spec, 2, "ds-lede")}>${esc(section.body)}</p>
-      ${withEnter(spec, 3, keelActions)}
+      ${section.body ? `<p ${enterAttr(spec, 2, "ds-lede")}>${esc(section.body)}</p>` : ""}
+      ${withEnter(spec, section.body ? 3 : 2, keelActions)}
     </div>`;
     return `<section id="top" class="ds-section ds-hero ds-hero-keel" data-surface="${section.surface}" data-section="${esc(section.id)}">
       <div class="ds-keel-fold">
         <div class="ds-keel-claim">${keelCopy}</div>
-        ${renderKeelTerminal("hero")}
+        ${renderKeelTerminal("hero", isKeelSample(spec))}
       </div>
     </section>`;
   }
@@ -1321,11 +1324,10 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         // Lantern is not here: the fold prints none, so the index is the one home for every description.
         spec.brief.siteKind === "corporate-story" ||
-        spec.brief.siteKind === "fintech-marketing" ||
+        spec.brief.siteKind === "fintech-marketing";
         // Harness rows carry their description too: the fold prints none (removed from quietIndex).
-        // Control-plane rows carry their description too: the index is their one home on the page.
         // Clinic is not here: the fold prints none, so the index is the one home for every description.
-        spec.brief.siteKind === "control-plane-oss";
+        // Keel is not here: the fold prints none, so the index is the one home for every description.
       const isArchive = spec.brief.siteKind === "archive-index";
       // Field guide rows are the binomial strip's jump targets.
       const isField = spec.brief.siteKind === "field-guide";
@@ -1345,6 +1347,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isClinic = spec.brief.siteKind === "care-pathway";
       // Lantern rows are the index jump targets for Path/Chapters/Ember craft.
       const isLantern = spec.brief.siteKind === "lantern-path";
+      // Keel rows are the index jump targets for Session/Capabilities/Start craft.
+      const isKeel = spec.brief.siteKind === "control-plane-oss";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1368,6 +1372,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                         ? ` id="encounter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                       : isLantern
                         ? ` id="chapter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                      : isKeel
+                        ? ` id="capability-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                         : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
@@ -1487,7 +1493,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     spec.brief.siteKind !== "dashboard-webapp" &&
     spec.brief.siteKind !== "fintech-marketing" &&
     // Harness too: radius, body size and contrast chips are design notes, not page content.
-    spec.brief.siteKind !== "agent-harness"
+    spec.brief.siteKind !== "agent-harness" &&
+    // Keel too: radius, body size and contrast chips are design notes, not page content.
+    spec.brief.siteKind !== "control-plane-oss"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1530,7 +1538,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Clinic too: the list beside the drawing named every round again, right under the index.
     spec.brief.siteKind !== "care-pathway" &&
     // Lantern too: the list beside the drawing named every chapter again, right under the index.
-    spec.brief.siteKind !== "lantern-path"
+    spec.brief.siteKind !== "lantern-path" &&
+    // Keel too: the list beside the drawing named every capability again, right under the index.
+    spec.brief.siteKind !== "control-plane-oss"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1663,9 +1673,9 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "signal-observatory" ||
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
-    spec?.brief.siteKind === "care-pathway" ||
+    spec?.brief.siteKind === "care-pathway";
     // Harness priorities name their instruments in the chapter body, so they are not quiet.
-    spec?.brief.siteKind === "control-plane-oss";
+    // Keel priorities name their capabilities in the chapter body, so they are not quiet.
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
       ${
@@ -1676,7 +1686,8 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
         spec?.brief.siteKind === "docs-educational" ||
         spec?.brief.siteKind === "research-dossier" ||
         // Harness likewise: the chapters are priority tiers, not editorial beats.
-        spec?.brief.siteKind === "agent-harness"
+        spec?.brief.siteKind === "agent-harness" ||
+        spec?.brief.siteKind === "control-plane-oss"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1685,14 +1696,15 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
         ${section.blocks
           .map(
             (b, i) => `<li class="ds-chapter${quietChapters ? " ds-chapter-quiet" : ""}">
-              <p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>
+              ${spec?.brief.siteKind === "control-plane-oss" && !b.meta ? "" : `<p class="ds-chapter-index">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</p>`}
               <h3>${esc(b.title)}</h3>
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
               ${
                 // Dossier tiers are not instruments, so instrument i's drawing does not belong on tier i.
                 // Harness tiers are not instruments: instrument i's drawing does not belong on tier i
                 // (row 02 showed the fuel log's lines, row 03 the crew list's branches).
-                figures.marks[i] && spec?.brief.siteKind !== "research-dossier" && spec?.brief.siteKind !== "agent-harness"
+                // Keel tiers are not capabilities: capability i's drawing does not belong on tier i.
+                figures.marks[i] && spec?.brief.siteKind !== "research-dossier" && spec?.brief.siteKind !== "agent-harness" && spec?.brief.siteKind !== "control-plane-oss"
                   ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
                   : ""
               }
@@ -2540,7 +2552,8 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
      * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
      */
     // Lantern has no figure band: its path atlas on the fold is how it works.
-    "how it works": () => prefer("figure", "path-atlas"),
+    // Keel has no figure band: the session tape on the fold is how it works.
+    "how it works": () => prefer("figure", "path-atlas") ?? prefer("figure", "session-tape"),
     "what is included": () => prefer("compare"),
     questions: () => prefer("faq"),
     // No template has a security section (saas "proof" is the declared sequence) or a contact path.
@@ -2570,6 +2583,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   // The care-pathway fold carries the pathway figure as id="figure" (How it works lands on it).
   if (spec.sections.some((s) => s.layout === "hero-rounds")) knownIds.add("figure");
   if (spec.brief.siteKind === "lantern-path") knownIds.add("path-atlas");
+  if (spec.brief.siteKind === "control-plane-oss") knownIds.add("session-tape");
   // Clinic's footer button reads "See every round": it lands on the rounds index, not the closing band.
   const footerCtaHref =
     spec.brief.siteKind === "care-pathway" && knownIds.has("features") ? "#features" : "#cta";
@@ -2578,7 +2592,8 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
    * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
    * specimen footer keeps its own plain-text columns, which describe the specimen and link nowhere.
    */
-  const linkOnly = spec.brief.siteKind !== "control-plane-oss";
+  // Keel uses the shared columns now, so its footer is link-only too.
+  const linkOnly = true;
   const footerBlocks = section.blocks
     .map((b) =>
       linkOnly ? { ...b, points: b.points.filter((p) => footerPointHref(p, knownIds, b.title)) } : b,
@@ -3243,7 +3258,8 @@ function renderPreviewPage(spec: DesignSpec): string {
     spec.brief.siteKind === "research-dossier" ||
     spec.brief.siteKind === "agent-harness" ||
     spec.brief.siteKind === "care-pathway" ||
-    spec.brief.siteKind === "lantern-path"
+    spec.brief.siteKind === "lantern-path" ||
+    spec.brief.siteKind === "control-plane-oss"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

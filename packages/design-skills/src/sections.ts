@@ -15,7 +15,7 @@ import {
   featuresTitle,
   headline,
   heroLede,
-  keelLoopBeats,
+  keelQuestions,
   lower,
   navFor,
   outcomeNames,
@@ -350,6 +350,8 @@ export function buildSections(
                             ? clinicQuestions(brief, features)
                           : brief.siteKind === "lantern-path"
                             ? lanternQuestions(brief, features)
+                          : brief.siteKind === "control-plane-oss"
+                            ? keelQuestions(brief, features)
                             : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
@@ -427,7 +429,7 @@ export function buildSections(
         const isWire = brief.siteKind === "fintech-marketing";
         const isFoundry = brief.siteKind === "editorial-foundry";
         const craftFold =
-          isDossier || isObservatory || isArchive || isLoom || isField || isPress || isLantern || isClinic || isHarness
+          isDossier || isObservatory || isArchive || isLoom || isField || isPress || isLantern || isClinic || isHarness || isKeel
           || isPipeline || isQueue || isDiligence || isMechanism || isWire;
         sections.push(
           SectionSpec.parse({
@@ -469,15 +471,14 @@ export function buildSections(
              * Press: same rule. The claim hides its lede, so the lead description sat in the page
              * unseen and was printed again in the gather essay; the index now holds every description.
              */
-            body: isKeel
-              ? sentence(
-                  "Keel is an open harness that runs many coding agents without the UI collapsing — honest permits, local run data, finish conditions you can see",
-                )
-              /*
-               * Loom: same rule. The lead description sat under the claim and was printed again in
-               * the hangtag essay; the index now holds every description.
-               */
-              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom || isDossier || isHarness || isClinic || isLantern
+            /*
+             * Keel: same rule as other craft folds. The lead description sat under the headline and
+             * was restated in What / How / Principles; the index now holds every description, and
+             * the fold carries none. Both CTAs stay visible — the fold is marketing + specimen.
+             * Loom: same rule. The lead description sat under the claim and was printed again in
+             * the hangtag essay; the index now holds every description.
+             */
+            body: isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom || isDossier || isHarness || isClinic || isLantern || isKeel
                 ? ""
                 : brief.siteKind === "consumer-craft"
                   ? consumerLede(brief, features)
@@ -491,12 +492,12 @@ export function buildSections(
               : craftFold || isFoundry
                 ? undefined
                 : cta.secondary,
-            // Compact claim — leave the fold to the instrument plate / rail.
+            // Compact claim — leave the fold to the terminal specimen.
             // When Phase-1 `authored` is present (incl. no-key deterministicAuthored),
             // surface the grounded note even on craft folds so product-specific CTA
             // copy actually reaches HTML. Sync path without authored stays compact.
-            // Keel is marketing+specimen: keep both CTAs visible on the fold.
-            ctaNote: isKeel ? cta.note : craftFold && !authored ? undefined : cta.note,
+            // Keel keeps CTAs; fold note is empty (specimen caption carries honesty).
+            ctaNote: craftFold && !authored ? undefined : cta.note,
             blocks:
               p.layout === "feature-alternating"
                 ? editorial.features.map((c) =>
@@ -611,6 +612,8 @@ export function buildSections(
           brief.siteKind === "care-pathway" ||
           // Lantern too: its index stopped at three or four chapters, whatever the brief gave.
           brief.siteKind === "lantern-path" ||
+          // Keel too: its index stopped at four capabilities on a six-capability brief.
+          brief.siteKind === "control-plane-oss" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -721,6 +724,9 @@ export function buildSections(
                              * Lantern: every row keeps its description, because the fold prints none.
                              * Rows are numbered the way the index numbers them, and carry no tier word,
                              * because the priorities section says that once.
+                             * Keel: every row keeps its description, because the fold prints none.
+                             * Rows are numbered the way the index numbers them, and carry no tier word,
+                             * because the priorities section says that once.
                              */
                             : brief.siteKind === "commerce-loom"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: loomLine(i) }))
@@ -731,6 +737,8 @@ export function buildSections(
                             : brief.siteKind === "care-pathway"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
                             : brief.siteKind === "lantern-path"
+                              ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                            : brief.siteKind === "control-plane-oss"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
                               : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
@@ -805,7 +813,7 @@ export function buildSections(
                           : isHarness
                             ? "The instruments"
                           : isKeel
-                            ? "Principles"
+                            ? "The capabilities"
                     : eyebrow.features,
             title: isSecond
               ? isStudio
@@ -882,8 +890,9 @@ export function buildSections(
                         ? sentence(
                             `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} things ${brief.productName} does`,
                           )
+                        // Keel: "what holds when you run many agents" was on a pottery studio's page too.
                         : isKeel
-                          ? sentence(`What holds when you run many agents`)
+                          ? sentence(`${brief.productName}, capability by capability`)
                         : featuresTitle(brief, features),
             body: isSecond
               ? isStudio
@@ -961,8 +970,10 @@ export function buildSections(
                       brief.siteKind === "corporate-story" ||
                       brief.siteKind === "docs-educational"
                     ? ""
+                    // Keel: "each line is a control-plane fact" was on every keel page. The index title
+                    // already names the product; no stock lede.
                     : isKeel
-                      ? sentence(`Each line is a control-plane fact — not a chat wrapper dressed as a product`)
+                      ? ""
                     : featuresLede(brief, features),
             blocks: slice,
           }),
@@ -1146,6 +1157,49 @@ export function buildSections(
       }
 
       case "story":
+        /*
+         * Keel: the how-loop reprinted Ask/Permit/Check/Ship copy that restated permits and finish
+         * conditions under "how it works" and "four beats on one session — no invented host", lines
+         * written for one control-plane product and printed on every keel page, a pottery studio's
+         * included. Now each chapter is one priority tier from the brief and names the capabilities
+         * in it by index number. With a single priority there is nothing to group, so the section
+         * is left out.
+         */
+        if (brief.siteKind === "control-plane-oss") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              // Index numbers, not names: the index above already names every capability once.
+              nums: features
+                .map((f, i) => [f, String(i + 1).padStart(2, "0")] as const)
+                .filter(([f]) => f.priority === priority)
+                .map(([, n]) => n),
+            }))
+            .filter((t) => t.nums.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} capabilities to open first`),
+              body: "",
+              // Tier label + index numbers only: no "01 / 02 / 03" line over the tier.
+              blocks: tiers.map((t) =>
+                block({
+                  title: t.tier,
+                  body: sentence(`${t.nums.length === 1 ? "Capability" : "Capabilities"} ${spoken(t.nums)}`),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
         /*
          * Studio: the chapters were the capability names again as "Step 01" to "Step 06" under
          * "How a system gets made here" and "without the pitch theatre", lines written for one
@@ -1691,13 +1745,9 @@ export function buildSections(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "control-plane-oss"
-                    ? "How it works"
-                  : eyebrow.story,
+              eyebrow.story,
             title:
-              brief.siteKind === "control-plane-oss"
-                    ? sentence(`Ask, permit, check, ship`)
-                  : brief.siteKind === "saas-marketing"
+              brief.siteKind === "saas-marketing"
                     ? sentence(`How ${brief.productName} moves an account`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`How a day on ${brief.productName} actually runs`)
@@ -1705,9 +1755,7 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "control-plane-oss"
-                    ? sentence(`Four beats on one session — no invented host`)
-                  : brief.siteKind === "saas-marketing"
+              brief.siteKind === "saas-marketing"
                     ? sentence(`From first signal to booked walkthrough — the path revenue leaders actually take`)
                     : brief.siteKind === "dashboard-webapp"
                       ? sentence(`Queue, deal room, playbook, handoff — the loop account executives live in`)
@@ -1715,16 +1763,7 @@ export function buildSections(
                             ? sentence(`Wire, wallet, approval, FX — the send path treasury actually walks`)
                   : sentence(`The sequence ${brief.audience} actually meet, in order`),
             blocks:
-              brief.siteKind === "control-plane-oss"
-                ? keelLoopBeats().map((c) =>
-                    block({
-                      title: c.title,
-                      body: sentence(c.body),
-                      meta: c.meta,
-                      kicker: `Beat ${c.meta}`,
-                    }),
-                  )
-                : chapters(editorial.features).map((c, i) =>
+              chapters(editorial.features).map((c, i) =>
               block({
                 title:
                   c.title,
@@ -2097,6 +2136,8 @@ export function buildSections(
                             ? sentence(`Questions about the ${brief.productName} pathway`)
                           : brief.siteKind === "lantern-path"
                             ? sentence(`Questions about the ${brief.productName} path`)
+                          : brief.siteKind === "control-plane-oss"
+                            ? sentence(`Questions about ${brief.productName}`)
                             : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
@@ -2194,8 +2235,11 @@ export function buildSections(
                 // Educational: "your own material" closed every explainer too. The close says where to begin.
                 : brief.siteKind === "docs-educational" && features[0]
                   ? `Start with ${lower(features[0].name)}`
+                // Keel: "get started with X" fit one OSS storefront; the close says where to begin.
                 : brief.siteKind === "control-plane-oss"
-                  ? `Get started with ${brief.productName}`
+                  ? features[0]
+                    ? `Start ${brief.productName} with ${lower(features[0].name)}`
+                    : `Start ${brief.productName}`
                 : brief.businessGoal === "trust"
                   ? `See it against your own material`
                   // The audience's last word is not who the reader shows a product to: "revenue
@@ -2350,8 +2394,16 @@ export function buildSections(
                     ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
                         features.length === 2 ? "capability sits" : "capabilities sit"
                       } ${plan.some((row) => row.kind === "pricing") ? "in the lanes" : "in the list"} above`
+                    /*
+                     * Keel: "repository and install path coming" invented a storefront no brief
+                     * declares. The close gives the count the brief gives instead.
+                     */
                     : brief.siteKind === "control-plane-oss"
-                      ? `Repository and install path coming. This page is the product story and UI specimen`
+                      ? features.length > 1
+                        ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                            features.length === 2 ? "capability sits" : "capabilities sit"
+                          } in the index above`
+                        : ""
                     : `${count(features.length)[0]!.toUpperCase()}${count(features.length).slice(1)} capabilities, one conversation`,
             ),
             ctaLabel: cta.primary,
@@ -2360,8 +2412,10 @@ export function buildSections(
              * hold that could be cancelled anytime. No brief declares a hold or its terms.
              */
             secondaryLabel:
-              brief.siteKind === "control-plane-oss"
-                ? undefined
+              brief.siteKind === "control-plane-oss" && features.length > 1
+                ? `Read all ${count(features.length)} capabilities`
+                : brief.siteKind === "control-plane-oss"
+                  ? undefined
                 : brief.siteKind === "fintech-marketing"
                   ? "See every capability"
                   // Corporate: the button leads back to the catalogue, so it says what is there.
@@ -2399,9 +2453,7 @@ export function buildSections(
                             : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote:
-              brief.siteKind === "control-plane-oss"
-                ? sentence("This page is the specimen, not a storefront")
-                : brief.siteKind === "saas-marketing"
+              brief.siteKind === "saas-marketing"
                   ? riskLine
                   : undefined,
           }),
@@ -2417,29 +2469,11 @@ export function buildSections(
             body: sentence(`${brief.productName} for ${brief.audience}`),
             // Fintech: the walkthrough is already the ask. Do not put "Read the mechanics" here.
             ctaLabel:
-              brief.siteKind === "control-plane-oss"
-                ? undefined
-                : brief.siteKind === "fintech-marketing"
+              brief.siteKind === "fintech-marketing"
                   ? cta.primary
                   : cta.secondary,
-            blocks:
-              brief.siteKind === "control-plane-oss"
-                ? [
-                    block({ title: "On this page", points: ["What", "How", "Demo", "Principles"] }),
-                    block({
-                      title: "Specimen",
-                      points: ["Session tape", "One permit", "Done-when pin", "Not a live API"],
-                    }),
-                    block({
-                      title: "Source",
-                      points: ["Install path coming", "Honest placeholder", "No invented host", "Local-first"],
-                    }),
-                    block({
-                      title: "License",
-                      points: ["Open when the path is real", "Specimen page", "Tell Proof showcase"],
-                    }),
-                  ]
-                : [
+            // Shared footer columns — owned by PR #100; keel no longer special-cases them.
+            blocks: [
                   block({ title: "Capabilities", points: editorial.features.map((c) => c.name) }),
                   block({
                     title: "Evaluate",

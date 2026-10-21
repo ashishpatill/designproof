@@ -55,7 +55,13 @@ function checkPage(html: string, siteKind: string) {
     expect(t!.tag, `${label} → #${id}: target hidden`).not.toMatch(/\shidden[\s>=]|aria-hidden="true"|display:\s*none|visibility:\s*hidden/);
     expect(t!.text.length, `${label} → #${id}: target section empty`).toBeGreaterThan(20);
     // Lantern has no figure band; its path atlas on the fold is how it works.
-    const want = siteKind === "lantern-path" && label === "How it works" ? "path-atlas" : EVALUATE_TARGET[label];
+    // Keel has no figure band; its session tape on the fold is how it works.
+    const want =
+      siteKind === "lantern-path" && label === "How it works"
+        ? "path-atlas"
+        : siteKind === "control-plane-oss" && label === "How it works"
+          ? "session-tape"
+          : EVALUATE_TARGET[label];
     if (want) expect(id, `${label} must link its own section`).toBe(want);
   }
   if (siteKind !== "control-plane-oss") expect(footer).not.toContain("ds-footer-item");
