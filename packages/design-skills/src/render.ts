@@ -931,15 +931,21 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
         .map((c) => `<li><span class="ds-steer-mark" aria-hidden="true"></span><span>${esc(c)}</span></li>`)
         .join("")}</ul>
     </aside>`;
+    /*
+     * The steer pin sits in the open space right of the headline, above the tape, and stays sticky
+     * from there. It used to sit on top of the turn tape and the permit plate.
+     */
     return `<section id="top" class="ds-section ds-hero ds-hero-helm" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${mast}
-      <div class="ds-helm-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-helm-fold">
-        <div class="ds-helm-main">
-          ${rail}
-          <div class="ds-bleed ds-helm-field">${plateFig}</div>
-        </div>
+      <div class="ds-helm-body">
+        <div class="ds-helm-claim">${copy}</div>
         ${pin}
+        <div class="ds-helm-fold">
+          <div class="ds-helm-main">
+            ${rail}
+            <div class="ds-helm-field">${plateFig}</div>
+          </div>
+        </div>
       </div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
     </section>`;
@@ -1334,8 +1340,7 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
-        // SaaS and workspace rows carry their description: the catalogue is its one home on the page.
-        spec.brief.siteKind === "agent-harness" ||
+        // Harness rows carry their description too: the fold prints none (removed from quietIndex).
         // Control-plane rows carry their description too: the index is their one home on the page.
         spec.brief.siteKind === "control-plane-oss";
       const isArchive = spec.brief.siteKind === "archive-index";
@@ -1351,6 +1356,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isLoom = spec.brief.siteKind === "commerce-loom";
       // Dossier rows are the chapter rail's jump targets.
       const isDossier = spec.brief.siteKind === "research-dossier";
+      // Harness rows are the index jump targets for Session/Permit/Finish craft.
+      const isHarness = spec.brief.siteKind === "agent-harness";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1367,6 +1374,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                       : isLoom
                         ? ` id="line-${esc(loomLine(i))}"`
                       : isDossier
+                        ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                      : isHarness
                         ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                         : ""
           } data-feature="${esc(b.title)}">
@@ -1485,7 +1494,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
   const rail =
     spec.taste.aestheticLean === "system-crafted" &&
     spec.brief.siteKind !== "dashboard-webapp" &&
-    spec.brief.siteKind !== "fintech-marketing"
+    spec.brief.siteKind !== "fintech-marketing" &&
+    // Harness too: radius, body size and contrast chips are design notes, not page content.
+    spec.brief.siteKind !== "agent-harness"
       ? `<div class="ds-token-rail" aria-hidden="true">${[
           `radius ${spec.tokens.radius.md}`,
           `body ${spec.tokens.type.find((t) => t.name === "body")?.px}px`,
@@ -1522,7 +1533,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Loom too: the list beside the drawing named every line again, right under the index.
     spec.brief.siteKind !== "commerce-loom" &&
     // Dossier too: the list beside the drawing named every instrument again, right under the index.
-    spec.brief.siteKind !== "research-dossier"
+    spec.brief.siteKind !== "research-dossier" &&
+    // Harness too: the list beside the drawing named every instrument again, right under the index.
+    spec.brief.siteKind !== "agent-harness"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -1656,7 +1669,7 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
     spec?.brief.siteKind === "editorial-foundry" ||
     spec?.brief.siteKind === "field-guide" ||
     spec?.brief.siteKind === "care-pathway" ||
-    spec?.brief.siteKind === "agent-harness" ||
+    // Harness priorities name their instruments in the chapter body, so they are not quiet.
     spec?.brief.siteKind === "control-plane-oss";
   return `<section class="ds-section ds-story" data-surface="${section.surface}" data-section="${esc(section.id)}" data-editorial-chapters id="${esc(section.id)}">
     <div class="ds-wrap-wide">
@@ -1666,7 +1679,9 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
         spec?.brief.siteKind === "art-directed-studio" ||
         spec?.brief.siteKind === "corporate-story" ||
         spec?.brief.siteKind === "docs-educational" ||
-        spec?.brief.siteKind === "research-dossier"
+        spec?.brief.siteKind === "research-dossier" ||
+        // Harness likewise: the chapters are priority tiers, not editorial beats.
+        spec?.brief.siteKind === "agent-harness"
           ? ""
           : secMeta("Chapters", `${count} beats · editorial order`)
       }
@@ -1680,7 +1695,9 @@ function renderChapters(section: SectionSpec, figures: FigurePlan, spec?: Design
               ${!quietChapters && b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
               ${
                 // Dossier tiers are not instruments, so instrument i's drawing does not belong on tier i.
-                figures.marks[i] && spec?.brief.siteKind !== "research-dossier"
+                // Harness tiers are not instruments: instrument i's drawing does not belong on tier i
+                // (row 02 showed the fuel log's lines, row 03 the crew list's branches).
+                figures.marks[i] && spec?.brief.siteKind !== "research-dossier" && spec?.brief.siteKind !== "agent-harness"
                   ? `<div class="ds-chapter-mark" aria-hidden="true">${figures.marks[i]}</div>`
                   : ""
               }
@@ -3211,7 +3228,8 @@ function renderPreviewPage(spec: DesignSpec): string {
     spec.brief.siteKind === "press-atelier" ||
     spec.brief.siteKind === "commerce-loom" ||
     spec.brief.siteKind === "consumer-craft" ||
-    spec.brief.siteKind === "research-dossier"
+    spec.brief.siteKind === "research-dossier" ||
+    spec.brief.siteKind === "agent-harness"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

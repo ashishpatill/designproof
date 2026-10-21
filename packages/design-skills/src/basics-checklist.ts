@@ -769,9 +769,13 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && !/data-figure="queue-console"/.test(html)
           && !/class="[^"]*ds-dash-grid/.test(html)
           && /ds-bleed-rule/.test(html)
+          // The priorities section groups the instruments by tier, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || spec.sections.some((s) => s.kind === "story"))
+          // No figure band or specimen band naming the instruments again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Agent-harness offerings use helm fold + turn rail + permit plate + steer pin + LOCAL — no pricing, no metrics theatre, no workflow-proof, no pipeline/queue, zero inverse bands.",
+      "Agent-harness offerings use helm fold + turn rail + permit plate + steer pin + LOCAL + priorities grouping by tier — no pricing, no metrics theatre, no figure band or specimen band, no workflow-proof, no pipeline/queue, zero inverse bands.",
     ),
     check(
       "helm-has-permit-plate",
@@ -879,6 +883,8 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           spec.brief.siteKind !== "research-dossier"
           && spec.brief.siteKind !== "archive-index"
           && spec.brief.siteKind !== "commerce-loom"
+          // Harness priorities are three short rows with no vacancy; the grey thumbnail strip that
+          // filled it said nothing and was cut.
           || /class="ds-story-fill"/.test(html)
           // Archive leaves its entry essay out on a single-priority brief, and the vacancy with it.
           || (spec.brief.siteKind === "archive-index" && !spec.sections.some((s) => s.kind === "story"))
