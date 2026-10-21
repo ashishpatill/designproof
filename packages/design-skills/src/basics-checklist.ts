@@ -701,17 +701,22 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           && /ds-path-masthead/.test(html)
           && /ds-way-rail/.test(html)
           && /data-figure="path-plate"/.test(html)
-          && /ds-ember/.test(html)
-          && /class="ds-ember-trail"/.test(html)
-          && /aria-label="Night trail"/.test(html)
+          // The night trail groups chapters by tier, so a single-priority brief has none.
+          && (new Set(spec.brief.features.map((f) => f.priority)).size < 2 || (
+            /ds-ember/.test(html)
+            && /class="ds-ember-trail"/.test(html)
+            && /aria-label="Night trail"/.test(html)
+          ))
           && !/class="ds-ember-aside"/.test(html)
           && !/class="ds-ember-grid"/.test(html)
           && /Ember/.test(html)
           && /ds-bleed-rule/.test(html)
           && /ds-path-near/.test(html)
+          // No figure band or specimen band naming the chapters again under the index.
+          && !spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")
           && spec.sections.filter((s) => s.surface === "inverse").length === 0
         ),
-      "Lantern-path offerings use path fold + waypoint rail + path plate + night trail + Ember — no pricing, no metrics theatre, zero inverse bands.",
+      "Lantern-path offerings use path fold + waypoint rail + path plate + night trail (when the brief has more than one priority) + Ember — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
       "path-plate-walk-not-scribble",
@@ -722,7 +727,7 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
           plate.length > 0
           && !/stroke-width="10"/.test(plate)
           && /CH I/.test(plate)
-          && /Threshold/.test(plate)
+          && !/Threshold/.test(plate)
           && /PATH ATLAS/.test(plate)
           && /class="ds-draw"/.test(plate)
         );

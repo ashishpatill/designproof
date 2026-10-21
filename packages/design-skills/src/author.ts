@@ -32,6 +32,7 @@ import {
   dossierQuestions,
   harnessQuestions,
   clinicQuestions,
+  lanternQuestions,
   workspaceQuestions,
 } from "./copy";
 import type { DesignBrief, FeatureSpec } from "./types";
@@ -358,6 +359,8 @@ export function deterministicAuthored(brief: DesignBrief): AuthoredConnectiveTis
                             ? harnessQuestions(brief, brief.features)
                           : brief.siteKind === "care-pathway"
                             ? clinicQuestions(brief, brief.features)
+                          : brief.siteKind === "lantern-path"
+                            ? lanternQuestions(brief, brief.features)
                             : questions(brief, brief.features);
   const hasWorkflow = hasApprovalWorkflowSignal(brief);
 

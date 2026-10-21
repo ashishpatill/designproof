@@ -40,6 +40,7 @@ import {
   dossierQuestions,
   harnessQuestions,
   clinicQuestions,
+  lanternQuestions,
   PRESS_SIGS,
   loomQuestions,
   loomLine,
@@ -347,6 +348,8 @@ export function buildSections(
                             ? harnessQuestions(brief, features)
                           : brief.siteKind === "care-pathway"
                             ? clinicQuestions(brief, features)
+                          : brief.siteKind === "lantern-path"
+                            ? lanternQuestions(brief, features)
                             : questions(brief, features);
   const riskLine = authored?.cta.riskReversal ?? riskReversal(brief);
   const packNav =
@@ -474,7 +477,7 @@ export function buildSections(
                * Loom: same rule. The lead description sat under the claim and was printed again in
                * the hangtag essay; the index now holds every description.
                */
-              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom || isDossier || isHarness || isClinic
+              : isArchive || isMechanism || isField || isObservatory || isFoundry || isPress || isLoom || isDossier || isHarness || isClinic || isLantern
                 ? ""
                 : brief.siteKind === "consumer-craft"
                   ? consumerLede(brief, features)
@@ -606,6 +609,8 @@ export function buildSections(
           brief.siteKind === "agent-harness" ||
           // Clinic too: its handoff strip stopped at three or four rounds, whatever the brief gave.
           brief.siteKind === "care-pathway" ||
+          // Lantern too: its index stopped at three or four chapters, whatever the brief gave.
+          brief.siteKind === "lantern-path" ||
           total - wanted < 2
             ? total
             : wanted;
@@ -713,6 +718,9 @@ export function buildSections(
                              * Clinic: every row keeps its description, because the fold prints none.
                              * Rows are numbered the way the index numbers them, and carry no tier word,
                              * because the rounds ladder says that once.
+                             * Lantern: every row keeps its description, because the fold prints none.
+                             * Rows are numbered the way the index numbers them, and carry no tier word,
+                             * because the priorities section says that once.
                              */
                             : brief.siteKind === "commerce-loom"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: loomLine(i) }))
@@ -721,6 +729,8 @@ export function buildSections(
                             : brief.siteKind === "agent-harness"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
                             : brief.siteKind === "care-pathway"
+                              ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
+                            : brief.siteKind === "lantern-path"
                               ? rawSlice.map((b, i) => ({ ...b, kicker: undefined, meta: String(i + 1).padStart(2, "0") }))
                               : rawSlice;
         featureCursor = featureCursor === 0 ? slice.length : featureCursor + slice.length;
@@ -852,8 +862,9 @@ export function buildSections(
                         // Press: "everything X does, starting with Y" named the lead plate before its row did.
                         : isPress
                           ? sentence(`${brief.productName}, plate by plate`)
+                        // Lantern: "chapters a night walk actually keeps" was on a pottery studio's page too.
                         : isLantern
-                          ? sentence(`Chapters a night walk actually keeps`)
+                          ? sentence(`${brief.productName}, chapter by chapter`)
                         // Clinic: "stages a care pathway actually keeps" was on a pottery studio's page too.
                         : isClinic
                           ? sentence(`${brief.productName}, round by round`)
@@ -929,8 +940,9 @@ export function buildSections(
                         // Press: "a gallery dressed as a pressroom" was on every press page.
                         : isPress
                           ? ""
+                        // Lantern: "not a dark glow page dressed as cinema" sat on every lantern page.
                         : isLantern
-                          ? sentence(`Each chapter is a lantern waypoint — not a dark glow page dressed as cinema`)
+                          ? ""
                         // Clinic: "not a SaaS pipeline dressed as care" sat on every care-pathway page.
                         : isClinic
                           ? ""
@@ -1634,21 +1646,57 @@ export function buildSections(
           );
           break;
         }
+        /*
+         * Lantern: the ember-notes essay printed every description a second time as "Ch I Threshold"
+         * under "how a night walk is actually read" and "lantern beads, chapter index, and the embers
+         * that keep a walk honest", lines written for one lantern product and printed on every
+         * lantern-path page, a pottery studio's included. Now each trail rung is one priority tier
+         * from the brief and names the chapters in it once. With a single priority there is nothing
+         * to group, so the section is left out. Way rail + path-plate on the fold keep the Ch I–V craft.
+         */
+        if (brief.siteKind === "lantern-path") {
+          const tiers = (
+            [
+              ["p0", "Core"],
+              ["p1", "Supporting"],
+              ["p2", "Additional"],
+            ] as const
+          )
+            .map(([priority, tier]) => ({
+              tier,
+              names: features.filter((f) => f.priority === priority).map((f) => f.name),
+              at: features.flatMap((f, i) => (f.priority === priority ? [String(i + 1).padStart(2, "0")] : [])),
+            }))
+            .filter((t) => t.names.length);
+          if (tiers.length < 2) break;
+          sections.push(
+            SectionSpec.parse({
+              ...base,
+              eyebrow: "Priorities",
+              title: sentence(`Which ${brief.productName} chapters to open first`),
+              body: "",
+              blocks: tiers.map((t) =>
+                block({
+                  title: t.tier,
+                  // Chapter numbers only: the names already sit once in the index above.
+                  body: sentence(`${t.at.length === 1 ? "Chapter" : "Chapters"} ${spoken(t.at)}`),
+                }),
+              ),
+            }),
+          );
+          break;
+        }
 
         sections.push(
           SectionSpec.parse({
             ...base,
             eyebrow:
-              brief.siteKind === "lantern-path"
-                    ? "Ember notes"
-                        : brief.siteKind === "control-plane-oss"
-                          ? "How it works"
+              brief.siteKind === "control-plane-oss"
+                    ? "How it works"
                   : eyebrow.story,
             title:
-              brief.siteKind === "lantern-path"
-                    ? sentence(`How a night walk is actually read`)
-                        : brief.siteKind === "control-plane-oss"
-                          ? sentence(`Ask, permit, check, ship`)
+              brief.siteKind === "control-plane-oss"
+                    ? sentence(`Ask, permit, check, ship`)
                   : brief.siteKind === "saas-marketing"
                     ? sentence(`How ${brief.productName} moves an account`)
                     : brief.siteKind === "dashboard-webapp"
@@ -1657,10 +1705,8 @@ export function buildSections(
                             ? sentence(`How a send clears on ${brief.productName}`)
                   : sentence(`The order things happen in`),
             body:
-              brief.siteKind === "lantern-path"
-                    ? sentence(`Lantern beads, chapter index, and the embers that keep a walk honest`)
-                        : brief.siteKind === "control-plane-oss"
-                          ? sentence(`Four beats on one session — no invented host`)
+              brief.siteKind === "control-plane-oss"
+                    ? sentence(`Four beats on one session — no invented host`)
                   : brief.siteKind === "saas-marketing"
                     ? sentence(`From first signal to booked walkthrough — the path revenue leaders actually take`)
                     : brief.siteKind === "dashboard-webapp"
@@ -1681,16 +1727,11 @@ export function buildSections(
                 : chapters(editorial.features).map((c, i) =>
               block({
                 title:
-                  brief.siteKind === "lantern-path"
-                    ? ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight", "Ember"][i] ?? c.title
-
-                    : c.title,
+                  c.title,
                 body: c.body,
-                meta: brief.siteKind === "lantern-path"
-                          ? `Ch ${["I","II","III","IV","V","VI"][i] ?? String(i + 1)}`
-                  : c.meta,
+                meta: c.meta,
                 kicker:
-                  brief.siteKind === "research-dossier" || brief.siteKind === "lantern-path"
+                  brief.siteKind === "research-dossier"
                     ? `Note ${String(i + 1).padStart(2, "0")}`
                     : undefined,
               }),
@@ -2054,6 +2095,8 @@ export function buildSections(
                             ? sentence(`Questions about the ${brief.productName} session`)
                           : brief.siteKind === "care-pathway"
                             ? sentence(`Questions about the ${brief.productName} pathway`)
+                          : brief.siteKind === "lantern-path"
+                            ? sentence(`Questions about the ${brief.productName} path`)
                             : sentence(`Questions ${brief.audience} ask first`),
             blocks: faqItems.map((q) => block({ title: q.title, body: q.body })),
           }),
@@ -2124,8 +2167,11 @@ export function buildSections(
                         ? features[0]
                           ? `Start the ${brief.productName} press sheet with ${lower(features[0].name)}`
                           : `Start the ${brief.productName} press sheet`
+                      // Lantern: "walk the next chapter" fit one atlas; the close says where to begin.
                       : brief.siteKind === "lantern-path"
-                        ? `Walk the next ${brief.productName} chapter`
+                        ? features[0]
+                          ? `Walk the ${brief.productName} path with ${lower(features[0].name)}`
+                          : `Walk the ${brief.productName} path`
                       // Clinic: "chart the next pathway" fit one ward; the close says where to begin.
                       : brief.siteKind === "care-pathway"
                         ? features[0]
@@ -2239,8 +2285,17 @@ export function buildSections(
                               features.length === 2 ? "plate is" : "plates are"
                             } set in the index above`
                           : ""
+                      /*
+                       * Lantern: "waypoint marks, path plates, and the chapters editors and founders
+                       * actually walk" closed every lantern page, a pottery studio's included. The
+                       * close gives the count the brief gives instead.
+                       */
                       : brief.siteKind === "lantern-path"
-                        ? `Waypoint marks, path plates, and the chapters ${brief.audience} actually walk`
+                        ? features.length > 1
+                          ? `${count(features.length - 1)[0]!.toUpperCase()}${count(features.length - 1).slice(1)} more ${
+                              features.length === 2 ? "chapter sits" : "chapters sit"
+                            } in the index above`
+                          : ""
                       /*
                        * Clinic: "stage marks, care plates, and the rounds a ward lead actually charts"
                        * closed every care-pathway page, a pottery studio's included. The close gives
@@ -2339,6 +2394,8 @@ export function buildSections(
                             ? `Read all ${count(features.length)} instruments`
                           : brief.siteKind === "care-pathway" && features.length > 1
                             ? `Read all ${count(features.length)} rounds`
+                          : brief.siteKind === "lantern-path" && features.length > 1
+                            ? `Read all ${count(features.length)} chapters`
                             : cta.secondary,
             // Conversion landing craft — name the reversible path once, at the close.
             ctaNote:

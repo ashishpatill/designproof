@@ -712,12 +712,18 @@ export function planSections(input: CompositionInput): SectionPlan[] {
   /*
    * Lantern path — cinematic night-walk craft.
    *
-   * Art-directed + editorial-longform corridors favour figure-owned folds and quiet display.
-   * Soft dark glow pages answer with WebGL tourism chrome. This offering invents an unreplicable
-   * night atlas: chapter waypoint rail, path-plate cartograph owning the fold, ember essay, Ember close.
+   * The page used to follow the path fold with a figure band that named the chapters twice more
+   * beside a "cost · cumulative" chart of made-up values under "how X charts a night walk", a
+   * specimen strip that printed every name again under "X path field", and an ember-notes essay
+   * that reprinted every description as "Ch I Threshold" under "how a night walk is actually read"
+   * and "lantern beads, chapter index, and the embers that keep a walk honest" — lines written for
+   * one lantern product and printed on every lantern-path page, a pottery studio's included. A
+   * six-chapter brief named its lead seven times. The fold's way rail + path-plate and one index
+   * hold every description once; the night trail groups the chapters by the brief's priority tiers.
    */
   if (siteKind === "lantern-path") {
     plans.push({ id: "hero", kind: "hero", layout: "hero-path", surface: "paper", columns: split.wide });
+    // Chapter index — every chapter, numbered, each with its description.
     plans.push({
       id: "features",
       kind: "features",
@@ -725,24 +731,17 @@ export function planSections(input: CompositionInput): SectionPlan[] {
       surface: "paper",
       columns: split.wide,
     });
-    plans.push({
-      id: "figure",
-      kind: "figure",
-      layout: "figure-explainer",
-      surface: "raised",
-      columns: split.wide,
-    });
-    plans.push({ id: "specimen", kind: "specimen", layout: "specimen-band", surface: "sunken" });
+    // Night trail — one chapter tier per priority the brief gives. It sits in a sunken tray
+    // where the specimen band's valley used to be.
     plans.push({
       id: "story",
       kind: "story",
       layout: "story-ember",
-      surface: "paper",
-      bond: true,
+      surface: "sunken",
+      columns: split.wide,
     });
-    // No second feature-rows catalogue — sparse airways after marquee cut (Phase 9).
-    // No shared marquee-proof — night trail is the lantern proof instrument.
-    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "paper", columns: "5fr 7fr", bond: true });
+    // No shared marquee-proof — way rail + path-plate + night trail already prove lantern craft.
+    plans.push({ id: "faq", kind: "faq", layout: "faq-columns", surface: "raised", columns: "5fr 7fr" });
     plans.push({ id: "cta", kind: "cta", layout: "cta-band", surface: "paper" });
     plans.push({ id: "footer", kind: "footer", layout: "footer-columns", surface: "paper" });
     return plans;

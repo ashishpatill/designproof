@@ -827,12 +827,12 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
       ? `<figure class="ds-path-plate" aria-label="${esc(caption)}">${figures.hero}<figcaption class="ds-sr">${esc(caption)}</figcaption></figure>`
       : "";
     const romans = ["I", "II", "III", "IV", "V"];
-    const labels = ["Threshold", "Gardens", "Craft", "Rituals", "Afterlight"];
-    const hrefs = ["#features", "#figure", "#specimen", "#story", "#cta"];
+    // No chapter names: those were Ember Gate's, printed on every lantern brand.
+    const hrefs = ["#features", "#features", "#story", "#faq", "#cta"];
     const rail = `<nav class="ds-way-rail" aria-label="Chapter waypoints"><ol>${romans
       .map((R, i) => {
         const href = hrefs[i] ?? "#features";
-        return `<li><a href="${href}" class="ds-way-mark${i === 0 ? " is-active" : ""}" data-way="${R}" aria-label="Chapter ${R}: ${labels[i]}"><span class="ds-way-num">Ch ${R}</span><span class="ds-way-label">${labels[i]}</span></a></li>`;
+        return `<li><a href="${href}" class="ds-way-mark${i === 0 ? " is-active" : ""}" data-way="${R}" aria-label="Chapter ${R}"><span class="ds-way-num">Ch ${R}</span></a></li>`;
       })
       .join("")}</ol></nav>`;
     const mast = `<header class="ds-path-masthead" aria-label="Path masthead">
@@ -850,7 +850,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
     return `<section id="top" class="ds-section ds-hero ds-hero-path" data-surface="${section.surface}" data-section="${esc(section.id)}">
       ${mast}
       <div class="ds-path-claim"><div class="ds-wrap-wide">${copy}</div></div>
-      <div class="ds-bleed ds-path-field"${
+      <div id="path-atlas" class="ds-bleed ds-path-field"${
         spec.taste.motion === "immersive" ? ` data-motion-instrument="field"` : ""
       }>${rail}${plateFig}${near}</div>
       <div class="ds-bleed-rule" aria-hidden="true"></div>
@@ -1318,8 +1318,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
         // Dossier rows carry their description too: the fold prints none (removed from quietIndex).
         // Loom rows carry their description too: the cloth names the lines and prints no sentence.
         // Field guide rows carry their description too: the fold prints none.
-        spec.brief.siteKind === "lantern-path" ||
         // Archive rows carry their description: the fold prints none, so the catalogue is its home.
+        // Lantern is not here: the fold prints none, so the index is the one home for every description.
         spec.brief.siteKind === "corporate-story" ||
         spec.brief.siteKind === "fintech-marketing" ||
         // Harness rows carry their description too: the fold prints none (removed from quietIndex).
@@ -1343,6 +1343,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
       const isHarness = spec.brief.siteKind === "agent-harness";
       // Clinic rows are the index jump targets for Pathway/Rounds/Chart craft.
       const isClinic = spec.brief.siteKind === "care-pathway";
+      // Lantern rows are the index jump targets for Path/Chapters/Ember craft.
+      const isLantern = spec.brief.siteKind === "lantern-path";
       return `<ol class="ds-index">${section.blocks
         .map(
           (b, i) => `<li class="ds-index-row"${
@@ -1364,6 +1366,8 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
                         ? ` id="instrument-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                       : isClinic
                         ? ` id="encounter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
+                      : isLantern
+                        ? ` id="chapter-${esc(b.meta ?? String(i + 1).padStart(2, "0"))}"`
                         : ""
           } data-feature="${esc(b.title)}">
             <span class="ds-index-num">${esc(b.meta ?? String(i + 1).padStart(2, "0"))}</span>
@@ -1524,7 +1528,9 @@ function renderFeatures(section: SectionSpec, spec: DesignSpec, figures: FigureP
     // Harness too: the list beside the drawing named every instrument again, right under the index.
     spec.brief.siteKind !== "agent-harness" &&
     // Clinic too: the list beside the drawing named every round again, right under the index.
-    spec.brief.siteKind !== "care-pathway"
+    spec.brief.siteKind !== "care-pathway" &&
+    // Lantern too: the list beside the drawing named every chapter again, right under the index.
+    spec.brief.siteKind !== "lantern-path"
       ? plate(figures.body, `How ${spec.brief.productName} is put together`, "ds-plate-wide")
       : "";
 
@@ -2030,24 +2036,35 @@ function renderGather(section: SectionSpec): string {
  * Center path spine with chapters zigzagging left/right (night-walk reading).
  * Not the essay+aside list clone shared by hang/entry.
  */
+/**
+ * Night trail — lantern-path mid-page instrument.
+ *
+ * Zigzag priority trail with chapter beads and panels. Each rung is one priority tier from the
+ * brief; its note points at chapter numbers in the index. Not the essay+aside list that reprinted
+ * every description, or a figure mark on every rung. Ch I–V chapter names stay on the fold's way rail.
+ */
 function renderEmber(section: SectionSpec, figures: FigurePlan): string {
   const blocks = section.blocks;
   const count = blocks.length || 1;
-  const romans = ["I", "II", "III", "IV", "V", "VI"];
   const steps = blocks
     .map((b, i) => {
-      const mark = figures.marks[i] ? `<div class="ds-ember-mark" aria-hidden="true">${figures.marks[i]}</div>` : "";
-      const ch = esc(b.meta ?? `Ch ${romans[i] ?? String(i + 1)}`);
+      const ch = esc(b.meta ?? `Ch ${String(i + 1).padStart(2, "0")}`);
       const side = i % 2 === 0 ? "left" : "right";
+      const at = b.points.length ? b.points.join(", ") : "";
+      const n = b.points.length || 0;
+      const note =
+        n > 0
+          ? `<p class="ds-ember-note">${n} ${n === 1 ? "chapter" : "chapters"} · Ch ${esc(at)}</p>`
+          : b.kicker
+            ? `<p class="ds-ember-note">${esc(b.kicker)}</p>`
+            : "";
+      // Tier cards only: no grey rest card opposite, no chapter line over the tier label.
       return `<li class="ds-ember-step" data-side="${side}" style="--i:${i}">
-        <span class="ds-ember-bead" aria-hidden="true"></span>
-        <div class="ds-ember-rest" aria-hidden="true"></div>
-        <article class="ds-ember-panel">
-          <p class="ds-ember-ch">${ch}</p>
-          <h3>${esc(b.title)}</h3>
+        <article class="ds-ember-panel">${b.meta ? `
+          <p class="ds-ember-ch">${ch}</p>` : ""}
+          <p class="ds-ember-tier">${esc(b.title)}</p>
           ${b.body ? `<p class="ds-body">${esc(b.body)}</p>` : ""}
-          ${b.kicker ? `<p class="ds-ember-note">${esc(b.kicker)}</p>` : ""}
-          ${mark}
+          ${note}
         </article>
       </li>`;
     })
@@ -2055,7 +2072,7 @@ function renderEmber(section: SectionSpec, figures: FigurePlan): string {
   return `<section class="ds-section ds-story ds-ember" data-surface="${section.surface}" data-section="${esc(section.id)}" id="${esc(section.id)}">
     <div class="ds-bleed-rule" aria-hidden="true"></div>
     <div class="ds-wrap-wide">
-      ${secMeta("Ember", `${count} waypoints · night trail`)}
+      ${secMeta("Ember", `${count} priorities · night trail`)}
       ${sectionHead(section, 2, true)}
       <ol class="ds-ember-trail" aria-label="Night trail">${steps}</ol>
     </div>
@@ -2522,7 +2539,8 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
      * catalogue or the closing band: "Security review" on a page with no security section, or
      * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
      */
-    "how it works": () => prefer("figure"),
+    // Lantern has no figure band: its path atlas on the fold is how it works.
+    "how it works": () => prefer("figure", "path-atlas"),
     "what is included": () => prefer("compare"),
     questions: () => prefer("faq"),
     // No template has a security section (saas "proof" is the declared sequence) or a contact path.
@@ -2551,6 +2569,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("get-started");
   // The care-pathway fold carries the pathway figure as id="figure" (How it works lands on it).
   if (spec.sections.some((s) => s.layout === "hero-rounds")) knownIds.add("figure");
+  if (spec.brief.siteKind === "lantern-path") knownIds.add("path-atlas");
   // Clinic's footer button reads "See every round": it lands on the rounds index, not the closing band.
   const footerCtaHref =
     spec.brief.siteKind === "care-pathway" && knownIds.has("features") ? "#features" : "#cta";
@@ -3223,7 +3242,8 @@ function renderPreviewPage(spec: DesignSpec): string {
     spec.brief.siteKind === "consumer-craft" ||
     spec.brief.siteKind === "research-dossier" ||
     spec.brief.siteKind === "agent-harness" ||
-    spec.brief.siteKind === "care-pathway"
+    spec.brief.siteKind === "care-pathway" ||
+    spec.brief.siteKind === "lantern-path"
       ? `${spec.brief.productName}: ${spec.brief.tagline ? `${spec.brief.tagline.replace(/[.!?]+$/, "")}, for` : "for"} ${spec.brief.audience}`
       : spec.summary;
   return `<!doctype html>

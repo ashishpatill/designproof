@@ -838,15 +838,17 @@ describe("research-backed offerings + implementation basics", () => {
     expect(previewHtml).toMatch(/class="ds-bleed ds-path-field"[^>]*>[\s\S]*?class="ds-way-rail"/);
     const plate = previewHtml.match(/<svg[^>]*data-figure="path-plate"[^>]*>[\s\S]*?<\/svg>/)?.[0] ?? "";
     expect(plate).toContain("CH I");
-    expect(plate).toContain("Threshold");
+    expect(plate).not.toContain("Threshold");
     expect(plate).toContain('class="ds-draw"');
     expect(plate).not.toContain('stroke-width="10"');
     const drawn = pathPlate("Ember Gate", [], "ember-gate-atlas", "band");
     expect(drawn).toContain("PATH ATLAS");
     expect(drawn).toContain("CH I");
-    expect(drawn).toContain("Threshold");
+    expect(drawn).not.toContain("Threshold");
     expect(drawn).toContain('class="ds-draw"');
     expect(drawn).not.toContain('stroke-width="10"');
+    expect(spec.sections.some((s) => s.kind === "figure" || s.kind === "specimen")).toBe(false);
+    expect(previewHtml).toContain('class="ds-index"');
     const basics = assertBasics(spec, previewHtml);
     expect(basics.findings.filter((f) => !f.ok).map((f) => f.id)).not.toContain("path-plate-walk-not-scribble");
   });
@@ -1269,7 +1271,8 @@ describe("research-backed offerings + implementation basics", () => {
     // Press neither: its gather groups the plates by priority and carries no Note labels or marks.
     // Loom neither: its hangtags group the lines by priority and carry no Note labels or marks.
     // Clinic neither: its rounds ladder groups the rounds by priority and carries no Note labels or marks.
-    const noteKinds = ["lantern"] as const;
+    // Lantern neither: its night trail groups the chapters by priority and carries no Note labels or marks.
+    const noteKinds = [] as const;
     for (const key of noteKinds) {
       const brief = SHOWCASE_BRIEFS[key];
       if (!brief) continue;
@@ -1281,8 +1284,6 @@ describe("research-backed offerings + implementation basics", () => {
     }
     const { previewHtml: chrono } = designFromFeatures(SHOWCASE_BRIEFS.observatory!);
     expect(chrono).toMatch(/\.ds-chrono-note \+ \.ds-chrono-mark\{[^}]*margin-top:var\(--s-lg\)/);
-    const { previewHtml: ember } = designFromFeatures(SHOWCASE_BRIEFS.lantern!);
-    expect(ember).toMatch(/\.ds-ember-note \+ \.ds-ember-mark\{[^}]*margin-top:var\(--s-lg\)/);
   });
 
   it("clears the implementation basics gate on every offering", () => {
