@@ -2457,11 +2457,17 @@ function footerPointHref(label: string, knownIds: Set<string>, columnTitle: stri
   };
 
   const map: Record<string, () => string | null> = {
-    "how it works": () => prefer("figure", "features"),
-    "what is included": () => prefer("compare", "features"),
-    questions: () => prefer("faq", "cta"),
-    "security review": () => prefer("proof", "cta"),
-    "talk to us": () => prefer("cta"),
+    /*
+     * Evaluate column: each label links only to the section it names. No fallback to the
+     * catalogue or the closing band: "Security review" on a page with no security section, or
+     * "Talk to us" on a page with no contact path, would point somewhere that isn't what it says.
+     */
+    "how it works": () => prefer("figure"),
+    "what is included": () => prefer("compare"),
+    questions: () => prefer("faq"),
+    // No template has a security section (saas "proof" is the declared sequence) or a contact path.
+    "security review": () => null,
+    "talk to us": () => null,
     sequence: () => prefer("figure", "story"),
     "why it holds": () => prefer("proof"),
     workspace: () => prefer("app"),
@@ -2483,6 +2489,17 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
   knownIds.add("top");
   knownIds.add("demo");
   knownIds.add("get-started");
+  /*
+   * Every footer entry is a link to a section on this page. Labels with no section here (pages no
+   * brief gave) are dropped, and a column left empty is dropped with them. The control-plane
+   * specimen footer keeps its own plain-text columns, which describe the specimen and link nowhere.
+   */
+  const linkOnly = spec.brief.siteKind !== "control-plane-oss";
+  const footerBlocks = section.blocks
+    .map((b) =>
+      linkOnly ? { ...b, points: b.points.filter((p) => footerPointHref(p, knownIds, b.title)) } : b,
+    )
+    .filter((b) => b.points.length > 0);
   return `<footer class="ds-footer" data-surface="${section.surface}" data-section="${esc(section.id)}">
     <div class="ds-wrap-wide">
       <div class="ds-footer-grid">
@@ -2491,7 +2508,7 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
           <p class="ds-caption">${esc(section.body)}</p>
           ${section.ctaLabel ? `<a class="ds-btn ds-btn-secondary" href="#cta">${esc(section.ctaLabel)}</a>` : ""}
         </div>
-        ${section.blocks
+        ${footerBlocks
           .map(
             (b) => `<div class="ds-footer-col">
               <h4>${esc(b.title)}</h4>
@@ -2509,10 +2526,6 @@ function renderFooter(section: SectionSpec, spec: DesignSpec): string {
       </div>
       <div class="ds-footer-base">
         <span>© ${year} ${esc(section.brandLabel ?? section.title)}</span>
-        <span>All capabilities listed on this page are available today</span>
-        <span>Accessibility</span>
-        <span>Privacy</span>
-        <span>Terms</span>
       </div>
     </div>
   </footer>`;
@@ -3089,6 +3102,25 @@ function scripts(spec: DesignSpec): string {
 
 /** Self-contained HTML document for iframe preview / static showcase. */
 export function renderPreviewHtml(spec: DesignSpec): string {
+  return pruneDeadFooterLinks(renderPreviewPage(spec));
+}
+
+/**
+ * Footer links point at sections of this same page. Some templates render a section under a
+ * different anchor than its spec id (or skip it), so a link is kept only when its target id is
+ * really in the finished page; a column left with no links goes with it.
+ */
+export function pruneDeadFooterLinks(html: string): string {
+  return html.replace(/<footer class="ds-footer" data-surface[\s\S]*?<\/footer>/, (footer) => {
+    const body = html.replace(footer, "");
+    const pruned = footer.replace(/<a (?:class="[^"]*" )?href="#([^"]+)">[^<]*<\/a>/g, (a, id: string) =>
+      body.includes(`id="${id}"`) ? a : "",
+    );
+    return pruned.replace(/<div class="ds-footer-col">\s*<h4>[^<]*<\/h4>\s*<\/div>/g, "");
+  });
+}
+
+function renderPreviewPage(spec: DesignSpec): string {
   const fonts = spec.tokens.fontRequests.map((f) => `family=${f}`).join("&");
   const figures = figuresFor(spec);
   const needsHtmx = spec.sections.some((s) => s.layout === "workflow-proof");

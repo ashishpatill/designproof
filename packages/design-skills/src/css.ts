@@ -233,10 +233,8 @@ ${reducedInteractive}
 `;
 
   const immersiveAuthored = `
-.ds-authored-motion[data-authored-slot="empty"]{
-  position:fixed;inset:auto 1rem 1rem auto;width:4.5rem;height:4.5rem;border-radius:var(--r-md);
-  border:1px solid var(--c-border);background:var(--c-paper-raised);opacity:0.55;pointer-events:none;z-index:var(--z-overlay);
-}
+/* No runtime asset is mounted, so the slot shows nothing (it used to be an empty grey box). */
+.ds-authored-motion[data-authored-slot="empty"]{display:none}
 `;
 
   return `${interactive}${reveals}${narrative}${motion === "immersive" ? immersiveAuthored : authored}`;
@@ -4350,6 +4348,9 @@ body[data-atmosphere] footer.ds-section{position:relative;z-index:1}
 
 /* Footer */
 .ds-footer{padding-block:var(--section-y-tight);border-top:1px solid var(--c-border)}
+/* Fixed side rails (chapter, alpha, sig, way, care) stop at the footer: it sits above them on an opaque ground. */
+.ds-footer{position:relative;z-index:calc(var(--z-nav) + 1);background:var(--surface-bg,var(--c-paper))}
+.ds-footer[data-surface="paper"]{background:var(--c-paper)}
 .ds-footer-grid{display:grid;grid-template-columns:2.4fr 1fr 1fr 1fr 1fr;gap:var(--s-xl) var(--s-lg)}
 .ds-footer-col{display:grid;gap:var(--s-2xs);align-content:start;font-size:var(--t-bodySmall-size)}
 .ds-footer-brand{gap:var(--s-sm);max-width:34ch}
