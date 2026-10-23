@@ -166,6 +166,15 @@ export const SiteKind = z.enum([
 ]);
 export type SiteKind = z.infer<typeof SiteKind>;
 
+export const ConceptSpec = z.object({
+  oneLiner: z.string().min(1),
+  metaphor: z.string().min(1),
+  rejects: z.array(z.string()).min(2),
+  visibleTests: z.array(z.string()).min(3),
+  siteKind: SiteKind,
+});
+export type ConceptSpec = z.infer<typeof ConceptSpec>;
+
 export const SkillNodeId = z.enum([
   "analyze-features-requirements",
   "design-system-foundation",
@@ -301,6 +310,11 @@ export const DesignBrief = z.object({
    * via `resolveRequestedCraft` in route.ts.
    */
   craftNodes: z.array(z.string()).default([]),
+  /**
+   * Optional theme id from `THEMES` (staged flow). When set, colour comes from the
+   * explicit theme, never from a product-name hash.
+   */
+  theme: z.string().optional(),
 });
 export type DesignBrief = z.infer<typeof DesignBrief>;
 
@@ -634,6 +648,9 @@ export const DesignSpec = z.object({
   /** Evidence corridors this composition was built against. */
   evidenceNotes: z.array(z.string()).default([]),
   summary: z.string(),
+  concept: ConceptSpec.optional(),
+  themeId: z.string().optional(),
+  theme: z.string().optional(),
 });
 export type DesignSpec = z.infer<typeof DesignSpec>;
 
@@ -641,6 +658,8 @@ export const DesignFromFeaturesRequest = z.object({
   brief: DesignBrief,
   /** Prior spec when regenerating — features still win; used for redesign continuity hints. */
   redesignFrom: DesignSpec.optional(),
+  /** Optional theme id. */
+  theme: z.string().optional(),
 });
 export type DesignFromFeaturesRequest = z.infer<typeof DesignFromFeaturesRequest>;
 

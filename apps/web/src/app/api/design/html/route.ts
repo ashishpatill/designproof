@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     if (!template) {
       return new NextResponse(`Unknown showcase "${key}"`, { status: 404 });
     }
-    const { spec, previewHtml } = designFromFeatures(template.brief);
+    const { spec, previewHtml } = designFromFeatures(template.brief, { theme: template.theme });
     recordTrainingEvent(
       "design",
       {

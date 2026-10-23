@@ -10,10 +10,12 @@ import { renderPreviewHtml } from "./render";
 import { routeSkills } from "./route";
 import { buildSections } from "./sections";
 import { AESTHETIC_PROFILES, buildTokens, tellDirectionForLean } from "./tokens";
+import { deriveConcept, getTheme, applyTheme } from "./staged";
 import {
   DesignBrief,
   DesignFromFeaturesResponse,
   DesignSpec,
+  DesignTokens,
   ResearchPlanSpec,
   TasteControls,
 } from "./types";
@@ -110,6 +112,8 @@ export type DesignFromFeaturesOptions = {
    * CI and callers without a model omit this — `copy.ts` tables stay in force.
    */
   authored?: AuthoredConnectiveTissue;
+  /** Optional theme id — applies brandAccent + colorMood to the brief. */
+  theme?: string;
 };
 
 /**
@@ -127,9 +131,21 @@ export function designFromFeatures(
 ): DesignFromFeaturesResponse {
   const brief = DesignBrief.parse(briefInput);
   const prior = options.redesignFrom ? DesignSpec.parse(options.redesignFrom) : undefined;
-  const taste = resolveTaste(brief);
+  const themeId = options.theme ?? brief.theme;
+  let theme: ReturnType<typeof getTheme>;
+  if (themeId) {
+    theme = getTheme(themeId);
+    if (!theme) throw new Error(`Unknown theme: ${themeId}`);
+  }
+  let taste = resolveTaste(brief);
+  if (theme) taste = applyTheme(taste, theme);
   const analysis = analyzeFeatures(brief);
-  const effectiveBrief: DesignBrief = { ...brief, siteKind: analysis.siteKind };
+  const effectiveBrief: DesignBrief = {
+    ...brief,
+    siteKind: analysis.siteKind,
+    brandAccent: brief.brandAccent ?? theme?.brandAccent,
+    theme: themeId,
+  };
 
   const sportCoreSix =
     analysis.sportId === "cricket" || analysis.sportId === "tennis"
@@ -156,7 +172,10 @@ export function designFromFeatures(
     researchPlan: researchPlanRaw,
     brief: effectiveBrief,
   });
-  const tokens = buildTokens(taste, analysis.siteKind, brief.brandAccent, brief.productName);
+  let tokens = buildTokens(taste, analysis.siteKind, effectiveBrief.brandAccent, effectiveBrief.productName);
+  if (theme) {
+    tokens = DesignTokens.parse({ ...tokens, color: { ...tokens.color, paper: theme.paper } });
+  }
   const authored =
     options.authored && isConnectiveAuthorEligible(effectiveBrief) ? options.authored : undefined;
   const sections = buildSections(effectiveBrief, analysis, taste, {
@@ -195,6 +214,8 @@ export function designFromFeatures(
                 "prefers-reduced-motion collapses every duration to zero",
               ];
 
+  const concept = deriveConcept(effectiveBrief);
+
   const customizationHints = [
     `Research gate: ${researchPlan.researchNodes.join(" → ")}`,
     researchPlan.packFound
@@ -213,6 +234,11 @@ export function designFromFeatures(
     `Rounding: ${taste.roundingDepth}`,
     "Reply with Taste Controls to regenerate without changing features.",
   ];
+
+  if (theme) {
+    customizationHints.push(`Theme: ${theme.id} — colour from explicit theme ${theme.label}, not product-name hash`);
+  }
+  customizationHints.push(`Concept: ${concept.oneLiner}`);
 
   if (researchPlan.followOnCraft.length) {
     customizationHints.push(`Follow-on craft: ${researchPlan.followOnCraft.join(", ")}`);
@@ -254,6 +280,9 @@ export function designFromFeatures(
     customizationHints,
     evidenceNotes,
     summary,
+    concept,
+    theme: theme?.id,
+    themeId: theme?.id,
   });
 
   return DesignFromFeaturesResponse.parse({
@@ -294,6 +323,7 @@ export async function designFromFeaturesAuthored(
   return designFromFeatures(brief, {
     redesignFrom: options.redesignFrom,
     authored,
+    theme: options.theme,
   });
 }
 

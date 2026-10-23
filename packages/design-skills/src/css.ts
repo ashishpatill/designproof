@@ -1057,7 +1057,8 @@ body[data-sitekind="editorial-foundry"]{
 /* Research dossier — folio masthead, chapter rail, dossier plate, verso/recto, imprint. */
 [data-sitekind="research-dossier"]{
   --align-rail:5.5rem;
-  --chapter-rail:4.25rem;
+  /* Keep the vertical chapter rail (numbers + labels) inside the viewport with a gutter of air on its right. */
+  --chapter-rail:calc(4.25rem + var(--gutter));
 }
 body[data-sitekind="research-dossier"]{
   background:
@@ -2368,6 +2369,7 @@ ${surfaceRules()}
 /* Never overflow:visible here. An SVG that paints outside its own box escapes the clip on the
  * band it belongs to, and a background field two screens down lands as stray marks on the fold. */
 .ds-fig{display:block;width:100%;height:auto;font-family:var(--f-body);overflow:hidden}
+.ds-fig--mobile,.ds-fig-mobile,.ds-mobile,.ds-fig[data-viewport="mobile"],.ds-fig[data-breakpoint="mobile"],.ds-fig[data-variant="mobile"],.ds-fig[data-device="mobile"],.ds-fig[data-responsive="mobile"],.ds-fig[data-mobile="true"]{display:none}
 .ds-fig text{font-family:var(--f-body)}
 .ds-fig .ds-fig-mono{font-family:var(--f-mono)}
 /* A rule stays a rule at any size.
@@ -2714,7 +2716,21 @@ ${surfaceRules()}
 @media (max-width:800px){
   .ds-chapter-rail{display:none}
   .ds-folio-masthead,.ds-folio-claim{padding-right:var(--gutter)}
-  .ds-folio-plate .ds-fig{min-height:min(58vh,560px)}
+  [data-sitekind="research-dossier"] .ds-folio-plate .ds-fig{min-height:0 !important;height:auto;max-height:52vh}
+  [data-sitekind="research-dossier"] .ds-folio-plate .ds-fig{min-height:0 !important;height:auto;max-height:none;aspect-ratio:4/3}
+  .ds-hero-folio{min-height:auto !important}
+  [data-sitekind="research-dossier"] .ds-folio-masthead{padding-top:var(--s-2xs);padding-bottom:var(--s-2xs)}
+  [data-sitekind="research-dossier"] .ds-folio-claim{padding:var(--s-xs) 0 var(--s-xs)}
+  [data-sitekind="research-dossier"] .ds-folio-claim .ds-hero-copy{gap:0.4rem}
+  [data-sitekind="research-dossier"] .ds-hero-folio .ds-lede{margin:0.25rem 0 0}
+  [data-sitekind="research-dossier"] .ds-hero-folio .ds-actions{margin-top:0.4rem}
+  .ds-fig--desktop,.ds-fig-desktop,.ds-desktop,.ds-fig[data-viewport="desktop"],.ds-fig[data-breakpoint="desktop"],.ds-fig[data-variant="desktop"],.ds-fig[data-device="desktop"],.ds-fig[data-responsive="desktop"],.ds-fig[data-mobile="false"]{display:none}
+  .ds-fig--mobile,.ds-fig-mobile,.ds-mobile,.ds-fig[data-viewport="mobile"],.ds-fig[data-breakpoint="mobile"],.ds-fig[data-variant="mobile"],.ds-fig[data-device="mobile"],.ds-fig[data-responsive="mobile"],.ds-fig[data-mobile="true"]{display:block}
+}
+@media (min-width:801px){
+  [data-sitekind="research-dossier"] .ds-folio-plate .ds-fig{min-height:0 !important;height:auto;max-height:31vh;width:100%;max-width:100%}
+  [data-sitekind="research-dossier"] .ds-folio-claim{padding:var(--s-xs) 0 var(--s-xs)}
+  [data-sitekind="research-dossier"] .ds-hero-folio{min-height:auto !important}
 }
 /* Verso/recto spread + footnote register. */
 .ds-spread-grid{

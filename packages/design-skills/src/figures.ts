@@ -196,7 +196,7 @@ function frame(body: string, o: FrameOptions): string {
  *  - `band`   — spanning the viewport, so wide and shallow enough to leave the fold readable
  *  - `plate`  — inside a container, between paragraphs
  */
-export type FigureRole = "column" | "band" | "plate";
+export type FigureRole = "column" | "band" | "plate" | "mobile";
 
 /**
  * How far a full-bleed drawing holds off the screen edge, as a share of its own width.
@@ -1128,8 +1128,10 @@ export function dossierPlate(
   role: FigureRole = "band",
 ): string {
   const r = rng(`${seed}:dossier`);
-  const W = role === "band" ? 1440 : role === "column" ? 640 : 920;
-  const H = role === "band" ? 820 : role === "column" ? 720 : 560;
+  // Band role: wide, shallow coordinate space so the plate fills a 1280x800 fold at
+  // <=36vh without letterboxing or stretching the drawing (uniform scale).
+  const W = role === "band" ? 1440 : role === "mobile" ? 640 : role === "column" ? 640 : 920;
+  const H = role === "band" ? 320 : role === "mobile" ? 480 : role === "column" ? 720 : 560;
   const padX = role === "band" ? W * 0.06 : W * 0.08;
   const padY = role === "band" ? H * 0.08 : H * 0.09;
   const parts: string[] = [];
@@ -1250,7 +1252,7 @@ export function dossierPlate(
     kind: "dossier-plate",
     // Product name only. "dossier plate" reached every aria-label, a pottery studio's included.
     label: productName,
-    inset: role === "band" ? BLEED_INSET : 0,
+    inset: 0,
   });
 }
 
@@ -2392,7 +2394,7 @@ export function queueConsole(
   const r = rng(`${seed}:queue`);
   const pad = W * 0.04;
   const parts: string[] = [];
-  const railW = W * 0.18;
+  const railW = W * 0.22;
   parts.push(box(pad, pad, railW, H - pad * 2, { r: 0, fill: "var(--c-paper-raised)", stroke: LINE }));
   parts.push(text("PRIORITY", pad + 16, pad + 28, { size: FIG_MONO_PX, fill: QUIET, mono: true, track: 1 }));
   items.forEach((b, i) => {
@@ -2406,7 +2408,7 @@ export function queueConsole(
         mono: true,
       }),
     );
-    parts.push(text(clip(b.title, 16), pad + 48, y, { size: 13, fill: INK, weight: lead ? 600 : 500 }));
+    parts.push(text(b.title, pad + 48, y, { size: 13, fill: INK, weight: lead ? 600 : 500 }));
     if (numbers) {
       const delta = lead ? "+3" : r() > 0.5 ? "−1" : "0";
       parts.push(

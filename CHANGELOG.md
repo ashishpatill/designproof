@@ -1,6 +1,44 @@
 # Changelog
 
+## 2026-10-18 — Research-dossier responsive plate fix
+
+- Mobile (max-width:800px): emit a second taller dossier-plate variant (640x480, 4:3) shown only on mobile, with legible labels at 390px; desktop 1440x320 wide-shallow plate and CSS unchanged.
+
+## 2026-10-18 — Research-dossier plate visual full-width fix
+
+- Desktop (min-width 801px): widened the dossier-plate coordinate space (1440×320) and removed the bleed inset so the plate fills the fold width at a uniform scale with capped height <=36vh instead of letterboxing; mobile 390 and other templates unchanged.
+
+## 2026-10-18 — Research-dossier desktop plate full-width fix
+
+- Desktop (min-width 801px): `.ds-folio-plate .ds-fig` now spans full content width (`width:100%`) with capped height (`max-height:36vh`) instead of shrinking to its intrinsic aspect; SVG preserveAspectRatio keeps the drawing legible.
+
+## 2026-10-18 — Research-dossier desktop first-screen fix
+
+- Desktop (min-width 801px): capped the dossier thesis-map plate figure height (max-height 36vh) and tightened the folio claim padding so masthead, headline, lede, CTA and the full plate fit within the first screen at 1280x800; hero min-height no longer forces the plate below the fold. Dossier-gated only.
+- Kept chapter-rail calc fix, mobile 390 first-screen behaviour, and typographic Priorities (no grey bars).
+
+## 2026-10-18 — Research-dossier specimen polish
+
+- Chapter rail: widened `--chapter-rail` by the gutter so the numbered rail (numbers + vertical labels) sits fully inside the desktop viewport instead of clipping at the right edge.
+- Mobile (390): tightened folio hero spacing and let the dossier plate use its natural aspect (no forced min-height) so headline, lede, CTA and the plate show in the first screen without shrinking text.
+- Priorities: removed grey placeholder thumbnail bars/marks from the dossier priorities section, leaving typographic rows; dossier-gated only.
+
+## 2026-10-18 — Dossier rebuild through staged concept-first flow
+
+- Rebuilt the research-dossier template/specimen around the `research-dossier` concept (folio masthead with chapter rail) using the staged primitives: explicit `ink-paper` theme from `THEMES`, concept attached to the spec, theme accent/paper driving tokens.
+- Added optional `theme` to `DesignBrief` and `DesignTemplate`; dossier template carries `theme: "ink-paper"` and `brief.theme`.
+- `designFromFeatures` now resolves theme from `options.theme ?? brief.theme` and overrides token paper with the theme paper.
+- Showcase/API routes pass `template.theme` when generating dossier HTML.
+- Added staged rebuild plan at `/workspace/designproof-revamp-verification/dossier-rebuild/plan.md`.
+
 Notable Tell Proof work, newest first. Dates follow `git log`. This is not a semver release log.
+
+## 2026-10-18 — Studio first-screen staged panel + SaaS rail labels
+
+- Moved the Studio concept-first staged-run panel directly under the page header so theme picker, concept card, and stage Approve controls are visible without scrolling at 1280 and 390.
+- Improved staged panel spacing and responsive stacking (no tiny 3-column squeeze on mobile).
+- SaaS specimen queue console no longer clips rail labels (Account scoring, Pipeline coaching, Territory modelling render in full).
+- Swap result now states the ≥50% pass threshold and 0% for identical input; removed unsupported 83% wording.
 
 Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app design across many sessions — an independent critic and craft layer beside the coding agent. It is not a Studio web app as the product.
 
@@ -70,6 +108,17 @@ Tell Proof is the **Cursor / Grok Build plugin** for world-class site and app de
 - The priorities section groups the capabilities by the priority the brief gives (core, supporting, additional). Each tier cites index numbers, not names again. With a single priority the section is left out; specimen craft stays on the fold.
 - The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Steer the Kilnroom course with kiln calendar." and "Four more capabilities sit in the index above." The buttons read "See the session" and "Read all five capabilities". The menu reads Session / Capabilities / Start. The page description is the product's own tagline and audience.
 - On four sample briefs, the template's score on this measure went from 190 to 124. Lantern and clinic four-brief rep/lead/any ranges stayed the same. New styles sit only in the control-plane-oss motion-signature block. New test: `packages/design-skills/src/__tests__/keel-template-once.test.ts`.
+
+---
+
+## 2026-10-15 — Research dossier template says each thing once
+
+- The research dossier page drops the figure band (a "cost · cumulative" chart with made-up values under "how X maps a briefing", which named the instruments twice more) and the specimen band, which printed every description again under "X field plate". It goes from nine sections to seven: first screen, one index, the priorities, questions, closing, footer.
+- Each instrument description is printed once, in the index. Before, the first screen printed the lead description under the headline, the index printed bare names (three or four of them, whatever the brief gave) under "instruments a capital brief actually uses" and "not a dashboard dressed as research", beside a "how it is put together" list that named them again, the specimen band printed every description, and the verso/recto spread printed them a third time as "Step 01" under "how a brief is actually read". The index now holds every instrument, numbered 01 onward, each with its sentence. Its title is the product's own ("Kilnroom, instrument by instrument").
+- The first screen names each instrument once, on the dossier plate and in the chapter rail. The rail used to point at #figure / #story / #proof bands; it now jumps to each index row. The masthead no longer prints "Vol. XII" / "Issue 03" on every product. The plate no longer says "1 briefing unit" or "· dossier plate".
+- The priorities group the instruments by the priority the brief gives (core, supporting, additional). With a single priority the section is left out.
+- The questions, the closing line, and the buttons are built from the brief. The answers no longer promise cancelling anytime, a comparison table, "one session" on the reader's data, a person for procurement, "no hidden tier", or that every capability ships "from day one". The close says "Start the Kilnroom brief with kiln calendar." and "Four more instruments sit in the index above." The buttons read "Open the brief" and "Read all five instruments". The menu reads Instruments, Priorities, Questions. The page description is the product's own tagline and audience.
+- On four sample briefs, the template's score on this measure went from 309 to 100. New styles sit only in the dossier motion-signature block. New test: `packages/design-skills/src/__tests__/dossier-template-once.test.ts`.
 
 ---
 

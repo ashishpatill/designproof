@@ -141,15 +141,16 @@ describe("research dossier template says each thing once", () => {
     }
   });
 
-  it("names each instrument once on the plate, once in the index, and the lead once more in the close; the priorities give index numbers", async () => {
+  it("names each instrument once per plate variant, once in the index, and the lead once more in the close; the priorities give index numbers", async () => {
     for (const brief of briefs.slice(1)) {
       for (const html of [designFromFeatures(brief).previewHtml, (await designFromFeaturesAuthored(brief, {})).previewHtml]) {
         const text = visible(html);
         const plate = plateOf(html);
         for (const [i, f] of brief.features.entries()) {
-          // Plate (drawn text) and index in the page text, plus the close for the lead. Priorities cite numbers.
+          // Both plate variants (desktop and mobile, one shown per viewport) and the index in the
+          // page text, plus the close for the lead. Priorities cite numbers.
           // Plate names are inside the SVG so they count in visible() after tag strip.
-          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 3 : 2);
+          expect(text.split(f.name.toLowerCase()).length - 1, `${brief.productName}: ${f.name}`).toBe(i === 0 ? 4 : 3);
           expect(plate.split(`>${nn(i)} ${f.name.slice(0, 17)}`).length - 1, `${brief.productName} plate: ${f.name}`).toBe(1);
         }
       }

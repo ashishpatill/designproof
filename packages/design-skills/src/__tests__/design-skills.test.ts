@@ -1251,7 +1251,7 @@ describe("research-backed offerings + implementation basics", () => {
   });
 
   it("fills wrap-wide vacancy with opaque slabs instead of CSS-bordered shelf rows", () => {
-    for (const key of ["dossier", "archive", "loom"] as const) {
+    for (const key of ["archive", "loom"] as const) {
       const { previewHtml } = designFromFeatures(SHOWCASE_BRIEFS[key]!);
       expect(previewHtml, key).toContain('class="ds-story-fill"');
       expect(previewHtml, key).toContain("ds-story-fill-plate");

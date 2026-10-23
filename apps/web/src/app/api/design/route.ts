@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     if (typeof body.query === "string" && body.query.trim()) {
       const { brief, plan } = briefFromFreeText(body.query);
-      const result = designFromFeatures(brief);
+      const result = designFromFeatures(brief, { theme: typeof body.theme === "string" ? body.theme : undefined });
       recordDesignResult(result, {
         via: "api.design.post.query",
         siteKind: brief.siteKind,
@@ -68,6 +68,7 @@ export async function POST(req: Request) {
     const result = await designFromFeaturesAuthored(parsed.brief, {
       redesignFrom: parsed.redesignFrom,
       apiKey,
+      theme: parsed.theme,
     });
     recordDesignResult(result, {
       via: "api.design.post",
@@ -110,7 +111,7 @@ export async function GET(req: Request) {
     if (!template) {
       return NextResponse.json({ error: `Unknown showcase "${key}"` }, { status: 404 });
     }
-    const result = designFromFeatures(template.brief);
+    const result = designFromFeatures(template.brief, { theme: template.theme });
     recordDesignResult(result, {
       via: "api.design.get",
       showcaseKey: key,
