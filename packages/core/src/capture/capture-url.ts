@@ -104,6 +104,64 @@ const SAMPLE_SELECTORS = [
 const MAX_INLINE_CSS = 400_000;
 const MAX_SNAPSHOT = 2_600_000;
 
+/**
+ * Measures the first screen as a reader sees it (no image decoding). Runs as an
+ * expression string so tsx/esbuild's `__name` helper never leaks into the page.
+ * Shape must stay in sync with `FirstFold` in @tell/schema.
+ */
+const FOLD_PROBE_SOURCE = `(() => {
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  const intersects = (r) => r.width > 0 && r.height > 0 && r.top < vh && r.bottom > 0;
+  let textChars = 0;
+  let largestTextPx = 0;
+  const walker = document.createTreeWalker(document.body, 4);
+  let node;
+  while ((node = walker.nextNode())) {
+    const text = (node.textContent || "").trim();
+    if (!text) continue;
+    const el = node.parentElement;
+    if (!el) continue;
+    const style = getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    let visible = false;
+    for (const r of Array.from(range.getClientRects())) {
+      if (intersects(r)) { visible = true; break; }
+    }
+    if (!visible) continue;
+    textChars += text.length;
+    largestTextPx = Math.max(largestTextPx, parseFloat(style.fontSize) || 0);
+  }
+  const headingEntries = Array.from(document.querySelectorAll("h1, h2, h3")).map((el) => ({
+    el,
+    rect: el.getBoundingClientRect(),
+  })).filter((entry) => entry.rect.width > 0 && entry.rect.height > 0);
+  const title = headingEntries.find((entry) => entry.el.tagName === "H1") ?? headingEntries[0] ?? null;
+  let mediaArea = 0;
+  for (const el of Array.from(document.querySelectorAll("img, video, picture, canvas, svg"))) {
+    const r = el.getBoundingClientRect();
+    if (!intersects(r)) continue;
+    const h = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    const w = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0));
+    mediaArea += h * w;
+  }
+  return {
+    foldHeight: vh,
+    textChars: Math.round(textChars),
+    headingCount: headingEntries.filter((entry) => intersects(entry.rect)).length,
+    buttonCount: Array.from(document.querySelectorAll("button, a[role='button']"))
+      .filter((el) => intersects(el.getBoundingClientRect())).length,
+    mediaAreaRatio: Math.min(1, mediaArea / Math.max(1, vw * vh)),
+    largestTextPx: Math.round(largestTextPx),
+    titleTopY: title ? Math.round(title.rect.top) : -1,
+    titleBottomY: title ? Math.round(title.rect.bottom) : -1,
+    titleFontPx: title ? Math.round(parseFloat(getComputedStyle(title.el).fontSize) || 0) : 0,
+    overflowXPx: Math.max(0, Math.round(document.documentElement.scrollWidth - document.documentElement.clientWidth)),
+  };
+})()`;
+
 async function captureViewportSummary(page: Page, preset: ViewportMatrixEntry["preset"], width: number, height: number) {
   await page.setViewportSize({ width, height });
   await page.waitForTimeout(250);
@@ -123,7 +181,8 @@ async function captureViewportSummary(page: Page, preset: ViewportMatrixEntry["p
       emojiInUiCount,
     };
   });
-  return ViewportMatrixEntry.parse({ preset, width, height, screenshotBase64, domSummary });
+  const fold = await page.evaluate(FOLD_PROBE_SOURCE);
+  return ViewportMatrixEntry.parse({ preset, width, height, screenshotBase64, fold, domSummary });
 }
 
 export async function captureUrl(url: string, options: CaptureUrlOptions = {}): Promise<CapturePayload> {
@@ -369,6 +428,9 @@ export async function captureUrl(url: string, options: CaptureUrlOptions = {}): 
       [SAMPLE_SELECTORS, MAX_INLINE_CSS, MAX_SNAPSHOT] as const,
     );
 
+    // First-screen sample for the primary viewport (frame / title-on-fold tells).
+    const fold = await page.evaluate(FOLD_PROBE_SOURCE);
+
     const stateShots: { selector: string; state: "default" | "hover" | "focus"; imageBase64: string }[] = [];
     for (const probe of payload.probes.slice(0, 4)) {
       try {
@@ -416,6 +478,7 @@ export async function captureUrl(url: string, options: CaptureUrlOptions = {}): 
       screenshotBase64,
       stateShots,
       viewportMatrix,
+      fold,
       ...payload,
     });
   } finally {

@@ -215,6 +215,8 @@ export async function handleProofVerify(args: {
   projectRoot?: string;
   waitMs?: number;
   revertOnFail?: boolean;
+  screenshotDir?: string;
+  maxCritiqueRounds?: number;
 }): Promise<Awaited<ReturnType<typeof verifyProofPatch>>> {
   const projectRoot = args.projectRoot ?? process.cwd();
   const result = await verifyProofPatch({
@@ -223,6 +225,8 @@ export async function handleProofVerify(args: {
     projectRoot,
     waitMs: args.waitMs,
     revertOnFail: args.revertOnFail,
+    screenshotDir: args.screenshotDir,
+    maxCritiqueRounds: args.maxCritiqueRounds,
   });
   recordTrainingEvent(
     "proof",
@@ -230,6 +234,7 @@ export async function handleProofVerify(args: {
       mode: "patch",
       status: result.status,
       proof: result.proof,
+      critique: result.critique,
       beforeReport: result.beforeReport,
       afterReport: result.afterReport,
       patch: args.patch,

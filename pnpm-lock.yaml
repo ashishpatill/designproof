@@ -160,6 +160,9 @@ importers:
       '@tell/schema':
         specifier: workspace:*
         version: link:../schema
+      '@tell/taste':
+        specifier: workspace:*
+        version: link:../taste
       playwright:
         specifier: ^1.49.1
         version: 1.61.1

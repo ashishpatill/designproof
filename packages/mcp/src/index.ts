@@ -183,16 +183,26 @@ server.tool(
 
 server.tool(
   "tell_proof_verify",
-  "Apply a candidate patch in the project workspace, recapture the live URL, and return an independent pass/review/fail verdict with before/after scores. Failed attempts auto-revert when revertOnFail is true (default). Requires a reachable dev server at url. When a sibling tell-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
+  "Apply a candidate patch in the project workspace, recapture the live URL, and return an independent pass/review/fail verdict with before/after scores plus a bounded screenshot critique (max 3 rounds; notes cite written PNG paths). Failed attempts auto-revert when revertOnFail is true (default). Requires a reachable dev server at url. When a sibling tell-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
   {
     url: z.string().url(),
     patch: z.string().min(1),
     projectRoot: z.string().optional(),
     waitMs: z.number().int().min(0).max(30_000).optional(),
     revertOnFail: z.boolean().optional(),
+    screenshotDir: z.string().optional(),
+    maxCritiqueRounds: z.number().int().min(1).max(3).optional(),
   },
-  async ({ url, patch, projectRoot, waitMs, revertOnFail }) => {
-    const result = await handleProofVerify({ url, patch, projectRoot, waitMs, revertOnFail });
+  async ({ url, patch, projectRoot, waitMs, revertOnFail, screenshotDir, maxCritiqueRounds }) => {
+    const result = await handleProofVerify({
+      url,
+      patch,
+      projectRoot,
+      waitMs,
+      revertOnFail,
+      screenshotDir,
+      maxCritiqueRounds,
+    });
     return asJson(result);
   },
 );

@@ -5,6 +5,7 @@ import { DIRECTION_PRESETS } from "./presets";
 
 export * from "./engine";
 export * from "./parse-direction";
+export * from "./critique-loop";
 export { DIRECTION_PRESETS } from "./presets";
 
 /** Deterministic single-finding verdict (offline-safe). */

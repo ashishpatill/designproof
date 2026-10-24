@@ -7,6 +7,7 @@ Learned from the Oct 2026 shortlist in [`design-engine-revamp-plan.html`](../des
 Near-term:
 
 - [anti-slop](./designproof-anti-slop.md) — detectors for `tell_proof_verify` / planned `tell_review`
+- [tells registry](./designproof-tells-registry.md) — dated ban / warn rows with replacement procedures
 - [diagram](./designproof-diagram.md) — HTML+SVG on our tokens
 - [demo/promo](./designproof-demo-promo.md) — film verified specimens only
 - [taste](./designproof-taste.md) — art direction from the subject, multi-width browser check, screenshot critique loop

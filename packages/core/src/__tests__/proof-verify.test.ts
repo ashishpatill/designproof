@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { CapturePayload, DesignFingerprint, ScenarioMatrix } from "@tell/schema";
-import { compareProofMatrices, compareProofReports } from "../proof-verify";
+import { mkdtempSync, existsSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { CapturePayload, DesignFingerprint, Finding, ScenarioMatrix } from "@tell/schema";
+import { buildProofCritique, compareProofMatrices, compareProofReports } from "../proof-verify";
 import { buildScenario } from "../capture/scenario-matrix";
+import { MAX_CRITIQUE_ROUNDS } from "@tell/taste";
 
 function axis(key: "contrast" | "typescale" | "spacing" | "depth" | "accent" | "identity", before: number, after: number) {
   return {
@@ -109,6 +113,97 @@ describe("compareProofReports", () => {
     const after = stubReport("after", 4, 0.5, 5, 4, 20);
     const { status } = compareProofReports(before, after, "http://localhost:3000");
     expect(status).toBe("failed");
+  });
+
+  it("fails on a banned frame tell even when the score improves", () => {
+    const before = stubReport("before", 8, 0.8, 5, 4, 20);
+    const after = {
+      ...stubReport("after", 4, 0.8, 5, 4, 20),
+      findings: [
+        Finding.parse({
+          id: "tell-title-on-fold",
+          family: "tell",
+          detector: "TitleOnFoldTell",
+          verdictHint: "generic",
+          severity: "high",
+          facts: { position: "below-fold" },
+          evidence: [{ kind: "computed", label: "Primary title vs fold", value: "1180px vs 1100px" }],
+          fixHint: "Fit the title and one action above the fold line.",
+        }),
+      ],
+    };
+    const { status, proof } = compareProofReports(before, after, "http://localhost:3000");
+    expect(proof.scoreDelta).toBeLessThan(0);
+    expect(proof.bannedTellsAfter).toEqual(["tell-title-on-fold"]);
+    expect(status).toBe("failed");
+  });
+
+  it("attaches a bounded critique with the round cap visible", () => {
+    const before = stubReport("before", 8, 0.8, 5, 4, 20);
+    const after = {
+      ...stubReport("after", 4, 0.8, 5, 4, 20),
+      findings: [
+        Finding.parse({
+          id: "tell-blank-stretch",
+          family: "tell",
+          detector: "BlankStretchTell",
+          verdictHint: "generic",
+          severity: "medium",
+          facts: { largestGapPx: 820 },
+          evidence: [{ kind: "computed", label: "Dead vertical bands", value: "820px gap after y=640" }],
+          fixHint: "Fill the dead band or remove the spacing.",
+        }),
+      ],
+    };
+    const { critique } = compareProofReports(before, after, "http://localhost:3000");
+    expect(critique.maxRounds).toBe(MAX_CRITIQUE_ROUNDS);
+    expect(critique.roundsUsed).toBe(0);
+    expect(critique.source).toBe("report-only");
+    expect(critique.rounds[0]!.findings).toEqual(["tell-blank-stretch"]);
+    expect(critique.rounds[0]!.notes[0]).toMatch(/No screenshot path was persisted/);
+  });
+});
+
+describe("buildProofCritique", () => {
+  it("writes before/after PNGs and cites their paths in the round notes", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "tell-critique-test-"));
+    try {
+      const before = stubReport("before", 8, 0.8, 5, 4, 20);
+      const after = {
+        ...stubReport("after", 4, 0.8, 5, 4, 20),
+        findings: [
+          Finding.parse({
+            id: "tell-title-on-fold",
+            family: "tell",
+            detector: "TitleOnFoldTell",
+            verdictHint: "generic",
+            severity: "high",
+            facts: { position: "below-fold" },
+            evidence: [{ kind: "computed", label: "Primary title vs fold", value: "1180px vs 1100px" }],
+            fixHint: "Fit the title and one action above the fold line.",
+          }),
+        ],
+      };
+      const critique = await buildProofCritique({ before, after, screenshotDir: dir, status: "review" });
+      expect(critique.source).toBe("screenshots");
+      expect(critique.screenshots.map((shot) => shot.phase)).toEqual(["before", "after"]);
+      for (const shot of critique.screenshots) {
+        expect(existsSync(shot.path)).toBe(true);
+        expect(shot.path.startsWith(dir)).toBe(true);
+      }
+      expect(critique.rounds[0]!.notes[0]).toContain(path.join(dir, "after-primary.png"));
+      expect(readFileSync(critique.screenshots[1]!.path).length).toBeGreaterThan(0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("says the gate failed without inventing screenshots", async () => {
+    const report = stubReport("before", 8, 0.8, 5, 4, 20);
+    const critique = await buildProofCritique({ before: report, after: report, status: "failed" });
+    expect(critique.source).toBe("report-only");
+    expect(critique.screenshots).toEqual([]);
+    expect(critique.nextAction.startsWith("Gate failed.")).toBe(true);
   });
 });
 

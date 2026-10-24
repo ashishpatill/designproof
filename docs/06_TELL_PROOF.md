@@ -58,6 +58,8 @@ Each cell is a replayable `CapturePayload` tagged with scenario dimensions. Auth
 
 `ResponsiveViewportDrift` fires when tablet/mobile `viewportMatrix` summaries lose ≥40% of desktop headings or buttons.
 
+Frame / first-screen tells read `capture.fold` and `viewportMatrix[].fold` (text, headings, buttons, media, title box, overflow) rather than screenshot bytes: `TitleOnFoldTell` (ban), `MobileFirstScreenTell` (ban), `FrameGutterTell` (warn), `BlankStretchTell` (warn). Bans fail `tell_proof_verify` on their own. Rows and replacement procedures live in [`docs/skills/designproof-tells-registry.md`](./skills/designproof-tells-registry.md); the result also carries a bounded `critique` block (max 3 rounds, cited screenshot paths).
+
 ## Why this belongs beside Cursor
 
 Cursor already has strong authoring, visual prompting, browser control, cloud execution, and code review. Tell Proof is complementary infrastructure:

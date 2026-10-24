@@ -4,7 +4,8 @@
     "outDir": "dist",
     "paths": {
       "@tell/redesign": ["../redesign/src"],
-      "@tell/schema": ["../schema/src"]
+      "@tell/schema": ["../schema/src"],
+      "@tell/taste": ["../taste/src"]
     }
   },
   "include": ["src"]
