@@ -53,7 +53,7 @@ Load: read `.cursor/skills/<name>/SKILL.md` (many have a twin under `agent-skill
 
 ## External design & motion skills (shortlist)
 
-Not shipped as Tell MCP tools. CEO Oct 2026 shortlist (impeccable, UI UX Pro Max, diagram-design, Remotion + video-shotcraft keep; Blender / img2threejs / HyperFrames / lemo-opuscar later; Penpot skip while Figma is primary) lives in [`design-engine-revamp-plan.html`](./design-engine-revamp-plan.html#2b-external-design-motion-skills-oct-2026-shortlist) §2b. Adopt as craft / proof / demo layers only — do not invent catalog entries here until a skill is actually onboarded in-repo.
+Not shipped as Tell MCP tools. Design Expert Oct 2026 engine plug-in shortlist (keep: impeccable, diagram-design, video-shotcraft, HyperFrames, Remotion; later: UI UX Pro Max for ConceptSpec rejects only, img2threejs, Penpot Figma-fallback; skip: Blender MCP, lemo-opuscar) lives in [`design-engine-revamp-plan.html`](./design-engine-revamp-plan.html#2b-external-design-motion-skills-oct-2026-shortlist) §2b. Craft / proof / demo layers only — do not invent catalog entries here until a skill is actually onboarded in-repo.
 
 ---
 
