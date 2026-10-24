@@ -78,6 +78,38 @@
       "flipThreshold": "emojiInUiCount ≥ 3"
     },
     {
+      "id": "T10",
+      "name": "Title lost at the fold",
+      "detector": "TitleOnFoldTell",
+      "family": "tell",
+      "signature": "Primary title starts below the first screen or is cut by it",
+      "flipThreshold": "capture.fold present AND (titleTopY ≥ foldHeight OR titleBottomY > foldHeight)"
+    },
+    {
+      "id": "T11",
+      "name": "One centred column",
+      "detector": "FrameGutterTell",
+      "family": "tell",
+      "signature": "Every wide band sits in the same centred column with equal side margins",
+      "flipThreshold": "≥3 wide bands, ≥80% on one symmetric gutter of 4–32% viewport width"
+    },
+    {
+      "id": "T12",
+      "name": "Blank stretch",
+      "detector": "BlankStretchTell",
+      "family": "tell",
+      "signature": "Dead vertical band between two content runs, taller than half a screen",
+      "flipThreshold": "merged reading-block gap ≥ max(320px, 55% of fold)"
+    },
+    {
+      "id": "T13",
+      "name": "Phone first screen not composed",
+      "detector": "MobileFirstScreenTell",
+      "family": "tell",
+      "signature": "Mobile fold has no title, starved text, an image-only fold, or sideways overflow",
+      "flipThreshold": "mobile fold sample present AND any of: title below/cut by fold, overflowXPx > 4, textChars < 25% of desktop (min 24), mediaAreaRatio ≥ 0.7 with < 60 chars, largestTextPx < 20 vs desktop ≥ 32"
+    },
+    {
       "id": "D1",
       "name": "Token bypass",
       "detector": "TokenBypass",

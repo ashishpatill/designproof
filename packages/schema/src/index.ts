@@ -75,11 +75,42 @@ export type SurfaceTokens = z.infer<typeof SurfaceTokens>;
 export const ViewportPreset = z.enum(["desktop", "tablet", "mobile"]);
 export type ViewportPreset = z.infer<typeof ViewportPreset>;
 
+/**
+ * What a reader actually sees before scrolling, measured in the rendered page.
+ * Frame detectors (`TitleOnFoldTell`, `MobileFirstScreenTell`) read this instead of
+ * guessing from screenshot bytes — no image decoding, no LLM.
+ * Optional on captures: older fixtures and offline reports predate the probe.
+ */
+export const FirstFold = z.object({
+  /** `window.innerHeight` at capture time — the fold line in CSS px. */
+  foldHeight: z.number(),
+  /** Characters of real text whose glyph boxes intersect the fold. */
+  textChars: z.number().default(0),
+  /** Headings (h1–h3) intersecting the fold. */
+  headingCount: z.number().default(0),
+  /** Buttons and button-role links intersecting the fold. */
+  buttonCount: z.number().default(0),
+  /** 0..1 — share of the fold covered by img/video/canvas/svg boxes. */
+  mediaAreaRatio: z.number().default(0),
+  /** Largest rendered font-size among text visible in the fold. */
+  largestTextPx: z.number().default(0),
+  /** Top of the page's primary title (first h1, else first heading). -1 when none. */
+  titleTopY: z.number().default(-1),
+  /** Bottom of the primary title. -1 when none. */
+  titleBottomY: z.number().default(-1),
+  /** Rendered font-size of the primary title. */
+  titleFontPx: z.number().default(0),
+  /** Horizontal overflow of the document (scrollWidth - clientWidth), in px. */
+  overflowXPx: z.number().default(0),
+});
+export type FirstFold = z.infer<typeof FirstFold>;
+
 export const ViewportMatrixEntry = z.object({
   preset: ViewportPreset,
   width: z.number(),
   height: z.number(),
   screenshotBase64: z.string(),
+  fold: FirstFold.optional(),
   domSummary: z.object({
     headingCount: z.number(),
     buttonCount: z.number(),
@@ -131,6 +162,8 @@ export const CapturePayload = z.object({
   stateShots: z.array(StateProbeShot).default([]),
   /** Tablet + mobile captures for responsive drift checks; desktop lives in the primary fields above. */
   viewportMatrix: z.array(ViewportMatrixEntry).default([]),
+  /** First-screen (fold) measurement for the primary viewport. */
+  fold: FirstFold.optional(),
   domSummary: z.object({
     headingCount: z.number(),
     buttonCount: z.number(),
@@ -176,6 +209,40 @@ export const ProofMatrixResult = z.object({
 });
 export type ProofMatrixResult = z.infer<typeof ProofMatrixResult>;
 
+/** One screenshot the critique cites. `path` is written to disk; empty when not persisted. */
+export const CritiqueScreenshot = z.object({
+  label: z.string(),
+  viewport: z.string(),
+  phase: z.enum(["before", "after"]),
+  path: z.string().default(""),
+  capturedAt: z.string().optional(),
+});
+export type CritiqueScreenshot = z.infer<typeof CritiqueScreenshot>;
+
+/** One bounded look → name → fix round. Notes cite screenshot paths, never source files. */
+export const CritiqueRound = z.object({
+  index: z.number().int().positive(),
+  focus: z.array(z.string()),
+  findings: z.array(z.string()),
+  status: z.enum(["open", "fixed", "remaining"]),
+  notes: z.array(z.string()),
+});
+export type CritiqueRound = z.infer<typeof CritiqueRound>;
+
+/**
+ * Bounded screenshot critique attached to a proof result. `maxRounds` is always
+ * visible so no loop can run forever; rounds are capped by packages/taste.
+ */
+export const ProofCritique = z.object({
+  maxRounds: z.number().int().positive(),
+  roundsUsed: z.number().int().nonnegative(),
+  rounds: z.array(CritiqueRound),
+  screenshots: z.array(CritiqueScreenshot),
+  source: z.enum(["screenshots", "report-only"]),
+  nextAction: z.string(),
+});
+export type ProofCritique = z.infer<typeof ProofCritique>;
+
 export const DesignFingerprint = z.object({
   url: z.string(),
   generatedAt: z.string(),
@@ -212,6 +279,11 @@ export const TellDetector = z.enum([
   "CenteredEverythingTell",
   "GrayMushTell",
   "BoilerplateCopyTell",
+  // Frame / first-screen tells — measured from first-fold samples and rendered boxes.
+  "TitleOnFoldTell",
+  "FrameGutterTell",
+  "BlankStretchTell",
+  "MobileFirstScreenTell",
 ]);
 export type TellDetector = z.infer<typeof TellDetector>;
 
@@ -244,6 +316,11 @@ export const Finding = z.object({
   facts: z.record(z.any()),
   evidence: z.array(Evidence),
   severity: z.enum(["high", "medium", "low"]).default("medium"),
+  /**
+   * Plain-language next move. A procedure ("derive the headline from the subject,
+   * then re-check the fold"), never a fixed font/colour recipe.
+   */
+  fixHint: z.string().optional(),
 });
 export type Finding = z.infer<typeof Finding>;
 

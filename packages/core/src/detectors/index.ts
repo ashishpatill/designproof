@@ -1,8 +1,17 @@
 import { CapturePayload, DesignFingerprint, Finding } from "@tell/schema";
 import { hexToRgb, saturation } from "../fingerprint/build-fingerprint";
 import { detectDesignSystemDrift, parseDesignDoc, type DesignDocSpec } from "./design-system-drift";
+import { detectFrameFindings } from "./frame";
 
 export { parseDesignDoc, parseDesignTokens, type DesignDocSpec } from "./design-system-drift";
+export {
+  TELLS_REGISTRY,
+  PROOF_GATE_BANS,
+  fixHintFor,
+  tellRegistryEntry,
+  type TellRegistryEntry,
+} from "./tells-registry";
+export { detectFrameFindings } from "./frame";
 
 const evidence = (label: string, value: string, selector?: string) => [{ kind: "computed" as const, label, value, selector }];
 
@@ -259,6 +268,9 @@ export function detectFindings(
   const designSpec = typeof opts?.designDoc === "string" ? parseDesignDoc(opts.designDoc) : opts?.designDoc;
   const designFinding = detectDesignSystemDrift(fingerprint, designSpec);
   if (designFinding) findings.push(designFinding);
+
+  // Frame / first-screen tells — measured from fold samples and rendered boxes.
+  findings.push(...detectFrameFindings(capture));
 
   // ResponsiveViewportDrift — non-desktop viewports lose structure vs a desktop baseline.
   // Baseline is always desktop: primary domSummary when the matrix is tablet/mobile-only,

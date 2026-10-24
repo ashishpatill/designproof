@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-24 — Frame / multi-width tells and bounded critique in `tell_proof_verify`
+
+- Added four frame tells that read rendered boxes and first-fold samples, not screenshot bytes or a model: `TitleOnFoldTell` (`tell-title-on-fold`), `FrameGutterTell` (`tell-frame-gutter`), `BlankStretchTell` (`tell-blank-stretch`), `MobileFirstScreenTell` (`tell-mobile-first-screen`). Each finding carries deterministic `facts`, evidence (including a screenshot region), and a `fixHint` procedure.
+- `TitleOnFoldTell` and `MobileFirstScreenTell` are registry **bans**: `verdictFromProof` now fails the gate while the after capture still ships either one, even if the score improved. `FrameGutterTell` and `BlankStretchTell` warn.
+- Capture records a `FirstFold` sample per viewport (`capture.fold`, `viewportMatrix[].fold`): text characters, headings, buttons, media coverage, largest type, primary-title box, horizontal overflow. Older fixtures without a fold stay silent — no retro-failing.
+- Added the dated tells registry (`packages/core/src/detectors/tells-registry.ts`, rendered in `docs/skills/designproof-tells-registry.md`): ban/warn, `since` date, `enforcedInProof`, and a replacement *procedure* per row — no fixed font/colour recipes.
+- Added bounded critique scaffolding in `packages/taste` (`planCritiqueRounds`, `closeCritiqueRound`, caps 3 rounds × 3 fixes) and attached a `critique` block to the `tell_proof_verify` result: `maxRounds`, `roundsUsed`, planned rounds, cited screenshot paths written to disk, `nextAction`. No new MCP tool — the catalog stays at eleven.
+- Failing fixtures and clean specimens for all four tells; taxonomy fixture rows T10–T13; the existing 14-detector golden set is unchanged.
+
+
 ## 2026-10-18 — Research-dossier responsive plate fix
 
 - Mobile (max-width:800px): emit a second taller dossier-plate variant (640x480, 4:3) shown only on mobile, with legible labels at 390px; desktop 1440x320 wide-shallow plate and CSS unchanged.

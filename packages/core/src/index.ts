@@ -21,5 +21,7 @@ export {
   revertProofPatch,
   compareProofReports,
   compareProofMatrices,
+  buildProofCritique,
   type ProofVerifyResult,
+  type ProofVerifyOptions,
 } from "./proof-verify";

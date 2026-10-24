@@ -1,9 +1,20 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
-import { ProofMatrixResult, type ScenarioMatrix, type TellReport } from "@tell/schema";
+import {
+  ProofMatrixResult,
+  type CritiqueScreenshot,
+  type ProofCritique,
+  type ScenarioMatrix,
+  type TellDetector,
+  type TellReport,
+} from "@tell/schema";
+import { MAX_CRITIQUE_ROUNDS, planCritiqueRounds } from "@tell/taste";
 import { captureUrl } from "./capture/capture-url";
 import { diagnoseCapture } from "./diagnose";
+import { PROOF_GATE_BANS } from "./detectors/tells-registry";
 
 export type ProofVerifyResult = {
   status: "passed" | "review" | "failed";
@@ -24,12 +35,91 @@ export type ProofVerifyResult = {
     headingsAfter: number;
     buttonsBefore: number;
     buttonsAfter: number;
+    /** Gate-enforced tells (see the dated tells registry) in each capture. */
+    bannedTellsBefore: string[];
+    bannedTellsAfter: string[];
+    /** Detector ids present after but not before — the tells this patch introduced. */
+    newTells: string[];
     url: string;
     capturedAt: string;
   };
+  /** Bounded screenshot critique: max rounds, rounds planned/used, cited screenshot paths. */
+  critique: ProofCritique;
   reverted: boolean;
   error?: string;
 };
+
+export type ProofVerifyOptions = {
+  /**
+   * Where before/after PNGs are written so critique notes can cite paths.
+   * Defaults to a per-project directory under the OS temp dir — proof never
+   * writes into the checkout and never creates a `.git` directory.
+   */
+  screenshotDir?: string;
+  /** Defaults to MAX_CRITIQUE_ROUNDS (3). */
+  maxCritiqueRounds?: number;
+};
+
+function bannedTells(report: TellReport): string[] {
+  return report.findings
+    .filter((finding) => PROOF_GATE_BANS.has(finding.detector as TellDetector))
+    .map((finding) => finding.id);
+}
+
+async function persistScreenshots(
+  dir: string,
+  before: TellReport,
+  after: TellReport,
+): Promise<CritiqueScreenshot[]> {
+  const shots: CritiqueScreenshot[] = [];
+  const mkdir = await fs.mkdir(dir, { recursive: true }).then(() => true).catch(() => false);
+  if (!mkdir) return shots;
+
+  const write = async (
+    phase: "before" | "after",
+    viewport: string,
+    label: string,
+    base64: string,
+    capturedAt: string,
+  ) => {
+    if (!base64) return;
+    const file = path.join(dir, `${phase}-${viewport}.png`);
+    const ok = await fs.writeFile(file, Buffer.from(base64, "base64")).then(() => true).catch(() => false);
+    if (ok) shots.push({ label, viewport, phase, path: file, capturedAt });
+  };
+
+  await write("before", "primary", "before/primary", before.capture.screenshotBase64, before.capture.capturedAt);
+  await write("after", "primary", "after/primary", after.capture.screenshotBase64, after.capture.capturedAt);
+  for (const entry of after.capture.viewportMatrix) {
+    await write("after", entry.preset, `after/${entry.preset}`, entry.screenshotBase64, after.capture.capturedAt);
+  }
+  return shots;
+}
+
+export async function buildProofCritique(input: {
+  before: TellReport;
+  after: TellReport;
+  screenshotDir?: string;
+  maxRounds?: number;
+  status: ProofVerifyResult["status"];
+}): Promise<ProofCritique> {
+  const screenshots = input.screenshotDir
+    ? await persistScreenshots(input.screenshotDir, input.before, input.after)
+    : [];
+  const critique = planCritiqueRounds({
+    findings: input.after.findings,
+    screenshots,
+    maxRounds: input.maxRounds,
+    source: screenshots.length > 0 ? "screenshots" : "report-only",
+  });
+  if (input.status === "failed") {
+    return {
+      ...critique,
+      nextAction: `Gate failed. ${critique.nextAction}`,
+    };
+  }
+  return critique;
+}
 
 function scoreOf(report: TellReport): number {
   return report.measures?.score ?? Math.min(100, report.score.generic * 12 + report.score.drift * 7);
@@ -51,10 +141,14 @@ export async function verifyProofPatch(input: {
   projectRoot: string;
   waitMs?: number;
   revertOnFail?: boolean;
-}): Promise<ProofVerifyResult> {
+} & ProofVerifyOptions): Promise<ProofVerifyResult> {
   const projectRoot = path.resolve(input.projectRoot);
   const waitMs = input.waitMs ?? 1800;
   const revertOnFail = input.revertOnFail ?? true;
+  const screenshotDir =
+    input.screenshotDir ??
+    path.join(tmpdir(), "tell-critique", createHash("sha1").update(projectRoot).digest("hex").slice(0, 8));
+  const maxCritiqueRounds = input.maxCritiqueRounds ?? MAX_CRITIQUE_ROUNDS;
   const patchMarker = path.join(projectRoot, ".git", "tell-proof-mcp.patch");
 
   const beforeCapture = await captureUrl(input.url);
@@ -67,6 +161,13 @@ export async function verifyProofPatch(input: {
       beforeReport,
       afterReport: beforeReport,
       proof: buildProof(beforeReport, beforeReport, input.url),
+      critique: await buildProofCritique({
+        before: beforeReport,
+        after: beforeReport,
+        screenshotDir,
+        maxRounds: maxCritiqueRounds,
+        status: "failed",
+      }),
       reverted: false,
       error: check.stderr || "Patch did not apply cleanly.",
     };
@@ -79,6 +180,13 @@ export async function verifyProofPatch(input: {
       beforeReport,
       afterReport: beforeReport,
       proof: buildProof(beforeReport, beforeReport, input.url),
+      critique: await buildProofCritique({
+        before: beforeReport,
+        after: beforeReport,
+        screenshotDir,
+        maxRounds: maxCritiqueRounds,
+        status: "failed",
+      }),
       reverted: false,
       error: applied.stderr || "Patch could not be applied.",
     };
@@ -92,14 +200,21 @@ export async function verifyProofPatch(input: {
     const afterReport = diagnoseCapture(afterCapture);
     const proof = buildProof(beforeReport, afterReport, input.url);
     const status = verdictFromProof(proof);
+    const critique = await buildProofCritique({
+      before: beforeReport,
+      after: afterReport,
+      screenshotDir,
+      maxRounds: maxCritiqueRounds,
+      status,
+    });
 
     if (status === "failed" && revertOnFail) {
       await gitApply(["-R", "--whitespace=nowarn"], projectRoot, input.patch);
       await fs.rm(patchMarker, { force: true });
-      return { status, beforeReport, afterReport, proof, reverted: true };
+      return { status, beforeReport, afterReport, proof, critique, reverted: true };
     }
 
-    return { status, beforeReport, afterReport, proof, reverted: false };
+    return { status, beforeReport, afterReport, proof, critique, reverted: false };
   } catch (error) {
     await gitApply(["-R", "--whitespace=nowarn"], projectRoot, input.patch).catch(() => {});
     await fs.rm(patchMarker, { force: true });
@@ -117,9 +232,20 @@ export async function revertProofPatch(projectRoot: string, patch?: string): Pro
   return reverted.ok;
 }
 
-export function compareProofReports(before: TellReport, after: TellReport, url: string) {
+export function compareProofReports(
+  before: TellReport,
+  after: TellReport,
+  url: string,
+  opts: ProofVerifyOptions = {},
+) {
   const proof = buildProof(before, after, url);
-  return { status: verdictFromProof(proof), proof };
+  const status = verdictFromProof(proof);
+  const critique = planCritiqueRounds({
+    findings: after.findings,
+    maxRounds: opts.maxCritiqueRounds ?? MAX_CRITIQUE_ROUNDS,
+    source: "report-only",
+  });
+  return { status, proof, critique };
 }
 
 /**
@@ -209,6 +335,11 @@ function buildProof(before: TellReport, after: TellReport, url: string) {
   const afterStructure = after.capture.domSummary;
   const headingFloor = Math.max(1, Math.floor(beforeStructure.headingCount * 0.8));
   const buttonFloor = beforeStructure.buttonCount ? Math.max(1, Math.floor(beforeStructure.buttonCount * 0.8)) : 0;
+  const bannedBefore = bannedTells(before);
+  const bannedAfter = bannedTells(after);
+  const newTells = [...new Set(after.findings.map((finding) => finding.detector))].filter(
+    (detector) => !before.findings.some((finding) => finding.detector === detector),
+  );
   return {
     beforeScore,
     afterScore,
@@ -227,12 +358,18 @@ function buildProof(before: TellReport, after: TellReport, url: string) {
     headingsAfter: afterStructure.headingCount,
     buttonsBefore: beforeStructure.buttonCount,
     buttonsAfter: afterStructure.buttonCount,
+    bannedTellsBefore: bannedBefore,
+    bannedTellsAfter: bannedAfter,
+    newTells,
     url,
     capturedAt: after.capture.capturedAt,
   };
 }
 
 function verdictFromProof(proof: ProofVerifyResult["proof"]): ProofVerifyResult["status"] {
+  // Registry bans fail the gate on their own: a patch cannot pass while the
+  // first screen still ships a banned frame tell.
+  if (proof.bannedTellsAfter.length > 0) return "failed";
   if (proof.scoreDelta <= -3 && proof.screenshotsDiffer && !proof.focusRegressed && !proof.structureRegressed) {
     return "passed";
   }
