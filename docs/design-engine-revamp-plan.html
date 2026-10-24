@@ -70,7 +70,7 @@ li { margin: .25rem 0; }
 <li class="toc-h3"><a href="#1-9-shadertoy-https-www-shadertoy-com">1.9 Shadertoy — https://www.shadertoy.com</a></li>
 <li class="toc-h3"><a href="#1-10-lovable-https-lovable-dev">1.10 Lovable — https://lovable.dev</a></li>
 <li class="toc-h2"><a href="#2-honest-gaps-in-designproof-today">2. Honest gaps in DesignProof today</a></li>
-<li class="toc-h2"><a href="#2b-external-design-motion-skills-oct-2026-shortlist">2b. External design &amp; motion skills (Oct 2026 shortlist)</a></li>
+<li class="toc-h2"><a href="#2b-external-design-motion-skills-oct-2026-shortlist">2b. External design &amp; motion skills (Oct 2026 shortlist) — learn, don’t copy</a></li>
 <li class="toc-h3"><a href="#2b-1-keep-integrations">Keep — concrete integrations</a></li>
 <li class="toc-h3"><a href="#2b-2-non-goals">Explicit non-goals</a></li>
 <li class="toc-h3"><a href="#2b-3-suggested-adoption-order">Suggested adoption order</a></li>
@@ -219,63 +219,61 @@ li { margin: .25rem 0; }
 
 
 
+
 <hr>
-<h2 id="2b-external-design-motion-skills-oct-2026-shortlist">2b. External design &amp; motion skills (Oct 2026 shortlist)</h2>
-<p><strong>Yes — several improve the design engine as skill / stage inputs and proof / demo layers, not a rewrite of the deterministic core</strong> (<code>packages/design-skills</code>, <code>designFromFeatures</code> / <code>tell_design_from_features</code>). Design Expert engine plug-in calls (2026-10-24, Asia/Calcutta) override the earlier CEO marketing shortlist where they differ; star counts in social posts are unverified.</p>
-<p class="meta">Source of truth for keep/later/skip on engine plug-in: Design Expert review of READMEs (not full code audit). Fold parallel notes into <code>docs/16_DESIGN_ENGINE_BEAT_SCROLLTIDE_PLAN.local.md</code> when that file is updated.</p>
+<h2 id="2b-external-design-motion-skills-oct-2026-shortlist">2b. External design &amp; motion skills (Oct 2026 shortlist) — learn, don’t copy</h2>
+<p><strong>Yes — several of these repos teach patterns that improve the design engine, but only as inspiration for DesignProof-owned skills, detectors, and demo gates.</strong> Do <em>not</em> vendor, fork-as-dependency, or “install” those skills into the product. Study READMEs and public patterns, then write or extend <em>our</em> craft under <code>.cursor/skills/</code>, <code>packages/core</code>, <code>packages/design-skills</code>, and demo/README gates so they match staged design (BIM-203), <code>designFromFeatures</code> / <code>tell_design_from_features</code>, and verified output.</p>
+<p class="meta">Ashish (2026-10-24, Asia/Calcutta): learn from the ten, create or enhance DesignProof’s own skills per our features. Design Expert engine plug-in calls below; star counts in social posts are unverified.</p>
 
 <table>
-<thead><tr><th>#</th><th>Repo</th><th>Verdict</th><th>How it plugs into the DesignProof engine</th><th>Must not do</th></tr></thead>
+<thead><tr><th>#</th><th>Inspiration repo</th><th>Verdict</th><th>DesignProof-owned outcome (learn → build ours)</th><th>Must not do</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><a href="https://github.com/pbakaus/impeccable">pbakaus/impeccable</a></td><td><strong>Keep</strong></td><td>Wire its 62 deterministic anti-slop detectors into Phase 5 <code>tell_proof_verify</code> / genericness checks (Inter-only, violet gradients, nested cards, bounce easing — matches DESIGN.md rejects).</td><td>Replace <code>designFromFeatures</code></td></tr>
-<tr><td>2</td><td><a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill">nextlevelbuilder/ui-ux-pro-max-skill</a></td><td><strong>Later</strong></td><td>Mine industry anti-patterns + pattern/type catalogs to seed Phase 1 <code>ConceptSpec</code> rejects only.</td><td>Auto-apply palette→layout packs (theme-pack failure Ashish rejected)</td></tr>
-<tr><td>3</td><td><a href="https://github.com/ahujasid/blender-mcp">ahujasid/blender-mcp</a></td><td><strong>Skip</strong></td><td>—</td><td>Desktop Blender MCP in the web generate path; Phase 3 is Three.js/GLSL and cut-first</td></tr>
-<tr><td>4</td><td><a href="https://github.com/img2threejs/img2threejs">img2threejs/img2threejs</a></td><td><strong>Later</strong></td><td>Optional Phase 3 helper: reference image → animation-ready Three.js when <code>immersive</code> is on; still-image fallback stays default.</td><td>Ungated WebGL on every generate</td></tr>
-<tr><td>5</td><td><a href="https://github.com/Vincentwei1021/video-shotcraft">Vincentwei1021/video-shotcraft</a></td><td><strong>Keep</strong></td><td>Adjacent to engine: capture specimen/preview pages + Remotion shot recipes for OSS demo video gate — not a Studio stage.</td><td>Inside <code>POST /api/design</code> or staged MCP catalog</td></tr>
-<tr><td>6</td><td><a href="https://github.com/heygen-com/hyperframes">heygen-com/hyperframes</a></td><td><strong>Keep</strong></td><td>Adjacent: HTML→deterministic MP4 for specimen promos; <code>/figma</code> brand-token path can feed video from DesignProof tokens.</td><td>Phase 7 catalog tools</td></tr>
-<tr><td>7</td><td><a href="https://github.com/penpot/penpot">penpot/penpot</a></td><td><strong>Later</strong></td><td>Open design-file MCP as a fallback agent read path when Figma is unavailable.</td><td>Replace Web Designer's Figma workflow</td></tr>
-<tr><td>8</td><td><a href="https://github.com/remotion-dev/remotion">remotion-dev/remotion</a> (+ skills)</td><td><strong>Keep</strong></td><td>Runtime/skills under video-shotcraft / promo pipeline.</td><td>Page generate stages</td></tr>
-<tr><td>9</td><td><a href="https://github.com/lemomo-ai/lemo-opuscar">lemomo-ai/lemo-opuscar</a></td><td><strong>Skip</strong></td><td>—</td><td>Treat as page-spec or proof-loop gain (code film-look only)</td></tr>
-<tr><td>10</td><td><a href="https://github.com/cathrynlavery/diagram-design">cathrynlavery/diagram-design</a></td><td><strong>Keep</strong></td><td>Brand-token HTML+SVG diagrams for concept cards / proof dossiers (Instrument Serif-friendly, anti-Mermaid-slop); onboard to DesignProof tokens.</td><td>Generic off-brand stock diagrams</td></tr>
+<tr><td>1</td><td><a href="https://github.com/pbakaus/impeccable">pbakaus/impeccable</a></td><td><strong>Keep (learn)</strong></td><td>Port <em>ideas</em> from its ~62 anti-slop checks into Phase 5 <code>tell_proof_verify</code> / DesignProof genericness detectors (Inter-only, violet gradients, nested cards, bounce easing — DESIGN.md rejects). Own skill: extend <code>tell-detector-authoring</code> / <code>packages/core</code>.</td><td>Depend on or vendor impeccable; replace <code>designFromFeatures</code></td></tr>
+<tr><td>2</td><td><a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill">nextlevelbuilder/ui-ux-pro-max-skill</a></td><td><strong>Later (learn)</strong></td><td>Mine anti-patterns + pattern/type catalogs only to seed Phase 1 <code>ConceptSpec</code> <em>rejects</em> in our staged concept skill.</td><td>Auto-apply their palette→layout packs (theme-pack failure Ashish rejected); wholesale adopt their skill</td></tr>
+<tr><td>3</td><td><a href="https://github.com/ahujasid/blender-mcp">ahujasid/blender-mcp</a></td><td><strong>Skip</strong></td><td>—</td><td>Host Blender MCP; put desktop Blender on the web generate path (Phase 3 is Three.js/GLSL, cut-first)</td></tr>
+<tr><td>4</td><td><a href="https://github.com/img2threejs/img2threejs">img2threejs/img2threejs</a></td><td><strong>Later (learn)</strong></td><td>Optional Phase 3 helper pattern: reference image → animation-ready Three.js when <code>immersive</code> is on — implemented as our own gated path; still-image stays default.</td><td>Vendor their package; ungate WebGL on every generate</td></tr>
+<tr><td>5</td><td><a href="https://github.com/Vincentwei1021/video-shotcraft">Vincentwei1021/video-shotcraft</a></td><td><strong>Keep (learn)</strong></td><td>Capture specimen/preview pages + shot recipes for our OSS demo-video gate — DesignProof-native demo skill under Demo Director / <code>tell-demo-script</code>, not a Studio stage.</td><td>Inside <code>POST /api/design</code>; install their skill as a dependency</td></tr>
+<tr><td>6</td><td><a href="https://github.com/heygen-com/hyperframes">heygen-com/hyperframes</a></td><td><strong>Keep (learn)</strong></td><td>HTML→deterministic MP4 pattern for specimen promos; feed <em>our</em> DesignProof tokens (optional Figma brand-token path) — still not Phase 7 catalog tools.</td><td>New public MCP endpoint; treat as staged design tool</td></tr>
+<tr><td>7</td><td><a href="https://github.com/penpot/penpot">penpot/penpot</a></td><td><strong>Later</strong></td><td>Optional agent read on the <em>user’s</em> machine when Figma is unavailable — never DesignProof-hosted.</td><td>Replace Web Designer’s Figma workflow; host Penpot</td></tr>
+<tr><td>8</td><td><a href="https://github.com/remotion-dev/remotion">remotion-dev/remotion</a> (+ skills)</td><td><strong>Keep (learn)</strong></td><td>Runtime/patterns under our promo / demo-video pipeline (paired with shotcraft learning).</td><td>Page generate stages; vendor as product dependency without a named DP skill</td></tr>
+<tr><td>9</td><td><a href="https://github.com/lemomo-ai/lemo-opuscar">lemomo-ai/lemo-opuscar</a></td><td><strong>Skip</strong></td><td>—</td><td>Treat as page-spec or proof-loop gain</td></tr>
+<tr><td>10</td><td><a href="https://github.com/cathrynlavery/diagram-design">cathrynlavery/diagram-design</a></td><td><strong>Keep (learn)</strong></td><td>Write a DesignProof-native HTML+SVG diagram skill on our tokens (Instrument Serif-friendly, anti-Mermaid-slop) for concept cards / proof dossiers / Tell Report.</td><td>Copy their skill tree; ship off-brand stock diagrams</td></tr>
 </tbody>
 </table>
 
-<h3 id="2b-1-keep-integrations">Keep — concrete integrations</h3>
-<h4>impeccable (Phase 5)</h4>
+<h3 id="2b-1-keep-integrations">Keep — DesignProof-owned work (not vendored skills)</h3>
+<h4>Anti-slop verify gates (inspired by impeccable)</h4>
 <ul>
-<li>Map the 62 deterministic detectors into <code>tell_proof_verify</code> / genericness checks in <code>packages/core</code> via <code>tell-detector-authoring</code> where they match DESIGN.md rejects (Inter-only, violet gradients, nested cards, bounce easing).</li>
-<li>Run in the Phase 5 proof/polish loop after capture/fingerprint — advise and fail gates; do not become a second generate pipeline.</li>
-<li>Keep existing DesignProof detectors as source of truth; import ideas only when falsifiable and measurable.</li>
+<li>Extend <code>tell-detector-authoring</code> / <code>packages/core</code> and Phase 5 <code>tell_proof_verify</code> with DesignProof-owned detectors that match DESIGN.md rejects.</li>
+<li>Advise and fail gates after capture/fingerprint — never a second generate pipeline.</li>
 </ul>
-<h4>diagram-design (Phase 1 / 4b artifacts)</h4>
+<h4>Diagram artifacts (inspired by diagram-design)</h4>
 <ul>
-<li>Onboard one HTML+SVG diagram skill tinted to DesignProof tokens (Instrument Serif-friendly, anti-Mermaid-slop).</li>
-<li>Target concept cards and proof dossiers / Tell Report figures (<code>tell-report-ui</code>), not every marketing landing.</li>
+<li>New or extended DesignProof craft skill: HTML+SVG on our tokens for concept cards, proof dossiers, <code>tell-report-ui</code>.</li>
 <li>Craft skill first; promote into generate only if a measured specimen beats current figure quality.</li>
 </ul>
-<h4>video-shotcraft + HyperFrames + Remotion (demo / promo adjacent)</h4>
+<h4>Demo / promo video (inspired by video-shotcraft, HyperFrames, Remotion)</h4>
 <ul>
-<li>Capture real specimen / preview pages; Remotion shot recipes + HyperFrames HTML→MP4 for OSS demo-video gate and specimen promos.</li>
-<li>Optional: feed DesignProof tokens into HyperFrames via a <code>/figma</code> brand-token path — still outside Phase 7 catalog tools.</li>
-<li>Stay outside <code>POST /api/design</code> and outside the eleven-tool MCP catalog; Demo Director / <code>tell-demo-script</code> owns the gate.</li>
+<li>DesignProof-owned demo/promo pipeline: specimen capture → MP4 / Remotion-style composition under Demo Director / <code>tell-demo-script</code>.</li>
+<li>Outside <code>POST /api/design</code> and outside the eleven-tool MCP catalog; no new public MCP host.</li>
 </ul>
 
 <h3 id="2b-2-non-goals">Explicit non-goals</h3>
 <ul>
-<li>No Blender in core (desktop Blender MCP skipped; Phase 3 stays Three.js/GLSL, cut-first).</li>
-<li>No UI-UX-Pro-Max as a default theme / palette→layout pack (Later: seed <code>ConceptSpec</code> rejects only).</li>
-<li>No new public MCP endpoint from these repos; <code>docs/TOOLS-AND-SKILLS.md</code> honesty stays binding.</li>
+<li><strong>Do not copy or vendor</strong> the ten repos as product skills or dependencies.</li>
+<li>No Blender in core; no DesignProof-hosted Penpot or Blender MCP (user-machine optional only).</li>
+<li>No UI-UX-Pro-Max (or any external) theme / palette→layout pack as default.</li>
+<li>No new public MCP endpoint from this shortlist; <code>docs/TOOLS-AND-SKILLS.md</code> honesty stays binding.</li>
 <li>No replacing <code>tell_design_from_features</code> until BIM-203 staged catalog decision.</li>
-<li>Penpot does not replace Figma while Web Designer’s Figma workflow is primary (Later: fallback read only).</li>
 <li>lemo-opuscar skipped — no page-spec or proof-loop gain.</li>
 </ul>
 
-<h3 id="2b-3-suggested-adoption-order">Suggested adoption order</h3>
+<h3 id="2b-3-suggested-adoption-order">Suggested adoption order (build ours)</h3>
 <ol>
-<li>impeccable detectors into Phase 5 <code>tell_proof_verify</code> / genericness</li>
-<li>diagram-design for concept cards / proof dossiers</li>
-<li>Remotion + video-shotcraft + HyperFrames for demo / specimen promo (adjacent, not staged MCP)</li>
-<li>Later: UI-UX-Pro-Max for <code>ConceptSpec</code> rejects only; img2threejs behind <code>immersive</code>; Penpot as Figma-unavailable fallback</li>
+<li>DesignProof anti-slop detectors into Phase 5 <code>tell_proof_verify</code> / genericness</li>
+<li>DesignProof-native diagram skill for concept cards / proof dossiers</li>
+<li>DesignProof demo/promo video gate (patterns from Remotion / shotcraft / HyperFrames)</li>
+<li>Later: our staged <code>ConceptSpec</code> rejects (patterns from UI UX Pro Max); gated immersive helper (patterns from img2threejs); Penpot only as user-local Figma fallback</li>
 </ol>
 
 <hr>
