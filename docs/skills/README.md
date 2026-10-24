@@ -9,6 +9,6 @@ Near-term:
 - [anti-slop](./designproof-anti-slop.md) — detectors for `tell_proof_verify` / planned `tell_review`
 - [diagram](./designproof-diagram.md) — HTML+SVG on our tokens
 - [demo/promo](./designproof-demo-promo.md) — film verified specimens only
-- [taste](./designproof-taste.md) — art direction from the subject, multi-width browser check, screenshot critique loop
+- [taste-loop](./designproof-taste-loop.md) — subject inventory, art direction, credited imagery (detectors live in anti-slop)
 
 Later and skip: [later/](./later/README.md). None of these stubs is a Model Context Protocol (MCP) tool; the catalog stays eleven today and nineteen by replacement.
