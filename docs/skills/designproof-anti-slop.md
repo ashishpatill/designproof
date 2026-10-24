@@ -18,6 +18,8 @@ Deterministic genericness / anti-slop detectors in `packages/core`, authored wit
 ## Non-goals
 Depending on or vendoring impeccable. Replacing `designFromFeatures`. Adding a new catalog tool.
 
+Frame, multi-width, and screenshot-critique loops live in [designproof-taste](./designproof-taste.md); this stub owns the named detector catalog only.
+
 ## Acceptance cues
 - Each new detector has a fixture page that triggers it and a clean specimen that passes.
 - `tell_proof_verify` reports detector ids. Shipped specimens report 0 new genericness tells.

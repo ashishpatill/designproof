@@ -1,3 +1,14 @@
 # DesignProof-owned skill stubs
 
-These stubs are learned from the Oct 2026 shortlist in [`design-engine-revamp-plan.html`](../design-engine-revamp-plan.html) §2b (PR #106 tip `4a55640`). Ashish's rule: learn, don't copy. Near-term: [anti-slop](./designproof-anti-slop.md), [diagram](./designproof-diagram.md), [demo/promo](./designproof-demo-promo.md). Later and skip: [later/](./later/README.md). These are stubs only. None of them is built or catalogued yet.
+These are **plan stubs only**. They live under `docs/skills/` until a real skill lands under `.cursor/skills/` (or the agent skill path DesignProof ships). Do not treat this folder as the runtime home.
+
+Learned from the Oct 2026 shortlist in [`design-engine-revamp-plan.html`](../design-engine-revamp-plan.html) §2b (PR #106) plus [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT; inspiration only). Ashish's rule: **learn, don't copy** — no vendored forks, no install of their skill into DesignProof.
+
+Near-term:
+
+- [anti-slop](./designproof-anti-slop.md) — detectors for `tell_proof_verify` / planned `tell_review`
+- [diagram](./designproof-diagram.md) — HTML+SVG on our tokens
+- [demo/promo](./designproof-demo-promo.md) — film verified specimens only
+- [taste](./designproof-taste.md) — art direction from the subject, multi-width browser check, screenshot critique loop
+
+Later and skip: [later/](./later/README.md). None of these stubs is a Model Context Protocol (MCP) tool; the catalog stays eleven today and nineteen by replacement.
