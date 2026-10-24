@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-24 — DesignProof-owned taste skills land under `.cursor/skills`
+
+- Added two runtime agent skills, both written here from learned patterns — nothing vendored, submoduled, or installed from an external taste skill:
+  - `.cursor/skills/designproof-taste-loop/SKILL.md` — subject inventory → one-sentence idea → one dealt direction → credited imagery, with the cover-the-logo and swap-the-name tests, then a handoff to measurement. Explicitly separates DesignProof's own chrome (DESIGN.md) from a generated site's direction.
+  - `.cursor/skills/designproof-anti-slop/SKILL.md` — how agents read a finding and the dated tells registry, run `tell_proof_verify`, triage `newTells` / `bannedTellsAfter` before the score delta, replace a tell by procedure, use the bounded critique, and keep failing fixtures honest.
+- Updated `.cursor/skills/tell-proof-verify/SKILL.md` for #108: the four frame finding ids and which two fail the gate, `bannedTellsBefore/After` and `newTells`, and the `critique` block (`maxRounds`, `roundsUsed`, `rounds`, `screenshots`, `source`, `nextAction`, 3 rounds × 3 fixes, frame-first ranking). No new MCP tool; the catalog stays at eleven.
+- The tells registry gets no runtime twin: its rows stay in `packages/core/src/detectors/tells-registry.ts`, the human read stays in `docs/skills/designproof-tells-registry.md`, and the anti-slop skill links to both.
+- `docs/skills/README.md` now records which stubs have a runtime home. The stubs stay as the plan of record; `designproof-diagram` and `designproof-demo-promo` remain docs-only.
+
 ## 2026-10-24 — Frame / multi-width tells and bounded critique in `tell_proof_verify`
 
 - Added four frame tells that read rendered boxes and first-fold samples, not screenshot bytes or a model: `TitleOnFoldTell` (`tell-title-on-fold`), `FrameGutterTell` (`tell-frame-gutter`), `BlankStretchTell` (`tell-blank-stretch`), `MobileFirstScreenTell` (`tell-mobile-first-screen`). Each finding carries deterministic `facts`, evidence (including a screenshot region), and a `fixHint` procedure.
