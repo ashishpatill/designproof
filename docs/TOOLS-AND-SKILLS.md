@@ -51,6 +51,12 @@ Load: read `.cursor/skills/<name>/SKILL.md` (many have a twin under `agent-skill
 
 ---
 
+## External design & motion skills (shortlist)
+
+Not shipped as Tell MCP tools and **not vendored** from external skill repos. Ashish rule (2026-10-24): learn patterns from the Oct shortlist, then create or enhance DesignProof-owned skills/gates. Plan of record: [`design-engine-revamp-plan.html`](./design-engine-revamp-plan.html#2b-external-design-motion-skills-oct-2026-shortlist) §2b (keep-learn: impeccable→our detectors, taste-skill→our taste-direction/critique loop, diagram-design→our diagram skill, video-shotcraft/HyperFrames/Remotion→our demo/promo pipeline; later/skip as in that section). Do not invent catalog entries here until a DesignProof-native skill is actually built in-repo.
+
+---
+
 ## MCP servers / connectors
 
 **In this repo** (`.cursor/mcp.json`):
