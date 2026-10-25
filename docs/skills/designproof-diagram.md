@@ -3,6 +3,8 @@
 
 **Status:** near-term (Keep, learn). **Inspiration:** cathrynlavery/diagram-design.
 
+> **Runtime twin (landed 2026-10-25):** [`.cursor/skills/designproof-diagram/SKILL.md`](../../.cursor/skills/designproof-diagram/SKILL.md) is the procedure an agent follows today — four kinds only, hand-authored inline SVG on DesignProof tokens, 0 KB JS. This stub stays the plan of record; where the two disagree, the runtime skill is what an agent does now and this file is what the plan still wants.
+
 ## Purpose
 A craft skill that draws HTML+SVG diagrams on DesignProof tokens (works with Instrument Serif) for concept cards, proof dossiers, and Tell Report (`tell-report-ui`). It starts as a craft skill. It moves into generate only if a measured specimen beats our current figure quality.
 

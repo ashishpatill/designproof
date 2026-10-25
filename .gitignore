@@ -92,6 +92,8 @@ developer-drop/
 !.cursor/skills/designproof-taste-loop/**
 !.cursor/skills/designproof-anti-slop/
 !.cursor/skills/designproof-anti-slop/**
+!.cursor/skills/designproof-diagram/
+!.cursor/skills/designproof-diagram/**
 !.cursor/skills/tell-proof-verify/
 !.cursor/skills/tell-proof-verify/**
 agent-skills/

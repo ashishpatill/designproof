@@ -30,6 +30,7 @@ Load: read `.cursor/skills/<name>/SKILL.md` (many have a twin under `agent-skill
 | `designproof-taste` | Subject-first art direction (inventory → idea → small DesignProof-owned shortlist) before designFromFeatures/redesign |
 | `designproof-taste-loop` | Subject-first direction + imagery loop; hands off to measurement |
 | `designproof-anti-slop` | Registry, frame tells, bounded screenshot critique (≤3 rounds, ≤3 fixes) driving `tell_proof_verify` |
+| `designproof-diagram` | Hand-drawn inline SVG+HTML figures (flow / before-after / layer stack / timeline) for concept cards, dossiers, Tell Report — craft skill, not MCP |
 
 ### Site craft (auto-graph)
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-25 — DesignProof-owned diagram runtime skill lands under `.cursor/skills`
+
+- Added `.cursor/skills/designproof-diagram/SKILL.md`, written here from learned patterns — nothing vendored, submoduled, or installed from an external diagram skill. It is a **craft skill**, not the generate path and not an MCP tool: the catalog stays at eleven.
+  - Four kinds only — flow, before/after, layer stack, timeline — each with the claim it makes, when to pick it, and when to reject it. No fifth kind; when none of the four makes the claim, the skill says write prose.
+  - Hand-authored inline SVG + HTML on DesignProof tokens (`#181614` paper, Instrument Serif / Source Sans 3 / IBM Plex Mono, terra `#D4714A`), with measured ink ratios on dark: `paper-100` 15.5:1, `paper-300` 11.1:1, `paper-400` 7.9:1, `paper-500` 5.2:1 floor, `--accent` 5.4:1; `paper-700` (2.2:1) and `paper-800` (1.5:1) are lines and fills only, never text.
+  - Readable-at-360 px is stated as arithmetic: a 560-wide plate renders at 0.59 on a phone, putting an 11 px label at 6.4 px — author at phone width or raise the label. 0 KB of JavaScript, no Mermaid/D3/Rough.js/svg.js/auto-layout library, one accent per figure, `role="img"` plus a one-sentence `aria-label`.
+  - Named real surfaces: Studio concept card (`apps/web/src/app/studio/page.tsx`), proof dossier (`research-dossier` in `packages/design-skills/src/templates.ts` plus `dossierPlate` in `figures.ts`), Tell Report (`apps/web/src/app/report/[id]`, `BeforeAfterSeam.tsx`).
+  - Handoff runs the existing gate on the page that embeds the figure — `designproof-anti-slop` / `tell_proof_verify`, triaging `newTells` and `bannedTellsAfter` before the score delta, with `tell-gray-mush`, `tell-radius-monotone`, `tell-blank-stretch` and `tell-system-font` called out as the figure-side rows that actually fire. No new MCP tool.
+- `.gitignore` allowlists `.cursor/skills/designproof-diagram/` and `**` alongside the two taste skills.
+- `docs/skills/README.md` marks diagram as a landed runtime skill with a stub that stays as the plan; `docs/skills/designproof-diagram.md` gains a one-line runtime-twin note. Demo/promo remains docs-only.
+- No dossier template, generate path, `packages/` code, or MCP catalog change in this PR.
+
 ## 2026-10-24 — DesignProof-owned taste skills land under `.cursor/skills`
 
 - Added two runtime agent skills, both written here from learned patterns — nothing vendored, submoduled, or installed from an external taste skill:
