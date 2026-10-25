@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book I — DesignProof Hub, Architecture, MCP &amp; Agent Routing</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-paper: #FAF6F0;
+      --bg-linen: #F2ECE1;
+      --bg-aged: #E8DFD1;
+      --ink-900: #161412;
+      --ink-700: #3D3833;
+      --ink-500: #6E665E;
+      --ink-300: #A39B90;
+      --rule-hairline: #DDD4C6;
+      --terracotta: #D4714A;
+      --terracotta-deep: #B55632;
+      --forest: #2E5A44;
+      --ochre: #C88A2B;
+      --crimson: #B83B3B;
+      --serif: "Iowan Old Style", "Instrument Serif", "Palatino Linotype", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+      --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-paper);
+      color: var(--ink-900);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(250, 246, 240, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--rule-hairline);
+    }
+    .book-ribbon {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1.5rem;
+      border-bottom: 1px solid var(--rule-hairline);
+      font-size: 0.78rem;
+      background: var(--bg-linen);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .book-links { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .book-pill {
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      border: 1px solid var(--rule-hairline);
+      background: var(--bg-paper);
+      color: var(--ink-700);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+    .book-pill.active {
+      background: var(--ink-900);
+      color: var(--bg-paper);
+      border-color: var(--ink-900);
+    }
+    .book-pill:hover:not(.active) { border-color: var(--terracotta); color: var(--terracotta-deep); }
+    .tabbar {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.5rem 1.5rem 0;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--ink-500);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.55rem 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      border-radius: 6px 6px 0 0;
+    }
+    .tab-btn:hover { color: var(--ink-900); background: rgba(232,223,209,0.4); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--ink-900);
+      background: var(--bg-paper);
+      border-color: var(--rule-hairline);
+      border-bottom-color: var(--terracotta);
+    }
+    .page-panel { display: none; max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .page-panel.active { display: block; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+    h1 { font-size: clamp(2rem, 3.2vw, 2.85rem); line-height: 1.08; }
+    h2 { font-size: 1.65rem; border-bottom: 1px solid var(--rule-hairline); padding-bottom: 0.4rem; margin-top: 2rem; }
+    h3 { font-size: 1.2rem; }
+    .kicker {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--terracotta-deep);
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+    .card {
+      background: var(--bg-linen);
+      border: 1px solid var(--rule-hairline);
+      border-radius: 8px;
+      padding: 1.15rem;
+    }
+    .card-paper {
+      background: var(--bg-paper);
+      border: 1px solid var(--rule-hairline);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+    .badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      border: 1px solid var(--rule-hairline);
+      background: var(--bg-paper);
+    }
+    .badge-ok { background: #E6F0EB; color: var(--forest); border-color: #B7D4C5; }
+    .badge-warn { background: #FBF1DF; color: #8F5E10; border-color: #E8CB96; }
+    .badge-terra { background: #F9EAE3; color: var(--terracotta-deep); border-color: #E6B8A6; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule-hairline); vertical-align: top; }
+    th { font-family: var(--mono); font-size: 0.71rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-500); background: var(--bg-linen); }
+    code { font-family: var(--mono); font-size: 0.8em; background: rgba(232,223,209,0.65); padding: 0.1rem 0.32rem; border-radius: 3px; }
+    a.file-link { color: var(--terracotta-deep); text-decoration: underline; text-underline-offset: 2px; font-family: var(--mono); font-size: 0.78rem; }
+    .step-thumb {
+      width: 100%;
+      height: 135px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 5px;
+      border: 1px solid var(--rule-hairline);
+      background: var(--bg-aged);
+      display: block;
+      margin-bottom: 0.55rem;
+    }
+    .svg-frame {
+      background: var(--bg-paper);
+      border: 1px solid var(--rule-hairline);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="book-ribbon">
+      <div>
+        <strong>DESIGNPROOF DOCS</strong>
+        <span style="color:var(--ink-500); margin-left:0.5rem;">Print-Atelier Master Reference · Replaces 48 scattered docs</span>
+      </div>
+      <nav class="book-links" aria-label="Consolidated Books">
+        <a class="book-pill active" href="00-hub-architecture-and-mcp.html">Book I: Hub, Arch &amp; MCP</a>
+        <a class="book-pill" href="01-detectors-taste-and-design-system.html">Book II: 21 Detectors &amp; Design System</a>
+        <a class="book-pill" href="02-craft-engine-rootcause-and-staged-plan.html">Book III: Root-Cause &amp; 8-Stage Engine</a>
+        <a class="book-pill" href="03-status-audit-ops-and-training.html">Book IV: Status, 48-Doc Audit &amp; Ops</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a>
+      </nav>
+    </div>
+    <nav class="tabbar" role="tablist" aria-label="Book I Pages">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="overview">1. Product Loop &amp; Visual Tour</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="architecture">2. Monorepo &amp; Zod Spine</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="mcp">3. MCP Catalog (11 → 19 Tools)</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="security">4. 19-Host Matrix &amp; 5-Layer Security</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="agents">5. 11 Subagents, Rules &amp; Skills</button>
+    </nav>
+  </header>
+
+  <!-- PAGE 1: PRODUCT LOOP & VISUAL TOUR -->
+  <main id="panel-overview" class="page-panel active" role="tabpanel">
+    <span class="kicker">Book I · Page 1 · Consolidates README.md, PITCH.md, USER_STORY.md, CONTRIBUTIONS.md, docs/03 &amp; docs/04</span>
+    <h1>DesignProof: The Design Eye &amp; Proof Loop for Coding Agents</h1>
+    <p style="max-width: 820px; color: var(--ink-700); font-size: 1.02rem;">
+      Coding agents (Cursor, Claude Code, Grok Build, Windsurf) write code blind to the rendered DOM.
+      <strong>DesignProof</strong> (<code>designproof.site</code>) is the MCP plugin + CLI + skill suite that captures the live rendered page in headless Chromium, names <strong>13 Genericness Tells</strong> and <strong>8 Consistency Drifts</strong>, takes plain-English or voice direction, synthesizes WCAG-verified CSS/token patches, and proves zero regressions in a disposable git worktree before a human approves.
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1120 210" width="100%" role="img" aria-label="6-Step Product Loop">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="#D4714A"/>
+          </marker>
+        </defs>
+        <rect x="10" y="22" width="165" height="150" rx="8" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="24" y="46" font-family="monospace" font-size="11" fill="#B55632">STEP 01 · OBSERVE</text>
+        <text x="24" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">Capture DOM</text>
+        <text x="24" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">Playwright Chromium</text>
+        <text x="24" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">1440×1100 + 390×844</text>
+        <text x="24" y="124" font-family="sans-serif" font-size="11.5" fill="#3D3833">Computed styles + hover</text>
+        <text x="24" y="152" font-family="monospace" font-size="10.5" fill="#6E665E">tell_capture</text>
+
+        <line x1="175" y1="97" x2="195" y2="97" stroke="#D4714A" stroke-width="2" marker-end="url(#arr)"/>
+
+        <rect x="198" y="22" width="165" height="150" rx="8" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="212" y="46" font-family="monospace" font-size="11" fill="#B55632">STEP 02 · NAME</text>
+        <text x="212" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">21 Detectors</text>
+        <text x="212" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">13 Genericness Tells</text>
+        <text x="212" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">8 Drift Detectors</text>
+        <text x="212" y="124" font-family="sans-serif" font-size="11.5" fill="#3D3833">+ Gemini 2-pass verdict</text>
+        <text x="212" y="152" font-family="monospace" font-size="10.5" fill="#6E665E">tell_diagnose</text>
+
+        <line x1="363" y1="97" x2="383" y2="97" stroke="#D4714A" stroke-width="2" marker-end="url(#arr)"/>
+
+        <rect x="386" y="22" width="165" height="150" rx="8" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="400" y="46" font-family="monospace" font-size="11" fill="#B55632">STEP 03 · DIRECT</text>
+        <text x="400" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">Art Direction</text>
+        <text x="400" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">7 Named Directions</text>
+        <text x="400" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">Voice / English brief</text>
+        <text x="400" y="124" font-family="sans-serif" font-size="11.5" fill="#3D3833">6-Axis BrandDNA target</text>
+        <text x="400" y="152" font-family="monospace" font-size="10.5" fill="#6E665E">tell_voice / redesign</text>
+
+        <line x1="551" y1="97" x2="571" y2="97" stroke="#D4714A" stroke-width="2" marker-end="url(#arr)"/>
+
+        <rect x="574" y="22" width="165" height="150" rx="8" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="588" y="46" font-family="monospace" font-size="11" fill="#B55632">STEP 04 · REPAIR</text>
+        <text x="588" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">Safe Patch</text>
+        <text x="588" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">WCAG AA Contrast Solver</text>
+        <text x="588" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">globals.css + Tailwind</text>
+        <text x="588" y="124" font-family="sans-serif" font-size="11.5" fill="#3D3833">Never writes to disk</text>
+        <text x="588" y="152" font-family="monospace" font-size="10.5" fill="#6E665E">tell_apply</text>
+
+        <line x1="739" y1="97" x2="759" y2="97" stroke="#D4714A" stroke-width="2" marker-end="url(#arr)"/>
+
+        <rect x="762" y="22" width="165" height="150" rx="8" fill="#E6F0EB" stroke="#2E5A44" stroke-width="2"/>
+        <text x="776" y="46" font-family="monospace" font-size="11" fill="#2E5A44">STEP 05 · PROVE</text>
+        <text x="776" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">Worktree Verify</text>
+        <text x="776" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">Disposable git worktree</text>
+        <text x="776" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">3-viewport matrix diff</text>
+        <text x="776" y="124" font-family="sans-serif" font-size="11.5" fill="#2E5A44" font-weight="bold">netScoreDelta &lt; 0</text>
+        <text x="776" y="152" font-family="monospace" font-size="10.5" fill="#2E5A44">tell_proof_verify</text>
+
+        <line x1="927" y1="97" x2="947" y2="97" stroke="#D4714A" stroke-width="2" marker-end="url(#arr)"/>
+
+        <rect x="950" y="22" width="158" height="150" rx="8" fill="#F9EAE3" stroke="#D4714A" stroke-width="1.5"/>
+        <text x="964" y="46" font-family="monospace" font-size="11" fill="#B55632">STEP 06 · AUTHOR</text>
+        <text x="964" y="68" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#161412">Staged Studio</text>
+        <text x="964" y="90" font-family="sans-serif" font-size="11.5" fill="#3D3833">8 Reviewed Stages</text>
+        <text x="964" y="107" font-family="sans-serif" font-size="11.5" fill="#3D3833">6 Named Colour Themes</text>
+        <text x="964" y="124" font-family="sans-serif" font-size="11.5" fill="#3D3833">Human Gate per Stage</text>
+        <text x="964" y="152" font-family="monospace" font-size="10.5" fill="#B55632">staged.ts · /studio</text>
+      </svg>
+    </div>
+
+    <h2>Visual Product Walkthrough (Actual Rendered Captures from <code>docs/media/</code>)</h2>
+    <div class="grid-5">
+      <div class="card-paper">
+        <img class="step-thumb" src="media/step-capture.webp" alt="Step 1 Capture rendered UI" />
+        <span class="badge badge-terra">01 · Capture</span>
+        <h3 style="margin-top:0.35rem; font-size:1rem;">Playwright DOM Probe</h3>
+        <p style="font-size:0.78rem; color:var(--ink-700); margin:0;">Captures 1440×1100 &amp; 390×844 viewports, computed styles, bounding boxes, and hover state transitions.</p>
+      </div>
+      <div class="card-paper">
+        <img class="step-thumb" src="media/step-detect.webp" alt="Step 2 Detect tells and drift" />
+        <span class="badge badge-terra">02 · Diagnose</span>
+        <h3 style="margin-top:0.35rem; font-size:1rem;">Name Tells &amp; Drift</h3>
+        <p style="font-size:0.78rem; color:var(--ink-700); margin:0;">Pins numbered Terracotta badges (13 Genericness Tells) &amp; Ochre badges (8 Consistency Drifts) to selectors.</p>
+      </div>
+      <div class="card-paper">
+        <img class="step-thumb" src="media/step-art-direct.webp" alt="Step 3 Art Direction" />
+        <span class="badge badge-terra">03 · Art Direct</span>
+        <h3 style="margin-top:0.35rem; font-size:1rem;">Voice &amp; Preset Direction</h3>
+        <p style="font-size:0.78rem; color:var(--ink-700); margin:0;">Translates plain-English briefs into 7 concrete typography, palette, spacing, and layout structures.</p>
+      </div>
+      <div class="card-paper">
+        <img class="step-thumb" src="media/step-repair.webp" alt="Step 4 Contrast-Safe Patch" />
+        <span class="badge badge-terra">04 · Repair</span>
+        <h3 style="margin-top:0.35rem; font-size:1rem;">Contrast-Safe Diff</h3>
+        <p style="font-size:0.78rem; color:var(--ink-700); margin:0;">Emits WCAG AA verified CSS variables + Tailwind overrides. Never mutates user files without approval.</p>
+      </div>
+      <div class="card-paper">
+        <img class="step-thumb" src="media/step-prove.webp" alt="Step 5 Worktree Proof" />
+        <span class="badge badge-ok">05 · Prove</span>
+        <h3 style="margin-top:0.35rem; font-size:1rem;">Before / After Seam</h3>
+        <p style="font-size:0.78rem; color:var(--ink-700); margin:0;">Applies patch in disposable git worktree, recaptures 3 viewports, and verifies <code>newTells === 0</code>.</p>
+      </div>
+    </div>
+
+    <h2>5-Beat Ashish Demo Script &amp; Senior Critic Voice Contract (from <code>USER_STORY.md</code> &amp; <code>CONTRIBUTIONS.md</code>)</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Senior Design Critic Copy Rules</h3>
+        <ul style="margin:0; padding-left:1.2rem; font-size:0.86rem; color:var(--ink-700);">
+          <li><strong>Max 3 sentences per TellCard</strong>: (1) Measured DOM fact with selector/numbers, (2) Why it reads as a generic template or drift, (3) Concrete token/CSS fix.</li>
+          <li><strong>Zero hedging</strong>: Never write <em>"Consider..."</em>, <em>"You might want to..."</em>, or <em>"Perhaps..."</em>.</li>
+          <li><strong>Zero emojis in product chrome</strong>: Orbs, sparkles, and celebratory confetti are banned (`NoEmojiChromeTell` dogfooded on `apps/web`).</li>
+          <li><strong>Attribution Hygiene (<code>CONTRIBUTIONS.md</code>)</strong>: Every commit uses <code>Ashish &lt;ashish@bimlabz.com&gt;</code>; zero <code>Co-authored-by</code> trailers.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>5-Beat Demo Rehearsal Flow</h3>
+        <ol style="margin:0; padding-left:1.2rem; font-size:0.86rem; color:var(--ink-700);">
+          <li><strong>Beat 1 (Paste URL)</strong>: Capture <code>http://localhost:3001</code> (`fixtures/generic-app`) or click <em>Load sample report</em> offline fallback (`fixtures/reports/tell-report.json`).</li>
+          <li><strong>Beat 2 (Inspect Findings)</strong>: Show Genericness Score (`78/100`), click Terracotta pin `#1` (`GradientCrutchTell` / `FontDefaultTell`), toggle `/brutalist` route to prove Gemini marks intentional choices `intentional` (Forest badge).</li>
+          <li><strong>Beat 3 (Direct)</strong>: Click <strong>Editorial Serif</strong> or speak <em>"Make it feel like an architectural monograph on warm paper"</em>.</li>
+          <li><strong>Beat 4 (Seam)</strong>: Drag `BeforeAfterSeam` (`2px` Terracotta `#D4714A` rule, `40px` brass handle, keyboard arrows `2%`, `Shift+Arrow` `10%`).</li>
+          <li><strong>Beat 5 (Prove)</strong>: Run `tell_proof_verify` in Cursor MCP (`78 → 14`, `0` new tells across `375px / 768px / 1440px`).</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE 2: MONOREPO & ZOD SPINE -->
+  <section id="panel-architecture" class="page-panel" role="tabpanel">
+    <span class="kicker">Book I · Page 2 · Consolidates BUILD.md, AGENTS.md &amp; Package Architecture</span>
+    <h1>Monorepo Dependency Graph &amp; Determinism Boundary</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      Every package boundary is validated by <strong>Zod schemas in <code>@tell/schema</code></strong>. The core diagnostic and redesign engines (<code>@tell/core</code>, <code>@tell/redesign</code>, <code>@tell/design-skills</code>) are <strong>100% deterministic with zero LLM calls</strong>.
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1050 340" width="100%" role="img" aria-label="Monorepo Package Graph">
+        <!-- Foundation -->
+        <rect x="340" y="16" width="370" height="58" rx="6" fill="#161412" stroke="#161412"/>
+        <text x="525" y="42" text-anchor="middle" font-family="monospace" font-size="14" font-weight="bold" fill="#FAF6F0">@tell/schema (packages/schema)</text>
+        <text x="525" y="61" text-anchor="middle" font-family="sans-serif" font-size="11.5" fill="#E8DFD1">Zod Spine: CapturePayload · DOMFingerprint · TellFinding · TellReport · MCP_TOOL_NAMES (11)</text>
+
+        <!-- Deterministic Core Zone -->
+        <rect x="20" y="105" width="700" height="115" rx="8" fill="#E6F0EB" stroke="#2E5A44" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="36" y="126" font-family="monospace" font-size="11" font-weight="bold" fill="#2E5A44">DETERMINISTIC ZERO-LLM ZONE (Pure TS + WCAG Math + Playwright)</text>
+
+        <rect x="36" y="138" width="210" height="68" rx="6" fill="#FAF6F0" stroke="#2E5A44"/>
+        <text x="48" y="160" font-family="monospace" font-size="12.5" font-weight="bold" fill="#161412">@tell/core</text>
+        <text x="48" y="177" font-family="sans-serif" font-size="11" fill="#3D3833">Playwright capture, 21 pure</text>
+        <text x="48" y="192" font-family="sans-serif" font-size="11" fill="#3D3833">detectors, git worktree proof</text>
+
+        <rect x="262" y="138" width="210" height="68" rx="6" fill="#FAF6F0" stroke="#2E5A44"/>
+        <text x="274" y="160" font-family="monospace" font-size="12.5" font-weight="bold" fill="#161412">@tell/redesign</text>
+        <text x="274" y="177" font-family="sans-serif" font-size="11" fill="#3D3833">6-axis BrandDNA, WCAG AA</text>
+        <text x="274" y="192" font-family="sans-serif" font-size="11" fill="#3D3833">contrast solver, 7 directions</text>
+
+        <rect x="488" y="138" width="215" height="68" rx="6" fill="#FAF6F0" stroke="#2E5A44"/>
+        <text x="500" y="160" font-family="monospace" font-size="12.5" font-weight="bold" fill="#161412">@tell/design-skills</text>
+        <text x="500" y="177" font-family="sans-serif" font-size="11" fill="#3D3833">staged.ts (8 stages, 6 themes),</text>
+        <text x="500" y="192" font-family="sans-serif" font-size="11" fill="#3D3833">templates, 70+ basics checks</text>
+
+        <!-- Optional AI Taste Zone -->
+        <rect x="740" y="105" width="290" height="115" rx="8" fill="#FBF1DF" stroke="#C88A2B" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="756" y="126" font-family="monospace" font-size="11" font-weight="bold" fill="#8F5E10">OPTIONAL AI REFLECTION ZONE</text>
+        <rect x="756" y="138" width="258" height="68" rx="6" fill="#FAF6F0" stroke="#C88A2B"/>
+        <text x="768" y="160" font-family="monospace" font-size="12.5" font-weight="bold" fill="#161412">@tell/taste</text>
+        <text x="768" y="177" font-family="sans-serif" font-size="11" fill="#3D3833">Gemini 2.5 Pro 2-pass reflection</text>
+        <text x="768" y="192" font-family="sans-serif" font-size="11" fill="#3D3833">Fallback: confidence=0.5 offline</text>
+
+        <!-- Delivery Surfaces -->
+        <rect x="36" y="252" width="300" height="68" rx="6" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="50" y="275" font-family="monospace" font-size="13" font-weight="bold" fill="#161412">@tell/mcp (packages/mcp)</text>
+        <text x="50" y="294" font-family="sans-serif" font-size="11.5" fill="#3D3833">Stdio MCP Server · 11 tell_* tools</text>
+        <text x="50" y="310" font-family="monospace" font-size="10.5" fill="#B55632">packages/mcp/src/registered-tools.ts</text>
+
+        <rect x="365" y="252" width="300" height="68" rx="6" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="379" y="275" font-family="monospace" font-size="13" font-weight="bold" fill="#161412">@tell/cli (packages/cli)</text>
+        <text x="379" y="294" font-family="sans-serif" font-size="11.5" fill="#3D3833">npx @tell/cli init · doctor · diagnose</text>
+        <text x="379" y="310" font-family="monospace" font-size="10.5" fill="#B55632">packages/cli/src/index.ts</text>
+
+        <rect x="694" y="252" width="336" height="68" rx="6" fill="#F2ECE1" stroke="#161412" stroke-width="1.5"/>
+        <text x="708" y="275" font-family="monospace" font-size="13" font-weight="bold" fill="#161412">@tell/web (apps/web)</text>
+        <text x="708" y="294" font-family="sans-serif" font-size="11.5" fill="#3D3833">Next.js 15 Print-Atelier UI · /studio · /showcase</text>
+        <text x="708" y="310" font-family="monospace" font-size="10.5" fill="#B55632">apps/web/src/app/page.tsx</text>
+      </svg>
+    </div>
+
+    <h2>Workspace Packages &amp; Entrypoint Registry</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Package</th>
+          <th>Key Source Files</th>
+          <th>Determinism &amp; Boundary Contract</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>@tell/schema</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/schema/src/index.ts">packages/schema/src/index.ts</a><br/><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/schema/src/install-info.ts">packages/schema/src/install-info.ts</a></td>
+          <td>Single source of truth for all Zod types and <code>MCP_TOOL_NAMES</code> (11 tools). Must build before dependents (<code>pnpm -F @tell/schema build</code>).</td>
+        </tr>
+        <tr>
+          <td><code>@tell/core</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/index.ts">packages/core/src/detectors/index.ts</a><br/><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/proof-verify.ts">packages/core/src/proof-verify.ts</a></td>
+          <td>Pure functions over <code>DOMFingerprint</code>. Zero network/LLM calls inside detectors. Worktree proof runs in <code>os.tmpdir()</code>.</td>
+        </tr>
+        <tr>
+          <td><code>@tell/taste</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/taste/src/index.ts">packages/taste/src/index.ts</a></td>
+          <td>Wraps <code>@google/genai</code> (`gemini-2.5-pro`). If <code>GEMINI_API_KEY</code> is absent or times out, returns mechanical report with <code>confidence: 0.5</code>.</td>
+        </tr>
+        <tr>
+          <td><code>@tell/redesign</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/restyle.ts">packages/redesign/src/restyle.ts</a><br/><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/directions.ts">packages/redesign/src/directions.ts</a></td>
+          <td>Deterministic 6-axis BrandDNA inference, 7 distinct structural directions, WCAG 2.1 AA contrast solver (`>= 4.5:1` body, `>= 3.0:1` large).</td>
+        </tr>
+        <tr>
+          <td><code>@tell/design-skills</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/design-skills/src/staged.ts">packages/design-skills/src/staged.ts</a><br/><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/design-skills/src/orchestrate.ts">packages/design-skills/src/orchestrate.ts</a></td>
+          <td>Contains PR #105 staged primitives (`STAGED_STAGES`, `THEMES`, `deriveConcept`, `swapTest`, `weightedReview`) + specimen generator.</td>
+        </tr>
+        <tr>
+          <td><code>@tell/mcp</code> &amp; <code>@tell/cli</code></td>
+          <td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/mcp/src/registered-tools.ts">packages/mcp/src/registered-tools.ts</a><br/><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/cli/src/index.ts">packages/cli/src/index.ts</a></td>
+          <td>Stdio MCP server &amp; CLI installer. Enforces drift guard: registered tools must exactly match <code>MCP_TOOL_NAMES</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 3: MCP CATALOG (11 -> 19 TOOLS) -->
+  <section id="panel-mcp" class="page-panel" role="tabpanel">
+    <span class="kicker">Book I · Page 3 · Consolidates docs/features/mcp-plugin.md, Linear §4.1 &amp; BIM-203</span>
+    <h1>MCP Tool Catalog: 11 Shipped Tools → 19 Planned Staged Tools</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      Today <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/schema/src/install-info.ts">packages/schema/src/install-info.ts</a> exports <strong>11 live tools</strong> (enforced by <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/mcp/src/registered-tools.ts">registered-tools.ts</a>). Under the Concept-First Staged Redesign Plan (<a href="02-craft-engine-rootcause-and-staged-plan.html">Book III</a> / <code>BIM-203</code>), the single one-shot generator tool <code>tell_design_from_features</code> is retired and replaced by <strong>8 stage tools + <code>tell_review</code></strong> (`11 - 1 + 9 = 19` tools; note `BIM-203` summary text says `18` while Linear §4.1 table lists `19`).
+    </p>
+
+    <div class="grid-2" style="margin-bottom: 1.5rem;">
+      <div class="card">
+        <span class="badge badge-ok">LIVE ON MASTER (11 TOOLS)</span>
+        <h3 style="margin-top:0.4rem;">Current <code>MCP_TOOL_NAMES</code> Catalog</h3>
+        <table>
+          <thead><tr><th>Tool</th><th>Purpose &amp; Safety Contract</th></tr></thead>
+          <tbody>
+            <tr><td><code>tell_capture</code></td><td>Playwright capture (1440×1100 + 390×844) + computed styles + probes.</td></tr>
+            <tr><td><code>tell_diagnose</code></td><td>Runs 21 detectors + optional Gemini 2-pass reflection → <code>TellReport</code>.</td></tr>
+            <tr><td><code>tell_voice</code></td><td>Parses spoken/English art direction into concrete token deltas.</td></tr>
+            <tr><td><code>tell_redesign</code></td><td>Generates WCAG-verified CSS/Tailwind patch + 6-axis scorecard delta.</td></tr>
+            <tr><td><code>tell_apply</code></td><td><strong>Returns patch strings only</strong> (`globals.css`, `tailwind.config.ts`). Never writes files.</td></tr>
+            <tr><td><code>tell_capture_matrix</code></td><td>Multi-viewport (`375 / 768 / 1440`) × theme (`light / dark`) matrix capture.</td></tr>
+            <tr><td><code>tell_proof_verify</code></td><td>Applies patch in disposable git worktree; passes iff `netScoreDelta &lt; 0` &amp; `newTells === 0`.</td></tr>
+            <tr><td><code>tell_proof_revert</code></td><td>Cleans up disposable worktree and restores clean state.</td></tr>
+            <tr><td><code>tell_design_from_features</code></td><td>One-pass feature brief → design spec + HTML (<strong>Retiring in Phase 7</strong>).</td></tr>
+            <tr><td><code>tell_resolve_intent</code></td><td>Resolves messy prompt + repo context into structured design intent + BrandDNA.</td></tr>
+            <tr><td><code>tell_install_info</code></td><td>Returns canonical MCP/CLI config snippets for Cursor, Claude Code, etc.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <span class="badge badge-warn">PLANNED SPLIT (19 TOOLS · GATED ON BIM-203)</span>
+        <h3 style="margin-top:0.4rem;">9 New Stage &amp; Gate Tools Replacing <code>tell_design_from_features</code></h3>
+        <table>
+          <thead><tr><th>Stage</th><th>Proposed Tool</th><th>Output Record &amp; Server Gate</th></tr></thead>
+          <tbody>
+            <tr><td>S1 Brief</td><td><code>tell_brief</code></td><td>Saves <code>brief.md</code> (product facts, audience, assets). Gate: none.</td></tr>
+            <tr><td>S2 Concept</td><td><code>tell_concepts</code></td><td>Saves <code>concepts.md</code> (2–3 options + swap-test hooks). Gate: brief approved.</td></tr>
+            <tr><td>S3 Moodboard</td><td><code>tell_moodboard</code></td><td>Saves <code>moodboard.md</code> (3–5 credited references). Gate: concept chosen.</td></tr>
+            <tr><td>S4 Direction</td><td><code>tell_art_direction</code></td><td>Saves <code>direction.md</code> (tokens, named theme, motion sentence). Gate: moodboard approved.</td></tr>
+            <tr><td>S5 Imagery</td><td><code>tell_imagery</code></td><td>Saves <code>imagery.md</code> + media slots (source, licence, focal point). Gate: direction approved.</td></tr>
+            <tr><td>S6 Key Screen</td><td><code>tell_key_screen</code></td><td>Renders hero HTML + desktop/mobile screenshot + swap test. Gate: imagery approved.</td></tr>
+            <tr><td>S7 Sections</td><td><code>tell_section</code></td><td>Builds one section per call from the concept. Gate: key screen approved.</td></tr>
+            <tr><td>S8 Refine</td><td><code>tell_refine</code></td><td>Runs 7 motion checks + budgets + 40/30/20/10 review sheet. Gate: all sections approved.</td></tr>
+            <tr><td><strong>Human Gate</strong></td><td><code>tell_review</code></td><td><strong>Only way a stage changes status.</strong> Records human reviewer; agent cannot self-approve.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: 19-HOST MATRIX & 5-LAYER SECURITY -->
+  <section id="panel-security" class="page-panel" role="tabpanel">
+    <span class="kicker">Book I · Page 4 · Consolidates docs/11, docs/12 &amp; docs/13</span>
+    <h1>19-Host Compatibility &amp; 5-Layer Security Boundaries</h1>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1050 185" width="100%" role="img" aria-label="5-Layer Security Architecture">
+        <rect x="12" y="18" width="195" height="148" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="24" y="42" font-family="monospace" font-size="11" fill="#B55632">LAYER 1 · TRANSPORT</text>
+        <text x="24" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">Local Stdio First</text>
+        <text x="24" y="86" font-family="sans-serif" font-size="11" fill="#3D3833">Zero open ports by default.</text>
+        <text x="24" y="103" font-family="sans-serif" font-size="11" fill="#3D3833">Remote Worker requires</text>
+        <text x="24" y="120" font-family="sans-serif" font-size="11" fill="#3D3833">x-capture-secret header.</text>
+
+        <rect x="220" y="18" width="195" height="148" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="232" y="42" font-family="monospace" font-size="11" fill="#B55632">LAYER 2 · SSRF GUARD</text>
+        <text x="232" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">URL Allowlist</text>
+        <text x="232" y="86" font-family="sans-serif" font-size="11" fill="#3D3833">Blocks file://, 169.254.169.254,</text>
+        <text x="232" y="103" font-family="sans-serif" font-size="11" fill="#3D3833">RFC1918 LAN IPs in cloud.</text>
+        <text x="232" y="120" font-family="sans-serif" font-size="11" fill="#3D3833">Localhost allowed in local CLI.</text>
+
+        <rect x="428" y="18" width="195" height="148" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="440" y="42" font-family="monospace" font-size="11" fill="#B55632">LAYER 3 · REDACTION</text>
+        <text x="440" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">DOM Scrubbing</text>
+        <text x="440" y="86" font-family="sans-serif" font-size="11" fill="#3D3833">Strips cookies, storage,</text>
+        <text x="440" y="103" font-family="sans-serif" font-size="11" fill="#3D3833">password inputs &amp; bearer</text>
+        <text x="440" y="120" font-family="sans-serif" font-size="11" fill="#3D3833">tokens before Gemini call.</text>
+
+        <rect x="636" y="18" width="195" height="148" rx="7" fill="#E6F0EB" stroke="#2E5A44"/>
+        <text x="648" y="42" font-family="monospace" font-size="11" fill="#2E5A44">LAYER 4 · WORKTREE</text>
+        <text x="648" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">Disposable Checkout</text>
+        <text x="648" y="86" font-family="sans-serif" font-size="11" fill="#3D3833">tell_proof_verify runs in</text>
+        <text x="648" y="103" font-family="sans-serif" font-size="11" fill="#3D3833">os.tmpdir() git worktree;</text>
+        <text x="648" y="120" font-family="sans-serif" font-size="11" fill="#3D3833">Disabled on Vercel via env.</text>
+
+        <rect x="844" y="18" width="195" height="148" rx="7" fill="#F9EAE3" stroke="#D4714A"/>
+        <text x="856" y="42" font-family="monospace" font-size="11" fill="#B55632">LAYER 5 · HUMAN GATE</text>
+        <text x="856" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">Read-Only Patch</text>
+        <text x="856" y="86" font-family="sans-serif" font-size="11" fill="#3D3833">tell_apply returns strings.</text>
+        <text x="856" y="103" font-family="sans-serif" font-size="11" fill="#3D3833">tell_review requires human</text>
+        <text x="856" y="120" font-family="sans-serif" font-size="11" fill="#3D3833">approver ID per stage.</text>
+      </svg>
+    </div>
+
+    <h2>19-Host Integration Matrix (from <code>docs/11_AGENT_PLATFORM_INTEGRATION_PLAN.md</code>)</h2>
+    <table>
+      <thead>
+        <tr><th>Wave</th><th>Host / Agent Surfaces</th><th>Config Path / Mechanism</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Wave 1 (Tier-1 MCP)</strong></td>
+          <td>Cursor, Claude Code, Claude Desktop, Windsurf, VS Code Copilot</td>
+          <td><code>.cursor/mcp.json</code>, <code>.mcp.json</code>, <code>claude_desktop_config.json</code> via <code>npx @tell/cli init</code></td>
+          <td><span class="badge badge-ok">SHIPPED</span></td>
+        </tr>
+        <tr>
+          <td><strong>Wave 2 (IDE &amp; CLI)</strong></td>
+          <td>Cline, Roo Code, Continue, Zed, JetBrains AI, OpenAI Codex CLI, Gemini CLI</td>
+          <td>Stdio MCP entry generated by <code>packages/schema/src/install-info.ts</code></td>
+          <td><span class="badge badge-ok">SHIPPED</span></td>
+        </tr>
+        <tr>
+          <td><strong>Wave 3 (Cloud Agents)</strong></td>
+          <td>Devin, Grok Build, Replit Agent, Lovable, v0, Bolt</td>
+          <td>HTTP `/api/diagnose`, `/api/redesign`, `/api/install-info` + skill packs</td>
+          <td><span class="badge badge-ok">SHIPPED (HTTP + Skills)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Wave 4 (Browser)</strong></td>
+          <td>WebMCP (`navigator.modelContext`)</td>
+          <td>Evaluated in Linear §4.2 — <strong>Deferred</strong> (Chromium-only flag, no permission model)</td>
+          <td><span class="badge badge-warn">DEFERRED</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 5: 11 SUBAGENTS, RULES & SKILLS -->
+  <section id="panel-agents" class="page-panel" role="tabpanel">
+    <span class="kicker">Book I · Page 5 · Consolidates ORCHESTRATION.md, FEATURE-MAP.md, TOOLS-AND-SKILLS.md &amp; docs/skills/*</span>
+    <h1>11-Subagent Roster, Standing Rules &amp; Skill Routing</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      All 19 <code>.cursor/rules/*.mdc</code> files are consolidated into <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>, and agent routing is anchored in <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a> and <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/CLAUDE.md">CLAUDE.md</a>.
+    </p>
+
+    <h2>11 Specialized Subagents (<code>.cursor/agents/*.md</code>)</h2>
+    <table>
+      <thead>
+        <tr><th>Subagent</th><th>Model Pin</th><th>Owned Paths</th><th>Primary Responsibility</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/orchestrator.md">orchestrator</a></td><td><code>composer-2.5-fast</code></td><td>Root, milestone gates</td><td>Task decomposition, schema freeze gate, local verification gate.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/core-engineer.md">core-engineer</a></td><td><code>claude-opus-4-8-thinking-high</code></td><td><code>packages/schema</code>, <code>packages/core</code></td><td>Playwright capture, DOM fingerprint, 21 pure detectors, <code>proof-verify.ts</code>.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/taste-engineer.md">taste-engineer</a></td><td><code>claude-opus-4-8-thinking-high</code></td><td><code>packages/taste</code></td><td>Gemini 2.5 Pro 2-pass reflection verdicts + mechanical offline fallback (`0.5`).</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/redesign-engineer.md">redesign-engineer</a></td><td><code>claude-opus-4-8-thinking-high</code></td><td><code>packages/redesign</code></td><td>WCAG contrast solver, 6-axis BrandDNA reconciliation, 7 art-direction presets.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/mcp-engineer.md">mcp-engineer</a></td><td><code>composer-2.5-fast</code></td><td><code>packages/mcp</code>, <code>packages/cli</code></td><td>11 stdio MCP tools, drift guard test, CLI `init`/`doctor`.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/ui-builder.md">ui-builder</a></td><td><code>composer-2.5-fast</code></td><td><code>apps/web</code></td><td>Print-Atelier UI, `BeforeAfterSeam`, `TellCard`, `/studio`, `/showcase`.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/ux-copywriter.md">ux-copywriter</a></td><td><code>gpt-5.5-medium</code></td><td>Copy bank, `TellCard` prose</td><td>Senior critic voice (`<= 3` sentences, zero hedging, zero emoji).</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/fixture-smith.md">fixture-smith</a></td><td><code>composer-2.5-fast</code></td><td><code>fixtures/generic-app</code>, <code>fixtures/reports</code></td><td>Planted generic SaaS tells + `/brutalist` intentional route + golden JSON.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/dogfood-auditor.md">dogfood-auditor</a></td><td><code>claude-opus-4-8-thinking-high</code></td><td><code>pnpm dogfood:web</code></td><td>Verifies `apps/web` triggers 0 generic tells and 0 unintentional drift.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/deploy-engineer.md">deploy-engineer</a></td><td><code>composer-2.5-fast</code></td><td><code>Dockerfile</code>, <code>render.yaml</code>, <code>apps/web/vercel.json</code></td><td>Vercel + Vultr/Render Playwright worker + Neon Postgres setup.</td></tr>
+        <tr><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/agents/demo-director.md">demo-director</a></td><td><code>gpt-5.5-medium</code></td><td>Demo scripts, `docs/media`</td><td>5-beat Ashish demo rehearsal and offline fallback verification.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Active Skills Routing Index (<code>.cursor/skills/*</code> &amp; <code>agent-skills/web-design/*</code>)</h2>
+    <div class="grid-3">
+      <div class="card-paper">
+        <span class="badge badge-terra">DIAGNOSE &amp; PROVE</span>
+        <ul style="margin:0.5rem 0 0; padding-left:1.1rem; font-size:0.8rem;">
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-diagnose-ui/SKILL.md">tell-diagnose-ui</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-redesign-direction/SKILL.md">tell-redesign-direction</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-proof-verify/SKILL.md">tell-proof-verify</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/designproof-taste-loop/SKILL.md">designproof-taste-loop</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/designproof-anti-slop/SKILL.md">designproof-anti-slop</a></li>
+        </ul>
+      </div>
+      <div class="card-paper">
+        <span class="badge badge-ok">CRAFT &amp; SPECIMENS</span>
+        <ul style="margin:0.5rem 0 0; padding-left:1.1rem; font-size:0.8rem;">
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/agency-quality-site/SKILL.md">agency-quality-site</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-template-craft/SKILL.md">tell-template-craft</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/website-domain-research/SKILL.md">website-domain-research</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/responsive-performance/SKILL.md">responsive-performance</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/motion-stack/SKILL.md">motion-stack</a></li>
+        </ul>
+      </div>
+      <div class="card-paper">
+        <span class="badge badge-warn">OPS, DATA &amp; DEMO</span>
+        <ul style="margin:0.5rem 0 0; padding-left:1.1rem; font-size:0.8rem;">
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-mcp-setup/SKILL.md">tell-mcp-setup</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-dogfood-audit/SKILL.md">tell-dogfood-audit</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/emit-training-episode/SKILL.md">emit-training-episode</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/tell-demo-script/SKILL.md">tell-demo-script</a></li>
+          <li><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/designproof-diagram/SKILL.md">designproof-diagram</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.page-panel');
+    function activateTab(id) {
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+      history.replaceState(null, '', '#' + id);
+    }
+    tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab)));
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById('panel-' + hash)) activateTab(hash);
+  </script>
+</body>
+</html>

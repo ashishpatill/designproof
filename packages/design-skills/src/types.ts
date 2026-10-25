@@ -265,6 +265,107 @@ export const FeatureSpec = z.object({
 });
 export type FeatureSpec = z.infer<typeof FeatureSpec>;
 
+/* ------------------------------------------------------------------ */
+/* Media (S1 real assets → S5 imagery stage)                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * What a media asset is. SVG line drawings are deliberately absent: drawn schematics are
+ * figures, not imagery, and the root-cause study showed counting them as imagery is how pages
+ * with zero photographs passed the internal bands.
+ */
+export const MediaKind = z.enum(["photo", "product-screenshot", "video", "render-3d", "capture"]);
+export type MediaKind = z.infer<typeof MediaKind>;
+
+/** Where the asset came from. Provenance is required so licence review is never guesswork. */
+export const MediaSource = z.enum([
+  "brief-asset",
+  "product-capture",
+  "commissioned",
+  "licensed-library",
+  "generated",
+]);
+export type MediaSource = z.infer<typeof MediaSource>;
+
+export const MediaRole = z.enum(["hero", "section", "band"]);
+export type MediaRole = z.infer<typeof MediaRole>;
+
+/** Normalised crop anchor (0..1 on each axis). Rendered as `object-position`. */
+export const FocalPoint = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+});
+export type FocalPoint = z.infer<typeof FocalPoint>;
+
+/**
+ * Media URLs are emitted into HTML attributes, so they are whitelisted: https, root/relative
+ * paths, or raster data URIs only. Quotes, angle brackets and whitespace are rejected, and so is
+ * SVG — a vector drawing is not imagery.
+ */
+export const MediaSrc = z
+  .string()
+  .min(1)
+  .refine(
+    (s) =>
+      /^(https:\/\/|\/(?!\/)|\.\/|data:image\/(png|jpeg|webp|avif);base64,)/.test(s) && !/["'<>\s`]/.test(s),
+    "media src must be https://, a relative path, or a raster data URI with no quotes or whitespace",
+  )
+  .refine(
+    (s) => !/^data:image\/svg/i.test(s) && !/\.svg(\?|#|$)/i.test(s),
+    "SVG is drawn matter, not imagery — supply a raster, video, or 3D poster",
+  );
+
+export const MediaAsset = z
+  .object({
+    id: z.string().min(1),
+    kind: MediaKind.default("photo"),
+    src: MediaSrc,
+    /** Poster frame for video / 3D so the fold paints before any heavy runtime loads. */
+    posterSrc: MediaSrc.optional(),
+    source: MediaSource.default("brief-asset"),
+    /** Licence or rights statement, e.g. "Client-owned", "Unsplash License". */
+    licence: z.string().min(1),
+    alt: z.string().default(""),
+    /** Purely decorative media may have empty alt; everything else must describe itself. */
+    decorative: z.boolean().default(false),
+    focalPoint: FocalPoint.default({ x: 0.5, y: 0.5 }),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+    /** What the asset depicts — matched against section titles and feature names. */
+    subject: z.string().default(""),
+    /** Requested placement. The imagery stage honours it when the slot exists. */
+    preferredRole: MediaRole.optional(),
+    /** One line on how the asset should be cropped, layered, or treated. */
+    artDirectionNote: z.string().default(""),
+    caption: z.string().optional(),
+  })
+  .superRefine((a, ctx) => {
+    if (!a.decorative && !a.alt.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["alt"],
+        message: "non-decorative media needs alt text",
+      });
+    }
+    if ((a.kind === "video" || a.kind === "render-3d") && !a.posterSrc) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["posterSrc"],
+        message: "video and 3D media need a poster frame",
+      });
+    }
+  });
+export type MediaAsset = z.infer<typeof MediaAsset>;
+
+/** One placed asset on a section. */
+export const MediaSlot = z.object({
+  role: MediaRole,
+  asset: MediaAsset,
+  /** Why the imagery stage put it here — shown at the human review gate. */
+  reason: z.string().default(""),
+});
+export type MediaSlot = z.infer<typeof MediaSlot>;
+
 export const DesignBrief = z.object({
   productName: z.string().min(1),
   tagline: z.string().default(""),
@@ -315,6 +416,12 @@ export const DesignBrief = z.object({
    * explicit theme, never from a product-name hash.
    */
   theme: z.string().optional(),
+  /**
+   * S1 real assets — product photography, screenshots, captures, posters. The imagery stage
+   * places only these (never cycles one asset across slots, never invents stock), and reports
+   * every slot it could not fill as a gap instead of drawing an SVG in its place.
+   */
+  assets: z.array(MediaAsset).optional(),
 });
 export type DesignBrief = z.infer<typeof DesignBrief>;
 
@@ -615,8 +722,23 @@ export const SectionSpec = z.object({
   brandLabel: z.string().optional(),
   navItems: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
   inspirationNotes: z.array(z.string()).default([]),
+  /** Placed imagery from the S5 imagery stage. Absent when the brief supplied no assets. */
+  media: z.array(MediaSlot).optional(),
 });
 export type SectionSpec = z.infer<typeof SectionSpec>;
+
+/** Output of the S5 imagery stage — what was placed, and what is still missing. */
+export const ImageryPlanSpec = z.object({
+  placed: z.array(
+    z.object({ sectionId: z.string(), role: MediaRole, assetId: z.string(), reason: z.string() }),
+  ),
+  unusedAssetIds: z.array(z.string()).default([]),
+  heroHasMedia: z.boolean(),
+  rasterSlots: z.number().int().nonnegative(),
+  /** Honest list of slots that still need real media. Never filled with drawings. */
+  gaps: z.array(z.string()).default([]),
+});
+export type ImageryPlanSpec = z.infer<typeof ImageryPlanSpec>;
 
 /**
  * Machine-readable research gate plan — agents and agency:run must execute these nodes
@@ -651,6 +773,8 @@ export const DesignSpec = z.object({
   concept: ConceptSpec.optional(),
   themeId: z.string().optional(),
   theme: z.string().optional(),
+  /** S5 imagery stage result. */
+  imagery: ImageryPlanSpec.optional(),
 });
 export type DesignSpec = z.infer<typeof DesignSpec>;
 

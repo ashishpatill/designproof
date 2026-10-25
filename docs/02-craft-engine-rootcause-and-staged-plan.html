@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book III — Root-Cause Study, 12-Studio Research &amp; Concept-First 8-Stage Plan</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-paper: #FAF6F0;
+      --bg-linen: #F2ECE1;
+      --bg-aged: #E8DFD1;
+      --ink-900: #161412;
+      --ink-700: #3D3833;
+      --ink-500: #6E665E;
+      --rule-hairline: #DDD4C6;
+      --terracotta: #D4714A;
+      --terracotta-deep: #B55632;
+      --forest: #2E5A44;
+      --ochre: #C88A2B;
+      --crimson: #B83B3B;
+      --serif: "Iowan Old Style", "Instrument Serif", "Palatino Linotype", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+      --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg-paper); color: var(--ink-900); font-family: var(--sans); line-height: 1.55; }
+    .topbar { position: sticky; top: 0; z-index: 50; background: rgba(250, 246, 240, 0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule-hairline); }
+    .book-ribbon { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 1.5rem; border-bottom: 1px solid var(--rule-hairline); font-size: 0.78rem; background: var(--bg-linen); flex-wrap: wrap; gap: 0.5rem; }
+    .book-links { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .book-pill { padding: 0.25rem 0.65rem; border-radius: 4px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); color: var(--ink-700); text-decoration: none; font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+    .book-pill.active { background: var(--ink-900); color: var(--bg-paper); border-color: var(--ink-900); }
+    .book-pill:hover:not(.active) { border-color: var(--terracotta); color: var(--terracotta-deep); }
+    .tabbar { display: flex; gap: 0.25rem; padding: 0.5rem 1.5rem 0; overflow-x: auto; }
+    .tab-btn { appearance: none; border: 1px solid transparent; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-500); font-family: var(--sans); font-size: 0.82rem; font-weight: 600; padding: 0.55rem 0.95rem; cursor: pointer; white-space: nowrap; border-radius: 6px 6px 0 0; }
+    .tab-btn[aria-selected="true"] { color: var(--ink-900); background: var(--bg-paper); border-color: var(--rule-hairline); border-bottom-color: var(--terracotta); }
+    .page-panel { display: none; max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .page-panel.active { display: block; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+    h1 { font-size: clamp(2rem, 3.2vw, 2.8rem); line-height: 1.08; }
+    h2 { font-size: 1.6rem; border-bottom: 1px solid var(--rule-hairline); padding-bottom: 0.4rem; margin-top: 2rem; }
+    h3 { font-size: 1.15rem; }
+    .kicker { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta-deep); margin-bottom: 0.35rem; display: block; }
+    .card { background: var(--bg-linen); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1.1rem; }
+    .card-paper { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 0.95rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 0.85rem; }
+    .badge { display: inline-block; font-family: var(--mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 3px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); }
+    .badge-miss { background: #FCE8E8; color: var(--crimson); border-color: #E8B0B0; }
+    .badge-part { background: #FBF1DF; color: #8F5E10; border-color: #E8CB96; }
+    .badge-ok { background: #E6F0EB; color: var(--forest); border-color: #B7D4C5; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--rule-hairline); vertical-align: top; }
+    th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-500); background: var(--bg-linen); }
+    code { font-family: var(--mono); font-size: 0.8em; background: rgba(232,223,209,0.65); padding: 0.1rem 0.32rem; border-radius: 3px; }
+    a.file-link { color: var(--terracotta-deep); text-decoration: underline; font-family: var(--mono); font-size: 0.76rem; }
+    .svg-frame { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .specimen-img { width: 100%; height: 145px; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--rule-hairline); margin-bottom: 0.5rem; background: var(--bg-aged); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="book-ribbon">
+      <div>
+        <strong>DESIGNPROOF DOCS</strong>
+        <span style="color:var(--ink-500); margin-left:0.5rem;">Book III · Root-Cause Study, 12-Studio Research &amp; Concept-First 8-Stage Engine</span>
+      </div>
+      <nav class="book-links" aria-label="Consolidated Books">
+        <a class="book-pill" href="00-hub-architecture-and-mcp.html">Book I: Hub, Arch &amp; MCP</a>
+        <a class="book-pill" href="01-detectors-taste-and-design-system.html">Book II: 21 Detectors &amp; Design System</a>
+        <a class="book-pill active" href="02-craft-engine-rootcause-and-staged-plan.html">Book III: Root-Cause &amp; 8-Stage Engine</a>
+        <a class="book-pill" href="03-status-audit-ops-and-training.html">Book IV: Status, 48-Doc Audit &amp; Ops</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a>
+      </nav>
+    </div>
+    <nav class="tabbar" role="tablist" aria-label="Book III Pages">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="rootcause">1. Root-Cause Study (3.2–4.7 vs SOTD 7.92)</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="studios-research">2. 12 Studios, Open Design &amp; Opus Research</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="staged-plan">3. Concept-First 8-Stage Plan &amp; Imagery</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="evidence-motion">4. 82-Site Evidence &amp; Motion Tiers</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="phases-rivals">5. 7-Step Roadmap, Phases 0–7 &amp; 10 Rivals</button>
+    </nav>
+  </header>
+
+  <!-- PAGE 1: ROOT CAUSE STUDY -->
+  <main id="panel-rootcause" class="page-panel active" role="tabpanel">
+    <span class="kicker">Book III · Page 1 · Consolidates designproof-central-plan.html, root-cause-study.md &amp; REVAMP-AUDIT.md</span>
+    <h1>Why Generated Sites Score 3.2–4.7 / 10 vs Awwwards SOTD 7.6–7.9</h1>
+    <p style="max-width: 880px; color: var(--ink-700);">
+      <strong>Core Verdict:</strong> DesignProof's generator (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/design-skills/src/staged.ts">packages/design-skills/src/staged.ts#L4-L12</a>) is a deterministic rulebook with no model in the loop, no media slot on <code>SectionSpec</code> (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/design-skills/src/types.ts">types.ts#L578-L618</a>), and ~30 self-drawn SVG line diagrams instead of photography. Meanwhile, <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/scripts/design-research/forensics.ts">forensics.ts#L606</a> counts <code>svg</code> the same as <code>img/video/canvas</code>, so pages with zero photos pass internal bands while scoring <strong>3.2–4.7 / 10</strong> on the Awwwards 40/30/20/10 rubric.
+    </p>
+
+    <!-- SVG CHART: TEMPLATE SCORES VS SOTD -->
+    <div class="svg-frame">
+      <svg viewBox="0 0 820 295" width="100%" role="img" aria-label="Template Scores vs Awwwards Site of the Day">
+        <rect x="652" y="18" width="15" height="232" fill="#2E5A44" opacity="0.16"/>
+        <line x1="652" y1="18" x2="652" y2="250" stroke="#2E5A44" stroke-dasharray="4,3"/>
+        <text x="659" y="13" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#2E5A44">SOTD 7.6–7.9</text>
+        <text x="210" y="34" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#95 merchandising loom (Drop)</text>
+        <rect x="220" y="20" width="193.8" height="20" rx="3" fill="#B83B3B"/><text x="420" y="35" font-family="monospace" font-size="12" font-weight="bold">3.4</text>
+        <text x="210" y="64" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#96 consumer craft (Fold)</text>
+        <rect x="220" y="50" width="182.4" height="20" rx="3" fill="#B83B3B"/><text x="409" y="65" font-family="monospace" font-size="12" font-weight="bold">3.2</text>
+        <text x="210" y="94" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#97 research dossier (Rebuild 1st)</text>
+        <rect x="220" y="80" width="245.1" height="20" rx="3" fill="#C88A2B"/><text x="472" y="95" font-family="monospace" font-size="12" font-weight="bold">4.3</text>
+        <text x="210" y="124" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#98 agent harness (Merge w/ keel)</text>
+        <rect x="220" y="110" width="245.1" height="20" rx="3" fill="#C88A2B"/><text x="472" y="125" font-family="monospace" font-size="12" font-weight="bold">4.3</text>
+        <text x="210" y="154" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#99 clinic / care pathway (Drop)</text>
+        <rect x="220" y="140" width="182.4" height="20" rx="3" fill="#B83B3B"/><text x="409" y="155" font-family="monospace" font-size="12" font-weight="bold">3.2</text>
+        <text x="210" y="184" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#101 lantern (Direction only)</text>
+        <rect x="220" y="170" width="222.3" height="20" rx="3" fill="#C88A2B"/><text x="449" y="185" font-family="monospace" font-size="12" font-weight="bold">3.9</text>
+        <text x="210" y="214" text-anchor="end" font-family="sans-serif" font-size="12.5" fill="#161412">#102 keel (Dev-tool base)</text>
+        <rect x="220" y="200" width="267.9" height="20" rx="3" fill="#C88A2B"/><text x="495" y="215" font-family="monospace" font-size="12" font-weight="bold">4.7</text>
+        <text x="210" y="244" text-anchor="end" font-family="sans-serif" font-size="12.5" font-weight="bold" fill="#2E5A44">Igloo Inc (Awwwards SOTD)</text>
+        <rect x="220" y="230" width="451.4" height="20" rx="3" fill="#2E5A44"/><text x="678" y="245" font-family="monospace" font-size="12" font-weight="bold" fill="#2E5A44">7.92</text>
+        <line x1="220" y1="255" x2="790" y2="255" stroke="#DDD4C6"/>
+        <text x="220" y="274" font-family="monospace" font-size="10.5" fill="#6E665E">0 / 10 (Design 40% · Usability 30% · Creativity 20% · Content 10%)</text>
+        <text x="790" y="274" text-anchor="end" font-family="monospace" font-size="10.5" fill="#6E665E">10 / 10</text>
+      </svg>
+    </div>
+
+    <!-- DIAGRAM A: CURRENT PIPELINE DEFECT SVG -->
+    <h2>Diagram (a): Current Pipeline — 8 Stage Labels Over 1 Deterministic Pass</h2>
+    <div class="svg-frame">
+      <svg viewBox="0 0 1000 310" width="100%" role="img" aria-label="Current Pipeline Defect Map">
+        <text x="20" y="22" font-family="sans-serif" font-size="12.5" font-weight="bold" fill="#6E665E">Eight stage labels in Studio (apps/web/src/app/studio/page.tsx, staged.ts) — but S5 Imagery is a label only:</text>
+        <rect x="20" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="76" y="54" text-anchor="middle" font-size="12" font-weight="bold">S1 Brief</text><text x="76" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">brief.md</text>
+        <rect x="140" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="196" y="54" text-anchor="middle" font-size="12" font-weight="bold">S2 Concept</text><text x="196" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">7-row table</text>
+        <rect x="260" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="316" y="54" text-anchor="middle" font-size="12" font-weight="bold">S3 Moodboard</text><text x="316" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">text refs</text>
+        <rect x="380" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="436" y="54" text-anchor="middle" font-size="12" font-weight="bold">S4 Direction</text><text x="436" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">THEMES / seed</text>
+        <rect x="500" y="34" width="112" height="44" rx="5" fill="#FCE8E8" stroke="#B83B3B" stroke-width="2" stroke-dasharray="5,3"/><text x="556" y="54" text-anchor="middle" font-size="12" font-weight="bold" fill="#B83B3B">S5 Imagery</text><text x="556" y="70" text-anchor="middle" font-size="10.5" fill="#B83B3B">LABEL ONLY</text>
+        <rect x="620" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="676" y="54" text-anchor="middle" font-size="12" font-weight="bold">S6 Key Screen</text><text x="676" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">hero slice</text>
+        <rect x="740" y="34" width="112" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="796" y="54" text-anchor="middle" font-size="12" font-weight="bold">S7 Sections</text><text x="796" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">section list</text>
+        <rect x="860" y="34" width="120" height="44" rx="5" fill="#F2ECE1" stroke="#3D3833"/><text x="920" y="54" text-anchor="middle" font-size="12" font-weight="bold">S8 Refinement</text><text x="920" y="70" text-anchor="middle" font-size="10.5" fill="#6E665E">checks listed</text>
+
+        <rect x="20" y="102" width="960" height="36" rx="5" fill="#E8DFD1" stroke="#161412"/><text x="500" y="125" text-anchor="middle" font-family="monospace" font-size="12.5" font-weight="bold">Actual generator beneath: ONE deterministic pass — designFromFeatures (orchestrate.ts:104) · Zero LLM</text>
+
+        <rect x="20" y="160" width="225" height="130" rx="6" fill="#FAF6F0" stroke="#3D3833"/>
+        <text x="32" y="182" font-size="12.5" font-weight="bold">1. Concept &amp; Palette</text>
+        <text x="32" y="202" font-size="11" fill="#3D3833">• Fixed 7-row CONCEPT_TABLE</text>
+        <text x="32" y="219" font-size="11" fill="#3D3833">• Legacy seed = productName</text>
+        <text x="32" y="236" font-size="11" fill="#3D3833">• Swap test compares strings only</text>
+        <text x="32" y="272" font-family="monospace" font-size="10" fill="#B55632">staged.ts:226–366</text>
+
+        <rect x="260" y="160" width="230" height="130" rx="6" fill="#FCE8E8" stroke="#B83B3B" stroke-dasharray="5,3"/>
+        <text x="272" y="182" font-size="12.5" font-weight="bold" fill="#B83B3B">2. SectionSpec (No Media)</text>
+        <text x="272" y="202" font-size="11" fill="#3D3833">• Zero image/video fields on spec</text>
+        <text x="272" y="219" font-size="11" fill="#3D3833">• Shared section skeleton across</text>
+        <text x="272" y="236" font-size="11" fill="#3D3833">  all 7 templates</text>
+        <text x="272" y="272" font-family="monospace" font-size="10" fill="#B83B3B">types.ts:578–618</text>
+
+        <rect x="505" y="160" width="230" height="130" rx="6" fill="#FCE8E8" stroke="#B83B3B" stroke-dasharray="5,3"/>
+        <text x="517" y="182" font-size="12.5" font-weight="bold" fill="#B83B3B">3. Figures (Line Drawings)</text>
+        <text x="517" y="202" font-size="11" fill="#3D3833">• ~30 self-drawn SVG schematics</text>
+        <text x="517" y="219" font-size="11" fill="#3D3833">• Loom photos disabled: void photos;</text>
+        <text x="517" y="236" font-size="11" fill="#3D3833">• Only 1 photo left (herbarium)</text>
+        <text x="517" y="272" font-family="monospace" font-size="10" fill="#B83B3B">figures.ts:2887, 2964</text>
+
+        <rect x="750" y="160" width="230" height="130" rx="6" fill="#FCE8E8" stroke="#B83B3B" stroke-dasharray="5,3"/>
+        <text x="762" y="182" font-size="12.5" font-weight="bold" fill="#B83B3B">4. Blind Evaluation</text>
+        <text x="762" y="202" font-size="11" fill="#3D3833">• Counts SVG == photo in band</text>
+        <text x="762" y="219" font-size="11" fill="#3D3833">• hasHeroMedia/WebGL unscored</text>
+        <text x="762" y="236" font-size="11" fill="#3D3833">• Judged PRs on copy repeat score</text>
+        <text x="762" y="272" font-family="monospace" font-size="10" fill="#B83B3B">forensics.ts:606 · metrics.ts:216</text>
+      </svg>
+    </div>
+
+    <h2>Visual Evidence: Extracted PR #105 Screenshots &amp; Showcase Specimens</h2>
+    <div class="grid-3" style="margin-bottom:1rem;">
+      <div class="card-paper">
+        <img class="specimen-img" src="media/pr105-saas-skeleton.jpg" alt="SaaS specimen after PR 105 showing grey skeleton bars" />
+        <span class="badge badge-miss">Evidence #1 · PR #105 SaaS</span>
+        <p style="font-size:0.78rem; margin:0.35rem 0 0; color:var(--ink-700);">Northstar SaaS sample at 1280px (`c1e2435`): hero visual is grey skeleton bars and a drawn schematic with zero photography.</p>
+      </div>
+      <div class="card-paper">
+        <img class="specimen-img" src="media/pr105-dossier-polygon.jpg" alt="Research dossier before rebuild" />
+        <span class="badge badge-part">Evidence #2 · Dossier Before</span>
+        <p style="font-size:0.78rem; margin:0.35rem 0 0; color:var(--ink-700);">`#97 research-dossier` before rebuild (`4.3/10` Awwwards score; repeat score `309 → 100`).</p>
+      </div>
+      <div class="card-paper">
+        <img class="specimen-img" src="media/pr105-herbarium-photo.jpg" alt="Research dossier after rebuild polygon plate" />
+        <span class="badge badge-miss">Evidence #3 · Dossier Rebuild S5</span>
+        <p style="font-size:0.78rem; margin:0.35rem 0 0; color:var(--ink-700);">Rebuilt `research-dossier` (`after6`): S5 Imagery produced a line-drawn polygon SVG plate instead of real imagery.</p>
+      </div>
+    </div>
+
+    <div class="grid-4">
+      <div class="card-paper"><img class="specimen-img" src="media/showcase/crease-fold.webp" alt="Keel / Crease specimen" /><span class="badge badge-ok">#102 keel (4.7/10)</span><p style="font-size:0.75rem; margin:0.25rem 0 0;">Keep as base of developer-tool concept (`BIM-192`).</p></div>
+      <div class="card-paper"><img class="specimen-img" src="media/showcase/harness-fold.webp" alt="Agent harness specimen" /><span class="badge badge-part">#98 harness (4.3/10)</span><p style="font-size:0.75rem; margin:0.25rem 0 0;">Merge ideas into `keel` (`BIM-180`).</p></div>
+      <div class="card-paper"><img class="specimen-img" src="media/showcase/lantern-fold.webp" alt="Lantern specimen" /><span class="badge badge-part">#101 lantern (3.9/10)</span><p style="font-size:0.75rem; margin:0.25rem 0 0;">Keep as dark visual direction only (`BIM-190`).</p></div>
+      <div class="card-paper"><img class="specimen-img" src="media/showcase/loom-fold.webp" alt="Merchandising loom specimen" /><span class="badge badge-miss">#95 loom (3.4/10)</span><p style="font-size:0.75rem; margin:0.25rem 0 0;">Proposed Drop (`BIM-177`); photos disabled in `figures.ts:2887`.</p></div>
+    </div>
+  </main>
+
+  <!-- PAGE 2: 12 STUDIOS, OPEN DESIGN & OPUS RESEARCH -->
+  <section id="panel-studios-research" class="page-panel" role="tabpanel">
+    <span class="kicker">Book III · Page 2 · Consolidates research-2/design-research-report.md, thread1-studio-process.md &amp; threads2-3-notes.md</span>
+    <h1>12 Studios, Open Design &amp; Frontier Model Research (23 Oct 2026)</h1>
+
+    <h2>Diagram (d): Comparison Matrix — DesignProof vs Open Design vs Top Studios</h2>
+    <table>
+      <thead>
+        <tr><th>Dimension</th><th>DesignProof (<code>c1e2435</code>)</th><th>Open Design (<code>open-design.ai</code> · 103.5K★)</th><th>Top Design Studios (SOTD 7.6–7.9+)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Imagery</strong></td><td><span class="badge badge-miss">Missing</span> No media field on `SectionSpec`; ~30 SVG line figures; 1 photo left (herbarium).</td><td><span class="badge badge-part">Model-driven</span> Relies on frontier coding agent + 152+ `DESIGN.md` systems.</td><td><span class="badge badge-ok">Strong</span> Custom 3D assets (Lusion), commissioned shoots (Hello Monday, BASIC/DEPT).</td></tr>
+        <tr><td><strong>Depth / Layering</strong></td><td><span class="badge badge-part">Partial</span> Faint by rule: 4–9% gradient tints, hairline rails, shadow cap `<= 0.04`.</td><td><span class="badge badge-part">System-driven</span> Brand consistency via `DESIGN.md` tokens.</td><td><span class="badge badge-ok">Strong</span> Photo + type overlap, 3D worlds (Igloo Inc), bas-relief (Immersive Garden).</td></tr>
+        <tr><td><strong>Motion</strong></td><td><span class="badge badge-part">Partial</span> "One restrained entrance, then stillness"; no GSAP/Rive/WebGL; motion review not gated.</td><td><span class="badge badge-part">Not specified</span> Static/HTML export + comment iteration loop.</td><td><span class="badge badge-ok">Strong</span> Motion IS the concept ("ice", "F1 speed"); prototyped on 1 key moment first.</td></tr>
+        <tr><td><strong>Concept</strong></td><td><span class="badge badge-part">Partial</span> Fixed 7-row `CONCEPT_TABLE`; swap test compares text only.</td><td><span class="badge badge-part">Partial</span> Starts from a design system, not a per-brief concept or moodboard.</td><td><span class="badge badge-ok">Strong</span> One positioning line ("Power your obsession" — Pentagram); ruthless cutting (Studio Freight).</td></tr>
+        <tr><td><strong>Evaluation</strong></td><td><span class="badge badge-miss">Structural only</span> Repeat score + ~70 plumbing checks; `svg == img` in figure band.</td><td><span class="badge badge-ok">Iterative</span> Teammates comment on canvas, agent revises.</td><td><span class="badge badge-ok">Jury &amp; Eye</span> Awwwards 40/30/20/10 (18+ jurors) + Developer review + "Does this feel right?"</td></tr>
+      </tbody>
+    </table>
+
+    <h2>12 Studios Studied &amp; What Must Reach Our Engine</h2>
+    <div class="grid-3">
+      <div class="card-paper"><h3>Lusion (lusion.co)</h3><p style="font-size:0.8rem; color:var(--ink-700);">Real-time 3D storytelling. <em>"Every single visual uses some custom assets."</em> Design &amp; dev run in parallel; every project gets its own system and logic.</p></div>
+      <div class="card-paper"><h3>Igloo Inc (abeto + Bureaux)</h3><p style="font-size:0.8rem; color:var(--ink-700);">Awwwards SOTD <strong>7.92</strong> (Animation 9.6). Bureaux supplied moodboards &amp; renders; abeto built grey mockups and procedural ice blocks in browser.</p></div>
+      <div class="card-paper"><h3>OFF+BRAND (Lando Norris)</h3><p style="font-size:0.8rem; color:var(--ink-700);">Awwwards SOTY. Built in &lt;2 months: 1 helmet motif, 4 colors, muted photos so the neon accent is brightest, thin serif + heavy sans, WebGL + Rive.</p></div>
+      <div class="card-paper"><h3>Active Theory (activetheory.net)</h3><p style="font-size:0.8rem; color:var(--ink-700);">Custom Hydra WebGL engine. <em>"Iteration is the essence of the project. Don't be afraid to iterate by small steps."</em></p></div>
+      <div class="card-paper"><h3>Immersive Garden</h3><p style="font-size:0.8rem; color:var(--ink-700);">3D luxury journeys (LV, Cartier, Dior). One-line concept (<em>"connect human to nature"</em>); spends more time removing elements than adding.</p></div>
+      <div class="card-paper"><h3>Pentagram</h3><p style="font-size:0.8rem; color:var(--ink-700);">Substance-first identity. One positioning idea (<em>"Power your obsession"</em>) drives tone, custom type, and imagery; one accountable creative director.</p></div>
+      <div class="card-paper"><h3>Studio Freight &amp; Darkroom</h3><p style="font-size:0.8rem; color:var(--ink-700);">Created Lenis smooth scroll (maintained by Darkroom Engineering; Studio Freight remains separate). <em>"Brutal elegance: dropping good ideas for one great one."</em></p></div>
+      <div class="card-paper"><h3>Instrument &amp; Work &amp; Co</h3><p style="font-size:0.8rem; color:var(--ink-700);">Instrument: <em>"Prototyping is design — can we build it, and does it feel right?"</em> Work &amp; Co: <em>"Zero big reveals"</em> — working prototype in ~20 days.</p></div>
+      <div class="card-paper"><h3>Locomotive (locomotive.ca)</h3><p style="font-size:0.8rem; color:var(--ink-700);">Montréal studio (corrected from SEO agency citation in `s2.md`). Custom typeface, modular case-study blocks, Locomotive Scroll.</p></div>
+    </div>
+
+    <h2>Frontier Model Behavior: Claude Opus 4.7/5.5 &amp; Claude Design (Threads 2 &amp; 3)</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Why Models Converge on Slop (&amp; How to Fix It)</h3>
+        <ul style="margin:0; padding-left:1.2rem; font-size:0.83rem; color:var(--ink-700);">
+          <li><strong>Anthropic Skills Study</strong>: Names <em>"distributional convergence"</em> (Inter, purple gradients, 3-card grids). Models have far higher capability than default prompts unlock.</li>
+          <li><strong>Contra Labs (600 Blind Designer Comparisons)</strong>: Top failure modes were <strong>missing imagery (33 write-ups)</strong> (<em>"each page had to draw its own with code"</em>), <strong>text-heavy sections (32)</strong>, and <strong>faint/low-contrast text (26)</strong>.</li>
+          <li><strong>Specific Bans Beat Vague Prompts</strong>: Saying <em>"avoid a generic AI look"</em> just swaps one default for another. Naming concrete bans (no `01/02/03` rails, no italic accent words, no pill badges above H1) plus 3–5 reference screenshots + `DESIGN.md` transforms output quality.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Top AI Design Skills &amp; Claude Design (17 Apr 2026)</h3>
+        <table>
+          <thead><tr><th>Repo / Tool</th><th>Stars / Date</th><th>Takeaway for DesignProof</th></tr></thead>
+          <tbody>
+            <tr><td><code>nextlevelbuilder/ui-ux-pro-max-skill</code></td><td>67,856 ★</td><td>Searchable style/palette/font tables beat prose rules.</td></tr>
+            <tr><td><code>VoltAgent/awesome-design-md</code></td><td>60,342 ★</td><td>`DESIGN.md` is now the universal cross-agent brand contract.</td></tr>
+            <tr><td><code>google-labs-code/stitch-skills</code></td><td>8,547 ★</td><td>Pair `DESIGN.md` with framework-specific component skills.</td></tr>
+            <tr><td><strong>Claude Design</strong> (Anthropic Labs)</td><td>17 Apr 2026</td><td>Opus 4.7 visual canvas + codebase onboarding + Claude Code handoff bundle.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 3: CONCEPT-FIRST 8-STAGE ARCHITECTURE & IMAGERY -->
+  <section id="panel-staged-plan" class="page-panel" role="tabpanel">
+    <span class="kicker">Book III · Page 3 · Consolidates Linear Redesign Plan §1–§4, BIM-203 &amp; packages/design-skills/src/staged.ts</span>
+    <h1>Proposed Concept-First 8-Stage Architecture &amp; Imagery Pipeline</h1>
+
+    <!-- DIAGRAM B: PROPOSED ARCHITECTURE SVG -->
+    <div class="svg-frame">
+      <svg viewBox="0 0 1000 430" width="100%" role="img" aria-label="Proposed 8-Stage Concept-First Architecture">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="#2E5A44"/>
+          </marker>
+        </defs>
+        <rect x="20" y="18" width="295" height="125" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="34" y="42" font-family="monospace" font-size="11" fill="#6E665E">STAGE 1 · tell_brief</text>
+        <text x="34" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">S1 Brief &amp; Real Assets</text>
+        <text x="34" y="84" font-size="11.5" fill="#3D3833">Facts, audience, goal, real product</text>
+        <text x="34" y="101" font-size="11.5" fill="#3D3833">photos/screenshots → saves brief.md</text>
+
+        <line x1="315" y1="80" x2="345" y2="80" stroke="#2E5A44" stroke-width="2" marker-end="url(#ar2)"/>
+
+        <rect x="350" y="18" width="300" height="125" rx="7" fill="#E6F0EB" stroke="#2E5A44" stroke-width="2"/>
+        <text x="364" y="42" font-family="monospace" font-size="11" fill="#2E5A44">STAGE 2 · tell_concepts (NEW MODEL STEP)</text>
+        <text x="364" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">S2 Model-Assisted Concept</text>
+        <text x="364" y="84" font-size="11.5" fill="#3D3833">In: 3–5 ref screenshots + DESIGN.md</text>
+        <text x="364" y="101" font-size="11.5" fill="#3D3833">Out: 2–3 concepts, 1-line idea, motif,</text>
+        <text x="364" y="118" font-size="11.5" fill="#3D3833">hero moment, named bans, runtime tier</text>
+
+        <line x1="650" y1="80" x2="680" y2="80" stroke="#2E5A44" stroke-width="2" marker-end="url(#ar2)"/>
+
+        <rect x="685" y="18" width="295" height="125" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="699" y="42" font-family="monospace" font-size="11" fill="#6E665E">STAGES 3–4 · moodboard + direction</text>
+        <text x="699" y="64" font-family="Georgia, serif" font-size="15" font-weight="bold">S3 Moodboard &amp; S4 Direction</text>
+        <text x="699" y="84" font-size="11.5" fill="#3D3833">Credited references + named colour</text>
+        <text x="699" y="101" font-size="11.5" fill="#3D3833">theme (6 themes) + 1-sentence motion</text>
+
+        <rect x="685" y="170" width="295" height="130" rx="7" fill="#E6F0EB" stroke="#2E5A44" stroke-width="2"/>
+        <text x="699" y="194" font-family="monospace" font-size="11" fill="#2E5A44">STAGE 5 · tell_imagery (NEW PIPELINE)</text>
+        <text x="699" y="216" font-family="Georgia, serif" font-size="15" font-weight="bold">S5 Imagery &amp; Asset Pipeline</text>
+        <text x="699" y="236" font-size="11.5" fill="#3D3833">Media slots on SectionSpec + hero:</text>
+        <text x="699" y="253" font-size="11.5" fill="#3D3833">source · licence · alt · focalPoint</text>
+        <text x="699" y="270" font-size="11.5" fill="#3D3833">AVIF/WebP + 3D posters + captures</text>
+
+        <line x1="685" y1="235" x2="655" y2="235" stroke="#2E5A44" stroke-width="2" marker-end="url(#ar2)"/>
+
+        <rect x="350" y="170" width="300" height="130" rx="7" fill="#E6F0EB" stroke="#2E5A44" stroke-width="2"/>
+        <text x="364" y="194" font-family="monospace" font-size="11" fill="#2E5A44">STAGES 6–7 · key_screen + section</text>
+        <text x="364" y="216" font-family="Georgia, serif" font-size="15" font-weight="bold">S6 Key Screen &amp; S7 Sections</text>
+        <text x="364" y="236" font-size="11.5" fill="#3D3833">Layering recipes: photo + type overlap,</text>
+        <text x="364" y="253" font-size="11.5" fill="#3D3833">cut-outs, masks, grain, earned shadows.</text>
+        <text x="364" y="270" font-size="11.5" fill="#3D3833">Sections derive from concept, not table.</text>
+
+        <line x1="350" y1="235" x2="320" y2="235" stroke="#2E5A44" stroke-width="2" marker-end="url(#ar2)"/>
+
+        <rect x="20" y="170" width="295" height="130" rx="7" fill="#E6F0EB" stroke="#2E5A44" stroke-width="2"/>
+        <text x="34" y="194" font-family="monospace" font-size="11" fill="#2E5A44">STAGE 8 · tell_refine + motion review</text>
+        <text x="34" y="216" font-family="Georgia, serif" font-size="15" font-weight="bold">S8 Motion Tiers &amp; Refine</text>
+        <text x="34" y="236" font-size="11.5" fill="#3D3833">static · enhanced · immersive tiers.</text>
+        <text x="34" y="253" font-size="11.5" fill="#3D3833">Prototype 1 hero interaction first,</text>
+        <text x="34" y="270" font-size="11.5" fill="#3D3833">then section rollout + 7 motion checks.</text>
+
+        <rect x="20" y="325" width="960" height="88" rx="7" fill="#F9EAE3" stroke="#D4714A" stroke-width="2"/>
+        <text x="36" y="349" font-family="monospace" font-size="11.5" font-weight="bold" fill="#B55632">HUMAN GATE BETWEEN EVERY STAGE (tell_review) + VISUAL EVALUATION LOOP</text>
+        <text x="36" y="370" font-size="11.5" fill="#161412">• Image / hero-media / WebGL bands scored; SVG figure credit capped · Visual screenshot swap test enforced as build gate</text>
+        <text x="36" y="389" font-size="11.5" fill="#161412">• Lighthouse CI mobile: LCP ≤ 2.5s, CLS ≤ 0.1, INP ≤ 200ms, JS ≤ 170KB · Rejecting a stage reruns ONLY that stage</text>
+      </svg>
+    </div>
+
+    <h2>6 Named Colour Themes in <code>packages/design-skills/src/staged.ts</code> (Replaces Product-Name Hashing)</h2>
+    <div class="grid-3">
+      <div class="card-paper"><span class="badge" style="background:#FAF6F0;color:#161412;border-color:#161412">01 · ink-paper</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Warm ivory paper `#FAF6F0`, carbon ink `#161412`, terracotta `#D4714A` signal accent. Editorial monographs &amp; dossiers.</p></div>
+      <div class="card-paper"><span class="badge" style="background:#F1F5F2;color:#163024;border-color:#163024">02 · forest-ledger</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Sage paper `#F1F5F2`, deep pine ink `#163024`, brass/ochre `#B88428` accent. Financial ledgers &amp; climate/field research.</p></div>
+      <div class="card-paper"><span class="badge" style="background:#F7EFE8;color:#2B1810;border-color:#B55632">03 · ember-clay</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Warm clay `#F7EFE8`, espresso ink `#2B1810`, burnt sienna `#C85A32`. Physical craft,industrial goods &amp; studios.</p></div>
+      <div class="card-paper"><span class="badge" style="background:#F2F6FA;color:#0F1E2E;border-color:#1D63B8">04 · glacier-signal</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Crisp ice `#F2F6FA`, naval slate `#0F1E2E`, cobalt signal `#1D63B8`. Precision developer infrastructure &amp; telemetry.</p></div>
+      <div class="card-paper"><span class="badge" style="background:#0E1014;color:#F4EFE6;border-color:#D4A359">05 · nocturne-brass</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Obsidian `#0E1014`, bone parchment `#F4EFE6`, brushed brass `#D4A359`. High-contrast dark cinema &amp; hardware.</p></div>
+      <div class="card-paper"><span class="badge" style="background:#F6F0F5;color:#261424;border-color:#8C2D6B">06 · plum-press</span><p style="font-size:0.8rem;margin:0.4rem 0 0;">Soft vellum `#F6F0F5`, aubergine ink `#261424`, berry press `#8C2D6B`. Cultural institutions &amp;independent publishing.</p></div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: 82-SITE EVIDENCE CORRIDORS & MOTION TIERS -->
+  <section id="panel-evidence-motion" class="page-panel" role="tabpanel">
+    <span class="kicker">Book III · Page 4 · Consolidates docs/10_DESIGN_EVIDENCE.md, docs/15_MOTION_ANIMATION_PLAN.md &amp; Linear §1 §3</span>
+    <h1>82-Site Quantitative Evidence Corridors &amp; Motion Tiers</h1>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>82-Site Reference Corpus Corridors (<code>docs/10</code>)</h3>
+        <table>
+          <thead><tr><th>Metric</th><th>Corpus Median / Target Band</th><th>Engine Gap Found</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Image Count &amp; Area</strong></td><td>Median <strong>42 images</strong> · <strong>24.2%</strong> viewport area</td><td>Reported in `aggregate.ts:127` but had <strong>no target band</strong>.</td></tr>
+            <tr><td><strong>Layered Elements</strong></td><td>Median <strong>18 layered elements</strong> per page</td><td>Shadow cap `<= 0.04` in `metrics.ts:195` flattened depth.</td></tr>
+            <tr><td><strong>Display : Body Ratio</strong></td><td>Median <strong>9.4×</strong> (`5.5× – 12.0×` band)</td><td>Enforced in `packages/design-skills/src/scale.ts`.</td></tr>
+            <tr><td><strong>Hero Line-Height</strong></td><td>Median <strong>1.04</strong> (`0.96 – 1.12` band)</td><td>Tight tracking (`-0.02em to -0.04em`) required.</td></tr>
+            <tr><td><strong>Distinct Radii</strong></td><td><code><= 4</code> non-pill border radii</td><td>Enforced by `RadiusDrift` detector (`#14`).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>3 Runtime Tiers (Declared at S2 Concept Stage)</h3>
+        <table>
+          <thead><tr><th>Tier</th><th>Allowed Stack</th><th>Gate &amp; Budget Contract</th></tr></thead>
+          <tbody>
+            <tr><td><code>static</code></td><td>HTML + CSS + SVG only</td><td>0 third-party requests; CSS transitions, View Transitions, `@supports (animation-timeline: view())`.</td></tr>
+            <tr><td><code>enhanced</code></td><td>+ Small self-hosted JS</td><td>Pinned GSAP (free commercial since Apr 2025) or Rive; no unpinned `unpkg.com` CDNs; initial JS `<= 170KB`.</td></tr>
+            <tr><td><code>immersive</code></td><td>+ 3D / WebGL / WebGPU</td><td>Requires written reason tying 3D to concept + human approval; AVIF/WebP poster-first (`fetchpriority="high"`).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2>7 Automatic Motion Checks (Linear §1 §6 &amp; <code>docs/15_MOTION_ANIMATION_PLAN.md</code>)</h2>
+    <table>
+      <thead><tr><th>#</th><th>Check Name</th><th>Verification Rule</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>Compositor-Only Static Scan</strong></td><td>Fail if `@keyframes` or `transition` animates layout properties (`top`, `left`, `width`, `height`, `margin`). Only `transform` and `opacity` allowed.</td></tr>
+        <tr><td>2</td><td><strong>Reduced Motion Emulation</strong></td><td>Playwright emulates `prefers-reduced-motion: reduce`; all non-essential scroll/loop animations must stop or collapse to instant opacity fade.</td></tr>
+        <tr><td>3</td><td><strong>Progressive Enhancement Guard</strong></td><td>`animation-timeline: view()` and cross-document View Transitions must sit inside `@supports` with clean static fallback.</td></tr>
+        <tr><td>4</td><td><strong>Runtime Trace (Playwright + CDP)</strong></td><td>Zero Layout/Paint thrashing during scroll; zero long animation frames `> 50ms`; lab INP `<= 200ms`.</td></tr>
+        <tr><td>5</td><td><strong>Motion Token Adherence</strong></td><td>Every duration (3 steps) and easing curve (2–3 curves) comes from the declared S4 motion token set.</td></tr>
+        <tr><td>6</td><td><strong>Initial Bundle Weight Gate</strong></td><td>Three.js / WebGL / Rive / Lottie bundles are lazy-loaded via `import()` on intersection/interaction, never in initial blocking bundle.</td></tr>
+        <tr><td>7</td><td><strong>Library &amp; CDN Hygiene</strong></td><td>GSAP loaded from pinned npm package (`gsap`), zero private tokens, zero unpinned third-party script tags (replaces `render.ts:3292` `unpkg.com` HTMX tag).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 5: 7-STEP ROADMAP, PHASES 0-7 & 10 RIVALS -->
+  <section id="panel-phases-rivals" class="page-panel" role="tabpanel">
+    <span class="kicker">Book III · Page 5 · Consolidates Roadmap (Page 12), Phases 0–7 &amp; 10-Rival Matrix</span>
+    <h1>Evidence-Ordered 7-Step Roadmap, Phases 0–7 &amp; 10 Rivals</h1>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>7-Step Execution Order (Gated on Ashish / <code>BIM-203</code>)</h3>
+        <ol style="margin:0; padding-left:1.2rem; font-size:0.84rem; color:var(--ink-700);">
+          <li><strong>Evaluation Bands + Visual Swap Test</strong>: Score `hasHeroMedia`, `hasWebGL`, and image area (`24%` median); cap SVG credit in `forensics.ts:606`; enforce screenshot swap test as build gate.</li>
+          <li><strong>Media Schema + <code>tell_imagery</code> Stage</strong>: Add `media` slot (`source`, `licence`, `alt`, `focalPoint`, `artDirectionNote`) to `SectionSpec` in `types.ts:578–618`.</li>
+          <li><strong>Model-Assisted Concept Generator (S2)</strong>: Replace fixed 7-row `CONCEPT_TABLE` (`staged.ts:226–313`) with directed model step taking 3–5 reference screenshots + `DESIGN.md`.</li>
+          <li><strong>Depth &amp; Layering Recipes (S6–S7)</strong>: Photo + type overlap, cutouts, masks, grain; reconcile `metrics.ts:195` shadow cap (`<= 0.04`) and scope `GradientCrutchTell` to hero-only.</li>
+          <li><strong>Motion Tiers &amp; 7 Gates (S8)</strong>: Wire `static / enhanced / immersive` tiers and execute the 7 motion checks as real Playwright gates.</li>
+          <li><strong>MCP Catalog Split (`11 → 19` Tools)</strong>: Replace `tell_design_from_features` with 8 stage tools + `tell_review` (`packages/schema/src/install-info.ts`).</li>
+          <li><strong>Template Rebuilds</strong>: Rebuild `#97 research-dossier` first (`BIM-179`), then unified developer-tool concept from `#102 keel` + `#98 agent-harness`.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>10 Rivals Benchmark Matrix</h3>
+        <table>
+          <thead><tr><th>Rival / Benchmark</th><th>What They Do Best</th><th>DesignProof Counter-Position</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Open Design</strong> (103.5K★)</td><td>152+ `DESIGN.md` systems + comment loop</td><td>Starts from a <strong>brief-specific concept &amp; proof worktree</strong>, not just a static system.</td></tr>
+            <tr><td><strong>Claude Design</strong></td><td>Opus 4.7 visual canvas + code handoff</td><td>Deterministic 21-detector DOM diagnostics + disposable git worktree verification inside any IDE.</td></tr>
+            <tr><td><strong>Awwwards SOTD / Igloo</strong></td><td>7.92 jury score, custom 3D + photography</td><td>Target benchmark for S2 concept + S5 imagery + S8 motion tiers.</td></tr>
+            <tr><td><strong>21st.dev / Aceternity / Magic UI</strong></td><td>Copy-paste animated React blocks</td><td>Prevents uncoordinated "effect soup" via single-motif discipline &amp; 7 motion gates.</td></tr>
+            <tr><td><strong>Lovable / v0 / Bolt</strong></td><td>Fast one-shot prompt-to-app</td><td>Diagnoses &amp; repairs the exact genericness tells (`78 → 14`) those one-shot generators emit.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.page-panel');
+    function activateTab(id) {
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+      history.replaceState(null, '', '#' + id);
+    }
+    tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab)));
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById('panel-' + hash)) activateTab(hash);
+  </script>
+</body>
+</html>

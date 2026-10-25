@@ -1,0 +1,344 @@
+  const findingVerdict = (id: string) => verdictOf(id);
+
+  const criticPane = (
+    <div className="dp-critic">
+      <header className="dp-critic__head">
+        <span className="dp-critic__status">
+          <span className="dp-critic__status-dot" data-tone={statusTone} aria-hidden />
+          <span className="dp-critic__status-label">{statusLabel}</span>
+          {report.findings.length ? <span className="text-muted">· {report.score.total} findings</span> : null}
+        </span>
+        <div className="dp-critic__head-actions">
+          {captureState === "done" && report.findings.length > 0 ? (
+            <button
+              type="button"
+              onClick={shareReport}
+              disabled={sharingReport || operationActive}
+              className="dp-ghost-btn"
+            >
+              <Link2 className="h-3.5 w-3.5" aria-hidden />
+              {sharingReport ? "Sharing…" : shareUrl ? "Copy link" : "Share"}
+            </button>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="dp-critic__tabs" role="tablist" aria-label="Review panes">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "findings"}
+          className="dp-critic__tab"
+          data-active={criticTab === "findings" ? "true" : "false"}
+          onClick={() => setCriticTab("findings")}
+        >
+          Findings
+          <span className="dp-critic__tab-count">{report.findings.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "direction"}
+          className="dp-critic__tab"
+          data-active={criticTab === "direction" ? "true" : "false"}
+          onClick={() => setCriticTab("direction")}
+        >
+          Direction
+          {directionPlan ? <span className="dp-critic__tab-count">●</span> : null}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={criticTab === "proof"}
+          className="dp-critic__tab"
+          data-active={criticTab === "proof" ? "true" : "false"}
+          onClick={() => setCriticTab("proof")}
+        >
+          Proof
+          {showProofWorkflow ? <span className="dp-critic__tab-count">●</span> : null}
+        </button>
+      </div>
+
+      <div className="dp-critic__panes">
+        {criticTab === "findings" ? (
+          <div className="dp-critic__pane dp-critic__pane--findings">
+            {designBrief && !captureMeta ? (
+              <p className="dp-critic__note">
+                Direction is primed. Capture a rendered URL to attach named tells, or{" "}
+                <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
+                  open it in Studio
+                </a>
+                .
+              </p>
+            ) : null}
+
+            {report.findings.length ? (
+              <div className="dp-findings">
+                <div className="dp-findings__filters" role="group" aria-label="Filter findings by verdict">
+                  {FINDING_FILTERS.map((filter) => (
+                    <button
+                      key={filter.id}
+                      type="button"
+                      className="dp-filter"
+                      data-active={findingFilter === filter.id ? "true" : "false"}
+                      aria-pressed={findingFilter === filter.id}
+                      onClick={() => setFindingFilter(filter.id)}
+                    >
+                      {filter.label}
+                      {filter.id === "all" ? ` ${report.findings.length}` : ` ${verdictCounts[filter.id]}`}
+                    </button>
+                  ))}
+                </div>
+                <ul className="dp-findings__list">
+                  {filteredFindings.map((finding) => (
+                    <li key={finding.id}>
+                      <button
+                        type="button"
+                        className="dp-finding"
+                        data-active={selectedId === finding.id ? "true" : "false"}
+                        aria-current={selectedId === finding.id ? "true" : undefined}
+                        onClick={() => setSelectedId(finding.id)}
+                      >
+                        <span
+                          className="dp-finding__dot"
+                          data-verdict={findingVerdict(finding.id)}
+                          aria-hidden
+                        />
+                        <span className="dp-finding__name">{finding.detector}</span>
+                        <VerdictBadge verdict={findingVerdict(finding.id)} />
+                      </button>
+                    </li>
+                  ))}
+                  {!filteredFindings.length ? (
+                    <li className="px-2 py-3 font-mono text-meta text-muted">
+                      No findings in this band.
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : (
+              <div className="dp-empty">
+                <p>Capture a rendered page to name the tells — or load the offline fixture.</p>
+              </div>
+            )}
+
+            {selectedFinding && verdict ? (
+              <section className="dp-inspector" aria-label={`Selected finding: ${selectedFinding.detector}`}>
+                <div className="dp-inspector__head">
+                  <h2 className="dp-inspector__title">{selectedFinding.detector}</h2>
+                  <VerdictBadge verdict={verdict.verdict} />
+                </div>
+                <div className="dp-inspector__body">
+                  <ConfidenceMeter value={verdict.confidence} />
+                  <p className="dp-inspector__rationale">{verdict.rationale}</p>
+                  {selectedFinding.evidence.length ? (
+                    <ul className="dp-evidence">
+                      {selectedFinding.evidence.map((evidence) => (
+                        <li key={`${evidence.label}-${evidence.value}`}>
+                          <span className="dp-evidence__label">{evidence.label}</span>
+                          <span>{evidence.value}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {showStateProbes && report.capture.stateShots.length > 0 ? (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer font-mono text-meta text-muted hover:text-secondary">
+                        State probes
+                      </summary>
+                      <ul className="mt-2 flex flex-wrap gap-1.5">
+                        {report.capture.stateShots.slice(0, 9).map((shot) => (
+                          <li
+                            key={`${shot.selector}-${shot.state}`}
+                            className="rounded-sm border border-border px-2 py-0.5 font-mono text-meta text-secondary"
+                          >
+                            {shot.state}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </div>
+                {proposal ? (
+                  <div className="dp-ready-strip">
+                    <span>
+                      Patch ready · {proposal.files.length} file{proposal.files.length === 1 ? "" : "s"}
+                    </span>
+                    <button type="button" onClick={() => setCriticTab("proof")}>
+                      Review patch →
+                    </button>
+                  </div>
+                ) : null}
+                {draftError ? <p className="dp-inspector__error">{draftError}</p> : null}
+                <div className="dp-inspector__actions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCriticTab("proof");
+                      void draftFix();
+                    }}
+                    disabled={draftState === "drafting" || operationActive}
+                    className="dp-btn dp-btn--primary"
+                  >
+                    <Wand2 className="h-4 w-4" aria-hidden />
+                    {draftState === "drafting"
+                      ? "Mapping source…"
+                      : setupJob?.state === "ready"
+                        ? "Plan source fix"
+                        : "Draft fix"}
+                  </button>
+                  <button type="button" onClick={markIntentional} className="dp-btn dp-btn--quiet">
+                    Mark intentional
+                  </button>
+                </div>
+              </section>
+            ) : null}
+          </div>
+        ) : null}
+
+        {criticTab === "direction" ? (
+          <div className="dp-critic__pane">
+            <section className="dp-panel">
+              <div className="dp-panel__head">
+                <p className="dp-panel__title">Art direction</p>
+                {directionPlan ? (
+                  <span className="font-mono text-meta text-muted">
+                    {resolveDirection(directionPlan.presetId).label.toLowerCase()}
+                    {directionParsing ? " · thinking…" : null}
+                  </span>
+                ) : null}
+              </div>
+              <div className="dp-panel__body space-y-3">
+                {designBrief ? (
+                  <p className="font-mono text-meta text-secondary">
+                    Brief: {designBrief}
+                    {" · "}
+                    <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
+                      Studio
+                    </a>
+                  </p>
+                ) : null}
+                <div className="dp-form-field">
+                  <span className="dp-form-field__label">Say it in plain English</span>
+                  <div className="dp-voice">
+                    {voice.supported ? (
+                      <button
+                        type="button"
+                        onClick={voice.listening ? voice.stop : voice.start}
+                        aria-label={voice.listening ? "Stop listening" : "Start voice direction"}
+                        className="dp-voice__mic"
+                        data-listening={voice.listening ? "true" : "false"}
+                      >
+                        {voice.listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                      </button>
+                    ) : null}
+                    <textarea
+                      value={voice.transcript}
+                      onChange={(event) => {
+                        voice.setTranscript(event.target.value);
+                        scheduleDirectionParse(event.target.value);
+                      }}
+                      rows={2}
+                      placeholder={voice.listening ? "Listening…" : "Warmer, more editorial, less shadow…"}
+                      className="dp-voice__input"
+                      aria-label="Direction in plain English"
+                    />
+                  </div>
+                </div>
+                <div className="dp-chips" role="group" aria-label="Direction presets">
+                  {PRESET_CHIPS.map((chip) => {
+                    const active = directionId === chip.key;
+                    return (
+                      <button
+                        key={chip.key}
+                        type="button"
+                        className="dp-chip"
+                        data-active={active ? "true" : "false"}
+                        onClick={() => {
+                          const preset = DIRECTION_PRESETS[chip.key as keyof typeof DIRECTION_PRESETS];
+                          const text = preset?.summary ?? chip.label;
+                          voice.setTranscript(text);
+                          const plan = parseDirectionPlan(text);
+                          applyDirectionPlan(plan);
+                          learnFromDirection(plan, text);
+                        }}
+                      >
+                        {chip.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {directionPlan?.actionItems.length ? (
+                  <ul className="flex flex-wrap gap-2">
+                    {directionPlan.actionItems.map((item) => (
+                      <li key={item.id} className="font-mono text-meta text-muted">
+                        {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </section>
+
+            <details className="dp-panel">
+              <summary className="dp-panel__head cursor-pointer list-none">
+                <span className="dp-panel__title">More — brand DNA &amp; measured change</span>
+                <span className="font-mono text-meta text-muted">expand</span>
+              </summary>
+              <div className="dp-panel__body space-y-3">
+                <BrandDnaBar dna={brandDna} onLearn={learnDna} onClear={clearDna} live={liveCapture} />
+                {!proofResult ? <Scorecard reconciliation={reconciliation} live={liveCapture} /> : null}
+                {!proofResult ? (
+                  <WhatChangedList
+                    notes={
+                      llmRestyle.mode === "ai" && llmRestyle.sheet?.notes.length
+                        ? llmRestyle.sheet.notes
+                        : reconciliation?.directionNotes ?? []
+                    }
+                  />
+                ) : null}
+                {!proofResult ? (
+                  <ReconciliationTable reconciliation={reconciliation} live={liveCapture} />
+                ) : null}
+              </div>
+            </details>
+          </div>
+        ) : null}
+
+        {criticTab === "proof" ? (
+          <div className="dp-critic__pane">
+            <WorkflowRail
+              captured={liveCapture}
+              sourceMapped={sourceContext?.mode === "repo" && sourceContext.filesLoaded > 0}
+              patchReady={Boolean(proposal)}
+              proofState={proofState}
+            />
+
+            {proposal ? (
+              <DiffViewer
+                proposal={proposal}
+                draftState={draftState}
+                sourceContext={sourceContext}
+                patchSource={patchSource}
+                proofState={proofState}
+                proofError={proofError}
+                canProve={captureBelongsToSetup}
+                onCopy={() => copyPatch()}
+                onApply={provePatch}
+              />
+            ) : (
+              <div className="dp-empty">
+                <p>
+                  Nothing drafted yet. Pick a finding, then <strong className="text-text">Draft fix</strong> to
+                  see the patch and its measured changes here.
+                </p>
+              </div>
+            )}
+
+            <ConnectAgent />
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book IV — Project Status, 48-Doc Replacement Matrix, Training Data &amp; Ops</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-paper: #FAF6F0;
+      --bg-linen: #F2ECE1;
+      --bg-aged: #E8DFD1;
+      --ink-900: #161412;
+      --ink-700: #3D3833;
+      --ink-500: #6E665E;
+      --rule-hairline: #DDD4C6;
+      --terracotta: #D4714A;
+      --terracotta-deep: #B55632;
+      --forest: #2E5A44;
+      --ochre: #C88A2B;
+      --crimson: #B83B3B;
+      --serif: "Iowan Old Style", "Instrument Serif", "Palatino Linotype", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+      --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg-paper); color: var(--ink-900); font-family: var(--sans); line-height: 1.55; }
+    .topbar { position: sticky; top: 0; z-index: 50; background: rgba(250, 246, 240, 0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule-hairline); }
+    .book-ribbon { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 1.5rem; border-bottom: 1px solid var(--rule-hairline); font-size: 0.78rem; background: var(--bg-linen); flex-wrap: wrap; gap: 0.5rem; }
+    .book-links { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .book-pill { padding: 0.25rem 0.65rem; border-radius: 4px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); color: var(--ink-700); text-decoration: none; font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+    .book-pill.active { background: var(--ink-900); color: var(--bg-paper); border-color: var(--ink-900); }
+    .book-pill:hover:not(.active) { border-color: var(--terracotta); color: var(--terracotta-deep); }
+    .tabbar { display: flex; gap: 0.25rem; padding: 0.5rem 1.5rem 0; overflow-x: auto; }
+    .tab-btn { appearance: none; border: 1px solid transparent; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-500); font-family: var(--sans); font-size: 0.82rem; font-weight: 600; padding: 0.55rem 0.95rem; cursor: pointer; white-space: nowrap; border-radius: 6px 6px 0 0; }
+    .tab-btn[aria-selected="true"] { color: var(--ink-900); background: var(--bg-paper); border-color: var(--rule-hairline); border-bottom-color: var(--terracotta); }
+    .page-panel { display: none; max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .page-panel.active { display: block; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+    h1 { font-size: clamp(2rem, 3.2vw, 2.8rem); line-height: 1.08; }
+    h2 { font-size: 1.6rem; border-bottom: 1px solid var(--rule-hairline); padding-bottom: 0.4rem; margin-top: 2rem; }
+    h3 { font-size: 1.15rem; }
+    .kicker { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta-deep); margin-bottom: 0.35rem; display: block; }
+    .card { background: var(--bg-linen); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1.1rem; }
+    .card-paper { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 0.95rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.85rem; }
+    .badge { display: inline-block; font-family: var(--mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 3px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); }
+    .badge-ok { background: #E6F0EB; color: var(--forest); border-color: #B7D4C5; }
+    .badge-part { background: #FBF1DF; color: #8F5E10; border-color: #E8CB96; }
+    .badge-miss { background: #FCE8E8; color: var(--crimson); border-color: #E8B0B0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.81rem; }
+    th, td { text-align: left; padding: 0.5rem 0.65rem; border-bottom: 1px solid var(--rule-hairline); vertical-align: top; }
+    th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-500); background: var(--bg-linen); }
+    code { font-family: var(--mono); font-size: 0.8em; background: rgba(232,223,209,0.65); padding: 0.1rem 0.32rem; border-radius: 3px; }
+    a.file-link { color: var(--terracotta-deep); text-decoration: underline; font-family: var(--mono); font-size: 0.76rem; }
+    .svg-frame { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="book-ribbon">
+      <div>
+        <strong>DESIGNPROOF DOCS</strong>
+        <span style="color:var(--ink-500); margin-left:0.5rem;">Book IV · Project Status, 48-Doc Replacement Audit, Training Sink &amp; Ops</span>
+      </div>
+      <nav class="book-links" aria-label="Consolidated Books">
+        <a class="book-pill" href="00-hub-architecture-and-mcp.html">Book I: Hub, Arch &amp; MCP</a>
+        <a class="book-pill" href="01-detectors-taste-and-design-system.html">Book II: 21 Detectors &amp; Design System</a>
+        <a class="book-pill" href="02-craft-engine-rootcause-and-staged-plan.html">Book III: Root-Cause &amp; 8-Stage Engine</a>
+        <a class="book-pill active" href="03-status-audit-ops-and-training.html">Book IV: Status, 48-Doc Audit &amp; Ops</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a>
+      </nav>
+    </div>
+    <nav class="tabbar" role="tablist" aria-label="Book IV Pages">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="status">1. Reconciled Status &amp; BIM-177..203</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="doc-audit">2. 48-Doc Replacement &amp; Consolidation Matrix</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="training-sink">3. Training-Data Sink &amp; BIM-187</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="deploy-ops">4. Vercel + Vultr/Render + Neon Ops</button>
+    </nav>
+  </header>
+
+  <!-- PAGE 1: RECONCILED STATUS & BIM-177..203 -->
+  <main id="panel-status" class="page-panel active" role="tabpanel">
+    <span class="kicker">Book IV · Page 1 · Consolidates PROJECT-STATUS.md, PLAN.md, CHANGELOG.md &amp; Linear BIM-177..203</span>
+    <h1>Reconciled Project Status (25 Oct 2026) &amp; Open Decisions</h1>
+    <p style="max-width: 860px; color: var(--ink-700);">
+      <strong>Priority Notice:</strong> Secondary to <strong>DeepHarness honesty</strong> while that remains open. All verification runs locally via <code>pnpm test &amp;&amp; pnpm -F @tell/schema build &amp;&amp; pnpm -F @tell/web typecheck</code> (never wait on GitHub Actions CI).
+    </p>
+
+    <!-- DIAGRAM F: 10 REDESIGN PROMISES BEFORE VS AFTER BUILD -->
+    <div class="svg-frame">
+      <svg viewBox="0 0 860 155" width="100%" role="img" aria-label="10 Redesign Promises Before vs After 18 Oct Build">
+        <text x="195" y="42" text-anchor="end" font-size="12.5" font-weight="bold">Before 18 Oct (Linear §3.1)</text>
+        <rect x="205" y="24" width="52" height="26" fill="#2E5A44"/><text x="231" y="42" text-anchor="middle" font-family="monospace" font-size="11" fill="#FAF6F0">1</text>
+        <rect x="257" y="24" width="52" height="26" fill="#C88A2B"/><text x="283" y="42" text-anchor="middle" font-family="monospace" font-size="11" fill="#161412">1</text>
+        <rect x="309" y="24" width="416" height="26" fill="#B83B3B"/><text x="517" y="42" text-anchor="middle" font-family="monospace" font-size="11" fill="#FAF6F0">8 missing</text>
+
+        <text x="195" y="88" text-anchor="end" font-size="12.5" font-weight="bold">After PR #105 (c1e2435)</text>
+        <rect x="205" y="70" width="104" height="26" fill="#2E5A44"/><text x="257" y="88" text-anchor="middle" font-family="monospace" font-size="11" fill="#FAF6F0">2 done</text>
+        <rect x="309" y="70" width="312" height="26" fill="#C88A2B"/><text x="465" y="88" text-anchor="middle" font-family="monospace" font-size="11" fill="#161412">6 partial (primitives built, not gated)</text>
+        <rect x="621" y="70" width="52" height="26" fill="#B83B3B"/><text x="647" y="88" text-anchor="middle" font-family="monospace" font-size="11" fill="#FAF6F0">1</text>
+        <rect x="673" y="70" width="52" height="26" fill="#6E665E"/><text x="699" y="88" text-anchor="middle" font-family="monospace" font-size="11" fill="#FAF6F0">1</text>
+
+        <text x="205" y="128" font-family="monospace" font-size="11" fill="#3D3833">Done (2): #1 Written Concept, #10 Runnable templates/DESIGN.md · Partial (6): #2 Stages, #4 Themes, #5 Swap test, #6 Motion review, #7 Budgets, #8 Weighted review · Missing (1): #3 MCP 11→19 split · Held (1): #9 Template calls (BIM-203)</text>
+      </svg>
+    </div>
+
+    <h2>Linear Decision Queue (<code>BIM-177</code> through <code>BIM-203</code>)</h2>
+    <table>
+      <thead><tr><th>Issue</th><th>Subject / PR</th><th>Metrics &amp; Score</th><th>Proposed Decision (Awaiting Ashish)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>BIM-203</strong></td><td>Concept-First Redesign Plan &amp; Template Calls</td><td>10 promises (2 done, 6 partial, 1 missing, 1 held)</td><td>1. Approve 8-stage MCP split (`11 → 19` tools) + imagery stage + swap test gate.<br/>2. Approve template keep/merge/drop calls below.<br/>3. Decide on 16 training rows (`BIM-187`).</td></tr>
+        <tr><td><strong>BIM-177</strong></td><td><code>#95</code> merchandising loom</td><td>Score <strong>3.4/10</strong> · repeat <code>317 → 90</code></td><td><span class="badge badge-miss">DROP</span> (Three photos in `free-assets.ts` were disabled via `void photos;` in `figures.ts:2887`).</td></tr>
+        <tr><td><strong>BIM-178</strong></td><td><code>#96</code> consumer craft</td><td>Score <strong>3.2/10</strong> · repeat <code>335 → 108</code></td><td><span class="badge badge-part">FOLD</span> into a future physical-product concept.</td></tr>
+        <tr><td><strong>BIM-179</strong></td><td><code>#97</code> research dossier</td><td>Score <strong>4.3/10</strong> · repeat <code>309 → 100</code></td><td><span class="badge badge-ok">KEEP &amp; REBUILD FIRST</span> as the first real test of the 8-stage + imagery pipeline.</td></tr>
+        <tr><td><strong>BIM-180</strong></td><td><code>#98</code> agent harness (<code>699c8212</code>)</td><td>Score <strong>4.3/10</strong> · repeat <code>307 → 134</code></td><td><span class="badge badge-part">MERGE WITH KEEL</span> into a single developer-tool concept.</td></tr>
+        <tr><td><strong>BIM-184</strong></td><td><code>#99</code> clinic / care pathway (<code>6edf4e1c</code>)</td><td>Score <strong>3.2/10</strong> · 518 tests</td><td><span class="badge badge-miss">DROP TEMPLATE</span>; keep care-handoff domain notes only.</td></tr>
+        <tr><td><strong>BIM-186</strong></td><td><code>#100</code> footer fix (<code>5f7abde</code>)</td><td>72-page footer-link test</td><td><span class="badge badge-ok">STANDALONE MERGE</span> (reduces keel repeat score `95 → 75`).</td></tr>
+        <tr><td><strong>BIM-187</strong></td><td>Delete superseded training rows</td><td>16 rows (`4` harness + `4` clinic + `8` B2)</td><td><span class="badge badge-part">CLEANUP</span> in `tell-design-data` &amp; Backblaze B2 (see Page 3).</td></tr>
+        <tr><td><strong>BIM-190</strong></td><td><code>#101</code> lantern (<code>3ac10228</code>)</td><td>Score <strong>3.9/10</strong> · repeat <code>289 → 87</code></td><td><span class="badge badge-part">DIRECTION ONLY</span> (keep dark ember aesthetic as a direction, not a separate layout).</td></tr>
+        <tr><td><strong>BIM-192</strong></td><td><code>#102</code> keel (<code>9c21abf9</code>)</td><td>Score <strong>4.7/10</strong> · repeat <code>190 → 95</code></td><td><span class="badge badge-ok">KEEP AS BASE</span> of the developer-tool concept (merge after `#100`).</td></tr>
+        <tr><td><strong>BIM-193</strong></td><td>Second revamp for `saas` (`#83`) &amp; `fintech` (`#85`)</td><td>Repeat scores <code>274</code> and <code>206</code></td><td><span class="badge badge-part">WAITS ON KEEL</span> and the new concept-first pipeline.</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <!-- PAGE 2: 48-DOC REPLACEMENT & CONSOLIDATION MATRIX -->
+  <section id="panel-doc-audit" class="page-panel" role="tabpanel">
+    <span class="kicker">Book IV · Page 2 · Complete Audit of All 48 Replaced Root &amp; docs/ Files</span>
+    <h1>48-File Deduplication &amp; Replacement Matrix</h1>
+    <p style="max-width: 860px; color: var(--ink-700);">
+      Every redundant or stale markdown/HTML file in root and <code>docs/</code> has been <strong>removed from disk and replaced</strong> by these 4 consolidated multi-page HTML books plus <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>, <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a>, and <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/CLAUDE.md">CLAUDE.md</a>.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Replaced / Removed File Path</th><th>Why It Was Outdated or Redundant</th><th>Consolidated Destination</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>BUILD.md</code> (root)</td><td>Listed only 14 detectors (missing 7 detectors incl. Oct 2026 Frame Tells) and stale 2-day sprint table.</td><td><a href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a> + <a href="01-detectors-taste-and-design-system.html#detectors">Book II Page 2</a></td></tr>
+        <tr><td><code>DESIGN.md</code> (root)</td><td>95% duplicate of `docs/01_DESIGN_SYSTEM.md`; runtime uses `design-tokens.json`.</td><td><a href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a> + <a href="01-detectors-taste-and-design-system.html#design-system">Book II Page 1</a></td></tr>
+        <tr><td><code>ORCHESTRATION.md</code> (root)</td><td>Duplicated subagent roster &amp; model pins in `AGENTS.md`.</td><td><a href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a> + <a href="00-hub-architecture-and-mcp.html#agents">Book I Page 5</a></td></tr>
+        <tr><td><code>PITCH.md</code>, <code>USER_STORY.md</code>, <code>CONTRIBUTIONS.md</code> (root)</td><td>Scattered product thesis, 5-beat demo script, critic voice rules, and git attribution rule.</td><td><a href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a> + <a href="00-hub-architecture-and-mcp.html#overview">Book I Page 1</a></td></tr>
+        <tr><td><code>PLAN.md</code>, <code>REVAMP-AUDIT.md</code> (root)</td><td>Overlapped with `PROJECT-STATUS.md` and `designproof-central-plan.html`.</td><td><a href="02-craft-engine-rootcause-and-staged-plan.html">Book III</a> + <a href="#status">Book IV Page 1</a></td></tr>
+        <tr><td><code>OPEN_TELL_DESIGN_DATA.md</code>, <code>TELL_DESIGN_DATA_HERE.md</code> (root)</td><td>Two near-identical 14-line pointer files to `../tell-design-data`.</td><td><a href="#training-sink">Book IV Page 3</a></td></tr>
+        <tr><td><code>docs/01_DESIGN_SYSTEM.md</code>, <code>docs/07_VISUALIZATION_PLAN.md</code></td><td>Duplicated Print-Atelier tokens and `BeforeAfterSeam` specs.</td><td><a href="01-detectors-taste-and-design-system.html#design-system">Book II Page 1</a></td></tr>
+        <tr><td><code>docs/02_CURSOR_BUILD_INSTRUCTIONS.md</code> + <code>docs/archive/02_*</code></td><td>Identical archived Sprint 1–4 prompt instructions.</td><td><a href="01-detectors-taste-and-design-system.html#detectors">Book II Page 2</a></td></tr>
+        <tr><td><code>docs/03_CLAUDE_DESIGN_BRIEF.md</code>, <code>docs/04_CLAUDE_PROJECT.md</code></td><td>Early naming ("Tell") and initial thesis; superseded by DesignProof loop.</td><td><a href="00-hub-architecture-and-mcp.html#overview">Book I Page 1</a></td></tr>
+        <tr><td><code>docs/05_GENERICNESS_METHODOLOGY.md</code></td><td>6-axis rubric &amp; Gemini 2-pass reflection specification.</td><td><a href="01-detectors-taste-and-design-system.html#taste-rubric">Book II Page 3</a></td></tr>
+        <tr><td><code>docs/06_REDESIGN_ENGINE_V2.md</code> (+ archive), <code>docs/06_TELL_PROOF.md</code></td><td>Two `06_*` files + identical archive copy covering 7 directions &amp; worktree proof.</td><td><a href="01-detectors-taste-and-design-system.html#redesign-proof">Book II Page 4</a></td></tr>
+        <tr><td><code>docs/08_AI_DESIGN_METHODS.md</code>, <code>docs/09_PREMIUM_DESIGN_SKILLS.md</code>, <code>docs/10_DESIGN_EVIDENCE.md</code>, <code>docs/15_MOTION_ANIMATION_PLAN.md</code></td><td>82-site evidence corridors, craft skills, and 7 motion checks.</td><td><a href="02-craft-engine-rootcause-and-staged-plan.html#evidence-motion">Book III Page 4</a></td></tr>
+        <tr><td><code>docs/11_AGENT_PLATFORM_INTEGRATION_PLAN.md</code>, <code>docs/12_AUTH_SECURITY_BOUNDARIES_PLAN.md</code>, <code>docs/13_DESIGN_CAPABILITY_FLOWS_PLAN.md</code></td><td>19-host compatibility matrix, 5-layer security, and capability flows.</td><td><a href="00-hub-architecture-and-mcp.html#security">Book I Page 4</a></td></tr>
+        <tr><td><code>docs/14_DESIGN_TRAINING_DATA_CURATION_PLAN.md</code></td><td>SFT/DPO episode schema and `tell-design-data` curation rules.</td><td><a href="#training-sink">Book IV Page 3</a></td></tr>
+        <tr><td><code>docs/DEPLOY.md</code>, <code>docs/DEPLOY-VULTR.md</code></td><td>Vercel + Vultr/Render Docker Playwright worker + Neon runbooks.</td><td><a href="#deploy-ops">Book IV Page 4</a></td></tr>
+        <tr><td><code>docs/FEATURE-MAP.md</code>, <code>docs/TOOLS-AND-SKILLS.md</code>, <code>docs/PROJECT-STATUS.md</code>, <code>docs/QUALITY-BAR.md</code></td><td>Feature-to-file lookup, skills index, and status notes.</td><td><a href="00-hub-architecture-and-mcp.html#agents">Book I Page 5</a> &amp; <a href="#status">Book IV Page 1</a></td></tr>
+        <tr><td><code>docs/features/*.md</code> (5 files) &amp; <code>docs/skills/*.md</code> (7 files)</td><td>Per-feature and per-skill markdown summaries duplicating `.cursor/skills/*/SKILL.md`.</td><td><a href="00-hub-architecture-and-mcp.html#agents">Book I Page 5</a></td></tr>
+        <tr><td><code>docs/design-engine-revamp-plan.html</code> &amp; <code>docs/designproof-rootcause/**</code> (12 files)</td><td>Root-cause study, 12-studio research, Linear `BIM-177..203` dumps, and revamp HTML.</td><td><a href="02-craft-engine-rootcause-and-staged-plan.html">Book III (Pages 1–5)</a> &amp; <a href="#status">Book IV Page 1</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 3: TRAINING-DATA SINK & BIM-187 -->
+  <section id="panel-training-sink" class="page-panel" role="tabpanel">
+    <span class="kicker">Book IV · Page 3 · Consolidates docs/14, OPEN_TELL_DESIGN_DATA.md, TELL_DESIGN_DATA_HERE.md &amp; BIM-187</span>
+    <h1>Training-Data Curation Pipeline (<code>tell-design-data</code>) &amp; <code>BIM-187</code></h1>
+    <p style="max-width: 860px; color: var(--ink-700);">
+      Approved DesignProof episodes are emitted via <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/.cursor/skills/emit-training-episode/SKILL.md">emit-training-episode</a> into the sibling repository <code>/Volumes/Developer/Workspace/tell-design-data</code> and Backblaze B2 (`design-data` bucket) for SFT and DPO preference tuning.
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1000 155" width="100%" role="img" aria-label="Training Data Curation Pipeline">
+        <rect x="16" y="20" width="225" height="115" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="30" y="44" font-family="monospace" font-size="10.5" fill="#B55632">1. CAPTURE &amp; DIAGNOSE</text>
+        <text x="30" y="66" font-family="Georgia, serif" font-size="14" font-weight="bold">Negative Pair (y_rejected)</text>
+        <text x="30" y="86" font-size="11" fill="#3D3833">DOMFingerprint + 21 detector</text>
+        <text x="30" y="102" font-size="11" fill="#3D3833">findings + before screenshot</text>
+
+        <rect x="266" y="20" width="225" height="115" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="280" y="44" font-family="monospace" font-size="10.5" fill="#B55632">2. PROOF VERIFY GATE</text>
+        <text x="280" y="66" font-family="Georgia, serif" font-size="14" font-weight="bold">Positive Pair (y_chosen)</text>
+        <text x="280" y="86" font-size="11" fill="#3D3833">netScoreDelta &lt;= -20, 0 new</text>
+        <text x="280" y="102" font-size="11" fill="#3D3833">tells, 0 WCAG AA failures</text>
+
+        <rect x="516" y="20" width="225" height="115" rx="7" fill="#E6F0EB" stroke="#2E5A44"/>
+        <text x="530" y="44" font-family="monospace" font-size="10.5" fill="#2E5A44">3. NEW STAGED RULES (§4.3)</text>
+        <text x="530" y="66" font-family="Georgia, serif" font-size="14" font-weight="bold">1 Row Set per Layout</text>
+        <text x="530" y="86" font-size="11" fill="#3D3833">Never duplicate rows by colour</text>
+        <text x="530" y="102" font-size="11" fill="#3D3833">hash; record stage &amp; approver</text>
+
+        <rect x="766" y="20" width="218" height="115" rx="7" fill="#F9EAE3" stroke="#D4714A"/>
+        <text x="780" y="44" font-family="monospace" font-size="10.5" fill="#B55632">4. SINK &amp; B2 STORAGE</text>
+        <text x="780" y="66" font-family="Georgia, serif" font-size="14" font-weight="bold">../tell-design-data</text>
+        <text x="780" y="86" font-size="11" fill="#3D3833">JSONL episodes + Backblaze B2</text>
+        <text x="780" y="102" font-size="11" fill="#3D3833">artifacts (BIM-187 cleanup)</text>
+      </svg>
+    </div>
+
+    <h2><code>BIM-187</code> / Linear §4.3 Training Rows Decision Table</h2>
+    <table>
+      <thead><tr><th>Dataset Batch</th><th>Source PR</th><th>Rows</th><th>Why It Fails the New Bar &amp; Options</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Agent Harness Rows</strong></td><td><code>tell-design-data</code> PR #16 (paired w/ `#98`)</td><td>4 rows (Tiller, Harborbook, Plotwise, Kilnroom)</td><td>One shared layout where test brands differ only by product-name color hash.</td></tr>
+        <tr><td><strong>Clinic / Care Pathway Rows</strong></td><td><code>tell-design-data</code> PR #17 (paired w/ `#99`)</td><td>4 rows (Roundspool, Harborbook, Plotwise, Kilnroom)</td><td>Same shared skeleton + template proposed for Drop (`BIM-184`).</td></tr>
+        <tr><td><strong>Superseded Backblaze Rows</strong></td><td>Flagged in <code>BIM-187</code></td><td>8 rows (16 B2 objects)</td><td>Outdated pre-revamp captures; ready to delete or mark <code>pre-bar, negative example</code>.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 4: DEPLOYMENT & OPS -->
+  <section id="panel-deploy-ops" class="page-panel" role="tabpanel">
+    <span class="kicker">Book IV · Page 4 · Consolidates docs/DEPLOY.md &amp; docs/DEPLOY-VULTR.md</span>
+    <h1>Hybrid Deployment Architecture (Vercel + Vultr/Render + Neon)</h1>
+    <p style="max-width: 860px; color: var(--ink-700);">
+      Because Playwright Chromium (`~350MB`) exceeds Vercel's serverless bundle size and timeout limits, DesignProof uses a <strong>split hybrid topology</strong> when deployed to the cloud, while running 100% locally in Cursor/CLI.
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1000 170" width="100%" role="img" aria-label="Hybrid Deployment Topology">
+        <rect x="20" y="20" width="295" height="130" rx="7" fill="#F2ECE1" stroke="#161412"/>
+        <text x="36" y="44" font-family="monospace" font-size="11" fill="#B55632">FRONTEND · VERCEL</text>
+        <text x="36" y="66" font-family="Georgia, serif" font-size="15" font-weight="bold">apps/web (designproof.site)</text>
+        <text x="36" y="88" font-size="11.5" fill="#3D3833">Next.js 15 App Router UI + API</text>
+        <text x="36" y="106" font-family="monospace" font-size="10.5" fill="#B83B3B">TELL_DISABLE_REPO_SETUP=1</text>
+        <text x="36" y="124" font-family="monospace" font-size="10.5" fill="#6E665E">apps/web/vercel.json</text>
+
+        <rect x="352" y="20" width="295" height="130" rx="7" fill="#E6F0EB" stroke="#2E5A44"/>
+        <text x="368" y="44" font-family="monospace" font-size="11" fill="#2E5A44">CAPTURE WORKER · VULTR / RENDER</text>
+        <text x="368" y="66" font-family="Georgia, serif" font-size="15" font-weight="bold">Docker Playwright Service</text>
+        <text x="368" y="88" font-size="11.5" fill="#3D3833">Headless Chromium :8787</text>
+        <text x="368" y="106" font-family="monospace" font-size="10.5" fill="#2E5A44">CAPTURE_SERVICE_URL + SECRET</text>
+        <text x="368" y="124" font-family="monospace" font-size="10.5" fill="#6E665E">Dockerfile · render.yaml</text>
+
+        <rect x="684" y="20" width="295" height="130" rx="7" fill="#F9EAE3" stroke="#D4714A"/>
+        <text x="700" y="44" font-family="monospace" font-size="11" fill="#B55632">PERSISTENCE · NEON POSTGRES</text>
+        <text x="700" y="66" font-family="Georgia, serif" font-size="15" font-weight="bold">Serverless Postgres + Fallback</text>
+        <text x="700" y="88" font-size="11.5" fill="#3D3833">Stores TellReport &amp; share links;</text>
+        <text x="700" y="106" font-size="11.5" fill="#3D3833">falls back to in-memory +</text>
+        <text x="700" y="124" font-family="monospace" font-size="10.5" fill="#6E665E">fixtures/reports/tell-report.json</text>
+      </svg>
+    </div>
+
+    <h2>Environment Variables &amp; Config Files</h2>
+    <table>
+      <thead><tr><th>Variable / File</th><th>Surface</th><th>Contract</th></tr></thead>
+      <tbody>
+        <tr><td><code>GEMINI_API_KEY</code></td><td>Vercel / Local</td><td>Optional. Powers `@tell/taste` (`gemini-2.5-pro`). Offline fallback sets `confidence: 0.5`.</td></tr>
+        <tr><td><code>CAPTURE_SERVICE_URL</code> &amp; <code>CAPTURE_SHARED_SECRET</code></td><td>Vercel ↔ Worker</td><td>Connects Vercel `/api/capture` to the Docker Playwright worker (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/Dockerfile">Dockerfile</a> / <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/render.yaml">render.yaml</a>).</td></tr>
+        <tr><td><code>DATABASE_URL</code></td><td>Vercel / Local</td><td>Optional Neon Postgres connection string (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/apps/web/src/lib/store.ts">apps/web/src/lib/store.ts</a>).</td></tr>
+        <tr><td><code>TELL_DISABLE_REPO_SETUP=1</code></td><td>Vercel (`vercel.json`)</td><td>Disables local git worktree shell commands on multi-tenant cloud hosts.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.page-panel');
+    function activateTab(id) {
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+      history.replaceState(null, '', '#' + id);
+    }
+    tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab)));
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById('panel-' + hash)) activateTab(hash);
+  </script>
+</body>
+</html>

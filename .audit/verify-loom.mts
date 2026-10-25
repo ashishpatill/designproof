@@ -1,0 +1,23 @@
+import { chromium } from "playwright";
+import { DESIGN_TEMPLATES, designFromFeatures } from "../packages/design-skills/src/index";
+const browser = await chromium.launch({ channel: "chrome" });
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const page = await ctx.newPage();
+await page.addInitScript({ content: "window.__name = (f) => f;" });
+const t = DESIGN_TEMPLATES.find((x) => x.key === "loom")!;
+const { previewHtml } = designFromFeatures(t.brief) as any;
+await page.setContent(previewHtml, { waitUntil: "load" });
+await page.addScriptTag({ content: "window.__name = (f) => f;" });
+await page.waitForTimeout(400);
+const r: any = await page.evaluate(`(() => {
+  const h1 = document.querySelector("h1");
+  const ink = [...h1.querySelectorAll(".ds-weft-ink")];
+  const inner = h1.innerText;
+  const lines = new Set(ink.map(e => Math.round(e.getBoundingClientRect().top)));
+  return { textContent: h1.textContent, innerText: inner, boxes: ink.map(e => Math.round(e.getBoundingClientRect().width)), visualLines: lines.size, html: h1.outerHTML.slice(0, 260) };
+})()`);
+console.log("textContent :", JSON.stringify(r.textContent));
+console.log("innerText   :", JSON.stringify(r.innerText));
+console.log("pick widths :", r.boxes.join(", "), "| visual lines:", r.visualLines);
+await page.screenshot({ path: "/tmp/tell-audit/loom-hero-fixed.png", clip: { x: 0, y: 0, width: 1440, height: 900 } });
+await browser.close();

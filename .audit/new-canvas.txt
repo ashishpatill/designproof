@@ -1,0 +1,204 @@
+  const canvasPane = (
+    <div className="dp-canvas">
+      <div className="dp-canvas__bar">
+        <label className="dp-canvas__target">
+          {isRepo ? (
+            <Github className="h-4 w-4 shrink-0 text-accent" aria-hidden />
+          ) : (
+            <span className="dp-canvas__target-icon" aria-hidden>
+              URL
+            </span>
+          )}
+          <input
+            value={inputUrl}
+            onChange={(e) => setInputUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !operationActive) onPrimary();
+            }}
+            disabled={operationActive}
+            spellCheck={false}
+            data-testid="capture-url"
+            aria-label="URL to capture or GitHub repo to run"
+            className="dp-canvas__input"
+            placeholder="https://your-app.com  ·  or  github.com/owner/repo"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={onPrimary}
+          disabled={operationActive}
+          data-testid="capture-submit"
+          className="dp-btn dp-btn--primary"
+        >
+          {setupActive ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Setting up…
+            </>
+          ) : captureState === "capturing" ? (
+            "Capturing…"
+          ) : isRepo ? (
+            <>
+              <Github className="h-4 w-4" aria-hidden /> Set up &amp; run
+            </>
+          ) : (
+            "Capture"
+          )}
+        </button>
+        <div className="dp-canvas__meta">
+          <span className="dp-badge" data-tone="accent">
+            direction: {dirMeta.id}
+          </span>
+          {hasProofSurface ? <span>{report.score.total} findings</span> : null}
+        </div>
+      </div>
+
+      {designBrief && !liveCapture ? (
+        <div className="dp-critic__note">
+          Paste a live URL or GitHub repo above to ground this direction
+          {" · "}
+          <a className="text-accent underline-offset-2 hover:underline" href={studioBriefHref}>
+            Open in Studio
+          </a>
+        </div>
+      ) : null}
+
+      {isRepo && !setupJob ? (
+        <p className="flex items-center gap-2 font-mono text-meta text-secondary">
+          <Github className="h-3.5 w-3.5 text-accent" aria-hidden />
+          Design Proof clones this repo, reads its README to find the run command, starts it, and captures the
+          localhost URL for you.
+        </p>
+      ) : null}
+
+      {setupError ? (
+        <div className="rounded-card border border-drift/40 bg-drift/10 px-4 py-3 text-sm text-drift">
+          {setupError}
+        </div>
+      ) : null}
+
+      {setupJob ? (
+        <SetupPanel
+          job={setupJob}
+          onRetry={() => startSetup(setupJob.repoUrl)}
+          onStop={stopApp}
+          onCaptureManual={(u) => {
+            setInputUrl(u);
+            void runCapture(u);
+          }}
+        />
+      ) : null}
+
+      {needsRecapture ? (
+        <div className="rounded-card border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-secondary">
+          URL changed to <span className="font-mono text-text">{inputUrl.trim()}</span> — click{" "}
+          <strong className="text-text">Capture</strong> to rescan.
+        </div>
+      ) : null}
+
+      {liveCapture ? (
+        <PagesStrip
+          pages={pages}
+          activeUrl={report.capture.url}
+          capturing={captureState === "capturing"}
+          scanningAll={scanningAll}
+          pageInput={pageInput}
+          setPageInput={setPageInput}
+          onSelect={(u) => runCapture(u)}
+          onAdd={addPage}
+          onScanAll={scanAllPages}
+        />
+      ) : null}
+
+      <section className="dp-stage">
+        <div className="dp-stage__head">
+          <h2 className="dp-stage__title" aria-live="polite">
+            {canvasTitle}
+          </h2>
+          {hasProofSurface ? <span className="dp-canvas__meta">{scoreLine}</span> : null}
+        </div>
+        <div className={hasProofSurface ? "dp-stage__body--flush" : "dp-stage__body"}>
+          {operationActive ? (
+            <div className="p-4">
+              <OperationPlaceholder title={operationTitle} detail={operationDetail} />
+            </div>
+          ) : !hasProofSurface ? (
+            <div className="p-4">
+              <div className="dp-empty" style={{ minHeight: "16rem" }}>
+                <div>
+                  <p className="font-display text-2xl text-text">
+                    {captureMeta?.error ? "Capture did not land" : designBrief ? "Ground the brief" : "No capture yet"}
+                  </p>
+                  <p className="mx-auto mt-2 max-w-md text-sm text-secondary">
+                    {captureMeta?.error
+                      ? captureMeta.error
+                      : designBrief
+                        ? "Paste a live URL or GitHub repo to attach findings and the before/after seam — Design Proof will not invent the demo site."
+                        : "Paste a live URL and capture. The offline fixture loads only from Offline mode."}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setComposerMode("offline");
+                        loadOfflineFixture();
+                      }}
+                      className="dp-btn dp-btn--quiet"
+                    >
+                      <FileCode2 className="h-4 w-4" aria-hidden /> Load offline fixture
+                    </button>
+                    <a className="dp-btn dp-btn--quiet" href={studioBriefHref}>
+                      <Sparkles className="h-4 w-4" aria-hidden /> Open Studio
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <BeforeAfterSeam
+              seam={seam}
+              setSeam={setSeam}
+              findings={report.findings}
+              reconciliation={reconciliation}
+              selectedId={selectedId}
+              onSelectFinding={(id) => {
+                setSelectedId(id);
+                setCriticTab("findings");
+              }}
+              snapshotHtml={report.capture.snapshotHtml || undefined}
+              screenshotBase64={report.capture.screenshotBase64 || undefined}
+              llmStatus={llmRestyle.status}
+              llmSheet={llmRestyle.sheet}
+              llmMode={llmRestyle.mode}
+              onLlmModeChange={llmRestyle.setMode}
+            />
+          )}
+        </div>
+      </section>
+
+      {liveCapture ? (
+        <ScenarioMatrixPanel
+          state={matrixState}
+          proof={matrixProof}
+          error={matrixError}
+          disabled={operationActive || matrixState === "scanning"}
+          onScan={() => {
+            void scanScenarioMatrix();
+          }}
+        />
+      ) : null}
+
+      {proofResult ? (
+        <VerifiedProofPanel
+          baseline={report}
+          result={proofResult}
+          seam={seam}
+          setSeam={setSeam}
+          onRevert={revertProof}
+          onCopy={() => {
+            void copyPatch();
+          }}
+        />
+      ) : null}
+    </div>
+  );
+

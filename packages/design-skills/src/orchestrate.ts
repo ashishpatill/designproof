@@ -6,6 +6,7 @@ import {
   type ContentAuthor,
 } from "./author";
 import { routeDomainResearchSkills } from "./domain-research";
+import { planImagery } from "./imagery";
 import { renderPreviewHtml } from "./render";
 import { routeSkills } from "./route";
 import { buildSections } from "./sections";
@@ -178,10 +179,13 @@ export function designFromFeatures(
   }
   const authored =
     options.authored && isConnectiveAuthorEligible(effectiveBrief) ? options.authored : undefined;
-  const sections = buildSections(effectiveBrief, analysis, taste, {
+  const builtSections = buildSections(effectiveBrief, analysis, taste, {
     domainPack: researchPlanRaw.pack,
     authored,
   });
+  // S5 imagery stage: place real brief assets; report gaps rather than drawing over them.
+  const imagery = planImagery(builtSections, effectiveBrief);
+  const sections = imagery.sections;
   const profile = AESTHETIC_PROFILES[taste.aestheticLean];
 
   const motionNotes =
@@ -239,6 +243,12 @@ export function designFromFeatures(
     customizationHints.push(`Theme: ${theme.id} — colour from explicit theme ${theme.label}, not product-name hash`);
   }
   customizationHints.push(`Concept: ${concept.oneLiner}`);
+  if (effectiveBrief.assets?.length) {
+    customizationHints.push(
+      `Imagery: ${imagery.plan.rasterSlots} real asset${imagery.plan.rasterSlots === 1 ? "" : "s"} placed${imagery.plan.heroHasMedia ? " (fold included)" : ""}`,
+    );
+  }
+  for (const gap of imagery.plan.gaps) customizationHints.push(`Imagery gap: ${gap}`);
 
   if (researchPlan.followOnCraft.length) {
     customizationHints.push(`Follow-on craft: ${researchPlan.followOnCraft.join(", ")}`);
@@ -283,6 +293,7 @@ export function designFromFeatures(
     concept,
     theme: theme?.id,
     themeId: theme?.id,
+    imagery: imagery.plan,
   });
 
   return DesignFromFeaturesResponse.parse({

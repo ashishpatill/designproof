@@ -1,0 +1,72 @@
+
+corporate  [proof]  "Measured outcomes"  ×3
+   · div.ds-proof-stage>figure.ds-plate.ds-proof-figure>svg>text
+     "Measured outcomes"
+   · div.ds-wrap-wide>div.ds-proof-stage>figure.ds-plate.ds-proof-figure>figcaption
+     "Board pack · measured outcomes · four pillars"
+   · ul.ds-proof-board.ds-proof-board-spine>li.ds-proof-cell>button.ds-proof-hit>h3
+     "Measured outcomes"
+
+archive  [hero]  "Alpha jump"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+
+archive  [hero]  "Ruled ledger"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+
+archive  [hero]  "Entry folio"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+
+archive  [hero]  "Cross stamps"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+
+loom  [hero]  "Size treadles"  ×3
+   · div.ds-drawloom-stage>div.ds-shed-stage>div.ds-weft-claim>p.ds-lede
+     "Bottom size treadles that land you on the fit window without a left sticky rail."
+   · div.ds-drawloom-cloth>figure.ds-loom-plate>svg>text
+     "Size treadles"
+   · div.ds-drawloom-cloth>figure.ds-loom-plate>svg>text
+     "Size treadles"
+
+herbarium  [story]  "Range beads"  ×3
+   · section.ds-section.ds-story>div.ds-wrap-wide>div.ds-section-head.ds-section-head-spine>p.ds-lede
+     "Range beads, taxon ranks, and the notes that keep a voucher honest."
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Range beads"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Range beads"
+
+herbarium  [story]  "Voucher close"  ×3
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Voucher close"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Voucher close"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → voucher close"
+
+press  [features]  "Registration lock"  ×3
+   · div.ds-wrap>div.ds-section-head.ds-section-head-spine>div.ds-section-head-main>h2.ds-title
+     "Everything Forme Desk does, starting with registration lock"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Registration lock"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Registration lock"

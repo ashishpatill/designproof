@@ -1,0 +1,424 @@
+
+saas  [hero]  "Account scoring"  ×4
+   · ol>li>button.ds-priority-chip.is-live>span.ds-priority-label
+     "Account scoring"
+   · main>section.ds-section.ds-hero>p.ds-rail-caption.ds-wrap-wide
+     "Account scoring"
+   · div.ds-queue-field>figure.ds-queue-console>svg>text
+     "Account scoring"
+   · div.ds-queue-field>figure.ds-queue-console>svg>text
+     "Account scoring"
+
+dashboard  [hero]  "Priority queue"  ×4
+   · ol>li>button.ds-priority-chip.is-live>span.ds-priority-label
+     "Priority queue"
+   · main>section.ds-section.ds-hero>p.ds-rail-caption.ds-wrap-wide
+     "Priority queue"
+   · div.ds-queue-field>figure.ds-queue-console>svg>text
+     "Priority queue"
+   · div.ds-queue-field>figure.ds-queue-console>svg>text
+     "Priority queue"
+
+dashboard  [app]  "Priority queue"  ×3
+   · aside.ds-app-side>ul.ds-app-nav>li>button.ds-app-nav-item.is-current
+     "Priority queue"
+   · div.ds-app>div.ds-app-grid>div.ds-app-main>p.ds-app-view-label
+     "Priority queue"
+   · table.ds-table>tbody>tr>th
+     "Priority queue"
+
+corporate  [proof]  "Measured outcomes"  ×4
+   · div.ds-wrap-wide>div.ds-proof-stage>header.ds-proof-head>p.ds-proof-foot
+     "Board pack · measured outcomes · four pillars"
+   · div.ds-proof-stage>figure.ds-plate.ds-proof-figure>svg>text
+     "Measured outcomes"
+   · div.ds-wrap-wide>div.ds-proof-stage>figure.ds-plate.ds-proof-figure>figcaption
+     "Board pack · measured outcomes · four pillars"
+   · ul.ds-proof-board.ds-proof-board-spine>li.ds-proof-cell>button.ds-proof-hit>h3
+     "Measured outcomes"
+
+educational  [features]  "Placement model"  ×4
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Placement model"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Placement model"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Placement model"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Placement model"
+
+educational  [features]  "Preemption ladder"  ×3
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Preemption ladder"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Preemption ladder"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Preemption ladder"
+
+educational  [features]  "Backpressure"  ×3
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Backpressure"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Backpressure"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Backpressure"
+
+educational  [features]  "Failure domains"  ×3
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Failure domains"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Failure domains"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Failure domains"
+
+studio  [figure]  "Identity systems"  ×3
+   · div>div.ds-section-head.ds-section-head-spine>div.ds-section-head-main>h2.ds-title
+     "Identity systems, step by step."
+   · div>ol.ds-figure-steps>li>strong
+     "Identity systems"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Identity systems"
+
+studio  [figure]  "Product surfaces"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Product surfaces"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Product surfaces"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Product surfaces"
+
+consumer  [hero]  "One-bag day"  ×3
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "One-bag day"
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "One-bag day"
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "One-bag day"
+
+consumer  [hero]  "Quiet hardware"  ×3
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "Quiet hardware"
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "Quiet hardware"
+   · div.ds-bleed>figure.ds-plate.ds-plate-hang>svg>text
+     "Quiet hardware"
+
+consumer  [figure]  "One-bag day"  ×3
+   · div>div.ds-section-head.ds-section-head-spine>div.ds-section-head-main>h2.ds-title
+     "One-bag day, step by step."
+   · div>ol.ds-figure-steps>li>strong
+     "One-bag day"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "One-bag day"
+
+consumer  [figure]  "Quiet hardware"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Quiet hardware"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Quiet hardware"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Quiet hardware"
+
+foundry  [figure]  "Text cut"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Text cut"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Text cut"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Text cut"
+
+foundry  [story]  "Display cut"  ×6
+   · div.ds-marginalia-grid>div.ds-marginalia-essay>article.ds-marginalia-beat>h3
+     "Display cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Display cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Display cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Display cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Display cut"
+   · aside.ds-marginalia-rail>ol.ds-marginalia-notes>li.ds-marginalia-note>p.ds-marginalia-title
+     "Display cut"
+
+foundry  [story]  "Text cut"  ×6
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Text cut"
+   · div.ds-marginalia-grid>div.ds-marginalia-essay>article.ds-marginalia-beat>h3
+     "Text cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Text cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Text cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Text cut"
+   · aside.ds-marginalia-rail>ol.ds-marginalia-notes>li.ds-marginalia-note>p.ds-marginalia-title
+     "Text cut"
+
+foundry  [story]  "Caption cut"  ×6
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Caption cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Caption cut"
+   · div.ds-marginalia-grid>div.ds-marginalia-essay>article.ds-marginalia-beat>h3
+     "Caption cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Caption cut"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Caption cut"
+   · aside.ds-marginalia-rail>ol.ds-marginalia-notes>li.ds-marginalia-note>p.ds-marginalia-title
+     "Caption cut"
+
+foundry  [story]  "Italic mates"  ×5
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Italic mates"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Italic mates"
+   · article.ds-marginalia-beat>ul.ds-cut-slips>li.ds-cut-slip>span.ds-cut-name
+     "Italic mates"
+   · div.ds-marginalia-grid>div.ds-marginalia-essay>article.ds-marginalia-beat>h3
+     "Italic mates"
+   · aside.ds-marginalia-rail>ol.ds-marginalia-notes>li.ds-marginalia-note>p.ds-marginalia-title
+     "Italic mates"
+
+dossier  [figure]  "Source rails"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Source rails"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Source rails"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Source rails"
+
+observatory  [figure]  "Channel lattice"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Channel lattice"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Channel lattice"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Channel lattice"
+
+archive  [hero]  "Alpha jump"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Alpha jump"
+
+archive  [hero]  "Ruled ledger"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Ruled ledger"
+
+archive  [hero]  "Entry folio"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Entry folio"
+
+archive  [hero]  "Cross stamps"  ×3
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+   · div.ds-bleed.ds-register-field>figure.ds-register-ledger>svg>text
+     "Cross stamps"
+
+archive  [figure]  "Ruled ledger"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Ruled ledger"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Ruled ledger"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Ruled ledger"
+
+archive  [story]  "Alpha jump"  ×6
+   · div.ds-entry-essay>article.ds-entry-beat>div.ds-entry-measure>h3
+     "Alpha jump"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Alpha jump"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Alpha jump"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Alpha jump"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Alpha jump"
+   · aside.ds-entry-aside>ol.ds-entry-aside-list>li.ds-entry-aside-item>span.ds-entry-aside-title
+     "Alpha jump"
+
+archive  [story]  "Ruled ledger"  ×6
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Ruled ledger"
+   · div.ds-entry-essay>article.ds-entry-beat>div.ds-entry-measure>h3
+     "Ruled ledger"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Ruled ledger"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Ruled ledger"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Ruled ledger"
+   · aside.ds-entry-aside>ol.ds-entry-aside-list>li.ds-entry-aside-item>span.ds-entry-aside-title
+     "Ruled ledger"
+
+archive  [story]  "Entry folio"  ×6
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Entry folio"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Entry folio"
+   · div.ds-entry-essay>article.ds-entry-beat>div.ds-entry-measure>h3
+     "Entry folio"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Entry folio"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Entry folio"
+   · aside.ds-entry-aside>ol.ds-entry-aside-list>li.ds-entry-aside-item>span.ds-entry-aside-title
+     "Entry folio"
+
+archive  [story]  "Cross stamps"  ×5
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Cross stamps"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Cross stamps"
+   · div.ds-entry-measure>ul.ds-cross-stamps>li.ds-cross-stamp>span.ds-stamp-name
+     "Cross stamps"
+   · div.ds-entry-essay>article.ds-entry-beat>div.ds-entry-measure>h3
+     "Cross stamps"
+   · aside.ds-entry-aside>ol.ds-entry-aside-list>li.ds-entry-aside-item>span.ds-entry-aside-title
+     "Cross stamps"
+
+loom  [hero]  "Size treadles"  ×3
+   · div.ds-drawloom-stage>div.ds-shed-stage>div.ds-weft-claim>p.ds-lede
+     "Bottom size treadles that land you on the fit window without a left sticky rail."
+   · div.ds-drawloom-cloth>figure.ds-loom-plate>svg>text
+     "Size treadles"
+   · div.ds-drawloom-cloth>figure.ds-loom-plate>svg>text
+     "Size treadles"
+
+loom  [figure]  "Warp cells"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Warp cells"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Warp cells"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Warp cells"
+
+loom  [story]  "Size treadles"  ×3
+   · div.ds-wrap-wide>ol.ds-hang-tape>li.ds-hang-tape-chip>span.ds-hang-tape-title
+     "Size treadles"
+   · div.ds-wrap-wide>div.ds-hang-stack>article.ds-hang-tag>h3
+     "Size treadles"
+   · div.ds-wrap-wide>div.ds-hang-stack>article.ds-hang-tag>p.ds-body
+     "Bottom size treadles that land you on the fit window without a left sticky rail."
+
+loom  [story]  "Hangtag notes"  ×3
+   · section.ds-section.ds-story>div.ds-wrap-wide>div.ds-section-head.ds-section-head-spine>p.ds-eyebrow
+     "Hangtag notes"
+   · div.ds-wrap-wide>ol.ds-hang-tape>li.ds-hang-tape-chip>span.ds-hang-tape-title
+     "Hangtag notes"
+   · div.ds-wrap-wide>div.ds-hang-stack>article.ds-hang-tag>h3
+     "Hangtag notes"
+
+herbarium  [figure]  "Pressed plate"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Pressed plate"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Pressed plate"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Pressed plate"
+
+herbarium  [story]  "Binomial strip"  ×6
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Binomial strip"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Binomial strip"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait fails → Binomial strip"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait fails → Binomial strip"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait fails → Binomial strip"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait fails → Binomial strip"
+
+herbarium  [story]  "Pressed plate"  ×3
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Pressed plate"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → Pressed plate"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Pressed plate"
+
+herbarium  [story]  "Photo inset"  ×3
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Photo inset"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → Photo inset"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Photo inset"
+
+herbarium  [story]  "Range beads"  ×4
+   · section.ds-section.ds-story>div.ds-wrap-wide>div.ds-section-head.ds-section-head-spine>p.ds-lede
+     "Range beads, taxon ranks, and the notes that keep a voucher honest."
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Range beads"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → Range beads"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Range beads"
+
+herbarium  [story]  "Voucher close"  ×4
+   · div.ds-wrap-wide>ol.ds-range-ladder>li.ds-range-step>span.ds-range-step-title
+     "Voucher close"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → Voucher close"
+   · div.ds-range-sheets>article.ds-range-sheet>header.ds-range-sheet-head>h3
+     "Voucher close"
+   · article.ds-range-sheet>ol.ds-range-couplet>li>span.ds-range-lead-copy
+     "Trait holds → Voucher close"
+
+press  [features]  "Registration lock"  ×3
+   · div.ds-wrap>div.ds-section-head.ds-section-head-spine>div.ds-section-head-main>h2.ds-title
+     "Everything Forme Desk does, starting with registration lock"
+   · div.ds-wrap>figure.ds-plate.ds-plate-wide>svg>text
+     "Registration lock"
+   · div.ds-wrap>ol.ds-index>li.ds-index-row>h3
+     "Registration lock"
+
+press  [figure]  "Imposition sheet"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Imposition sheet"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Imposition sheet"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Imposition sheet"
+
+lantern  [figure]  "Path cartograph"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Path cartograph"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Path cartograph"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Path cartograph"
+
+clinic  [figure]  "Handoff beads"  ×4
+   · div>div.ds-section-head.ds-section-head-spine>div.ds-section-head-main>p.ds-lede
+     "Stage nodes, dwell bars, and handoff beads — the chart drawn rather than claimed."
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Handoff beads"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Handoff beads"
+   · section.ds-reveal.ds-stagger>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Handoff beads"
+
+harness  [figure]  "Tool permit"  ×3
+   · div>ol.ds-figure-steps>li.is-active>strong
+     "Tool permit"
+   · figure.ds-figure>div.ds-figure-stage>svg>text
+     "Tool permit"
+   · section.ds-section>div.ds-wrap-wide.ds-split>figure.ds-figure>figcaption
+     "Tool permit"

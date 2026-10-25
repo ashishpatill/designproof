@@ -1,5 +1,7 @@
 export * from "./types";
 export * from "./staged";
+export * from "./imagery";
+export * from "./swap-visual";
 export * from "./analyze";
 export * from "./route";
 export * from "./color";

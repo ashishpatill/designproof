@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book II — Print-Atelier Design System, 21 Detectors, Taste &amp; Proof</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-paper: #FAF6F0;
+      --bg-linen: #F2ECE1;
+      --bg-aged: #E8DFD1;
+      --ink-900: #161412;
+      --ink-700: #3D3833;
+      --ink-500: #6E665E;
+      --ink-300: #A39B90;
+      --rule-hairline: #DDD4C6;
+      --terracotta: #D4714A;
+      --terracotta-deep: #B55632;
+      --forest: #2E5A44;
+      --ochre: #C88A2B;
+      --crimson: #B83B3B;
+      --serif: "Iowan Old Style", "Instrument Serif", "Palatino Linotype", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+      --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg-paper); color: var(--ink-900); font-family: var(--sans); line-height: 1.55; }
+    .topbar { position: sticky; top: 0; z-index: 50; background: rgba(250, 246, 240, 0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule-hairline); }
+    .book-ribbon { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 1.5rem; border-bottom: 1px solid var(--rule-hairline); font-size: 0.78rem; background: var(--bg-linen); flex-wrap: wrap; gap: 0.5rem; }
+    .book-links { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .book-pill { padding: 0.25rem 0.65rem; border-radius: 4px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); color: var(--ink-700); text-decoration: none; font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+    .book-pill.active { background: var(--ink-900); color: var(--bg-paper); border-color: var(--ink-900); }
+    .book-pill:hover:not(.active) { border-color: var(--terracotta); color: var(--terracotta-deep); }
+    .tabbar { display: flex; gap: 0.25rem; padding: 0.5rem 1.5rem 0; overflow-x: auto; }
+    .tab-btn { appearance: none; border: 1px solid transparent; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-500); font-family: var(--sans); font-size: 0.82rem; font-weight: 600; padding: 0.55rem 0.95rem; cursor: pointer; white-space: nowrap; border-radius: 6px 6px 0 0; }
+    .tab-btn[aria-selected="true"] { color: var(--ink-900); background: var(--bg-paper); border-color: var(--rule-hairline); border-bottom-color: var(--terracotta); }
+    .page-panel { display: none; max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .page-panel.active { display: block; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+    h1 { font-size: clamp(2rem, 3.2vw, 2.8rem); line-height: 1.08; }
+    h2 { font-size: 1.6rem; border-bottom: 1px solid var(--rule-hairline); padding-bottom: 0.4rem; margin-top: 2rem; }
+    h3 { font-size: 1.18rem; }
+    .kicker { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terracotta-deep); margin-bottom: 0.35rem; display: block; }
+    .card { background: var(--bg-linen); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1.1rem; }
+    .card-paper { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.8rem; }
+    .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 0.75rem; }
+    .swatch { border: 1px solid var(--rule-hairline); border-radius: 6px; overflow: hidden; background: var(--bg-paper); cursor: pointer; }
+    .swatch-color { height: 56px; border-bottom: 1px solid var(--rule-hairline); }
+    .swatch-meta { padding: 0.55rem 0.65rem; font-size: 0.75rem; }
+    .badge { display: inline-block; font-family: var(--mono); font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 3px; border: 1px solid var(--rule-hairline); background: var(--bg-paper); }
+    .badge-terra { background: #F9EAE3; color: var(--terracotta-deep); border-color: #E6B8A6; }
+    .badge-ochre { background: #FBF1DF; color: #8F5E10; border-color: #E8CB96; }
+    .badge-ok { background: #E6F0EB; color: var(--forest); border-color: #B7D4C5; }
+    .badge-frame { background: #FCE8E8; color: var(--crimson); border-color: #E8B0B0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--rule-hairline); vertical-align: top; }
+    th { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-500); background: var(--bg-linen); }
+    code { font-family: var(--mono); font-size: 0.8em; background: rgba(232,223,209,0.65); padding: 0.1rem 0.32rem; border-radius: 3px; }
+    a.file-link { color: var(--terracotta-deep); text-decoration: underline; font-family: var(--mono); font-size: 0.76rem; }
+    .svg-frame { background: var(--bg-paper); border: 1px solid var(--rule-hairline); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .filter-btn { font-family: var(--mono); font-size: 0.75rem; padding: 0.35rem 0.75rem; border-radius: 4px; border: 1px solid var(--rule-hairline); background: var(--bg-linen); cursor: pointer; }
+    .filter-btn.active { background: var(--ink-900); color: var(--bg-paper); border-color: var(--ink-900); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="book-ribbon">
+      <div>
+        <strong>DESIGNPROOF DOCS</strong>
+        <span style="color:var(--ink-500); margin-left:0.5rem;">Book II · Print-Atelier Design System, 21 Detectors &amp; Proof Engine</span>
+      </div>
+      <nav class="book-links" aria-label="Consolidated Books">
+        <a class="book-pill" href="00-hub-architecture-and-mcp.html">Book I: Hub, Arch &amp; MCP</a>
+        <a class="book-pill active" href="01-detectors-taste-and-design-system.html">Book II: 21 Detectors &amp; Design System</a>
+        <a class="book-pill" href="02-craft-engine-rootcause-and-staged-plan.html">Book III: Root-Cause &amp; 8-Stage Engine</a>
+        <a class="book-pill" href="03-status-audit-ops-and-training.html">Book IV: Status, 48-Doc Audit &amp; Ops</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/RULES.md">RULES.md</a>
+        <a class="book-pill" href="file:///Volumes/Developer/Workspace/designproof/AGENTS.md">AGENTS.md</a>
+      </nav>
+    </div>
+    <nav class="tabbar" role="tablist" aria-label="Book II Pages">
+      <button class="tab-btn" role="tab" aria-selected="true" data-tab="design-system">1. Print-Atelier Tokens &amp; Seam</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="detectors">2. All 21 Detectors (13 Tells + 8 Drifts)</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="taste-rubric">3. 6-Axis Rubric &amp; Gemini 2-Pass Taste</button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="redesign-proof">4. 7 Directions &amp; 3-Round Proof Loop</button>
+    </nav>
+  </header>
+
+  <!-- PAGE 1: PRINT-ATELIER DESIGN SYSTEM -->
+  <main id="panel-design-system" class="page-panel active" role="tabpanel">
+    <span class="kicker">Book II · Page 1 · Consolidates DESIGN.md, docs/01_DESIGN_SYSTEM.md, docs/07 &amp; design-tokens.json</span>
+    <h1>Print-Atelier Design System (Product Chrome Contract)</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      DesignProof's own web surface (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/apps/web/src/app/globals.css">apps/web/src/app/globals.css</a> and <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/design-tokens.json">design-tokens.json</a>) follows the <strong>Print-Atelier</strong> aesthetic (Linear, Stripe Press, Pentagram, Are.na, Read.cv). It applies <strong>only to DesignProof's own chrome</strong> (<code>shouldApplyDesignDoc</code> in <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/load-design-doc.ts">load-design-doc.ts</a>) — never to external user sites or generated specimens.
+    </p>
+
+    <h2>Interactive Color Token Swatches (Click any swatch to copy CSS var)</h2>
+    <div class="swatch-grid">
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--bg-paper)')"><div class="swatch-color" style="background:#FAF6F0"></div><div class="swatch-meta"><strong>--bg-paper</strong><br/><code>#FAF6F0</code> · Primary canvas</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--bg-linen)')"><div class="swatch-color" style="background:#F2ECE1"></div><div class="swatch-meta"><strong>--bg-linen</strong><br/><code>#F2ECE1</code> · Elevated cards</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--bg-aged)')"><div class="swatch-color" style="background:#E8DFD1"></div><div class="swatch-meta"><strong>--bg-aged</strong><br/><code>#E8DFD1</code> · Active/hover wells</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--ink-900)')"><div class="swatch-color" style="background:#161412"></div><div class="swatch-meta"><strong>--ink-900</strong><br/><code>#161412</code> · Primary ink (15.8:1)</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--ink-700)')"><div class="swatch-color" style="background:#3D3833"></div><div class="swatch-meta"><strong>--ink-700</strong><br/><code>#3D3833</code> · Body prose (10.4:1)</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--ink-500)')"><div class="swatch-color" style="background:#6E665E"></div><div class="swatch-meta"><strong>--ink-500</strong><br/><code>#6E665E</code> · Captions (5.1:1 AA)</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--rule-hairline)')"><div class="swatch-color" style="background:#DDD4C6"></div><div class="swatch-meta"><strong>--rule-hairline</strong><br/><code>#DDD4C6</code> · 1px structural rule</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--terracotta)')"><div class="swatch-color" style="background:#D4714A"></div><div class="swatch-meta"><strong>--terracotta</strong><br/><code>#D4714A</code> · Generic Tell / Seam</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--terracotta-deep)')"><div class="swatch-color" style="background:#B55632"></div><div class="swatch-meta"><strong>--terracotta-deep</strong><br/><code>#B55632</code> · Interactive text AA</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--forest)')"><div class="swatch-color" style="background:#2E5A44"></div><div class="swatch-meta"><strong>--forest</strong><br/><code>#2E5A44</code> · Intentional / Verified</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--ochre)')"><div class="swatch-color" style="background:#C88A2B"></div><div class="swatch-meta"><strong>--ochre</strong><br/><code>#C88A2B</code> · Consistency Drift</div></div>
+      <div class="swatch" onclick="navigator.clipboard?.writeText('var(--crimson)')"><div class="swatch-color" style="background:#B83B3B"></div><div class="swatch-meta"><strong>--crimson</strong><br/><code>#B83B3B</code> · Hard WCAG Failure</div></div>
+    </div>
+
+    <h2>Typography Scale &amp; Centerpiece <code>BeforeAfterSeam</code> Anatomy</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>3-Font Hierarchy (Declared in <code>design-tokens.json</code>)</h3>
+        <table>
+          <thead><tr><th>Role</th><th>Font Family</th><th>Scale &amp; Tracking</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Display / Critique</strong></td><td><code>Instrument Serif</code></td><td>Hero <code>clamp(2.5rem, 4.5vw, 4rem)</code>, lh <code>1.05</code>, tracking <code>-0.02em</code></td></tr>
+            <tr><td><strong>UI Chrome &amp; Body</strong></td><td><code>Plus Jakarta Sans</code></td><td>Body <code>15px</code> (<code>0.9375rem</code>), lh <code>1.6</code>, measure <code>60ch–70ch</code></td></tr>
+            <tr><td><strong>Selectors &amp; Scores</strong></td><td><code>JetBrains Mono</code></td><td><code>12px–13px</code>, <code>font-variant-numeric: tabular-nums</code> mandatory</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3><code>BeforeAfterSeam</code> &amp; Anti-Slop Bans</h3>
+        <div class="svg-frame" style="margin:0.4rem 0;">
+          <svg viewBox="0 0 460 115" width="100%" role="img" aria-label="BeforeAfterSeam diagram">
+            <rect x="10" y="10" width="215" height="95" fill="#E8DFD1" stroke="#DDD4C6"/>
+            <text x="24" y="34" font-family="monospace" font-size="10" fill="#6E665E">BEFORE · CAPTURED PNG</text>
+            <circle cx="95" cy="65" r="11" fill="#D4714A"/><text x="95" y="69" text-anchor="middle" font-family="monospace" font-size="10" fill="#FAF6F0">1</text>
+            <rect x="225" y="10" width="225" height="95" fill="#FAF6F0" stroke="#DDD4C6"/>
+            <text x="245" y="34" font-family="monospace" font-size="10" fill="#2E5A44">AFTER · INJECTED RESTYLE CSS</text>
+            <line x1="225" y1="6" x2="225" y2="109" stroke="#D4714A" stroke-width="3"/>
+            <circle cx="225" cy="58" r="16" fill="#FAF6F0" stroke="#D4714A" stroke-width="2"/>
+            <text x="225" y="62" text-anchor="middle" font-family="monospace" font-size="10" fill="#161412">↔</text>
+          </svg>
+        </div>
+        <p style="font-size:0.78rem; margin:0; color:var(--ink-700);">
+          <strong>Bans in <code>apps/web</code></strong>: Zero raw hex in JSX <code>className</code>s, zero purple/indigo gradients, zero glassmorphic <code>backdrop-blur</code> cards, zero <code>rounded-2xl+</code> (`> 8px`), zero dark-mode toggle on Print-Atelier canvas.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE 2: ALL 21 DETECTORS -->
+  <section id="panel-detectors" class="page-panel" role="tabpanel">
+    <span class="kicker">Book II · Page 2 · Consolidates packages/core/src/detectors/index.ts, BUILD.md &amp; Oct 2026 Frame Tells</span>
+    <h1>All 21 Pure Detectors (13 Genericness Tells + 8 Consistency Drifts)</h1>
+    <p style="max-width: 860px; color: var(--ink-700);">
+      Note: Early docs (<code>BUILD.md</code>) listed 14 detectors. The live registry in <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/index.ts">packages/core/src/detectors/index.ts</a> executes <strong>21 deterministic detectors</strong>: 9 classic genericness tells, <strong>4 Frame &amp; First-Screen Tells added 24 Oct 2026</strong>, and 8 internal consistency drift detectors.
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1040 175" width="100%" role="img" aria-label="4 Oct 2026 Frame Tells Visual Diagram">
+        <rect x="12" y="14" width="242" height="146" rx="7" fill="#FCE8E8" stroke="#B83B3B"/>
+        <text x="24" y="36" font-family="monospace" font-size="10.5" font-weight="bold" fill="#B83B3B">10 · TitleOnFoldTell</text>
+        <text x="24" y="55" font-family="Georgia, serif" font-size="14" font-weight="bold">Title Straddles Fold</text>
+        <text x="24" y="75" font-family="sans-serif" font-size="11" fill="#3D3833">Fires when heading spans</text>
+        <text x="24" y="91" font-family="sans-serif" font-size="11" fill="#3D3833">bottom of 1st screen or sits in</text>
+        <text x="24" y="107" font-family="sans-serif" font-size="11" fill="#3D3833">bottom 12% without 48px body.</text>
+        <text x="24" y="142" font-family="monospace" font-size="10" fill="#6E665E">title-on-fold.ts</text>
+
+        <rect x="270" y="14" width="242" height="146" rx="7" fill="#FCE8E8" stroke="#B83B3B"/>
+        <text x="282" y="36" font-family="monospace" font-size="10.5" font-weight="bold" fill="#B83B3B">11 · MobileFirstScreenTell</text>
+        <text x="282" y="55" font-family="Georgia, serif" font-size="14" font-weight="bold">Mobile 390×844 Overflow</text>
+        <text x="282" y="75" font-family="sans-serif" font-size="11" fill="#3D3833">Fires on horizontal overflow,</text>
+        <text x="282" y="91" font-family="sans-serif" font-size="11" fill="#3D3833">clipped H1, or missing CTA on</text>
+        <text x="282" y="107" font-family="sans-serif" font-size="11" fill="#3D3833">the 390×844 mobile probe.</text>
+        <text x="282" y="142" font-family="monospace" font-size="10" fill="#6E665E">mobile-first-screen.ts</text>
+
+        <rect x="528" y="14" width="242" height="146" rx="7" fill="#FCE8E8" stroke="#B83B3B"/>
+        <text x="540" y="36" font-family="monospace" font-size="10.5" font-weight="bold" fill="#B83B3B">12 · FrameGutterTell</text>
+        <text x="540" y="55" font-family="Georgia, serif" font-size="14" font-weight="bold">Lopsided / Flush Gutter</text>
+        <text x="540" y="75" font-family="sans-serif" font-size="11" fill="#3D3833">Fires when primary container</text>
+        <text x="540" y="91" font-family="sans-serif" font-size="11" fill="#3D3833">hugs viewport edge (&lt;12px)</text>
+        <text x="540" y="107" font-family="sans-serif" font-size="11" fill="#3D3833">or left/right gutters skew.</text>
+        <text x="540" y="142" font-family="monospace" font-size="10" fill="#6E665E">frame-gutter.ts</text>
+
+        <rect x="786" y="14" width="242" height="146" rx="7" fill="#FCE8E8" stroke="#B83B3B"/>
+        <text x="798" y="36" font-family="monospace" font-size="10.5" font-weight="bold" fill="#B83B3B">13 · BlankStretchTell</text>
+        <text x="798" y="55" font-family="Georgia, serif" font-size="14" font-weight="bold">Dead Vertical Band</text>
+        <text x="798" y="75" font-family="sans-serif" font-size="11" fill="#3D3833">Fires when an un-illustrated</text>
+        <text x="798" y="91" font-family="sans-serif" font-size="11" fill="#3D3833">vertical gap &gt; 260px interrupts</text>
+        <text x="798" y="107" font-family="sans-serif" font-size="11" fill="#3D3833">consecutive sections.</text>
+        <text x="798" y="142" font-family="monospace" font-size="10" fill="#6E665E">blank-stretch.ts</text>
+      </svg>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterDetectors('all', this)">All 21 Detectors</button>
+      <button class="filter-btn" onclick="filterDetectors('tell', this)">13 Genericness Tells</button>
+      <button class="filter-btn" onclick="filterDetectors('frame', this)">4 Oct 2026 Frame Tells</button>
+      <button class="filter-btn" onclick="filterDetectors('drift', this)">8 Drift Detectors</button>
+    </div>
+
+    <table id="detector-table">
+      <thead>
+        <tr><th>#</th><th>Detector ID &amp; Class</th><th>Category</th><th>Source File</th><th>Measured DOM Heuristic &amp; Firing Threshold</th></tr>
+      </thead>
+      <tbody>
+        <tr data-kind="tell"><td>01</td><td><code>tell-gradient-crutch</code><br/><strong>GradientCrutchTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/gradient-crutch.ts">gradient-crutch.ts</a></td><td>Purple/blue/pink multi-stop linear/radial gradient on hero/CTA (`hue 230°–310°`). *(Note: Root-cause study §5 flags scoping `build-fingerprint.ts:121` to hero-only).*</td></tr>
+        <tr data-kind="tell"><td>02</td><td><code>tell-font-default</code><br/><strong>FontDefaultTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/font-default.ts">font-default.ts</a></td><td>Unpaired `Inter`, `Roboto`, `Arial`, or `system-ui` across both display headings and body copy (`fontFamilies.length === 1`).</td></tr>
+        <tr data-kind="tell"><td>03</td><td><code>tell-card-grid-monotony</code><br/><strong>CardGridMonotonyTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/card-grid-monotony.ts">card-grid-monotony.ts</a></td><td>`>= 3` sibling cards sharing identical width/height (`±4px`), border-radius (`>= 12px`), padding, and icon+title+blurb subtree.</td></tr>
+        <tr data-kind="tell"><td>04</td><td><code>tell-pill-badge-soup</code><br/><strong>PillBadgeSoupTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/pill-badge-soup.ts">pill-badge-soup.ts</a></td><td>`>= 3` elements with `border-radius >= 999px` and height `< 32px` above the fold (`y < 700`), or pill badge directly above H1.</td></tr>
+        <tr data-kind="tell"><td>05</td><td><code>tell-glass-blur-overuse</code><br/><strong>GlassBlurOveruseTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/glass-blur-overuse.ts">glass-blur-overuse.ts</a></td><td>`>= 3` elements using `backdrop-filter: blur(...)` combined with translucent backgrounds (`0.05 <= alpha <= 0.75`).</td></tr>
+        <tr data-kind="tell"><td>06</td><td><code>tell-shadow-mush</code><br/><strong>ShadowMushTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/shadow-mush.ts">shadow-mush.ts</a></td><td>Heavy diffuse `box-shadow` with `blurRadius >= 24px` and `spread >= 0` on `>= 3` cards instead of structural hairline rules.</td></tr>
+        <tr data-kind="tell"><td>07</td><td><code>tell-center-everything</code><br/><strong>CenterEverythingTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/center-everything.ts">center-everything.ts</a></td><td>`> 65%` of top-level text containers have `text-align: center` across `>= 3` consecutive sections.</td></tr>
+        <tr data-kind="tell"><td>08</td><td><code>tell-emoji-as-icon</code><br/><strong>EmojiAsIconTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/emoji-as-icon.ts">emoji-as-icon.ts</a></td><td>Unicode emoji characters (`/[\p{Extended_Pictographic}]/u`) rendered inside headings, buttons, badges, or feature card headers.</td></tr>
+        <tr data-kind="tell"><td>09</td><td><code>tell-cta-rainbow</code><br/><strong>CtaRainbowTell</strong></td><td><span class="badge badge-terra">Generic Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/cta-rainbow.ts">cta-rainbow.ts</a></td><td>Buttons/CTAs using `>= 3` distinct non-neutral background hues across the page or competing primary CTAs in the hero.</td></tr>
+        <tr data-kind="tell frame"><td>10</td><td><code>tell-title-on-fold</code><br/><strong>TitleOnFoldTell</strong></td><td><span class="badge badge-frame">Oct 2026 Frame Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/title-on-fold.ts">title-on-fold.ts</a></td><td>Heading straddles `viewport.height` (`top < vh && bottom > vh`) or sits in bottom `12%` of fold (`top >= 0.88 * vh`) without `48px` of body content before fold.</td></tr>
+        <tr data-kind="tell frame"><td>11</td><td><code>tell-mobile-first-screen</code><br/><strong>MobileFirstScreenTell</strong></td><td><span class="badge badge-frame">Oct 2026 Frame Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/mobile-first-screen.ts">mobile-first-screen.ts</a></td><td>On `390×844` mobile probe: horizontal scroll overflow (`scrollWidth > clientWidth`), clipped hero heading, or primary action pushed below fold.</td></tr>
+        <tr data-kind="tell frame"><td>12</td><td><code>tell-frame-gutter</code><br/><strong>FrameGutterTell</strong></td><td><span class="badge badge-frame">Oct 2026 Frame Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/frame-gutter.ts">frame-gutter.ts</a></td><td>Content container hugs viewport edge (`gutter < 12px`) or asymmetric left/right gutters (`|left - right| > 24px` without intentional offset column).</td></tr>
+        <tr data-kind="tell frame"><td>13</td><td><code>tell-blank-stretch</code><br/><strong>BlankStretchTell</strong></td><td><span class="badge badge-frame">Oct 2026 Frame Tell</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/blank-stretch.ts">blank-stretch.ts</a></td><td>Vertical empty stretch `> 260px` between consecutive visible blocks with zero media or structural divider.</td></tr>
+        <tr data-kind="drift"><td>14</td><td><code>drift-radius</code><br/><strong>RadiusDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/radius-drift.ts">radius-drift.ts</a></td><td>`> 4` distinct non-zero `border-radius` values (excluding `9999px`) across interactive controls and cards.</td></tr>
+        <tr data-kind="drift"><td>15</td><td><code>drift-spacing</code><br/><strong>SpacingDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/spacing-drift.ts">spacing-drift.ts</a></td><td>`> 30%` of sampled padding/gap values fall off the `4px / 8px` spatial grid (`value % 4 !== 0`).</td></tr>
+        <tr data-kind="drift"><td>16</td><td><code>drift-type-scale</code><br/><strong>TypeScaleDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/type-scale-drift.ts">type-scale-drift.ts</a></td><td>`> 7` distinct `font-size` values or adjacent heading levels within `< 2px` of each other.</td></tr>
+        <tr data-kind="drift"><td>17</td><td><code>drift-near-duplicate-color</code><br/><strong>NearDuplicateColorDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/near-duplicate-color.ts">near-duplicate-color.ts</a></td><td>Color pairs with Euclidean RGB distance `0 < ΔRGB < 18` (accidental off-by-one hex values like `#161412` vs `#181513`).</td></tr>
+        <tr data-kind="drift"><td>18</td><td><code>drift-contrast-failure</code><br/><strong>ContrastFailureDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/contrast-failure.ts">contrast-failure.ts</a></td><td>WCAG 2.1 relative luminance ratio `< 4.5:1` for normal text (`< 18px` or `< 14px` bold) or `< 3.0:1` for large text.</td></tr>
+        <tr data-kind="drift"><td>19</td><td><code>drift-line-measure</code><br/><strong>LineMeasureDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/line-measure-drift.ts">line-measure-drift.ts</a></td><td>Paragraph blocks (`<p>`) rendered wider than `75ch` (`~680px` at `16px` font size), degrading reading rhythm.</td></tr>
+        <tr data-kind="drift"><td>20</td><td><code>drift-hover-dead</code><br/><strong>HoverDeadDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/hover-dead-drift.ts">hover-dead-drift.ts</a></td><td>Interactive controls (`<a>`, `<button>`) showing zero visual state delta (`color`, `backgroundColor`, `borderColor`, `transform`) on Playwright hover probe.</td></tr>
+        <tr data-kind="drift"><td>21</td><td><code>drift-design-system</code><br/><strong>DesignSystemDrift</strong></td><td><span class="badge badge-ochre">Consistency Drift</span></td><td><a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/detectors/design-system-drift.ts">design-system-drift.ts</a></td><td>Rendered fonts/colors violate repo `design-tokens.json` or `DESIGN.md` (scoped by `shouldApplyDesignDoc`).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PAGE 3: 6-AXIS RUBRIC & GEMINI 2-PASS TASTE -->
+  <section id="panel-taste-rubric" class="page-panel" role="tabpanel">
+    <span class="kicker">Book II · Page 3 · Consolidates docs/05_GENERICNESS_METHODOLOGY.md &amp; packages/taste</span>
+    <h1>6-Axis Genericness Scorecard &amp; Gemini 2.5 Pro 2-Pass Taste Engine</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      Encoded in <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/measures.ts">packages/redesign/src/measures.ts</a> and <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/dna.ts">packages/redesign/src/dna.ts</a>. Scores run <code>0 → 100</code> where <strong>lower is more distinctive</strong> (`0–20` Studio Grade, `21–40` Clean with minor drift, `41–65` Template Drift, `66–100` High AI Slop).
+    </p>
+
+    <div class="svg-frame">
+      <svg viewBox="0 0 1020 220" width="100%" role="img" aria-label="6-Axis Genericness Rubric Weights and Gemini 2-Pass Flow">
+        <!-- Left: 6 Axes -->
+        <text x="20" y="26" font-family="monospace" font-size="11" font-weight="bold" fill="#B55632">6-AXIS GENERICNESS SCORECARD WEIGHTS (100%)</text>
+        <rect x="20" y="40" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="40" width="352" height="22" rx="3" fill="#D4714A"/>
+        <text x="28" y="55" font-family="monospace" font-size="11" fill="#FAF6F0">1. Typography &amp; Scale Contrast (20%)</text>
+
+        <rect x="20" y="70" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="70" width="352" height="22" rx="3" fill="#D4714A"/>
+        <text x="28" y="85" font-family="monospace" font-size="11" fill="#FAF6F0">2. Color Discipline &amp; Restraint (20%)</text>
+
+        <rect x="20" y="100" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="100" width="352" height="22" rx="3" fill="#D4714A"/>
+        <text x="28" y="115" font-family="monospace" font-size="11" fill="#FAF6F0">3. Spatial Rhythm &amp; Grid Adherence (20%)</text>
+
+        <rect x="20" y="130" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="130" width="264" height="22" rx="3" fill="#B55632"/>
+        <text x="28" y="145" font-family="monospace" font-size="11" fill="#FAF6F0">4. Alignment &amp; Layout Asymmetry (15%)</text>
+
+        <rect x="20" y="160" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="160" width="264" height="22" rx="3" fill="#B55632"/>
+        <text x="28" y="175" font-family="monospace" font-size="11" fill="#FAF6F0">5. Surface &amp; Elevation Restraint (15%)</text>
+
+        <rect x="20" y="190" width="440" height="22" rx="3" fill="#E8DFD1"/><rect x="20" y="190" width="176" height="22" rx="3" fill="#3D3833"/>
+        <text x="28" y="205" font-family="monospace" font-size="11" fill="#FAF6F0">6. Icon &amp; Chrome Hygiene (10%)</text>
+
+        <!-- Right: Gemini 2.5 Pro 2-Pass Loop -->
+        <rect x="500" y="16" width="500" height="196" rx="8" fill="#F2ECE1" stroke="#161412"/>
+        <text x="518" y="40" font-family="monospace" font-size="11" font-weight="bold" fill="#161412">GEMINI 2.5 PRO 2-PASS TASTE ENGINE (packages/taste)</text>
+        <rect x="518" y="54" width="220" height="72" rx="6" fill="#FAF6F0" stroke="#DDD4C6"/>
+        <text x="530" y="74" font-family="Georgia, serif" font-size="14" font-weight="bold">Pass 1: Holistic Read</text>
+        <text x="530" y="92" font-family="sans-serif" font-size="11" fill="#3D3833">Full screenshot + DOM summary</text>
+        <text x="530" y="108" font-family="sans-serif" font-size="11" fill="#3D3833">→ infers Brand Persona &amp; Intent</text>
+
+        <rect x="760" y="54" width="222" height="72" rx="6" fill="#FAF6F0" stroke="#DDD4C6"/>
+        <text x="772" y="74" font-family="Georgia, serif" font-size="14" font-weight="bold">Pass 2: Per-Finding Verdict</text>
+        <text x="772" y="92" font-family="sans-serif" font-size="11" fill="#3D3833">Judges each mechanical finding:</text>
+        <text x="772" y="108" font-family="monospace" font-size="10.5" fill="#2E5A44">intentional → 0 score penalty!</text>
+
+        <rect x="518" y="140" width="464" height="56" rx="6" fill="#E6F0EB" stroke="#2E5A44"/>
+        <text x="530" y="162" font-family="monospace" font-size="11" font-weight="bold" fill="#2E5A44">4 VERDICTS + MECHANICAL FALLBACK CONTRACT</text>
+        <text x="530" y="181" font-family="sans-serif" font-size="11" fill="#161412">Verdicts: generic · drift · intentional · uncertain. Without GEMINI_API_KEY: confidence = 0.5</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- PAGE 4: 7 DIRECTIONS & 3-ROUND PROOF LOOP -->
+  <section id="panel-redesign-proof" class="page-panel" role="tabpanel">
+    <span class="kicker">Book II · Page 4 · Consolidates docs/06_REDESIGN_ENGINE_V2.md &amp; docs/06_TELL_PROOF.md</span>
+    <h1>7 Structural Art-Direction Presets &amp; Disposable Worktree Proof</h1>
+    <p style="max-width: 820px; color: var(--ink-700);">
+      Redesign Engine v2 (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/directions.ts">packages/redesign/src/directions.ts</a>, verified by <a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/redesign/src/reconcile-directions.test.ts">reconcile-directions.test.ts</a>) guarantees every direction emits structurally distinct typography, palette, border-radius, and layout rules — never mere token nudging.
+    </p>
+
+    <div class="grid-4" style="margin-bottom:1.5rem;">
+      <div class="card-paper"><span class="badge badge-terra">01</span><h3 style="margin-top:0.3rem;">editorial-serif</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">High-contrast display serif (`Instrument Serif`), warm paper `#FAF6F0`, `1px` hairline rules, asymmetric 12-col split.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">02</span><h3 style="margin-top:0.3rem;">swiss-grid</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Neo-grotesque sans, exposed `1px` grid cells, `0px` radius, stark monochrome + vermilion signal accent.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">03</span><h3 style="margin-top:0.3rem;">warm-craft</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Linen canvas `#F2ECE1`, organic serif + humanist sans, terracotta &amp; forest ink, tactile `4px` radius.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">04</span><h3 style="margin-top:0.3rem;">brutalist-mono</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Monospace display + body, `2px solid #161412` hard borders, hard offset shadows (`4px 4px 0`), `0px` radius.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">05</span><h3 style="margin-top:0.3rem;">high-contrast-dark</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Obsidian `#0D0E11` canvas, `#F5F2EB` bone ink (`>14:1` AAA), `1px` `#262930` borders, zero neon glow.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">06</span><h3 style="margin-top:0.3rem;">technical-minimal</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Precision instrument aesthetic, tabular mono callouts, tight `4px` density, cool slate paper.</p></div>
+      <div class="card-paper"><span class="badge badge-terra">07</span><h3 style="margin-top:0.3rem;">studio-magazine</h3><p style="font-size:0.78rem; margin:0; color:var(--ink-700);">Oversized editorial masthead, multi-column pull-quotes, numbered margin index, deep plum/brass ink.</p></div>
+    </div>
+
+    <h2>Disposable Git Worktree Verification (<code>tell_proof_verify</code>) &amp; 3-Round Critique Loop</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Worktree Proof Protocol (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/proof-verify.ts">proof-verify.ts</a>)</h3>
+        <ol style="margin:0; padding-left:1.2rem; font-size:0.84rem; color:var(--ink-700);">
+          <li>Creates disposable worktree via <code>git worktree add --detach</code> in <code>os.tmpdir()</code>.</li>
+          <li>Applies candidate CSS/Tailwind patch inside the isolated worktree only.</li>
+          <li>Captures <code>375px / 768px / 1440px</code> × <code>light / dark</code> matrix via <code>tell_capture_matrix</code>.</li>
+          <li>Re-runs all 21 detectors and computes <code>ProofVerificationReport</code>:
+            <ul>
+              <li><code>verified = (afterScore &lt; beforeScore) &amp;&amp; (newTells.length === 0) &amp;&amp; (wcagFailures === 0)</code></li>
+            </ul>
+          </li>
+          <li>Always cleans up worktree in <code>finally</code> (`tell_proof_revert`).</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>3-Round Screenshot Critique Loop (<a class="file-link" href="file:///Volumes/Developer/Workspace/designproof/packages/core/src/critique.ts">critique.ts</a>)</h3>
+        <ul style="margin:0; padding-left:1.2rem; font-size:0.84rem; color:var(--ink-700);">
+          <li><strong>Round 1 (Macro Layout &amp; Frame)</strong>: Checks fold cutoffs (`TitleOnFoldTell`), mobile overflow (`MobileFirstScreenTell`), and gutter symmetry (`FrameGutterTell`).</li>
+          <li><strong>Round 2 (Typography &amp; Contrast)</strong>: Audits display/body font pairing, line measure (`<= 75ch`), and WCAG AA contrast ratios across all text nodes.</li>
+          <li><strong>Round 3 (Surface &amp; Rhythm)</strong>: Eliminates residual card monotony, blank stretches (`> 260px`), and dead hover states. Converges early when `genericnessScore <= 20`.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.page-panel');
+    function activateTab(id) {
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+      history.replaceState(null, '', '#' + id);
+    }
+    tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab)));
+    const hash = location.hash.replace('#', '');
+    if (hash && document.getElementById('panel-' + hash)) activateTab(hash);
+
+    function filterDetectors(kind, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('#detector-table tbody tr').forEach(row => {
+        const k = row.getAttribute('data-kind') || '';
+        row.style.display = (kind === 'all' || k.includes(kind)) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

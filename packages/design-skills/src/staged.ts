@@ -10,6 +10,7 @@
  *   - performance budgets checked against preview HTML
  *   - a motion review (between art-direction and refinement, not a ninth stage)
  *   - an Awwwards-weighted review score
+ *   - measured stage gates (imagery: real fold media; refinement: budgets + visual swap test)
  */
 import {
   DesignBrief,
@@ -19,6 +20,7 @@ import {
   ConceptSpec,
 } from "./types";
 import type { DesignBrief as DesignBriefType, TasteControls as TasteControlsType } from "./types";
+import { imageryGate } from "./imagery";
 
 /* ------------------------------------------------------------------ */
 /* Stages                                                              */
@@ -115,6 +117,78 @@ export function assertStageCanRun(run: StagedRun, id: StagedStageId): void {
       );
     }
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Stage gates                                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Evidence a reviewer hands the gate. Visual swap results are computed by `runVisualSwapTest`
+ * (swap-visual.ts) and passed in, which keeps this module free of the renderer.
+ */
+export interface StageGateEvidence {
+  previewHtml?: string;
+  visualSwap?: { passed: boolean; changedRatio: number; reasons: string[] };
+}
+
+export interface StageGateResult {
+  stage: StagedStageId;
+  passed: boolean;
+  blocking: string[];
+  warnings: string[];
+}
+
+/**
+ * Measured gates that must hold before a stage can be approved. Stages without a measured gate
+ * pass through to human review unchanged.
+ *   - imagery: fold carries real raster media; no asset cycled across slots.
+ *   - refinement: preview budgets pass and the visual swap test passes (≥ 0.5 changed).
+ */
+export function stageGate(id: StagedStageId, evidence: StageGateEvidence): StageGateResult {
+  const blocking: string[] = [];
+  const warnings: string[] = [];
+  if (id === "imagery") {
+    if (!evidence.previewHtml) {
+      blocking.push("imagery gate needs the rendered preview HTML");
+    } else {
+      const report = imageryGate(evidence.previewHtml);
+      for (const f of report.findings) {
+        if (f.ok) continue;
+        (f.severity === "ban" ? blocking : warnings).push(`${f.id}: ${f.detail}`);
+      }
+    }
+  }
+  if (id === "refinement") {
+    if (!evidence.previewHtml) {
+      blocking.push("refinement gate needs the rendered preview HTML");
+    } else {
+      const budgets = checkPreviewBudgets(evidence.previewHtml);
+      for (const f of budgets.findings) if (!f.ok) blocking.push(`budget ${f.id}: ${f.detail}`);
+    }
+    if (!evidence.visualSwap) {
+      blocking.push("refinement gate needs a visual swap test result");
+    } else if (!evidence.visualSwap.passed) {
+      blocking.push(
+        `visual swap test failed (${evidence.visualSwap.changedRatio} changed, need ≥ 0.5): ${evidence.visualSwap.reasons.join("; ")}`,
+      );
+    }
+  }
+  return { stage: id, passed: blocking.length === 0, blocking, warnings };
+}
+
+/** Approve only when the stage's measured gate holds. Throws with the blocking reasons. */
+export function approveGatedStage(
+  run: StagedRun,
+  id: StagedStageId,
+  evidence: StageGateEvidence,
+  note?: string,
+): StagedRun {
+  const gate = stageGate(id, evidence);
+  if (!gate.passed) {
+    throw new Error(`Cannot approve stage "${id}": ${gate.blocking.join(" | ")}`);
+  }
+  return approveStage(run, id, note);
 }
 
 /* ------------------------------------------------------------------ */

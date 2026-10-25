@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const base = "http://localhost:3000";
+const browser = await chromium.launch({ channel: "chrome" });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+await page.goto(base + "/", { waitUntil: "networkidle" });
+await page.getByRole("tab", { name: /Offline fixture/i }).click();
+await page.waitForTimeout(300);
+await page.locator(".dp-composer__submit").click();
+await page.waitForTimeout(3000);
+await page.screenshot({ path: ".audit/shots/workspace.png", fullPage: true });
+await page.screenshot({ path: ".audit/shots/workspace-fold.png" });
+console.log("ok");
+await browser.close();

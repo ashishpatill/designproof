@@ -8,6 +8,7 @@
 import { count, helmSessionTurns, loomLine, PRESS_SIGS, keelSessionTurns } from "./copy";
 import { renderCss } from "./css";
 import { careStageLabels, dossierPlate, horizonPlot, isReading, miniPageMatter, planFigures, stackDiagram, type FigurePlan } from "./figures";
+import { heroMediaCaption, mediaCss, mediaElement, mediaFigure } from "./imagery";
 import {
   motionHasNarrative,
   motionHasReveals,
@@ -218,7 +219,7 @@ function figuresFor(spec: DesignSpec): FigurePlan {
           }))
         : listed;
   const steps = bySection("figure")?.blocks ?? bySection("story")?.blocks ?? [];
-  return planFigures({
+  const planned = planFigures({
     productName: spec.brief.productName,
     siteKind: spec.brief.siteKind,
     heroLayout: bySection("hero")?.layout ?? "hero-split",
@@ -227,6 +228,13 @@ function figuresFor(spec: DesignSpec): FigurePlan {
     steps,
     metrics: bySection("metrics")?.metrics ?? [],
   });
+  /*
+   * S5 imagery: a real asset placed on the fold replaces the drawn fold figure. Every hero layout
+   * reads `figures.hero`, so the photograph lands in the layout's own frame instead of being
+   * bolted on beside the schematic it supersedes.
+   */
+  const heroSlot = bySection("hero")?.media?.find((m) => m.role === "hero");
+  return heroSlot ? { ...planned, hero: mediaElement(heroSlot.asset, { priority: true }) } : planned;
 }
 
 /** A figure set against the page, with a caption that says what it is rather than repeating it. */
@@ -412,7 +420,7 @@ function renderHero(section: SectionSpec, spec: DesignSpec, figures: FigurePlan)
    * screen and gives the drawing the rest of it, then lets it overlap the following surface —
    * overlap being the cheapest depth there is, with nothing to repaint on scroll.
    */
-  const caption = `${spec.brief.productName} — illustrative`;
+  const caption = heroMediaCaption(section) ?? `${spec.brief.productName} — illustrative`;
   const spanning = figures.hero
     ? `<div class="ds-bleed">${plate(figures.hero, caption, "ds-plate-hang ds-plate-bleed ds-plate-lit")}</div>`
     : "";
@@ -2759,6 +2767,19 @@ function bondAttr(section: SectionSpec, html: string): string {
   return html.replace(/^<(section|footer)\s/, (_m, tag: string) => `<${tag} data-bond="continues" `);
 }
 
+/**
+ * S5 imagery on non-fold sections: placed assets sit inside the section, after its own content,
+ * so a layout's grammar is untouched and the photograph reads as that section's evidence.
+ * The fold's asset is handled by `figuresFor`, not here.
+ */
+function withSectionMedia(section: SectionSpec, html: string): string {
+  const slots = (section.media ?? []).filter((m) => m.role !== "hero");
+  if (!slots.length) return html;
+  const figures = slots.map(mediaFigure).join("");
+  const close = html.lastIndexOf("</section>");
+  return close < 0 ? `${html}${figures}` : `${html.slice(0, close)}${figures}${html.slice(close)}`;
+}
+
 function renderSection(
   section: SectionSpec,
   index: number,
@@ -2768,7 +2789,7 @@ function renderSection(
 ): string {
   const wrapped = (html: string): string => {
     if (section.layout === "nav") return html;
-    return revealAttrs(spec, index, bondAttr(section, html), opts);
+    return revealAttrs(spec, index, bondAttr(section, withSectionMedia(section, html)), opts);
   };
 
   switch (section.layout) {
@@ -3291,7 +3312,7 @@ ${spec.researchPlan ? `<meta name="tell-research-gate" content="${esc(spec.resea
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${fonts}&display=swap"/>
 ${needsHtmx ? `<script src="https://unpkg.com/htmx.org@2.0.4" defer></script>` : ""}
 <noscript><style>.ds-reveal,.ds-enter,.ds-stagger > *{opacity:1!important;transform:none!important;animation:none!important}.ds-chapter-pin{min-height:0!important}.ds-chapter-pin-inner{position:static!important}.ds-chapter-progress{display:none!important}</style></noscript>
-<style>${renderCss(spec)}</style>
+<style>${renderCss(spec)}${mediaCss(spec)}</style>
 </head>
 <body data-lean="${esc(spec.taste.aestheticLean)}" data-motion="${esc(spec.taste.motion)}" data-density="${esc(spec.taste.density)}" data-mood="${esc(spec.taste.colorMood)}" data-sitekind="${esc(spec.brief.siteKind)}" data-depth="${esc(depth)}"${paperFrame ? ` data-frame="paper-technical"` : ""}${atmosphere ? ` data-atmosphere="static"` : ""}${responsive ? ` data-responsive-performance="required"` : ""}${researchMeta}>
 ${atmosphereLayer}
