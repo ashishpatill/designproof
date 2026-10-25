@@ -27,6 +27,9 @@ Load: read `.cursor/skills/<name>/SKILL.md` (many have a twin under `agent-skill
 | `tell-demo-script` | Demo + compliance |
 | `tell-deploy` | Vercel / Docker / capture host |
 | `tell-dogfood-audit` | Zero tells on `apps/web`; `pnpm eye:shell` |
+| `designproof-taste` | Subject-first art direction (inventory → idea → small DesignProof-owned shortlist) before designFromFeatures/redesign |
+| `designproof-taste-loop` | Subject-first direction + imagery loop; hands off to measurement |
+| `designproof-anti-slop` | Registry, frame tells, bounded screenshot critique (≤3 rounds, ≤3 fixes) driving `tell_proof_verify` |
 
 ### Site craft (auto-graph)
 
