@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createServer, type Server } from "node:http";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
@@ -47,6 +48,10 @@ export type ProofVerifyResult = {
   critique: ProofCritique;
   reverted: boolean;
   error?: string;
+  /** "patch" = live URL + git apply; "preview" = generated HTML on a disposable local server. */
+  mode?: "patch" | "preview";
+  /** Localhost URL used for the preview capture (preview mode only). */
+  previewUrl?: string;
 };
 
 export type ProofVerifyOptions = {
@@ -231,6 +236,100 @@ export async function revertProofPatch(projectRoot: string, patch?: string): Pro
   await fs.rm(marker, { force: true });
   return reverted.ok;
 }
+
+/**
+ * Serve generated preview HTML on an ephemeral 127.0.0.1 listener, capture +
+ * diagnose once, and return a proof verdict. No git patch, no second generate
+ * path — agents pass the HTML from tell_design_from_features (or any specimen).
+ *
+ * Without a before baseline, scoreDelta is 0 so the honest ceiling is "review"
+ * unless a gate ban ships (then "failed"). Callers may tighten further (budgets).
+ */
+export async function verifyProofPreview(input: {
+  previewHtml: string;
+} & ProofVerifyOptions): Promise<ProofVerifyResult> {
+  const html = input.previewHtml?.trim() ?? "";
+  if (!html) {
+    throw new Error("previewHtml is required for preview-mode tell_proof_verify.");
+  }
+
+  const screenshotDir =
+    input.screenshotDir ??
+    path.join(tmpdir(), "tell-critique", createHash("sha1").update(html.slice(0, 512)).digest("hex").slice(0, 8));
+  const maxCritiqueRounds = input.maxCritiqueRounds ?? MAX_CRITIQUE_ROUNDS;
+
+  const { url, close } = await listenPreviewHtml(html);
+  try {
+    const afterCapture = await captureUrl(url);
+    const afterReport = diagnoseCapture(afterCapture);
+    // No before baseline for a generated preview: compare the capture to itself.
+    // scoreDelta stays 0 → verdictFromProof yields "review" unless banned tells fail.
+    const proof = buildProof(afterReport, afterReport, url);
+    const status = verdictFromProof(proof);
+    const critique = await buildProofCritique({
+      before: afterReport,
+      after: afterReport,
+      screenshotDir,
+      maxRounds: maxCritiqueRounds,
+      status,
+    });
+    return {
+      status,
+      beforeReport: afterReport,
+      afterReport,
+      proof,
+      critique,
+      reverted: false,
+      mode: "preview",
+      previewUrl: url,
+    };
+  } finally {
+    await close();
+  }
+}
+
+/** Ephemeral localhost server for one HTML document (repo pattern: shots.ts / record-template-motion). */
+export async function listenPreviewHtml(previewHtml: string): Promise<{ url: string; close: () => Promise<void> }> {
+  const server: Server = createServer((req, res) => {
+    // Any path serves the same document — captureUrl hits the root.
+    if ((req.method ?? "GET") !== "GET" && (req.method ?? "GET") !== "HEAD") {
+      res.writeHead(405).end();
+      return;
+    }
+    res.writeHead(200, {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+    });
+    if ((req.method ?? "GET") === "HEAD") {
+      res.end();
+      return;
+    }
+    res.end(previewHtml);
+  });
+
+  const port = await new Promise<number>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const addr = server.address();
+      if (!addr || typeof addr === "string") {
+        reject(new Error("preview server failed to bind"));
+        return;
+      }
+      resolve(addr.port);
+    });
+  });
+
+  return {
+    url: `http://127.0.0.1:${port}/`,
+    close: () =>
+      new Promise<void>((resolve) => {
+        server.close(() => resolve());
+        // Force-close hung keep-alives so tests do not hang.
+        setTimeout(() => resolve(), 500).unref?.();
+      }),
+  };
+}
+
 
 export function compareProofReports(
   before: TellReport,

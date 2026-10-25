@@ -18,6 +18,8 @@ export { diagnoseCapture } from "./diagnose";
 export { loadDesignDoc, shouldApplyDesignDoc } from "./load-design-doc";
 export {
   verifyProofPatch,
+  verifyProofPreview,
+  listenPreviewHtml,
   revertProofPatch,
   compareProofReports,
   compareProofMatrices,
