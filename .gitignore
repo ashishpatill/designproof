@@ -100,3 +100,12 @@ USER_STORY.md
 OPEN_TELL_DESIGN_DATA.md
 TELL_DESIGN_DATA_HERE.md
 DESIGN.md
+
+# Local consolidated HTML books (Design Expert hygiene) — Book IV private; I–III land only after chrome/detector gates
+docs/00-hub-architecture-and-mcp.html
+docs/01-detectors-taste-and-design-system.html
+docs/02-craft-engine-rootcause-and-staged-plan.html
+docs/03-status-audit-ops-and-training.html
+docs/BOOKS-AUDIT-REPORT.md
+RULES.md
+.audit-books/
