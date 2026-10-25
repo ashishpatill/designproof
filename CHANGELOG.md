@@ -20,6 +20,14 @@
 - Runtime skill `.cursor/skills/tell-proof-verify` documents the preview args. Catalog stays eleven; local stdio only.
 - Preview-mode unit tests stub `captureUrl` so the browserless `verify` CI job stays green without `playwright install`.
 
+## 2026-10-25 — Phase 0 baseline harness measures every generated preview
+
+- Added `pnpm measure:previews`, which renders all 18 catalog offerings through `designFromFeatures`, runs `checkPreviewBudgets`, and writes `research/measurements/baseline-YYYY-MM-DD.json` (per-preview bytes, script tags, viewport meta, `http://` assets, pass/fail, failure finding ids).
+- Recorded the first baseline on `67a2800`: 18 previews, 0 budget failures, largest `press` at 381,062 B; `pnpm test` 661 passed / 69 files; dossier plate 748/800 desktop and 798/844 mobile; one reduced-motion dossier screenshot hashed (PNG stays local). `cutIfShort: true`, INP helper skipped.
+- `pnpm test` now exercises the same measurement path (7 cases), so a renderer or budget change cannot quietly invalidate the committed baseline.
+- `.gitignore` re-opens only `research/measurements/*.json` for anonymised baselines; third-party `ref-*` dumps, the manifest, and the rest of `research/` stay local. No MCP tools added — the catalog stays at eleven.
+
+
 ## 2026-10-24 — DesignProof-owned taste skills land under `.cursor/skills`
 
 - Added two runtime agent skills, both written here from learned patterns — nothing vendored, submoduled, or installed from an external taste skill:
