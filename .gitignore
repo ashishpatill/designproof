@@ -85,6 +85,15 @@ developer-drop/
 # tracked so a fresh clone can connect to the local tell_* tools.
 .cursor/*
 !.cursor/mcp.json
+# DesignProof-owned runtime agent skills (learn-don't-copy; plan stubs stay in docs/skills/)
+!.cursor/skills/
+.cursor/skills/*
+!.cursor/skills/designproof-taste-loop/
+!.cursor/skills/designproof-taste-loop/**
+!.cursor/skills/designproof-anti-slop/
+!.cursor/skills/designproof-anti-slop/**
+!.cursor/skills/tell-proof-verify/
+!.cursor/skills/tell-proof-verify/**
 agent-skills/
 docs/PROJECT-STATUS.md
 USER_STORY.md
