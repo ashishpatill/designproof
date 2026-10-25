@@ -76,6 +76,19 @@ BUILD.md
 ORCHESTRATION.md
 PITCH.md
 research/
+# The blanket `research/` rule above also hides the measurements that the
+# comment at the top of this file says are shipped. Re-open exactly one path —
+# anonymised measurement baselines — and keep the rest of research/ local.
+# Order matters: `research/*` is what keeps corpus/raw/local files ignored.
+!research/
+research/*
+!research/measurements/
+!research/measurements/*.json
+# Third-party reference dumps and the run manifest stay local: they are
+# re-measured from or kept local to a corpus checkout, not shipped by this repo.
+# What ships is the engine's own baseline-YYYY-MM-DD.json.
+research/measurements/ref-*.json
+research/measurements/manifest.json
 docs/features/design-dogfood-loop.md
 docs/features/showcase-tiller.md
 docs/*_PLAN.md
