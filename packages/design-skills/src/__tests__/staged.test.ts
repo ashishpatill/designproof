@@ -15,10 +15,14 @@ import {
   buildSwappedBrief,
   PERFORMANCE_BUDGETS,
   checkPreviewBudgets,
+  evaluateRefinementProof,
+  canApproveRefinement,
+  REMOTE_PROOF_VERIFY_REASON,
   motionReviewFor,
   weightedReview,
   ConceptSpec,
   designFromFeatures,
+  type SwapTestResult,
 } from "../index";
 import { DesignBrief, TasteControls } from "../types";
 
@@ -185,6 +189,166 @@ describe("swap test", () => {
     expect(swapped.tagline).toBe("Unrelated placeholder tagline");
     expect(swapped.features[0].name).toBe("Swapped feature 1");
     expect(swapped.features[0].description).toBe("Swapped description 1");
+  });
+
+  it("labels a string-only run honestly when no structural fields are supplied", () => {
+    const c = deriveConcept(makeBrief("saas-marketing", "Acme"));
+    const d = deriveConcept(makeBrief("research-dossier", "Stranger Brand"));
+    const r = swapTest(
+      { concept: c, heroTitle: "Hello", bodyCopy: ["a", "b"] },
+      { concept: d, heroTitle: "Goodbye", bodyCopy: ["x", "y"] },
+    );
+    expect(r.passed).toBe(true);
+    expect(r.gate).toBe("string");
+    expect(r.structural).toEqual({});
+  });
+
+  it("fails near-identical copy on the string gate", () => {
+    const c = deriveConcept(makeBrief("saas-marketing", "Acme"));
+    const r = swapTest(
+      { concept: c, heroTitle: "Hello", bodyCopy: ["a", "b"] },
+      { concept: c, heroTitle: "Hello!", bodyCopy: ["a", "b"] },
+    );
+    expect(r.passed).toBe(false);
+    expect(r.changedRatio).toBeLessThan(0.5);
+    expect(r.reasons.join(" ")).toContain("bodyCopy[0] unchanged");
+  });
+
+  it("fails a recolour/synonym swap when structural fields are unchanged", () => {
+    const c = deriveConcept(makeBrief("saas-marketing", "Acme"));
+    const d = deriveConcept(makeBrief("research-dossier", "Stranger Brand"));
+    const original = {
+      concept: c,
+      heroTitle: "Hello",
+      bodyCopy: ["a", "b"],
+      sectionOrder: ["nav", "hero", "features"],
+      firstScreenDevice: "hero:metric-band",
+    };
+    const swapped = {
+      concept: d,
+      heroTitle: "Goodbye",
+      bodyCopy: ["x", "y"],
+      sectionOrder: ["nav", "hero", "features"],
+      firstScreenDevice: "hero:metric-band",
+    };
+    const r = swapTest(original, swapped);
+    expect(r.changedRatio).toBeGreaterThanOrEqual(0.5);
+    expect(r.passed).toBe(false);
+    expect(r.gate).toBe("string+structure");
+    expect(r.reasons.join(" ")).toContain("sectionOrder unchanged");
+    expect(r.reasons.join(" ")).toContain("firstScreenDevice unchanged");
+    expect(r.structural.sectionOrder?.changed).toBe(false);
+    expect(r.structural.firstScreenDevice?.changed).toBe(false);
+  });
+
+  it("passes when structural signals differ alongside copy", () => {
+    const c = deriveConcept(makeBrief("saas-marketing", "Acme"));
+    const d = deriveConcept(makeBrief("research-dossier", "Stranger Brand"));
+    const r = swapTest(
+      {
+        concept: c,
+        heroTitle: "Hello",
+        bodyCopy: ["a", "b"],
+        sectionOrder: ["nav", "hero", "features"],
+        firstScreenDevice: "hero:metric-band",
+      },
+      {
+        concept: d,
+        heroTitle: "Goodbye",
+        bodyCopy: ["x", "y"],
+        sectionOrder: ["nav", "hero", "dossier", "features"],
+        firstScreenDevice: "hero:chapter-rail",
+      },
+    );
+    expect(r.passed).toBe(true);
+    expect(r.gate).toBe("string+structure");
+    expect(r.reasons).toEqual([]);
+    expect(r.structural.sectionOrder?.changed).toBe(true);
+    expect(r.structural.firstScreenDevice?.changed).toBe(true);
+  });
+
+  it("fails when only one of two supplied structural signals changes", () => {
+    const c = deriveConcept(makeBrief("saas-marketing", "Acme"));
+    const d = deriveConcept(makeBrief("research-dossier", "Stranger Brand"));
+    const r = swapTest(
+      {
+        concept: c,
+        heroTitle: "Hello",
+        bodyCopy: ["a", "b"],
+        sectionOrder: ["nav", "hero", "features"],
+        firstScreenDevice: "hero:metric-band",
+      },
+      {
+        concept: d,
+        heroTitle: "Goodbye",
+        bodyCopy: ["x", "y"],
+        sectionOrder: ["nav", "hero", "dossier"],
+        firstScreenDevice: "hero:metric-band",
+      },
+    );
+    expect(r.passed).toBe(false);
+    expect(r.reasons.join(" ")).toContain("firstScreenDevice unchanged");
+    expect(r.reasons.join(" ")).not.toContain("sectionOrder unchanged");
+  });
+});
+
+describe("refinement proof gate", () => {
+  const passingSwap: SwapTestResult = {
+    passed: true,
+    changedRatio: 0.8,
+    reasons: [],
+    gate: "string+structure",
+    structural: {},
+  };
+
+  const passingHtml =
+    '<!doctype html><html><head><meta name="viewport" content="width=device-width"></head><body>hi</body></html>';
+
+  it("passes with swap + budgets and reports remote verify honestly unavailable", () => {
+    const proof = evaluateRefinementProof({ swap: passingSwap, previewHtml: passingHtml });
+    expect(proof.verdict).toBe("pass");
+    expect(proof.budgets?.passed).toBe(true);
+    expect(proof.reasons).toEqual([]);
+    expect(proof.remoteVerify).toEqual({ available: false, reason: REMOTE_PROOF_VERIFY_REASON });
+    expect(canApproveRefinement(proof).ok).toBe(true);
+  });
+
+  it("review when swap passes but preview HTML is missing", () => {
+    const proof = evaluateRefinementProof({ swap: passingSwap, previewHtml: null });
+    expect(proof.verdict).toBe("review");
+    expect(proof.budgets).toBeNull();
+    expect(proof.reasons.join(" ")).toContain("budgets were not measured");
+    const gate = canApproveRefinement(proof);
+    expect(gate.ok).toBe(true);
+    expect(gate.reason).toContain("budgets were not measured");
+  });
+
+  it("fails when the swap gate fails", () => {
+    const failedSwap: SwapTestResult = {
+      ...passingSwap,
+      passed: false,
+      changedRatio: 0.1,
+      reasons: ["heroTitle unchanged"],
+    };
+    const proof = evaluateRefinementProof({ swap: failedSwap, previewHtml: passingHtml });
+    expect(proof.verdict).toBe("fail");
+    expect(canApproveRefinement(proof).ok).toBe(false);
+    expect(canApproveRefinement(proof).reason).toContain("heroTitle unchanged");
+  });
+
+  it("fails when preview budgets fail", () => {
+    const html = "a".repeat(PERFORMANCE_BUDGETS.initialTransferKb * 1024 + 10);
+    const proof = evaluateRefinementProof({ swap: passingSwap, previewHtml: html });
+    expect(proof.verdict).toBe("fail");
+    expect(proof.budgets?.passed).toBe(false);
+    expect(proof.reasons.join(" ")).toContain("budget transfer-bytes");
+    expect(canApproveRefinement(proof).ok).toBe(false);
+  });
+
+  it("blocks approval until a swap test has run", () => {
+    const gate = canApproveRefinement(null);
+    expect(gate.ok).toBe(false);
+    expect(gate.reason).toContain("Run the swap test");
   });
 });
 

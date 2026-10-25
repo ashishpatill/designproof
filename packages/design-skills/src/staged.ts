@@ -337,14 +337,52 @@ export interface SwapTestInput {
   concept: ConceptSpec;
   heroTitle: string;
   bodyCopy: string[];
+  /**
+   * Optional structural signals. When supplied on both sides the arrays must
+   * differ or the swap fails, even if every string changed. This closes the
+   * "recolour-only / synonym rewrite" hole in the string gate.
+   */
+  sectionOrder?: string[];
+  /** Optional first-screen device label (e.g. section layout or site kind). */
+  firstScreenDevice?: string;
+}
+
+export type SwapGateMode = "string" | "string+structure";
+
+export interface StructuralSwapSignal {
+  changed: boolean;
+  detail: string;
 }
 
 export interface SwapTestResult {
   passed: boolean;
   changedRatio: number;
   reasons: string[];
+  /** Honest label for the gates that actually ran. */
+  gate: SwapGateMode;
+  /** Per-signal detail; a signal is present only when both sides supplied it. */
+  structural: {
+    sectionOrder?: StructuralSwapSignal;
+    firstScreenDevice?: StructuralSwapSignal;
+  };
 }
 
+function hasSectionOrder(value: string[] | undefined): value is string[] {
+  return Array.isArray(value) && value.length > 0;
+}
+
+function hasDeviceLabel(value: string | undefined): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/**
+ * String + structure swap test.
+ *
+ * The string gate is unchanged: at least 50% of concept/hero/body pairs must
+ * differ. When both sides supply `sectionOrder` and/or `firstScreenDevice`,
+ * every supplied structural signal must also differ. Missing structural
+ * signals are not invented — the result is labelled `string` in that case.
+ */
 export function swapTest(original: SwapTestInput, swapped: SwapTestInput): SwapTestResult {
   const pairs: { label: string; a: string; b: string }[] = [];
   pairs.push({
@@ -368,17 +406,149 @@ export function swapTest(original: SwapTestInput, swapped: SwapTestInput): SwapT
   }
   const total = pairs.length === 0 ? 1 : pairs.length;
   let changed = 0;
-  const reasons: string[] = [];
+  const stringReasons: string[] = [];
   for (const p of pairs) {
     if (p.a !== p.b) {
       changed += 1;
     } else {
-      reasons.push(`${p.label} unchanged`);
+      stringReasons.push(`${p.label} unchanged`);
     }
   }
   const changedRatio = changed / total;
-  const passed = changedRatio >= 0.5;
-  return { passed, changedRatio, reasons: passed ? [] : reasons };
+
+  const structural: SwapTestResult["structural"] = {};
+  const structuralReasons: string[] = [];
+  let structureCompared = false;
+
+  if (hasSectionOrder(original.sectionOrder) && hasSectionOrder(swapped.sectionOrder)) {
+    structureCompared = true;
+    const before = original.sectionOrder.join(" > ");
+    const after = swapped.sectionOrder.join(" > ");
+    const orderChanged = before !== after;
+    structural.sectionOrder = {
+      changed: orderChanged,
+      detail: orderChanged ? `${before} → ${after}` : before,
+    };
+    if (!orderChanged) structuralReasons.push(`sectionOrder unchanged (${before})`);
+  }
+
+  if (hasDeviceLabel(original.firstScreenDevice) && hasDeviceLabel(swapped.firstScreenDevice)) {
+    structureCompared = true;
+    const before = original.firstScreenDevice.trim();
+    const after = swapped.firstScreenDevice.trim();
+    const deviceChanged = before !== after;
+    structural.firstScreenDevice = {
+      changed: deviceChanged,
+      detail: deviceChanged ? `${before} → ${after}` : before,
+    };
+    if (!deviceChanged) structuralReasons.push(`firstScreenDevice unchanged (${before})`);
+  }
+
+  const stringPassed = changedRatio >= 0.5;
+  const passed = stringPassed && structuralReasons.length === 0;
+  const gate: SwapGateMode = structureCompared ? "string+structure" : "string";
+  return {
+    passed,
+    changedRatio,
+    reasons: passed ? [] : [...stringReasons, ...structuralReasons],
+    gate,
+    structural,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Refinement proof gate                                               */
+/* ------------------------------------------------------------------ */
+
+export type ProofVerdict = "pass" | "review" | "fail";
+
+export interface RemoteProofVerifyState {
+  available: false;
+  reason: string;
+}
+
+export const REMOTE_PROOF_VERIFY_REASON =
+  "Remote tell_proof_verify is not wired from the browser; this gate runs local swapTest + checkPreviewBudgets only.";
+
+export interface RefinementProofResult {
+  /** pass = swap + budgets ok; review = swap ok but budgets unmeasured; fail = either gate failed. */
+  verdict: ProofVerdict;
+  swap: SwapTestResult;
+  budgets: BudgetReport | null;
+  reasons: string[];
+  /** Honest browser state: no MCP tell_proof_verify call is made. */
+  remoteVerify: RemoteProofVerifyState;
+}
+
+/**
+ * Combined refinement proof. Structural/string swap gate is always required;
+ * preview budgets run only when preview HTML is actually available. No pixel,
+ * screenshot, LCP, CLS, or INP claim is made here.
+ */
+export function evaluateRefinementProof(args: {
+  swap: SwapTestResult;
+  previewHtml?: string | null;
+}): RefinementProofResult {
+  const previewHtml =
+    typeof args.previewHtml === "string" && args.previewHtml.trim().length > 0
+      ? args.previewHtml
+      : null;
+  const budgets = previewHtml ? checkPreviewBudgets(previewHtml) : null;
+  const reasons: string[] = [];
+
+  if (!args.swap.passed) {
+    reasons.push(...args.swap.reasons);
+  }
+  if (budgets && !budgets.passed) {
+    for (const finding of budgets.findings) {
+      if (!finding.ok) reasons.push(`budget ${finding.id}: ${finding.detail}`);
+    }
+  }
+  if (!budgets) {
+    reasons.push("Preview HTML not available — performance budgets were not measured.");
+  }
+
+  let verdict: ProofVerdict;
+  if (!args.swap.passed || (budgets !== null && !budgets.passed)) {
+    verdict = "fail";
+  } else if (budgets === null) {
+    verdict = "review";
+  } else {
+    verdict = "pass";
+  }
+
+  return {
+    verdict,
+    swap: args.swap,
+    budgets,
+    reasons,
+    remoteVerify: { available: false, reason: REMOTE_PROOF_VERIFY_REASON },
+  };
+}
+
+/**
+ * Approve gate for the refinement stage. A run swap test is the minimum; when
+ * preview HTML exists its budgets must pass too. `review` (swap passed, budgets
+ * unmeasured) is approvable but carries an explicit caveat reason.
+ */
+export function canApproveRefinement(proof: RefinementProofResult | null): {
+  ok: boolean;
+  reason?: string;
+} {
+  if (!proof) {
+    return { ok: false, reason: "Run the swap test to produce refinement proof before approving." };
+  }
+  if (proof.verdict === "fail") {
+    const detail = proof.reasons[0] ?? "swap test or preview budgets failed";
+    return { ok: false, reason: `Refinement proof failed: ${detail}` };
+  }
+  if (proof.verdict === "review") {
+    return {
+      ok: true,
+      reason: "Swap test passed; preview budgets were not measured because preview HTML is unavailable.",
+    };
+  }
+  return { ok: true };
 }
 
 export function buildSwappedBrief(brief: DesignBriefType): DesignBriefType {
