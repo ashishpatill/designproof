@@ -12,6 +12,14 @@
 - `docs/skills/README.md` marks diagram as a landed runtime skill with a stub that stays as the plan; `docs/skills/designproof-diagram.md` gains a one-line runtime-twin note. Demo/promo remains docs-only.
 - No dossier template, generate path, `packages/` code, or MCP catalog change in this PR.
 
+## 2026-10-25 — `tell_proof_verify` accepts generated preview HTML
+
+- Phase 5 cut-if-short (proof input only): `tell_proof_verify` still one of the eleven Model Context Protocol tools, now with two input shapes — patch mode `{ url, patch }` (unchanged) or preview mode `{ previewHtml, spec? }` from `tell_design_from_features` / specimen HTML.
+- Core adds `verifyProofPreview` + `listenPreviewHtml`: serve HTML on an ephemeral `127.0.0.1` listener (same pattern as research shots), capture once, run the existing gate. No before baseline → `scoreDelta` is 0 and the honest ceiling is `review` unless a banned frame tell fails the gate.
+- MCP runs `checkPreviewBudgets` before Playwright; oversized / insecure / missing-viewport previews fail fast. Optional `spec` is recorded on the training dump only (no second generate path). Swap-test hard gate left for a follow-up.
+- Runtime skill `.cursor/skills/tell-proof-verify` documents the preview args. Catalog stays eleven; local stdio only.
+- Preview-mode unit tests stub `captureUrl` so the browserless `verify` CI job stays green without `playwright install`.
+
 ## 2026-10-24 — DesignProof-owned taste skills land under `.cursor/skills`
 
 - Added two runtime agent skills, both written here from learned patterns — nothing vendored, submoduled, or installed from an external taste skill:

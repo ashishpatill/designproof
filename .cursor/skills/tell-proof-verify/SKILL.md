@@ -1,6 +1,6 @@
 ---
 name: tell-proof-verify
-description: Runs Tell Proof verification after UI changes — apply patch, recapture URL, return pass/review/fail. Use when verifying agent UI edits, before merge, or when tell_proof_verify MCP is available.
+description: Runs Tell Proof verification after UI changes — patch mode (apply patch + recapture URL) or preview mode (generated previewHtml). Returns pass/review/fail. Use when verifying agent UI edits, generated Studio previews, before merge, or when tell_proof_verify MCP is available.
 ---
 
 # Tell Proof verify workflow
@@ -13,6 +13,8 @@ description: Runs Tell Proof verification after UI changes — apply patch, reca
 
 ## MCP path (Cursor Agent)
 
+### Patch mode (live URL + candidate diff)
+
 ```
 1. tell_diagnose on the running preview URL
 2. tell_redesign with direction (e.g. "editorial")
@@ -23,6 +25,19 @@ description: Runs Tell Proof verification after UI changes — apply patch, reca
 7. If status is "failed" and reverted is true → revise patch and retry
 8. If status is "passed" or "review" → human approves merge
 ```
+
+### Preview mode (generated HTML — Phase 5 proof input)
+
+```
+1. tell_design_from_features → { spec, previewHtml }
+2. tell_proof_verify { previewHtml, spec? }   // do not also pass url+patch
+3. HTML budgets run first (transfer ≤2048KB, ≤3 script tags, no http:// assets, viewport meta)
+4. Disposable localhost serve + one capture; mode is "preview"; scoreDelta is 0 (no before baseline)
+5. Honest ceiling is "review" unless a gate ban ships (then "failed") — do not treat review as passed
+6. Read proof.bannedTellsAfter + critique; fix and regenerate preview, then re-verify
+```
+
+Pass **either** `previewHtml` **or** `url`+`patch`, never both. Catalog stays eleven tools.
 
 ## Verdict meanings
 

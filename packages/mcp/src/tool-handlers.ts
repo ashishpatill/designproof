@@ -18,11 +18,13 @@ import {
   captureUrl,
   diagnoseCapture,
   verifyProofPatch,
+  verifyProofPreview,
   revertProofPatch,
 } from "@tell/core";
 import {
   DesignBrief,
   designFromFeaturesAuthored,
+  checkPreviewBudgets,
   type DesignBrief as DesignBriefType,
 } from "@tell/design-skills";
 import {
@@ -208,10 +210,13 @@ export async function handleRedesign(
   return proposal;
 }
 
-/** tell_proof_verify */
+/** tell_proof_verify — patch mode ({url, patch}) or preview mode ({previewHtml}). */
 export async function handleProofVerify(args: {
-  url: string;
-  patch: string;
+  url?: string;
+  patch?: string;
+  previewHtml?: string;
+  /** Optional DesignSpec JSON from tell_design_from_features; stored on the training dump only. */
+  spec?: unknown;
   projectRoot?: string;
   waitMs?: number;
   revertOnFail?: boolean;
@@ -219,9 +224,69 @@ export async function handleProofVerify(args: {
   maxCritiqueRounds?: number;
 }): Promise<Awaited<ReturnType<typeof verifyProofPatch>>> {
   const projectRoot = args.projectRoot ?? process.cwd();
+  const previewHtml = args.previewHtml?.trim() ?? "";
+
+  if (previewHtml) {
+    if (args.patch?.trim()) {
+      throw new Error(
+        "tell_proof_verify: pass either previewHtml (generated preview) or url+patch, not both.",
+      );
+    }
+    const budgets = checkPreviewBudgets(previewHtml);
+    if (!budgets.passed) {
+      const failedIds = budgets.findings.filter((f) => !f.ok).map((f) => f.id);
+      const detail = budgets.findings.filter((f) => !f.ok).map((f) => f.detail).join("; ");
+      const error = `Preview budget gate failed: ${failedIds.join(", ")}`;
+      recordTrainingEvent(
+        "proof",
+        {
+          mode: "preview",
+          status: "failed",
+          budgets,
+          previewHtml,
+          spec: args.spec,
+          error,
+          reverted: false,
+        },
+        { via: "mcp.tell_proof_verify", url: "preview://budget-fail", projectRoot },
+      );
+      throw new Error(error + (detail ? ` (${detail})` : ""));
+    }
+    const result = await verifyProofPreview({
+      previewHtml,
+      screenshotDir: args.screenshotDir,
+      maxCritiqueRounds: args.maxCritiqueRounds,
+    });
+    recordTrainingEvent(
+      "proof",
+      {
+        mode: "preview",
+        status: result.status,
+        proof: result.proof,
+        critique: result.critique,
+        beforeReport: result.beforeReport,
+        afterReport: result.afterReport,
+        previewHtml,
+        spec: args.spec,
+        budgets,
+        reverted: false,
+        previewUrl: result.previewUrl,
+      },
+      { via: "mcp.tell_proof_verify", url: result.previewUrl ?? "preview://local", projectRoot },
+    );
+    return { ...result, mode: "preview" as const };
+  }
+
+  const url = args.url?.trim() ?? "";
+  const patch = args.patch ?? "";
+  if (!url || !patch) {
+    throw new Error(
+      "tell_proof_verify patch mode needs url + patch; preview mode needs previewHtml.",
+    );
+  }
   const result = await verifyProofPatch({
-    url: args.url,
-    patch: args.patch,
+    url,
+    patch,
     projectRoot,
     waitMs: args.waitMs,
     revertOnFail: args.revertOnFail,
@@ -237,12 +302,12 @@ export async function handleProofVerify(args: {
       critique: result.critique,
       beforeReport: result.beforeReport,
       afterReport: result.afterReport,
-      patch: args.patch,
+      patch,
       reverted: result.reverted,
     },
-    { via: "mcp.tell_proof_verify", url: args.url, projectRoot },
+    { via: "mcp.tell_proof_verify", url, projectRoot },
   );
-  return result;
+  return { ...result, mode: "patch" as const };
 }
 
 /** tell_proof_revert — no training write (revert only). */

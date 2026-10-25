@@ -183,20 +183,34 @@ server.tool(
 
 server.tool(
   "tell_proof_verify",
-  "Apply a candidate patch in the project workspace, recapture the live URL, and return an independent pass/review/fail verdict with before/after scores plus a bounded screenshot critique (max 3 rounds; notes cite written PNG paths). Failed attempts auto-revert when revertOnFail is true (default). Requires a reachable dev server at url. When a sibling tell-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
+  "Proof a UI change two ways (same tool, catalog stays eleven): (1) patch mode — apply a candidate patch, recapture the live url, return pass/review/fail with before/after scores + bounded screenshot critique (auto-revert on fail when revertOnFail is true); (2) preview mode — pass previewHtml from tell_design_from_features (optional spec for the training dump), serve it on a disposable localhost listener, capture once, run the same gate (banned frame tells fail; no before baseline so scoreDelta is 0 and the honest ceiling is review unless budgets fail). When a sibling tell-design-data checkout is present, writes a raw proof episode (same sink as /api/proof/verify).",
   {
-    url: z.string().url(),
-    patch: z.string().min(1),
+    url: z.string().url().optional(),
+    patch: z.string().min(1).optional(),
+    previewHtml: z.string().min(1).optional(),
+    spec: z.unknown().optional(),
     projectRoot: z.string().optional(),
     waitMs: z.number().int().min(0).max(30_000).optional(),
     revertOnFail: z.boolean().optional(),
     screenshotDir: z.string().optional(),
     maxCritiqueRounds: z.number().int().min(1).max(3).optional(),
   },
-  async ({ url, patch, projectRoot, waitMs, revertOnFail, screenshotDir, maxCritiqueRounds }) => {
+  async ({
+    url,
+    patch,
+    previewHtml,
+    spec,
+    projectRoot,
+    waitMs,
+    revertOnFail,
+    screenshotDir,
+    maxCritiqueRounds,
+  }) => {
     const result = await handleProofVerify({
       url,
       patch,
+      previewHtml,
+      spec,
       projectRoot,
       waitMs,
       revertOnFail,
