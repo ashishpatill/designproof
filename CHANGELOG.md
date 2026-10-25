@@ -18,6 +18,7 @@
 - Core adds `verifyProofPreview` + `listenPreviewHtml`: serve HTML on an ephemeral `127.0.0.1` listener (same pattern as research shots), capture once, run the existing gate. No before baseline → `scoreDelta` is 0 and the honest ceiling is `review` unless a banned frame tell fails the gate.
 - MCP runs `checkPreviewBudgets` before Playwright; oversized / insecure / missing-viewport previews fail fast. Optional `spec` is recorded on the training dump only (no second generate path). Swap-test hard gate left for a follow-up.
 - Runtime skill `.cursor/skills/tell-proof-verify` documents the preview args. Catalog stays eleven; local stdio only.
+- Preview-mode unit tests stub `captureUrl` so the browserless `verify` CI job stays green without `playwright install`.
 
 ## 2026-10-24 — DesignProof-owned taste skills land under `.cursor/skills`
 
