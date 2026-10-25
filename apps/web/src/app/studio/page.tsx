@@ -16,6 +16,8 @@ import {
   swapTest,
   buildSwappedBrief,
   checkPreviewBudgets,
+  evaluateRefinementProof,
+  canApproveRefinement,
   motionReviewFor,
   type AestheticLean,
   type ColorMood,
@@ -54,6 +56,15 @@ function controlsFromStudioPreset(): DesignControlsValue {
     colorMood: DEFAULT_BRIEF.colorMood,
     typographyWeight: DEFAULT_BRIEF.typographyWeight,
     roundingDepth: DEFAULT_BRIEF.roundingDepth,
+  };
+}
+
+/** Structural signals supplied to the swap test. Same site kind can legitimately
+ * keep the same first-screen device — that is exactly what the gate should catch. */
+function swapStructuralFields(spec: DesignSpec) {
+  return {
+    sectionOrder: spec.sections.map((s) => s.id || s.title),
+    firstScreenDevice: spec.brief.siteKind,
   };
 }
 
@@ -150,8 +161,19 @@ export default function StudioPage() {
     }
   }, [brief]);
 
+  const refinementProof = useMemo(
+    () =>
+      swapResult
+        ? evaluateRefinementProof({ swap: swapResult, previewHtml: result?.previewHtml ?? null })
+        : null,
+    [swapResult, result?.previewHtml],
+  );
+  const refinementGate = useMemo(() => canApproveRefinement(refinementProof), [refinementProof]);
+
   useEffect(() => {
     setStagedRun(createStagedRun());
+    setSwapResult(null);
+    setSwapError(null);
   }, [generation]);
 
   const themes = useMemo(() => listThemes(), []);
@@ -438,40 +460,57 @@ export default function StudioPage() {
                 if (allApproved) {
                   return <p className="text-text">All stages approved</p>;
                 }
+                const refinementBlocked = current === "refinement" && !refinementGate.ok;
                 return (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      className="rounded border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                      data-testid="stage-approve"
-                      disabled={!current}
-                      onClick={() => {
-                        if (!current) return;
-                        try {
-                          setStagedRun(approveStage(stagedRun, current));
-                        } catch {
-                          /* ignore */
-                        }
-                      }}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
-                      data-testid="stage-reject"
-                      disabled={!current}
-                      onClick={() => {
-                        if (!current) return;
-                        try {
-                          setStagedRun(rejectStage(stagedRun, current));
-                        } catch {
-                          /* ignore */
-                        }
-                      }}
-                    >
-                      Reject
-                    </button>
+                  <div className="space-y-2">
+                    {current === "refinement" ? (
+                      <p
+                        className={refinementGate.ok ? "text-xs text-secondary" : "text-xs text-drift"}
+                        data-testid="refinement-verdict-inline"
+                      >
+                        Refinement proof: {refinementProof?.verdict ?? "not run"}
+                        {refinementGate.reason ? ` — ${refinementGate.reason}` : ""}
+                      </p>
+                    ) : null}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className="rounded border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                        data-testid="stage-approve"
+                        disabled={!current || refinementBlocked}
+                        onClick={() => {
+                          if (!current || refinementBlocked) return;
+                          try {
+                            setStagedRun(approveStage(stagedRun, current));
+                          } catch {
+                            /* ignore */
+                          }
+                        }}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                        data-testid="stage-reject"
+                        disabled={!current}
+                        onClick={() => {
+                          if (!current) return;
+                          try {
+                            setStagedRun(rejectStage(stagedRun, current));
+                          } catch {
+                            /* ignore */
+                          }
+                        }}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                    {refinementBlocked ? (
+                      <p className="text-xs text-drift" data-testid="refinement-approve-blocked">
+                        {refinementGate.reason ?? "Refinement proof must pass before approval."}
+                      </p>
+                    ) : null}
                   </div>
                 );
               })()}
@@ -503,6 +542,7 @@ export default function StudioPage() {
                         concept: result.spec.concept!,
                         heroTitle: result.spec.sections[0]?.title ?? "",
                         bodyCopy: result.spec.sections.map((s) => s.title + " " + s.body),
+                        ...swapStructuralFields(result.spec),
                       };
                       const swappedConcept = (data.spec.concept ?? {
                         oneLiner: "",
@@ -515,6 +555,7 @@ export default function StudioPage() {
                         concept: swappedConcept,
                         heroTitle: data.spec.sections[0]?.title ?? "",
                         bodyCopy: data.spec.sections.map((s) => s.title + " " + s.body),
+                        ...swapStructuralFields(data.spec),
                       };
                       const r = swapTest(original, swapped);
                       setSwapResult(r);
@@ -532,7 +573,12 @@ export default function StudioPage() {
                   <div data-testid="swap-result">
                     <p>{swapResult.passed ? "passed" : "failed"}</p>
                     <p>{Math.round(swapResult.changedRatio * 100)}%</p>
-                    <p className="text-xs text-secondary">Passes at ≥50% changed; identical input scores 0%.</p>
+                    <p className="text-xs text-secondary">
+                      {swapResult.gate === "string+structure"
+                        ? "String + structure gate"
+                        : "String-level gate (no structural signals supplied)"}
+                      : passes at ≥50% changed copy; structural signals must change when supplied.
+                    </p>
                   </div>
                 ) : null}
               </div>
@@ -556,6 +602,60 @@ export default function StudioPage() {
                   })()}
                 </div>
               ) : null}
+
+              <div className="space-y-1" data-testid="refinement-proof">
+                <p className="font-medium text-text">Refinement proof</p>
+                {refinementProof ? (
+                  <>
+                    <p data-testid="refinement-proof-verdict">
+                      Verdict: <strong>{refinementProof.verdict}</strong>
+                    </p>
+                    <p data-testid="refinement-proof-swap">
+                      Swap: {refinementProof.swap.passed ? "passed" : "failed"} ·{" "}
+                      {Math.round(refinementProof.swap.changedRatio * 100)}% changed ·{" "}
+                      {refinementProof.swap.gate === "string+structure"
+                        ? "string + structure"
+                        : "string only"}
+                    </p>
+                    {refinementProof.swap.structural.sectionOrder ? (
+                      <p className="text-xs text-secondary" data-testid="refinement-proof-structure">
+                        sectionOrder:{" "}
+                        {refinementProof.swap.structural.sectionOrder.changed ? "changed" : "unchanged"} —{" "}
+                        {refinementProof.swap.structural.sectionOrder.detail}
+                      </p>
+                    ) : null}
+                    {refinementProof.swap.structural.firstScreenDevice ? (
+                      <p className="text-xs text-secondary" data-testid="refinement-proof-device">
+                        firstScreenDevice:{" "}
+                        {refinementProof.swap.structural.firstScreenDevice.changed ? "changed" : "unchanged"} —{" "}
+                        {refinementProof.swap.structural.firstScreenDevice.detail}
+                      </p>
+                    ) : null}
+                    <p data-testid="refinement-proof-budget">
+                      Budgets:{" "}
+                      {refinementProof.budgets
+                        ? refinementProof.budgets.passed
+                          ? "passed"
+                          : "failed"
+                        : "not measured (no preview HTML)"}
+                    </p>
+                    {refinementProof.reasons.length > 0 ? (
+                      <ul className="list-disc pl-4 text-xs text-drift" data-testid="refinement-proof-reasons">
+                        {refinementProof.reasons.map((reason) => (
+                          <li key={reason}>{reason}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    <p className="text-xs text-secondary" data-testid="refinement-proof-remote">
+                      Remote verify: unavailable — {refinementProof.remoteVerify.reason}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-secondary" data-testid="refinement-proof-empty">
+                    Run the swap test to evaluate refinement proof. No remote MCP verify call is made from the browser.
+                  </p>
+                )}
+              </div>
 
               {result?.spec?.concept ? (
                 <div data-testid="motion-review">
