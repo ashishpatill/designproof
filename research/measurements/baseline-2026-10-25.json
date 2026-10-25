@@ -1,0 +1,655 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-0-baseline",
+  "tipSha": "67a280055f4bb37c8c99d27bae0c35d8d8e3b700",
+  "measuredAt": "2026-10-25T15:53:30+05:30",
+  "node": "v24.22.1",
+  "pnpmTest": {
+    "passed": 661,
+    "files": 69,
+    "total": 661,
+    "note": "Measured on this head (67a280055f4bb37c8c99d27bae0c35d8d8e3b700): 661 passed / 69 files. Historic master 430 passed / 56 files (REVAMP-AUDIT) and branch f669c64 474 (PR #105) were reported before #105 merged; neither number is reused here."
+  },
+  "dossierPlate": {
+    "desktop": "748/800",
+    "mobile": "798/844",
+    "source": "plan-recorded measured pass"
+  },
+  "budgets": {
+    "lcpMs": 2500,
+    "cls": 0.1,
+    "inpMs": 200,
+    "initialScriptKb": 170,
+    "initialTransferKb": 2048,
+    "techTier": "enhanced"
+  },
+  "previews": [
+    {
+      "key": "saas",
+      "label": "SaaS conversion",
+      "siteKind": "saas-marketing",
+      "bytes": 290609,
+      "scriptCount": 2,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 290609 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "2 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "c5f176b2a7e1e69c932dbb75819cf8bac4c135ee2a8f17f31610d3ed121789bc"
+    },
+    {
+      "key": "dashboard",
+      "label": "Operator console",
+      "siteKind": "dashboard-webapp",
+      "bytes": 279171,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 279171 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "c23601cbd1eae3d615848f8b77868f15a679868b2ccb96c5ce9b98f5dbf37cb7"
+    },
+    {
+      "key": "corporate",
+      "label": "Trust narrative",
+      "siteKind": "corporate-story",
+      "bytes": 271434,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 271434 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "847f64d6870cb18072cc5780df7abcda847303898330a44f1dbaf285b07cc5bc"
+    },
+    {
+      "key": "educational",
+      "label": "Mechanism explainer",
+      "siteKind": "docs-educational",
+      "bytes": 272623,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 272623 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "600103535e745adc690f41e9df9993d7dd1dd3d9f110ac18810693efa2f1bbd8"
+    },
+    {
+      "key": "fintech",
+      "label": "Fintech trust",
+      "siteKind": "fintech-marketing",
+      "bytes": 281095,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 281095 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "81f011ff10864da6628d61c38ed9b06edfdc62bb3b2fa494daa03ca0ac939669"
+    },
+    {
+      "key": "studio",
+      "label": "Art-directed studio",
+      "siteKind": "art-directed-studio",
+      "bytes": 282431,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 282431 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "7072ef5d6f72bd83b9fe79a0160e695672899394ef2ddc478a339db839655b81"
+    },
+    {
+      "key": "consumer",
+      "label": "Consumer craft",
+      "siteKind": "consumer-craft",
+      "bytes": 277132,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 277132 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "642fb15dd63e483812da36db84521db869ba7fc03cbec601f3488899dbdc941b"
+    },
+    {
+      "key": "foundry",
+      "label": "Editorial foundry",
+      "siteKind": "editorial-foundry",
+      "bytes": 283091,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 283091 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "441bff70c6b3c4b93845379cc6f869144cd0298eb79b073fe5a9d09498942f6d"
+    },
+    {
+      "key": "dossier",
+      "label": "Research dossier",
+      "siteKind": "research-dossier",
+      "theme": "ink-paper",
+      "bytes": 302337,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 302337 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "b1d3054c5870dfd0d42285bc6e1d2424357034d78b7d2cc8bf580082d1941849"
+    },
+    {
+      "key": "observatory",
+      "label": "Signal observatory",
+      "siteKind": "signal-observatory",
+      "bytes": 296913,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 296913 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "9bcc3d337ce4026f72495ddaeb5221d9a0577aa5b5608129f7d830680ed34379"
+    },
+    {
+      "key": "archive",
+      "label": "Archive index",
+      "siteKind": "archive-index",
+      "bytes": 294000,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 294000 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "71bc06062d12f04ac9407ed47bcf9203c8cef708f5bb65cb231d703d4f1da747"
+    },
+    {
+      "key": "loom",
+      "label": "Commerce loom",
+      "siteKind": "commerce-loom",
+      "bytes": 302772,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 302772 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "228dd85c59cd2c9d15651d2fdf854f9dfed5de66c3a5e1cf093e65c4b5c45067"
+    },
+    {
+      "key": "herbarium",
+      "label": "Field guide",
+      "siteKind": "field-guide",
+      "bytes": 303934,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 303934 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "5fdfe4bade4a0f9d65481ba16ca6a23fd44cad57ad49b453eca894f3a4424bd2"
+    },
+    {
+      "key": "press",
+      "label": "Press atelier",
+      "siteKind": "press-atelier",
+      "bytes": 381062,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 381062 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "49cec27fb3f57040f62f6392bbad2178a89eba76e2521710c2a110ec0c7b2b80"
+    },
+    {
+      "key": "lantern",
+      "label": "Lantern path",
+      "siteKind": "lantern-path",
+      "bytes": 288277,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 288277 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "6f8a1e965da144e769e58dd0bb66fb5e25b13af348b32593bf998696eb57c418"
+    },
+    {
+      "key": "clinic",
+      "label": "Care pathway",
+      "siteKind": "care-pathway",
+      "bytes": 278903,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 278903 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "1bbb18fec42b665d62146b0d34475e9186a69289383044b61705659c9808d8fd"
+    },
+    {
+      "key": "harness",
+      "label": "Agent harness",
+      "siteKind": "agent-harness",
+      "bytes": 270747,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 270747 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "e3925de7e5e1405c5ec0830193b22cfe44e02e543df82109e12bdceac40e86ee"
+    },
+    {
+      "key": "keel",
+      "label": "Control plane",
+      "siteKind": "control-plane-oss",
+      "bytes": 275252,
+      "scriptCount": 1,
+      "viewportMeta": true,
+      "httpAssets": [],
+      "budgetPassed": true,
+      "failedFindingIds": [],
+      "findings": [
+        {
+          "id": "transfer-bytes",
+          "ok": true,
+          "detail": "HTML is 275252 bytes (budget 2048KB)."
+        },
+        {
+          "id": "script-tags",
+          "ok": true,
+          "detail": "1 <script> tags (budget 3)."
+        },
+        {
+          "id": "no-insecure-assets",
+          "ok": true,
+          "detail": "no http:// assets found."
+        },
+        {
+          "id": "viewport-meta",
+          "ok": true,
+          "detail": "viewport meta present."
+        }
+      ],
+      "htmlSha256": "4a498f8f1d6dcd79556f8b76158892b24c56d33794ad36e9aadc4e1135c7b859"
+    }
+  ],
+  "failures": [],
+  "reducedMotionScreenshot": {
+    "skipped": false,
+    "template": "dossier",
+    "viewport": "1440x900",
+    "reducedMotion": true,
+    "sha256": "a3f99c154d4a7f34a8161f646cab8d3628f177c049766a34ab43e5afd5ba9692",
+    "bytes": 488143,
+    "capturedAt": "2026-10-25T15:53:37+05:30",
+    "artifact": null,
+    "note": "PNG hash of the first fold with reducedMotion=reduce, animations disabled. The image stays local at research/shots/phase0-reduced-motion-dossier.png (gitignored); regenerate with pnpm measure:previews. Hashes are renderer-dependent."
+  },
+  "cutIfShort": true,
+  "inpHelper": "skipped"
+}
