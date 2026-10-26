@@ -22,13 +22,13 @@ Acronyms on first use:
 
 Brand contract (locked): **Instrument Serif** / **Source Sans 3** / **IBM Plex Mono**; accent **`#D4714A`** on **`#181614`**. Never default to Inter + `#2563EB`. Uniqueness = **different page shape**, not a palette swap. Stacked images, motion, artistic, unique — Crease-class bar.
 
-**Study notes:** detailed per-library Learn/Beat extraction lives **outside this repo** (box-private). Agents authoring packs must not paste foreign skill files into context; use this taxonomy + brand/brief grammar only.
+**Study notes:** capability study lives **off-repo** (internal box study). This OSS plan lists DesignProof inventions only. Agents authoring packs must not paste foreign skill files into context; use this taxonomy + brand/brief grammar only.
 
 ---
 
 ## 1. Executive intent
 
-Beat peer animated-sample galleries and seekable composition-style delivery **without** cloning their stacks, skills, or default brand recipes.
+Beat **open-design** galleries and seekable composition-style delivery **without** cloning third-party stacks, skills, or default brand recipes.
 
 We learn the *shape* of:
 - programmable animation via **`seek(t)`** (deterministic frame at time `t`) + encode, not generative video;
@@ -46,13 +46,13 @@ We invent **DesignProof-native** skill packs (`tell-*` / `designproof-*`) that:
 
 ---
 
-## 2. Study method (private detail)
+## 2. Capability study (off-repo)
 
-For each library in the private study set: extract **one capability we KEEP as learning** (pattern only) and **one DesignProof-native invention that beats it**. No forks, no installing foreign skill packs, no copy-paste of foreign skill bodies.
+Capability study lives off-repo (internal box study). OSS plan lists DesignProof inventions only.
 
-Categories covered (patterns only — names stay private): timeline choreography, spring/physics feel, GPU 2D/3D bands, particles, vector paths, shader transitions, asset budgets, capture discipline, optional voiceover/captions, transport clocks, timeline trim/contact sheet, and encode/mux delivery.
+Private Learn/Beat notes extract, for each capability area, **one pattern we keep as learning** and **one DesignProof-native invention that beats it**. No forks, no installing foreign skill packs, no copy-paste of foreign skill bodies into this tree. Capability areas covered (patterns only): timeline choreography, spring/physics feel, GPU 2D/3D bands, particles, vector paths, shader transitions, asset budgets, browser-capture discipline, optional voiceover/captions, transport clocks, timeline trim/contact sheet, and encode/mux delivery.
 
-**Article-shaped patterns → DesignProof beats**
+**Article-shaped patterns → DesignProof beats** (vendor-neutral; no third-party product names)
 
 | Pattern shape | DesignProof beat |
 |---|---|
@@ -234,7 +234,7 @@ Local worktree used for this write-up: `/workspace/designproof-motion-plan` (box
 - `docs/design-engine-revamp-plan.html` §2b — learn, don’t copy  
 - `packages/design-skills/src/templates.ts` — siteKind / template keys  
 
-Private study set (box only): `/workspace/designproof-motion-study/LEARN-BEAT.md` — not linked from product docs as a public path requirement.
+Private capability study (box-local Learn/Beat notes) — **not** shipped in this repository and not a public doc path.
 
 ---
 
