@@ -99,7 +99,10 @@ export default function ShowcaseGalleryPage() {
               until you hover.
             </p>
             <div className="sx-hero-actions">
-              <Link className="sx-nav-cta" href="/baseline" prefetch={false}>
+              <Link className="sx-nav-cta" href="/showcase/motion" prefetch={false}>
+                Crease motion loop
+              </Link>
+              <Link className="sx-btn-ghost" href="/baseline" prefetch={false}>
                 Open Baseline
               </Link>
               <a className="sx-btn-ghost" href="#reels">
