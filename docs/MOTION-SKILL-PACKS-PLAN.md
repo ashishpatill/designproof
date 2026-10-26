@@ -28,7 +28,7 @@ Brand contract (locked): **Instrument Serif** / **Source Sans 3** / **IBM Plex M
 
 ## 1. Executive intent
 
-Beat **open-design** galleries and seekable composition-style delivery **without** cloning third-party stacks, skills, or default brand recipes.
+Beat **Crease-class** peer galleries and seekable composition-style delivery **without** cloning third-party stacks, skills, or default brand recipes.
 
 We learn the *shape* of:
 - programmable animation via **`seek(t)`** (deterministic frame at time `t`) + encode, not generative video;
