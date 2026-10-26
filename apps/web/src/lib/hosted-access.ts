@@ -256,12 +256,16 @@ export async function requireHostedGenerationAccess(
   // concurrency-deny never burns one of the user's daily generations.
   const inflightBucket = inflightBucketFor(session.userId);
   let inflightAcquired = false;
+  let inflightFailedOpen = false;
   try {
     inflightAcquired = await tryAcquireInflight(executor, inflightBucket, caps.concurrency);
   } catch {
-    /* Neon hiccup: fail open like daily caps; the stale clamp self-heals a leaked slot */
+    // Neon hiccup: fail open like daily caps (counts stay 0). Do NOT treat the
+    // throw as a concurrency denial — that would return a false 429 while
+    // inflightAcquired is still false. Attach a no-op release below.
+    inflightFailedOpen = true;
   }
-  if (!inflightAcquired) {
+  if (!inflightAcquired && !inflightFailedOpen) {
     return {
       ok: false,
       error: NextResponse.json(
@@ -277,6 +281,7 @@ export async function requireHostedGenerationAccess(
   }
   let inflightReleased = false;
   const releaseInflightOnce = async (): Promise<void> => {
+    // Fail-open path never acquired a slot — no-op release (same as already-released).
     if (!inflightAcquired || inflightReleased) return;
     inflightReleased = true;
     try {

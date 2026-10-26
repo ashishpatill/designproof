@@ -260,4 +260,22 @@ describe("in-flight concurrency (Free = 1)", () => {
     expect(body.error).toContain("rate_limited");
     expect(body.error).not.toContain("concurrency_limited");
   });
+
+  it("Neon acquire throw fails open — ok:true with no-op release, never a false concurrency_limited 429", async () => {
+    const base = seededExecutor({ usage: {} });
+    const exec: SqlExecutor = {
+      async query(text, params = []) {
+        if (text.toLowerCase().includes("generation_inflight")) {
+          throw new Error("neon_inflight_unavailable");
+        }
+        return base.query(text, params);
+      },
+    };
+    const res = await requireHostedGenerationAccess(post(), { executor: exec, getSession: signedIn, now: NOW });
+    expect(res.ok).toBe(true);
+    expect(res.context?.releaseInflight).toBeTypeOf("function");
+    await expect(res.context!.releaseInflight!()).resolves.toBeUndefined();
+    // Calling release again stays a no-op (fail-open never held a slot).
+    await expect(res.context!.releaseInflight!()).resolves.toBeUndefined();
+  });
 });
