@@ -1,5 +1,4 @@
 import {
-  MotionPackId,
   type DesignBrief,
   type MotionLevel,
   type MotionPackId as MotionPackIdType,
@@ -99,8 +98,10 @@ export function getMotionPack(id: MotionPackIdType): MotionPackDefinition {
 function supports(pack: MotionPackDefinition, brief: Pick<DesignBrief, "siteKind" | "taste">): boolean {
   const motion = brief.taste?.motion ?? "subtle-micro";
   const siteKind = brief.siteKind;
-  const siteMatch = pack.supportedSiteKinds === "all" || pack.supportedSiteKinds.includes(siteKind);
-  return siteMatch && pack.motionLevels.includes(motion);
+  const siteMatch =
+    pack.supportedSiteKinds === "all" ||
+    (pack.supportedSiteKinds as readonly SiteKind[]).includes(siteKind);
+  return siteMatch && (pack.motionLevels as readonly MotionLevel[]).includes(motion);
 }
 
 /** Resolve active packs without changing the eleven-tool catalog. */
