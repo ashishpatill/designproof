@@ -20,6 +20,7 @@ import {
   evaluateRefinementProof,
   canApproveRefinement,
   motionReviewFor,
+  getMotionPack,
   type AestheticLean,
   type ColorMood,
   type Density,
@@ -918,6 +919,16 @@ export default function StudioPage() {
               </p>
               <p data-testid="meta-skills">
                 <strong className="text-text">Routed skills:</strong> {result.spec.routedSkills.join(", ")}
+              </p>
+              <p data-testid="meta-motion-packs">
+                <strong className="text-text">Motion packs:</strong>{" "}
+                {result.spec.motionPacks.length
+                  ? result.spec.motionPacks.map((id) => getMotionPack(id).title).join(", ")
+                  : "static specimen only"}
+              </p>
+              <p data-testid="meta-motion-seek">
+                <strong className="text-text">Seek contract:</strong>{" "}
+                {result.spec.specimenMotion?.seek.global} {result.spec.specimenMotion?.seek.signature}
               </p>
               <p data-testid="meta-sections">
                 <strong className="text-text">Sections:</strong> {result.spec.sections.map((s) => s.kind).join(", ")}

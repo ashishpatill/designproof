@@ -6,11 +6,13 @@ import {
   type ContentAuthor,
 } from "./author";
 import { routeDomainResearchSkills } from "./domain-research";
+import { motionPackIdsFor } from "./motion-packs";
 import { renderPreviewHtml } from "./render";
 import { routeSkills } from "./route";
 import { buildSections } from "./sections";
 import { AESTHETIC_PROFILES, buildTokens, tellDirectionForLean } from "./tokens";
 import { deriveConcept, getTheme, applyTheme } from "./staged";
+import { createSpecimenMotionJson } from "./specimen-motion";
 import {
   DesignBrief,
   DesignFromFeaturesResponse,
@@ -215,6 +217,15 @@ export function designFromFeatures(
               ];
 
   const concept = deriveConcept(effectiveBrief);
+  const motionPacks = motionPackIdsFor({ siteKind: effectiveBrief.siteKind, taste });
+  const specimenMotion = createSpecimenMotionJson({
+    brief: {
+      productName: effectiveBrief.productName,
+      siteKind: effectiveBrief.siteKind,
+    },
+    concept,
+    packs: motionPacks,
+  });
 
   const customizationHints = [
     `Research gate: ${researchPlan.researchNodes.join(" → ")}`,
@@ -279,6 +290,8 @@ export function designFromFeatures(
     motionNotes,
     customizationHints,
     evidenceNotes,
+    motionPacks,
+    specimenMotion,
     summary,
     concept,
     theme: theme?.id,

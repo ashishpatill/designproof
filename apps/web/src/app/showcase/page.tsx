@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listTemplates, type DesignTemplate } from "@tell/design-skills";
+import { listTemplates, motionPackIdsFor, type DesignTemplate, type MotionPackId } from "@tell/design-skills";
 import { ProductShell } from "@/components/shell";
 import { ShowcaseAnthologyReel } from "@/components/showcase/ShowcaseAnthologyReel";
 import { SpecimenPreview } from "@/components/showcase/SpecimenPreview";
@@ -21,6 +21,7 @@ type FilmstripCell = {
   index: string;
   href: string;
   src: string;
+  motionPacks: MotionPackId[];
 };
 
 /** Hand-crafted sport specimens — pinned near the top of the filmstrip (not engine templates). */
@@ -53,6 +54,7 @@ function buildFilmstrip(): FilmstripCell[] {
     index: String(i + 3).padStart(2, "0"),
     href: specimenOpenHref(t.key),
     src: specimenHtmlSrc(t.key),
+    motionPacks: motionPackIdsFor({ siteKind: t.siteKind, taste: t.brief.taste }),
   }));
   return [
     {
@@ -149,6 +151,7 @@ export default function ShowcaseGalleryPage() {
                   data-pinned={
                     o.key === "crease" ? "crease" : o.key === "baseline" ? "baseline" : undefined
                   }
+                  data-motion-packs={o.motionPacks.join(",")}
                 >
                   <div className="sx-cell-frame">
                     <div className="sx-cell-sprockets" aria-hidden="true">

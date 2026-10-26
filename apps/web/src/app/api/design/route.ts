@@ -6,6 +6,7 @@ import {
   designFromFeaturesAuthored,
   getTemplate,
   listTemplates,
+  listMotionPacks,
 } from "@tell/design-skills";
 import { ZodError } from "zod";
 import { requireHostedGenerationAccess } from "@/lib/hosted-access";
@@ -115,13 +116,15 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     if (url.searchParams.get("templates") === "1") {
       return NextResponse.json({
-        templates: listTemplates().map(({ key, label, marketJob, siteKind, researchBasis }) => ({
+        templates: listTemplates().map(({ key, label, marketJob, siteKind, researchBasis, brief }) => ({
           key,
           label,
           marketJob,
           siteKind,
           researchBasis,
+          motionPacks: designFromFeatures(brief).spec.motionPacks,
         })),
+        motionPacks: listMotionPacks(),
       });
     }
     const key = url.searchParams.get("showcase") ?? "saas";

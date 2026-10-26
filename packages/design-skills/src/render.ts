@@ -3246,6 +3246,12 @@ function renderPreviewPage(spec: DesignSpec): string {
   const researchMeta = spec.researchPlan
     ? ` data-research-domain="${esc(spec.researchPlan.domainId)}" data-research-nodes="${esc(spec.researchPlan.researchNodes.join(","))}" data-research-pack="${spec.researchPlan.packFound ? "1" : "0"}"`
     : "";
+  const motionMeta = spec.specimenMotion
+    ? `<meta name="specimen.motion.json" content="${esc(JSON.stringify(spec.specimenMotion))}"/><meta name="designproof-motion-seek" content="${esc(`${spec.specimenMotion.seek.global}${spec.specimenMotion.seek.signature}`)}"/>`
+    : "";
+  const motionData = spec.specimenMotion
+    ? ` data-motion-packs="${esc(spec.motionPacks.join(","))}" data-motion-duration-ms="${spec.specimenMotion.durationMs}" data-motion-seek="${esc(spec.specimenMotion.seek.global)}"`
+    : "";
   const atmosphereLayer = atmosphere
     ? `<div class="ds-atmosphere" aria-hidden="true"><div class="ds-atmosphere-motes"></div><div class="ds-accent-beam"></div></div>`
     : "";
@@ -3286,6 +3292,7 @@ function renderPreviewPage(spec: DesignSpec): string {
 <meta name="color-scheme" content="${spec.taste.colorMood === "dark-premium" ? "dark" : "light"}"/>
 ${responsive ? `<meta name="tell-responsive-performance" content="webp-display-budgets;lazy-below-fold;run-media-site-after-photography"/>` : ""}
 ${spec.researchPlan ? `<meta name="tell-research-gate" content="${esc(spec.researchPlan.researchNodes.join(" → "))}"/>` : ""}
+${motionMeta}
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?${fonts}&display=swap"/>
@@ -3293,7 +3300,7 @@ ${needsHtmx ? `<script src="https://unpkg.com/htmx.org@2.0.4" defer></script>` :
 <noscript><style>.ds-reveal,.ds-enter,.ds-stagger > *{opacity:1!important;transform:none!important;animation:none!important}.ds-chapter-pin{min-height:0!important}.ds-chapter-pin-inner{position:static!important}.ds-chapter-progress{display:none!important}</style></noscript>
 <style>${renderCss(spec)}</style>
 </head>
-<body data-lean="${esc(spec.taste.aestheticLean)}" data-motion="${esc(spec.taste.motion)}" data-density="${esc(spec.taste.density)}" data-mood="${esc(spec.taste.colorMood)}" data-sitekind="${esc(spec.brief.siteKind)}" data-depth="${esc(depth)}"${paperFrame ? ` data-frame="paper-technical"` : ""}${atmosphere ? ` data-atmosphere="static"` : ""}${responsive ? ` data-responsive-performance="required"` : ""}${researchMeta}>
+<body data-lean="${esc(spec.taste.aestheticLean)}" data-motion="${esc(spec.taste.motion)}" data-density="${esc(spec.taste.density)}" data-mood="${esc(spec.taste.colorMood)}" data-sitekind="${esc(spec.brief.siteKind)}" data-depth="${esc(depth)}"${paperFrame ? ` data-frame="paper-technical"` : ""}${atmosphere ? ` data-atmosphere="static"` : ""}${responsive ? ` data-responsive-performance="required"` : ""}${researchMeta}${motionData}>
 ${atmosphereLayer}
 <a class="ds-skip" href="#main">Skip to content</a>
 <p class="ds-sr">${esc(pageDescription)}</p>
