@@ -178,7 +178,7 @@ describe("care pathway template says each thing once", () => {
       for (const f of brief.features) expect(fold.toLowerCase()).not.toContain(f.description.toLowerCase().slice(0, 16));
       expect(railOf(previewHtml), brief.productName).not.toBe("");
       expect(plateOf(previewHtml), brief.productName).not.toBe("");
-      expect(previewHtml).toContain("PATHWAY");
+      expect(previewHtml).toContain("ACTIVE CASE");
       expect(previewHtml).toContain("Chart");
     }
   });
@@ -226,6 +226,10 @@ describe("care pathway template says each thing once", () => {
       }
       for (const f of brief.features) {
         const name = f.name.toLowerCase();
+        // The dense chart's one-line legend names the chart concepts themselves (STAGE MAP ·
+        // HANDOFF BEADS · DWELL WINDOWS); the sample rounds share those names, so the legend
+        // chrome is exempt — the rounds are still named once, in the index.
+        if (brief === sample && ["stage map", "handoff beads", "dwell windows"].includes(name)) continue;
         expect(plate.toLowerCase(), `${brief.productName} plate: ${f.name}`).not.toContain(name);
         expect(rail.toLowerCase(), `${brief.productName} rail: ${f.name}`).not.toContain(name);
       }
@@ -248,18 +252,26 @@ describe("care pathway template says each thing once", () => {
     }
   });
 
-  it("puts all five tags above the line, each centred over its own stage", () => {
+  it("draws the dense stage-column chart: five columns left to right, teaching legend, encounter log", () => {
     for (const brief of briefs) {
       const plate = plateOf(designFromFeatures(brief).previewHtml);
-      const tags = [...plate.matchAll(/data-care-tag="(\d\d)" data-stage-x="([\d.]+)"/g)];
-      expect(tags.map((t) => t[1]), brief.productName).toEqual(["01", "02", "03", "04", "05"]);
-      const xs = tags.map((t) => Number(t[2]));
-      for (let i = 1; i < xs.length; i += 1) expect(xs[i]!).toBeGreaterThan(xs[i - 1]!);
-      // Each tag's x is a stage disc's centre (r=8 disc on the spine).
-      for (const x of xs) expect(plate).toContain(`<circle cx="${x}"`);
-      // No instrument strip (clipboard/vial/cuff oval) in the panel foot.
+      const cols = [...plate.matchAll(/data-care-col="(\d\d)" data-stage-x="([\d.]+)"/g)];
+      expect(cols.map((c) => c[1]), brief.productName).toEqual(["01", "02", "03", "04", "05"]);
+      const xs = cols.map((c) => Number(c[2]));
+      for (let i = 1; i < xs.length; i += 1) expect(xs[i]!, brief.productName).toBeGreaterThan(xs[i - 1]!);
+      for (const n of ["01", "02", "03", "04", "05"]) expect(plate).toContain(`>STAGE ${n}<`);
+      // Teaching legend + citeable log — not an empty schematic, not hero cards.
+      expect(plate).toContain("ENCOUNTER LOG");
+      expect(plate).toContain("STAGE MAP");
+      expect(plate).toContain("HANDOFF BEADS");
+      expect(plate).toContain("DWELL WINDOWS");
+      expect(plate, brief.productName).toMatch(/LIVE|Dwell /);
+      // No instrument strip (clipboard/vial/cuff oval), no spine-void schematic.
       expect(plate).not.toContain("<ellipse");
       expect(plate).not.toContain("NEAR PLANE");
+      // The thin spine's tag-and-node geometry is gone — no data-care-tag required.
+      expect(plate).not.toContain("data-care-tag");
+      expect(plate).not.toContain("<circle");
     }
   });
 
