@@ -124,3 +124,6 @@ docs/03-status-audit-ops-and-training.html
 docs/BOOKS-AUDIT-REPORT.md
 RULES.md
 .audit-books/
+
+# Local OpenCode loops + design locks (not product source)
+.opencode-loops/

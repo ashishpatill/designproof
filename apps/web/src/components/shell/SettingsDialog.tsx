@@ -7,6 +7,7 @@ import {
   formatCaptureHealth,
   type CaptureHealthPayload,
 } from "@/lib/capture-honesty";
+import { SettingsPlanSection } from "@/components/billing";
 
 export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const titleId = useId();
@@ -99,10 +100,10 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
         <div className="tell-dialog__head">
           <div>
             <h2 id={titleId} className="font-display text-2xl text-text">
-              Keys &amp; integrations
+              Settings
             </h2>
             <p className="mt-1 text-sm text-secondary">
-              Bring your own keys. Stored only in this browser. Capture, detect, and reconcile need none.
+              Plan and keys for this browser. Capture, detect, and reconcile need none.
             </p>
           </div>
           <button
@@ -113,6 +114,15 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+
+        <SettingsPlanSection planState={null} />
+
+        <div className="mt-6 mb-2">
+          <h3 className="font-display text-lg text-text">Keys &amp; integrations</h3>
+          <p className="mt-1 text-sm text-secondary">
+            Bring your own keys. Stored only in this browser. Capture, detect, and reconcile need none.
+          </p>
         </div>
 
         <label htmlFor="tell-byok-gemini">
