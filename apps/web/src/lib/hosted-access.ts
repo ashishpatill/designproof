@@ -8,7 +8,10 @@
  * - Free: server uses its own hosted key only — client BYOK headers are
  *   ignored, never accepted as a Free substitute for a paid plan.
  * - Maker/Studio: higher caps; BYOK headers may override the hosted key.
- * - Rate limits are per-IP + per-user; over-quota → 429 with Retry-After.
+ * - Rate limits are per-IP + per-user daily caps + per-user in-flight
+ *   concurrency (Neon generation_inflight); over-quota or over-concurrency →
+ *   429 with Retry-After. Routes release the slot via context.releaseInflight
+ *   in a finally block.
  *
  * Pure decision logic lives here and is unit-tested without Neon/Dodo by
  * injecting a SqlExecutor + session resolver.
@@ -18,9 +21,12 @@ import {
   bumpUsage,
   getEntitlementExecutor,
   hashIp,
+  inflightBucketFor,
   isHostedPlan,
   readUsage,
+  releaseInflight,
   resolveUserPlan,
+  tryAcquireInflight,
   usageWindowStart,
   type SqlExecutor,
 } from "@/lib/entitlements";
@@ -144,6 +150,12 @@ export interface HostedAccessContext {
   caps: PlanCaps;
   keys: HostedKeys;
   entitlementSource: string;
+  /**
+   * Release the in-flight slot this request holds. Idempotent; routes MUST
+   * call it in a finally block covering the whole generation path, including
+   * early returns after the gate.
+   */
+  releaseInflight?: () => Promise<void>;
 }
 
 export interface HostedDeps {
@@ -240,6 +252,40 @@ export async function requireHostedGenerationAccess(
     };
   }
 
+  // Concurrency: take an in-flight slot before counting the request, so a
+  // concurrency-deny never burns one of the user's daily generations.
+  const inflightBucket = inflightBucketFor(session.userId);
+  let inflightAcquired = false;
+  try {
+    inflightAcquired = await tryAcquireInflight(executor, inflightBucket, caps.concurrency);
+  } catch {
+    /* Neon hiccup: fail open like daily caps; the stale clamp self-heals a leaked slot */
+  }
+  if (!inflightAcquired) {
+    return {
+      ok: false,
+      error: NextResponse.json(
+        {
+          ok: false,
+          error: `concurrency_limited: ${plan} allows ${caps.concurrency} in-flight generation${caps.concurrency === 1 ? "" : "s"} — wait for your current one to finish`,
+          plan,
+          maxInflight: caps.concurrency,
+        },
+        { status: 429, headers: { "Retry-After": "5" } },
+      ),
+    };
+  }
+  let inflightReleased = false;
+  const releaseInflightOnce = async (): Promise<void> => {
+    if (!inflightAcquired || inflightReleased) return;
+    inflightReleased = true;
+    try {
+      await releaseInflight(executor, inflightBucket);
+    } catch {
+      /* best-effort; the 120s stale clamp recovers a leaked slot */
+    }
+  };
+
   try {
     await bumpUsage(executor, userBucket, new Date(windowStart));
     await bumpUsage(executor, ipBucket, new Date(windowStart));
@@ -255,6 +301,7 @@ export async function requireHostedGenerationAccess(
       caps,
       keys: resolveHostedKeys(request, plan),
       entitlementSource: source,
+      releaseInflight: releaseInflightOnce,
     },
   };
 }

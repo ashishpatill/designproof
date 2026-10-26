@@ -66,6 +66,13 @@ export function ensureEntitlementTables(executor: SqlExecutor): Promise<void> {
           PRIMARY KEY (bucket, window_start)
         )`,
       );
+      await executor.query(
+        `CREATE TABLE IF NOT EXISTS generation_inflight (
+          bucket TEXT PRIMARY KEY,
+          count INTEGER NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )`,
+      );
     })().catch((err) => {
       tablesReady = null;
       throw err;
@@ -186,4 +193,70 @@ export async function bumpUsage(
 /** Hash an IP for per-IP buckets — never store raw addresses. */
 export function hashIp(ip: string): string {
   return `ip_${createHash("sha256").update(ip).digest("hex").slice(0, 24)}`;
+}
+
+/**
+ * In-flight generation slots (per-user concurrency), same Neon Postgres.
+ * A lease older than INFLIGHT_STALE_SECONDS is treated as a crashed Vercel
+ * invocation and clamped to zero on the next acquire, so a lost `release`
+ * can never permanently block a Free user.
+ */
+export const INFLIGHT_STALE_SECONDS = 120;
+
+export function inflightBucketFor(userId: string): string {
+  return `user:${userId}:inflight`;
+}
+
+function stalePredicate(): string {
+  return `updated_at < NOW() - (${INFLIGHT_STALE_SECONDS} * interval '1 second')`;
+}
+
+/**
+ * Atomically take one in-flight slot up to `max`. Returns false when the
+ * bucket is already at capacity — this is the definitive deny signal.
+ * Both statements are single-query atomic (Neon HTTP has no cross-query
+ * transaction, so no read-then-write race is introduced).
+ */
+export async function tryAcquireInflight(
+  executor: SqlExecutor,
+  bucket: string,
+  max: number,
+): Promise<boolean> {
+  const cap = Math.floor(max);
+  if (!Number.isFinite(cap) || cap < 1) return false;
+  // First acquire for the bucket: INSERT holds slot 1 (fresh row wins the race).
+  const inserted = await executor.query(
+    `INSERT INTO generation_inflight (bucket, count, updated_at)
+     VALUES ($1, 1, NOW())
+     ON CONFLICT (bucket) DO NOTHING
+     RETURNING bucket`,
+    [bucket],
+  );
+  if (inserted.length > 0) return true;
+  // Existing row: conditional UPDATE. A row whose updated_at is stale is
+  // clamped to 1 here (crashed invocation), a live row under capacity is
+  // incremented, and a full row matches zero rows ⇒ denied.
+  const rows = await executor.query(
+    `UPDATE generation_inflight
+     SET count = CASE WHEN ${stalePredicate()} THEN 1 ELSE count + 1 END,
+         updated_at = NOW()
+     WHERE bucket = $1 AND (${stalePredicate()} OR count < $2)
+     RETURNING count`,
+    [bucket, cap],
+  );
+  return rows.length > 0;
+}
+
+/**
+ * Give an in-flight slot back. Floor-clamped at 0 so an unexpected extra
+ * release can never drive the count negative (and thus over-admit).
+ * Throws on DB failure — callers decide their own fail-soft policy.
+ */
+export async function releaseInflight(executor: SqlExecutor, bucket: string): Promise<void> {
+  await executor.query(
+    `UPDATE generation_inflight
+     SET count = GREATEST(count - 1, 0), updated_at = NOW()
+     WHERE bucket = $1`,
+    [bucket],
+  );
 }
