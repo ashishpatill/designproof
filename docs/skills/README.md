@@ -1,8 +1,8 @@
 # DesignProof-owned skill stubs
 
-These are **plan stubs**. They live under `docs/skills/` even when a runtime skill has landed under `.cursor/skills/` — this folder is never the runtime home. Three stubs now have a runtime twin (anti-slop, taste-loop, diagram); the rest are still plans.
+These are **plan stubs**. They live under `docs/skills/` even when a runtime skill has landed under `.cursor/skills/` — this folder is never the runtime home. Eight stubs now have a runtime twin; the rest are still plans.
 
-Learned from the Oct 2026 shortlist in [`design-engine-revamp-plan.html`](../design-engine-revamp-plan.html) §2b (PR #106) plus [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT; inspiration only). Ashish's rule: **learn, don't copy** — no vendored forks, no install of their skill into DesignProof.
+The procedures are DesignProof-owned and follow the in-repo taxonomy, proof gates, and token contracts. Ashish's rule: **learn, don't copy** — no foreign skill bodies or vendored motion recipes enter this tree.
 
 Near-term:
 
