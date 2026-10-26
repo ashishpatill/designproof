@@ -42,46 +42,12 @@ export async function POST(req: Request) {
     if (!access.ok || !access.context) {
       return access.error ?? NextResponse.json({ error: "auth_required" }, { status: 401 });
     }
-    const body = await req.json();
-
-    if (typeof body.query === "string" && body.query.trim()) {
-      const { brief, plan } = briefFromFreeText(body.query);
-      const result = designFromFeatures(brief, { theme: typeof body.theme === "string" ? body.theme : undefined });
-      recordDesignResult(result, {
-        via: "api.design.post.query",
-        siteKind: brief.siteKind,
-        productName: brief.productName,
-        nicheKey: plan.nicheKey,
-      });
-      return NextResponse.json({
-        ...result,
-        plan: {
-          ...plan,
-          researchNodes: result.spec.customizationHints.filter((h) =>
-            h.startsWith("Research") || h.startsWith("Domain"),
-          ),
-          routedSkills: result.spec.routedSkills,
-          summary: result.spec.summary,
-        },
-      });
+    const accessCtx = access.context;
+    try {
+      return await handleDesignPost(req, accessCtx);
+    } finally {
+      await accessCtx.releaseInflight?.();
     }
-
-    const parsed = DesignFromFeaturesRequest.parse(
-      body.brief !== undefined ? body : { brief: body },
-    );
-    // Key policy enforced here: Free → hosted env key only; paid → BYOK may override.
-    const apiKey = access.context.keys.gemini;
-    const result = await designFromFeaturesAuthored(parsed.brief, {
-      redesignFrom: parsed.redesignFrom,
-      apiKey,
-      theme: parsed.theme,
-    });
-    recordDesignResult(result, {
-      via: "api.design.post",
-      siteKind: parsed.brief.siteKind,
-      productName: parsed.brief.productName,
-    });
-    return NextResponse.json(result);
   } catch (err) {
     if (err instanceof ZodError) {
       return NextResponse.json(
@@ -92,6 +58,52 @@ export async function POST(req: Request) {
     const message = err instanceof Error ? err.message : "Design generation failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+async function handleDesignPost(
+  req: Request,
+  accessCtx: NonNullable<Awaited<ReturnType<typeof requireHostedGenerationAccess>>["context"]>,
+): Promise<NextResponse> {
+  const body = await req.json();
+
+  if (typeof body.query === "string" && body.query.trim()) {
+    const { brief, plan } = briefFromFreeText(body.query);
+    const result = designFromFeatures(brief, { theme: typeof body.theme === "string" ? body.theme : undefined });
+    recordDesignResult(result, {
+      via: "api.design.post.query",
+      siteKind: brief.siteKind,
+      productName: brief.productName,
+      nicheKey: plan.nicheKey,
+    });
+    return NextResponse.json({
+      ...result,
+      plan: {
+        ...plan,
+        researchNodes: result.spec.customizationHints.filter((h) =>
+          h.startsWith("Research") || h.startsWith("Domain"),
+        ),
+        routedSkills: result.spec.routedSkills,
+        summary: result.spec.summary,
+      },
+    });
+  }
+
+  const parsed = DesignFromFeaturesRequest.parse(
+    body.brief !== undefined ? body : { brief: body },
+  );
+  // Key policy enforced here: Free → hosted env key only; paid → BYOK may override.
+  const apiKey = accessCtx.keys.gemini;
+  const result = await designFromFeaturesAuthored(parsed.brief, {
+    redesignFrom: parsed.redesignFrom,
+    apiKey,
+    theme: parsed.theme,
+  });
+  recordDesignResult(result, {
+    via: "api.design.post",
+    siteKind: parsed.brief.siteKind,
+    productName: parsed.brief.productName,
+  });
+  return NextResponse.json(result);
 }
 
 /**
