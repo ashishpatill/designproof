@@ -762,6 +762,40 @@ export function assertBasics(spec: DesignSpec, html: string): BasicsReport {
       "Care-pathway offerings use rounds fold + care rail + care plate + rounds ladder (when the brief has more than one priority) + Chart — no pricing, no metrics theatre, no figure band or specimen band, zero inverse bands.",
     ),
     check(
+      "care-plate-explains",
+      spec.brief.siteKind !== "care-pathway"
+        || (
+          /ACTIVE CASE/.test(html)
+          && /STAGE MAP/.test(html)
+          && /HANDOFF BEADS/.test(html)
+          && /DWELL WINDOWS/.test(html)
+          && /ENCOUNTER LOG/.test(html)
+          && /01 → 02|→/.test(html)
+          && /Dwell |LIVE|RN Okonkwo|MD Chen/.test(html)
+          && !/NEAR PLANE/.test(html)
+        ),
+      "Care-plate must teach as a dense stage-column chart with ownership, signed handoffs, and dwell — not an empty schematic or hero cards (template:care-plate-empty-schematic).",
+    ),
+    check(
+      "signature-figure-teaches",
+      (() => {
+        // Signature plates that only stamp a title fail the eye. When a craft figure is present,
+        // require at least one teaching surface beyond chrome labels (log / legend / concept panel).
+        const kind = spec.brief.siteKind;
+        if (kind === "care-pathway") {
+          return /ENCOUNTER LOG/.test(html) && /STAGE MAP/.test(html);
+        }
+        if (kind === "lantern-path") {
+          return /PATH ATLAS|WAYPOINT|ELEV/.test(html);
+        }
+        if (kind === "press-atelier") {
+          return /PRESS SHEET|SIG /.test(html);
+        }
+        return true;
+      })(),
+      "Signature craft figures must teach the product concept — title chrome alone is an empty schematic.",
+    ),
+    check(
       "kind-harness",
       spec.brief.siteKind !== "agent-harness"
         || (
