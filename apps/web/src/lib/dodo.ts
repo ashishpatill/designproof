@@ -24,7 +24,14 @@ export const DODO_PRODUCT_IDS_TEST = {
 /** Tip $5 LIVE on DesignProof brand. TEST twin: pdt_0NqZTWiGZkR5T3hw1gBsk */
 export const DODO_PRODUCT_TIP_LIVE = "pdt_0NqZTUk7iWWdTlUtajVSP";
 export const DODO_PRODUCT_TIP_TEST = "pdt_0NqZTWiGZkR5T3hw1gBsk";
-export const DODO_PRODUCT_TIP = process.env.DODO_PRODUCT_TIP?.trim() || undefined;
+export function tipProductId(env: Record<string, string | undefined> = process.env): string {
+  const override = env.DODO_PRODUCT_TIP?.trim();
+  if (override) return override;
+  const mode = (env.DODO_ENVIRONMENT?.trim() || "test").toLowerCase();
+  const live = mode === "live" || mode === "production";
+  return live ? DODO_PRODUCT_TIP_LIVE : DODO_PRODUCT_TIP_TEST;
+}
+export const DODO_PRODUCT_TIP = tipProductId();
 
 export type BillingCycle = "monthly" | "yearly";
 
