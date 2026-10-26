@@ -6,7 +6,7 @@ import { proposeWithCursorAgent } from "@/lib/cursor-redesign";
 import { collectProjectSources, rankSourcesForReport } from "@/lib/source-worktree";
 import { fetchRemoteBackend, hasRemoteBackend } from "@/lib/remote-api";
 import { assertRepoSetupEnabled } from "@/lib/setup-guard";
-import { resolveCursorKey } from "@/lib/byok";
+import { requireHostedGenerationAccess } from "@/lib/hosted-access";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 const tracer = trace.getTracer("tell.redesign");
@@ -24,7 +24,13 @@ export async function POST(request: Request) {
         }
       })()
     : {};
+  // Hosted generation gate: Neon Auth session + plan entitlements + rate limits.
+  const access = await requireHostedGenerationAccess(request);
+  if (!access.ok || !access.context) {
+    return access.error ?? NextResponse.json({ error: "auth_required" }, { status: 401 });
+  }
   const setupJobId = typeof body.setupJobId === "string" ? body.setupJobId : "";
+  const accessCtx = access.context;
   if (setupJobId && hasRemoteBackend()) {
     const res = await fetchRemoteBackend("/api/redesign", {
       method: "POST",
@@ -79,7 +85,7 @@ export async function POST(request: Request) {
         directionPlan?.actionItems,
         directionPlan?.summary ?? directionText,
         ranked?.files,
-        resolveCursorKey(request),
+        accessCtx.keys.cursor,
       );
       span.setAttributes({
         "tell.source_files": sourceContext?.files.length ?? 0,

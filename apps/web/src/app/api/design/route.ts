@@ -8,6 +8,7 @@ import {
   listTemplates,
 } from "@tell/design-skills";
 import { ZodError } from "zod";
+import { requireHostedGenerationAccess } from "@/lib/hosted-access";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 export const runtime = "nodejs";
@@ -37,6 +38,10 @@ function recordDesignResult(
  */
 export async function POST(req: Request) {
   try {
+    const access = await requireHostedGenerationAccess(req);
+    if (!access.ok || !access.context) {
+      return access.error ?? NextResponse.json({ error: "auth_required" }, { status: 401 });
+    }
     const body = await req.json();
 
     if (typeof body.query === "string" && body.query.trim()) {
@@ -64,7 +69,8 @@ export async function POST(req: Request) {
     const parsed = DesignFromFeaturesRequest.parse(
       body.brief !== undefined ? body : { brief: body },
     );
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    // Key policy enforced here: Free → hosted env key only; paid → BYOK may override.
+    const apiKey = access.context.keys.gemini;
     const result = await designFromFeaturesAuthored(parsed.brief, {
       redesignFrom: parsed.redesignFrom,
       apiKey,
