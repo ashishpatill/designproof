@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-26 — Local MCP durable raw/design dump prove
+
+- Added `packages/mcp/src/mcp-prove-dump.local.test.ts`: one Model Context Protocol call through `tell_design_from_features` writes a durable JSON under `.mcp-prove-sink/training-data/raw/design/` with `kind: design` and `meta.via: mcp.tell_design_from_features` (same path shape as Studio `/api/design`).
+- `.gitignore` ignores `.mcp-prove-sink/` so prove dumps stay on disk only. Catalog stays eleven; local stdio only; no new tool.
+
 ## 2026-10-25 — DesignProof-owned diagram runtime skill lands under `.cursor/skills`
 
 - Added `.cursor/skills/designproof-diagram/SKILL.md`, written here from learned patterns — nothing vendored, submoduled, or installed from an external diagram skill. It is a **craft skill**, not the generate path and not an MCP tool: the catalog stays at eleven.
