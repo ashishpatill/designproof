@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HostedGenerateGate } from "@/components/shell/HostedGenerateGate";
 import {
   DesignBrief,
   DesignFromFeaturesResponse,
@@ -870,6 +871,7 @@ export default function StudioPage() {
             />
           </label>
 
+          <HostedGenerateGate />
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

@@ -3,7 +3,7 @@ import { trace, SpanStatusCode, type Span } from "@opentelemetry/api";
 import { z } from "zod";
 import { BrandDNA, CapturePayload, DesignFingerprint } from "@tell/schema";
 import { restyleWithGemini } from "@tell/redesign/llm";
-import { resolveGeminiKey } from "@/lib/byok";
+import { requireHostedGenerationAccess } from "@/lib/hosted-access";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 export const runtime = "nodejs";
@@ -33,7 +33,12 @@ export async function POST(request: Request) {
   }
   const { capture, fingerprint, directionId, dna } = parsed.data;
 
-  const apiKey = resolveGeminiKey(request);
+  const access = await requireHostedGenerationAccess(request);
+  if (!access.ok || !access.context) {
+    return access.error ?? NextResponse.json({ ok: false, reason: "access denied" }, { status: 401 });
+  }
+  const accessCtx = access.context;
+  const apiKey = accessCtx.keys.gemini;
   if (!apiKey) {
     return NextResponse.json({ ok: false, reason: "GEMINI_API_KEY not configured" });
   }
@@ -42,6 +47,8 @@ export async function POST(request: Request) {
     span.setAttributes({
       "tell.restyle.direction": directionId,
       "tell.restyle.has_dna": Boolean(dna),
+      "tell.restyle.plan": accessCtx.plan,
+      "tell.restyle.key_source": accessCtx.keys.source,
     });
 
     try {

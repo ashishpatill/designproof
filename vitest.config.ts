@@ -9,6 +9,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@": path.resolve(__dirname, "apps/web/src"),
+      "@/lib": path.resolve(__dirname, "apps/web/src/lib"),
       "@tell/schema": path.resolve(__dirname, "packages/schema/src"),
       "@tell/core": path.resolve(__dirname, "packages/core/src"),
       "@tell/redesign": path.resolve(__dirname, "packages/redesign/src"),

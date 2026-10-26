@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { trace, SpanStatusCode, type Span } from "@opentelemetry/api";
 import { parseDirectionPlan, parseDirectionWithGemini } from "@tell/taste";
-import { resolveGeminiKey } from "@/lib/byok";
+import { requireHostedGenerationAccess } from "@/lib/hosted-access";
 import { recordTrainingEvent } from "@/lib/training-data-sink";
 
 const tracer = trace.getTracer("tell.voice");
 
 export async function POST(request: Request) {
+  const access = await requireHostedGenerationAccess(request);
+  if (!access.ok || !access.context) {
+    return access.error ?? NextResponse.json({ error: "auth_required" }, { status: 401 });
+  }
   const body = await request.json().catch(() => ({}));
   const transcript = typeof body.transcript === "string" ? body.transcript.trim() : "";
 
@@ -14,7 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "transcript required" }, { status: 400 });
   }
 
-  const apiKey = resolveGeminiKey(request);
+  const apiKey = access.context.keys.gemini;
   const source = apiKey ? "gemini" : "local";
 
   return tracer.startActiveSpan("tell.voice", async (span: Span) => {

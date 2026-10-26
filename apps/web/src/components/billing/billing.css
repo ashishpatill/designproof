@@ -1,0 +1,286 @@
+/* Billing UI — Design Expert plan UX lock §0/§5.
+   Token-driven: accent #D4714A on #181614; Instrument Serif / Source Sans 3 / IBM Plex Mono
+   arrive from globals.css via tailwind (font-display / font-mono not needed inline here). */
+
+/* Plan chip */
+
+.billing-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: 999px;
+  background: rgb(var(--surface));
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: rgb(var(--text-secondary));
+  white-space: nowrap;
+}
+
+.billing-chip--muted {
+  color: rgb(var(--text-muted));
+}
+
+.billing-chip--warn {
+  border-color: rgb(var(--drift));
+  color: rgb(var(--drift));
+}
+
+/* Buttons (billing scope — mirrors .pr-btn tokens) */
+
+.billing-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.billing-btn--primary {
+  border: 1px solid rgb(var(--accent));
+  background: rgb(var(--accent));
+  color: #ffffff;
+}
+
+.billing-btn--primary:hover {
+  background: rgb(var(--accent-hover));
+  border-color: rgb(var(--accent-hover));
+}
+
+.billing-btn--secondary {
+  border: 1px solid rgb(var(--accent));
+  background: transparent;
+  color: rgb(var(--accent));
+}
+
+.billing-btn--secondary:hover {
+  background: rgb(var(--accent) / 0.12);
+}
+
+.billing-btn--ghost {
+  border: 1px solid rgb(var(--border));
+  background: transparent;
+  color: rgb(var(--text-secondary));
+}
+
+.billing-btn--ghost:hover {
+  color: rgb(var(--text));
+  border-color: rgb(var(--text-muted));
+}
+
+.billing-btn--plain {
+  border: 0;
+  background: transparent;
+  color: rgb(var(--text-muted));
+}
+
+.billing-btn--plain:hover {
+  color: rgb(var(--text));
+}
+
+/* Exhausted-free modal */
+
+.billing-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.billing-modal {
+  width: min(28rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius-card);
+  background: rgb(var(--surface));
+  box-shadow: var(--shadow-card);
+}
+
+.billing-modal__head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.billing-modal__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: rgb(var(--text));
+}
+
+.billing-modal__close {
+  border: 0;
+  background: transparent;
+  color: rgb(var(--text-muted));
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.billing-modal__close:hover {
+  color: rgb(var(--text));
+}
+
+.billing-modal__body {
+  margin: 0;
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: rgb(var(--text-secondary));
+}
+
+.billing-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Inline exhausted banner */
+
+.billing-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgb(var(--drift));
+  border-radius: 0.65rem;
+  background: rgb(var(--drift) / 0.1);
+}
+
+.billing-banner__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: rgb(var(--text-secondary));
+}
+
+.billing-banner__link {
+  color: rgb(var(--accent));
+  text-decoration: underline;
+}
+
+.billing-banner__dismiss {
+  border: 0;
+  background: transparent;
+  color: rgb(var(--text-muted));
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.billing-banner__dismiss:hover {
+  color: rgb(var(--text));
+}
+
+/* Checkout success strip */
+
+.billing-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgb(var(--ok));
+  border-radius: 0.65rem;
+  background: rgb(var(--ok) / 0.14);
+}
+
+.billing-strip__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgb(var(--text));
+}
+
+.billing-strip__dismiss {
+  border: 0;
+  background: transparent;
+  color: rgb(var(--text-muted));
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.billing-strip__dismiss:hover {
+  color: rgb(var(--text));
+}
+
+/* Settings → Plan section */
+
+.billing-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.75rem;
+  background: rgb(var(--surface) / 0.6);
+}
+
+.billing-plan__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.billing-plan__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: rgb(var(--text));
+}
+
+.billing-plan__body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgb(var(--text-secondary));
+}
+
+.billing-plan__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.billing-plan__tip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgb(var(--border));
+}
+
+.billing-plan__tip-copy {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgb(var(--text-muted));
+}
+
+/* Shared checkout status line */
+
+.billing-status {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgb(var(--drift));
+}

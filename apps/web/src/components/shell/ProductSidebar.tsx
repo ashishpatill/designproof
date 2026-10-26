@@ -9,13 +9,14 @@ import {
   PanelLeftClose,
   Settings,
   Sparkles,
+  Tag,
   Maximize2,
   Minimize2,
   X,
 } from "lucide-react";
 import type { WorkspaceTab } from "./WorkspaceTabsBar";
 
-export type ProductNavId = "home" | "showcase" | "studio";
+export type ProductNavId = "home" | "showcase" | "studio" | "pricing";
 
 const COLLAPSE_DELAY_MS = 320;
 const PIN_KEY = "tell:rail-pinned";
@@ -162,6 +163,17 @@ export function ProductSidebar({
         >
           <Sparkles className="tell-rail__icon" aria-hidden />
           <span className="tell-rail__label">Studio</span>
+        </Link>
+        <Link
+          href="/pricing"
+          className="tell-rail__link"
+          data-active={active === "pricing" ? "true" : "false"}
+          aria-current={active === "pricing" ? "page" : undefined}
+          aria-label="Pricing"
+          title="Pricing"
+        >
+          <Tag className="tell-rail__icon" aria-hidden />
+          <span className="tell-rail__label">Pricing</span>
         </Link>
       </div>
 

@@ -1,0 +1,240 @@
+/* /pricing — Design Expert plan UX lock §0 + §5.
+   Accent #D4714A on #181614 via tokens; Instrument Serif display, Source Sans 3 body,
+   IBM Plex Mono meta. No violet gradient, no fourth tip card. */
+
+.pr-page {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pr-page__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: rgb(var(--text));
+  margin: 0;
+}
+
+.pr-page__deck {
+  max-width: 46rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgb(var(--text-secondary));
+}
+
+/* Cadence toggle */
+
+.pr-cadence {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: 999px;
+  background: rgb(var(--surface));
+  width: fit-content;
+  margin-top: 0.75rem;
+}
+
+.pr-cadence__btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--text-secondary));
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pr-cadence__btn:hover {
+  color: rgb(var(--text));
+}
+
+.pr-cadence__btn[data-active="true"] {
+  background: rgb(var(--accent));
+  color: #ffffff;
+}
+
+.pr-cadence-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgb(var(--text-muted));
+}
+
+/* Plan cards — exactly three columns; the tip is a footnote below, never a card */
+
+.pr-cards {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 52rem) {
+  .pr-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 1.4rem 1.6rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: var(--radius-card);
+  background: rgb(var(--surface));
+}
+
+.pr-card--featured {
+  border-color: rgb(var(--accent));
+  box-shadow: 0 0 0 1px rgb(var(--accent) / 0.35);
+}
+
+.pr-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pr-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: rgb(var(--text));
+}
+
+.pr-card__price {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.pr-card__amount {
+  font-family: var(--font-mono);
+  font-size: 1.9rem;
+  line-height: 1;
+  color: rgb(var(--text));
+}
+
+.pr-card__per {
+  font-size: 0.875rem;
+  color: rgb(var(--text-muted));
+}
+
+.pr-card__save {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgb(var(--accent));
+}
+
+.pr-card__blurb {
+  margin: 0;
+  flex: 1;
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: rgb(var(--text-secondary));
+}
+
+/* Buttons */
+
+.pr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pr-btn--primary {
+  border: 1px solid rgb(var(--accent));
+  background: rgb(var(--accent));
+  color: #ffffff;
+}
+
+.pr-btn--primary:hover {
+  background: rgb(var(--accent-hover));
+  border-color: rgb(var(--accent-hover));
+}
+
+.pr-btn--ghost {
+  border: 1px solid rgb(var(--border));
+  background: transparent;
+  color: rgb(var(--text-secondary));
+}
+
+.pr-btn--ghost:hover {
+  color: rgb(var(--text));
+  border-color: rgb(var(--text-muted));
+}
+
+/* Tip footnote — gratitude only, never a fourth plan column */
+
+.pr-tip {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(var(--border));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.pr-tip__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+}
+
+.pr-tip__blurb {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: rgb(var(--text-muted));
+}
+
+.pr-tip__blurb-inline {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: rgb(var(--text-muted));
+}
+
+/* Honesty line + checkout status */
+
+.pr-honesty {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgb(var(--text-muted));
+}
+
+.pr-status {
+  margin: 0.75rem 0 0;
+  min-height: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgb(var(--drift));
+}
