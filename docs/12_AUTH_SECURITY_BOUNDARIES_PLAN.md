@@ -43,6 +43,10 @@
 │ Layer C — Abuse caps (app API / edge — not Neon IP Allow)    │
 │   Free interim: 10 gen/user/day, 20/IP/day, concurrency 1    │
 │   Maker/Studio numeric caps: GTM plan-of-record via env      │
+│   ENFORCED at the gate — daily usage counted in Neon         │
+│   (generation_usage); concurrency is a real in-flight lease  │
+│   (generation_inflight), released by the route in finally.   │
+│   Second concurrent Free generate → 429 concurrency_limited. │
 ├──────────────────────────────────────────────────────────────┤
 │ Layer D — Dodo Payments                                      │
 │   Checkout session + webhook → entitlement                   │
