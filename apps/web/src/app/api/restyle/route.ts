@@ -39,56 +39,60 @@ export async function POST(request: Request) {
   }
   const accessCtx = access.context;
   const apiKey = accessCtx.keys.gemini;
-  if (!apiKey) {
-    return NextResponse.json({ ok: false, reason: "GEMINI_API_KEY not configured" });
-  }
+  try {
+    if (!apiKey) {
+      return NextResponse.json({ ok: false, reason: "GEMINI_API_KEY not configured" });
+    }
 
-  return tracer.startActiveSpan("tell.restyle", async (span: Span) => {
-    span.setAttributes({
-      "tell.restyle.direction": directionId,
-      "tell.restyle.has_dna": Boolean(dna),
-      "tell.restyle.plan": accessCtx.plan,
-      "tell.restyle.key_source": accessCtx.keys.source,
-    });
-
-    try {
-      const result = await restyleWithGemini(capture, fingerprint, directionId, dna, {
-        apiKey,
-        model: process.env.GEMINI_RESTYLE_MODEL?.trim() || "gemini-2.0-flash",
+    return await tracer.startActiveSpan("tell.restyle", async (span: Span) => {
+      span.setAttributes({
+        "tell.restyle.direction": directionId,
+        "tell.restyle.has_dna": Boolean(dna),
+        "tell.restyle.plan": accessCtx.plan,
+        "tell.restyle.key_source": accessCtx.keys.source,
       });
 
-      span.setAttributes({ "tell.restyle.ok": result.ok });
-      span.setStatus({ code: SpanStatusCode.OK });
-      span.end();
+      try {
+        const result = await restyleWithGemini(capture, fingerprint, directionId, dna, {
+          apiKey,
+          model: process.env.GEMINI_RESTYLE_MODEL?.trim() || "gemini-2.0-flash",
+        });
 
-      if (!result.ok) {
-        return NextResponse.json({ ok: false, reason: result.reason });
-      }
-      recordTrainingEvent(
-        "restyle",
-        {
-          directionId,
-          dna: dna ?? null,
+        span.setAttributes({ "tell.restyle.ok": result.ok });
+        span.setStatus({ code: SpanStatusCode.OK });
+        span.end();
+
+        if (!result.ok) {
+          return NextResponse.json({ ok: false, reason: result.reason });
+        }
+        recordTrainingEvent(
+          "restyle",
+          {
+            directionId,
+            dna: dna ?? null,
+            css: result.css,
+            fontImport: result.fontImport,
+            notes: result.notes,
+            url: capture.url,
+          },
+          { directionId },
+        );
+        return NextResponse.json({
+          ok: true,
           css: result.css,
           fontImport: result.fontImport,
+          cssSource: "llm" as const,
           notes: result.notes,
-          url: capture.url,
-        },
-        { directionId },
-      );
-      return NextResponse.json({
-        ok: true,
-        css: result.css,
-        fontImport: result.fontImport,
-        cssSource: "llm" as const,
-        notes: result.notes,
+        });
+      } catch (error) {
+        // restyleWithGemini never throws, but keep the route bulletproof regardless.
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error instanceof Error ? error : new Error(String(error)));
+        span.end();
+        return NextResponse.json({ ok: false, reason: `unexpected error: ${String(error)}` });
+      }
       });
-    } catch (error) {
-      // restyleWithGemini never throws, but keep the route bulletproof regardless.
-      span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
-      span.recordException(error instanceof Error ? error : new Error(String(error)));
-      span.end();
-      return NextResponse.json({ ok: false, reason: `unexpected error: ${String(error)}` });
-    }
-  });
+  } finally {
+    await accessCtx.releaseInflight?.();
+  }
 }
