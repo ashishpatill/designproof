@@ -175,6 +175,58 @@ export const ConceptSpec = z.object({
 });
 export type ConceptSpec = z.infer<typeof ConceptSpec>;
 
+/** DesignProof-owned motion packs. Packs are registry entries, not catalog tools. */
+export const MotionPackId = z.enum([
+  "tell-motion-timeline",
+  "tell-physics-fold",
+  "tell-shader-band",
+  "tell-audio-caption",
+  "tell-render-ship",
+]);
+export type MotionPackId = z.infer<typeof MotionPackId>;
+
+/** Stable timeline labels shared by Studio, showcase specimens, and render handoffs. */
+export const SpecimenMotionLabel = z.object({
+  id: z.string().min(1),
+  atMs: z.number().int().nonnegative(),
+  durationMs: z.number().int().nonnegative(),
+  note: z.string().min(1),
+});
+export type SpecimenMotionLabel = z.infer<typeof SpecimenMotionLabel>;
+
+/** Browser contract for deterministic specimen capture and gallery scrubbing. */
+export const DpSeekContract = z.object({
+  global: z.literal("window.__dpSeek"),
+  signature: z.literal("(timeSeconds: number) => void"),
+  units: z.literal("seconds"),
+  autoplay: z.literal(false),
+  clamp: z.literal(true),
+});
+export type DpSeekContract = z.infer<typeof DpSeekContract>;
+
+/** The JSON document emitted beside a specimen and embedded in preview metadata. */
+export const SpecimenMotion = z.object({
+  version: z.literal(1),
+  siteKind: SiteKind,
+  metaphor: z.string().min(1),
+  packs: z.array(MotionPackId),
+  durationMs: z.number().int().nonnegative(),
+  labels: z.array(SpecimenMotionLabel),
+  seek: DpSeekContract,
+  reducedMotion: z.object({
+    replacement: z.string().min(1),
+    still: z.string().min(1),
+  }),
+  brandContract: z.object({
+    display: z.literal("Instrument Serif"),
+    body: z.literal("Source Sans 3"),
+    mono: z.literal("IBM Plex Mono"),
+    accent: z.literal("#D4714A"),
+    surface: z.literal("#181614"),
+  }),
+});
+export type SpecimenMotion = z.infer<typeof SpecimenMotion>;
+
 export const SkillNodeId = z.enum([
   "analyze-features-requirements",
   "design-system-foundation",
@@ -647,6 +699,10 @@ export const DesignSpec = z.object({
   customizationHints: z.array(z.string()),
   /** Evidence corridors this composition was built against. */
   evidenceNotes: z.array(z.string()).default([]),
+  /** Active DesignProof motion packs discoverable by Studio and showcase consumers. */
+  motionPacks: z.array(MotionPackId).default([]),
+  /** Validated specimen.motion.json document for seekable review and render handoff. */
+  specimenMotion: SpecimenMotion.optional(),
   summary: z.string(),
   concept: ConceptSpec.optional(),
   themeId: z.string().optional(),

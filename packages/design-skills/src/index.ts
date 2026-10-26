@@ -62,6 +62,18 @@ export {
 } from "./skill-wiring";
 export type { SkillWiringFinding, SkillWiringReport } from "./skill-wiring";
 export {
+  MOTION_PACKS,
+  getMotionPack,
+  listMotionPacks,
+  motionPackIdsFor,
+} from "./motion-packs";
+export type { MotionPackDefinition } from "./motion-packs";
+export {
+  createSpecimenMotionJson,
+  parseSpecimenMotionJson,
+  specimenMotionJsonText,
+} from "./specimen-motion";
+export {
   applyAgencyPolish,
   applyAgencyPolishSequence,
   agencyPolishAxesPresent,
