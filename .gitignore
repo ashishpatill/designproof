@@ -127,3 +127,6 @@ RULES.md
 
 # Local OpenCode loops + design locks (not product source)
 .opencode-loops/
+
+# Local MCP prove sink (durable dump; not product source)
+.mcp-prove-sink/
