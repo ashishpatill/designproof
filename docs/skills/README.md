@@ -13,6 +13,11 @@ Near-term:
 | [taste-loop](./designproof-taste-loop.md) | [`.cursor/skills/designproof-taste-loop/`](../../.cursor/skills/designproof-taste-loop/SKILL.md) | **runtime skill landed** (2026-10-24); stub stays as the plan |
 | [diagram](./designproof-diagram.md) | [`.cursor/skills/designproof-diagram/`](../../.cursor/skills/designproof-diagram/SKILL.md) | **runtime skill landed** (2026-10-25); stub stays as the plan |
 | [demo/promo](./designproof-demo-promo.md) | none yet | docs-only stub |
+| [tell-motion-timeline](./tell-motion-timeline.md) | [`.cursor/skills/tell-motion-timeline/`](../../.cursor/skills/tell-motion-timeline/SKILL.md) | **runtime skill landed**; seek-safe timeline recipe |
+| [tell-physics-fold](./tell-physics-fold.md) | [`.cursor/skills/tell-physics-fold/`](../../.cursor/skills/tell-physics-fold/SKILL.md) | **runtime skill landed**; page-shape settle recipe |
+| [tell-shader-band](./tell-shader-band.md) | [`.cursor/skills/tell-shader-band/`](../../.cursor/skills/tell-shader-band/SKILL.md) | **runtime skill landed**; one-band immersive recipe |
+| [tell-audio-caption](./tell-audio-caption.md) | [`.cursor/skills/tell-audio-caption/`](../../.cursor/skills/tell-audio-caption/SKILL.md) | **runtime skill landed**; optional captioned demo recipe |
+| [tell-render-ship](./tell-render-ship.md) | [`.cursor/skills/tell-render-ship/`](../../.cursor/skills/tell-render-ship/SKILL.md) | **runtime skill landed**; verified artifact handoff |
 
 The runtime skills are the procedure an agent follows. A stub stays here as the plan of record until its feature area ships as product; the two are not duplicates — when they disagree, the runtime skill is what an agent does today and the stub is what the plan still wants. The tells registry keeps no runtime twin: its rows are code, and the anti-slop skill links to them.
 

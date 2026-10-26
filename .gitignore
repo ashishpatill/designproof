@@ -109,6 +109,16 @@ developer-drop/
 !.cursor/skills/designproof-diagram/**
 !.cursor/skills/tell-proof-verify/
 !.cursor/skills/tell-proof-verify/**
+!.cursor/skills/tell-motion-timeline/
+!.cursor/skills/tell-motion-timeline/**
+!.cursor/skills/tell-physics-fold/
+!.cursor/skills/tell-physics-fold/**
+!.cursor/skills/tell-shader-band/
+!.cursor/skills/tell-shader-band/**
+!.cursor/skills/tell-audio-caption/
+!.cursor/skills/tell-audio-caption/**
+!.cursor/skills/tell-render-ship/
+!.cursor/skills/tell-render-ship/**
 agent-skills/
 docs/PROJECT-STATUS.md
 USER_STORY.md
