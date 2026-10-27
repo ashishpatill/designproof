@@ -1,29 +1,29 @@
-import type { SpecimenMotion } from "./types";
+import type { MotionSpecimenSpec } from "./types";
 
-/** Crease-first motion specimen — sport-matchday golden depth bar. */
-export const creaseMotionSpecimen: SpecimenMotion = {
+/**
+ * Crease specimen motion — a stylized matchday loop composed for the
+ * DesignProof motion gallery. Beats map 1:1 to band sections and are read
+ * by the band CSS off --dp-t (normalized loop time).
+ * Pack chips reference their movement kits by name only: tell-motion-timeline
+ * drives the seek spine, tell-physics-fold shapes the settling sheet.
+ */
+export const creaseMotionSpecimen: MotionSpecimenSpec = {
   version: 1,
   siteKind: "sport-matchday",
   conceptId: "crease",
+  beats: [
+    { id: "hero-enter", label: "Hero enter", t0: 0, t1: 0.28 },
+    { id: "score-spine", label: "Score spine", t0: 0.28, t1: 0.55 },
+    { id: "fold-settle", label: "Fold settle", t0: 0.55, t1: 0.82 },
+    { id: "cta-pulse", label: "CTA pulse", t0: 0.82, t1: 1 },
+  ],
   seekRegistry: "__dpSeek",
   reducedMotion: "static-stack",
   durationMs: 8000,
-  beats: [
-    { id: "hero-enter", label: "Hero enter", t0: 0, t1: 0.22 },
-    { id: "score-spine", label: "Score spine", t0: 0.22, t1: 0.48 },
-    { id: "fold-settle", label: "Fold settle", t0: 0.48, t1: 0.74 },
-    { id: "cta-pulse", label: "CTA pulse", t0: 0.74, t1: 1 },
-  ],
 };
 
-export function clampSeek(t: number): number {
-  if (Number.isNaN(t)) return 0;
-  return Math.min(1, Math.max(0, t));
-}
+/** Pack chips named on the band (names only, nothing else is applied). */
+export const CREASE_MOTION_PACK_CHIPS = ["tell-motion-timeline", "tell-physics-fold"] as const;
 
-export function activeBeatIndex(specimen: SpecimenMotion, t: number): number {
-  const x = clampSeek(t);
-  const i = specimen.beats.findIndex((b) => x >= b.t0 && x < b.t1);
-  if (i >= 0) return i;
-  return specimen.beats.length - 1;
-}
+/** Normalized time the band paints when no transport is driving it. */
+export const CREASE_MOTION_STILL_T = 0.8;
