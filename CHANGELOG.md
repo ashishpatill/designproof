@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30 — Dependency security bumps
+
+- `@cursor/sdk` 1.0.23 → 1.2.0 (drops `@connectrpc/connect-node`, which pinned `undici` 5.29.0; GHSA-2m5v-pch6-74hx).
+- `@vercel/blob` 1.1.1 → 2.8.2 so `undici` resolves 6.29.1 (GHSA-2m5v-pch6-74hx). `head`/`put` usage in `report-store` unchanged.
+- `@modelcontextprotocol/sdk` 1.29.0 → 1.32.2 in `@tell/mcp` (GHSA-f897-62hf-6gxq).
+
 ## 2026-10-26 — Local MCP durable raw/design dump prove
 
 - Added `packages/mcp/src/mcp-prove-dump.local.test.ts`: one Model Context Protocol call through `tell_design_from_features` writes a durable JSON under `.mcp-prove-sink/training-data/raw/design/` with `kind: design` and `meta.via: mcp.tell_design_from_features` (same path shape as Studio `/api/design`).
