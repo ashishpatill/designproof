@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.3.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@tell/core": "workspace:*",
     "@tell/design-skills": "workspace:*",
     "@tell/redesign": "workspace:*",
@@ -22,8 +22,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
-    "tsx": "^4.19.2",
     "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
 }
