@@ -140,3 +140,19 @@ RULES.md
 
 # Local MCP prove sink (durable dump; not product source)
 .mcp-prove-sink/
+
+# Internal thinking docs unpublished 2026-11-05: kept local on maintainer machines only
+REVAMP-AUDIT.md
+docs/design-engine-revamp-plan.html
+docs/MOTION-SKILL-PACKS-PLAN.md
+docs/12_AUTH_SECURITY_BOUNDARIES_PLAN.md
+docs/05_GENERICNESS_METHODOLOGY.md
+docs/08_AI_DESIGN_METHODS.md
+docs/09_PREMIUM_DESIGN_SKILLS.md
+docs/06_REDESIGN_ENGINE_V2.md
+docs/02_CURSOR_BUILD_INSTRUCTIONS.md
+docs/06_TELL_PROOF.md
+docs/10_DESIGN_EVIDENCE.md
+docs/archive/02_CURSOR_BUILD_INSTRUCTIONS.md
+docs/archive/06_REDESIGN_ENGINE_V2.md
+INSTRUCTIONS.md
