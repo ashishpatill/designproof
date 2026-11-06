@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
   HONESTY_LINE,
@@ -30,6 +31,7 @@ export function PricingBoard() {
   const [status, setStatus] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const router = useRouter();
 
   function beginCheckout(id: string, productId?: string) {
     if (!productId) return;
@@ -37,7 +39,16 @@ export function PricingBoard() {
     setBusyId(id);
     startTransition(async () => {
       const result = await startCheckout(productId);
-      if (!result.ok) setStatus(result.message);
+      if (!result.ok) {
+        // Auth-gated checkout: route to /signin instead of surfacing the raw
+        // auth_required error on the pricing page.
+        if (result.message.startsWith("auth_required")) {
+          setStatus("Sign in first, then we'll open checkout.");
+          router.push("/signin");
+        } else {
+          setStatus(result.message);
+        }
+      }
       setBusyId(null);
     });
   }
