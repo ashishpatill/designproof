@@ -11,7 +11,7 @@ import { renderPreviewHtml } from "./render";
 import { routeSkills } from "./route";
 import { buildSections } from "./sections";
 import { AESTHETIC_PROFILES, buildTokens, tellDirectionForLean } from "./tokens";
-import { deriveConcept, getTheme, applyTheme } from "./staged";
+import { deriveConcept, getTemplateOverride, getTheme, applyTheme } from "./staged";
 import { createSpecimenMotionJson } from "./specimen-motion";
 import {
   DesignBrief,
@@ -116,6 +116,12 @@ export type DesignFromFeaturesOptions = {
   authored?: AuthoredConnectiveTissue;
   /** Optional theme id — applies brandAccent + colorMood to the brief. */
   theme?: string;
+  /**
+   * Optional template key from DESIGN_TEMPLATES. When a per-template concept
+   * override is registered for the key (see staged.TEMPLATE_OVERRIDES),
+   * the derived concept comes from the override instead of the site-kind row.
+   */
+  templateKey?: string;
 };
 
 /**
@@ -133,7 +139,8 @@ export function designFromFeatures(
 ): DesignFromFeaturesResponse {
   const brief = DesignBrief.parse(briefInput);
   const prior = options.redesignFrom ? DesignSpec.parse(options.redesignFrom) : undefined;
-  const themeId = options.theme ?? brief.theme;
+  const templateOverride = options.templateKey ? getTemplateOverride(options.templateKey) : undefined;
+  const themeId = options.theme ?? brief.theme ?? templateOverride?.theme;
   let theme: ReturnType<typeof getTheme>;
   if (themeId) {
     theme = getTheme(themeId);
@@ -216,7 +223,7 @@ export function designFromFeatures(
                 "prefers-reduced-motion collapses every duration to zero",
               ];
 
-  const concept = deriveConcept(effectiveBrief);
+  const concept = deriveConcept(effectiveBrief, options.templateKey);
   const motionPacks = motionPackIdsFor({ siteKind: effectiveBrief.siteKind, taste });
   const specimenMotion = createSpecimenMotionJson({
     brief: {
@@ -250,6 +257,17 @@ export function designFromFeatures(
     customizationHints.push(`Theme: ${theme.id} — colour from explicit theme ${theme.label}, not product-name hash`);
   }
   customizationHints.push(`Concept: ${concept.oneLiner}`);
+
+  if (options.templateKey && templateOverride?.concept) {
+    customizationHints.push(
+      `Concept override: ${options.templateKey} — per-template concept, not the site-kind default`,
+    );
+  }
+  if (templateOverride?.theme && !options.theme && !brief.theme) {
+    customizationHints.push(
+      `Theme override: ${options.templateKey} — ${templateOverride.theme}, the template's own theme`,
+    );
+  }
 
   if (researchPlan.followOnCraft.length) {
     customizationHints.push(`Follow-on craft: ${researchPlan.followOnCraft.join(", ")}`);
@@ -337,6 +355,7 @@ export async function designFromFeaturesAuthored(
     redesignFrom: options.redesignFrom,
     authored,
     theme: options.theme,
+    templateKey: options.templateKey,
   });
 }
 
