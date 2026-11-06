@@ -11,6 +11,12 @@ import { CREASE_MOTION_PACK_CHIPS, CREASE_MOTION_STILL_T, creaseMotionSpecimen }
 import { beatAt, clamp01 } from "./types";
 import { MotionSeekTransport } from "./MotionSeekTransport";
 
+declare global {
+  interface Window {
+    __dpSeek?: (raw: number) => void;
+  }
+}
+
 /**
  * Crease-first seekable motion band — the client conductor for the specimen.
  * Registers window.__dpSeek(t) with t clamped 0..1; the rAF play loop maps

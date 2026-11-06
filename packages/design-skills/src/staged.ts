@@ -296,9 +296,45 @@ const CONCEPT_TABLE: Record<string, ConceptRow> = {
   },
 };
 
-export function deriveConcept(brief: DesignBriefType): ConceptSpec {
+/**
+ * Per-template overrides.
+ *
+ * CONCEPT_TABLE keys concepts by siteKind, so two templates of the same kind would
+ * share one concept, and themes are usually left to the brief. A template that
+ * needs its own concept or theme registers an override here, keyed by its
+ * DESIGN_TEMPLATES key. deriveConcept prefers the registered concept when a
+ * template key is supplied; the uniqueness audit treats the override as the
+ * template's own. designFromFeatures applies the registered theme like an option
+ * theme (the brief's own theme still wins only when the caller sets one).
+ */
+export interface TemplateOverrideRow {
+  concept?: ConceptRow;
+  theme?: string;
+}
+
+export const TEMPLATE_OVERRIDES: Record<string, TemplateOverrideRow> = {
+  saas: {
+    concept: {
+      metaphor: "a surveyor's field instrument over live accounts",
+      rejects: ["violet gradient hero", "dashboard-default charts", "sparse bento airways"],
+      visibleTests: [
+        "crosshair grid and plotted bearings are visible in the hero device",
+        "the approve gate reads as a physical checkpoint in the workflow proof",
+        "calibration marks label the capability spine",
+      ],
+      phrase: "aims revenue work like a field instrument",
+    },
+    theme: "ember-clay",
+  },
+};
+
+export function getTemplateOverride(templateKey: string): TemplateOverrideRow | undefined {
+  return TEMPLATE_OVERRIDES[templateKey];
+}
+
+export function deriveConcept(brief: DesignBriefType, templateKey?: string): ConceptSpec {
   const kind = brief.siteKind;
-  const row = CONCEPT_TABLE[kind];
+  const row = (templateKey ? getTemplateOverride(templateKey)?.concept : undefined) ?? CONCEPT_TABLE[kind];
   let metaphor: string;
   let rejects: string[];
   let visibleTests: string[];
@@ -706,5 +742,3 @@ export function weightedReview(input: WeightedReviewInput): WeightedReviewResult
     weights: { design: 0.4, usability: 0.3, creativity: 0.2, content: 0.1 },
   };
 }
-
-

@@ -31,6 +31,7 @@ const CREASE_CELL: Omit<FilmstripCell, "index"> = {
   marketJob:
     "Cricket matchday companion — Core six multipage IA, glance-live score spine, pavilion-evening taste.",
   siteKind: "sport-matchday",
+  motionPacks: [],
   href: "/crease",
   src: "/crease",
 };
@@ -41,6 +42,7 @@ const BASELINE_CELL: Omit<FilmstripCell, "index"> = {
   marketJob:
     "Tennis court board — nested sets|games|points, server + pressure flags, best-of-3/5 lens, light-airy taste.",
   siteKind: "sport-matchday",
+  motionPacks: [],
   href: "/baseline",
   src: "/baseline",
 };

@@ -218,11 +218,11 @@ export const SpecimenMotion = z.object({
     still: z.string().min(1),
   }),
   brandContract: z.object({
-    display: z.literal("Instrument Serif"),
-    body: z.literal("Source Sans 3"),
-    mono: z.literal("IBM Plex Mono"),
-    accent: z.literal("#D4714A"),
-    surface: z.literal("#181614"),
+    display: z.string().min(1),
+    body: z.string().min(1),
+    mono: z.string().min(1),
+    accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+    surface: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   }),
 });
 export type SpecimenMotion = z.infer<typeof SpecimenMotion>;

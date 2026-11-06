@@ -32,6 +32,14 @@ export type SpecimenMotionInput = {
   brief: Pick<DesignBrief, "siteKind" | "productName">;
   concept: Pick<ConceptSpec, "metaphor">;
   packs: readonly MotionPackId[];
+  /** The specimen's own rendered tokens. Omitted only for tooling-internal motion docs. */
+  tokens?: {
+    display: string;
+    body: string;
+    mono: string;
+    accent: string;
+    surface: string;
+  };
 };
 
 /** Build the canonical specimen.motion.json document for a generated specimen. */
@@ -58,7 +66,7 @@ export function createSpecimenMotionJson(input: SpecimenMotionInput) {
       replacement: "Show the completed page-shape composition with all content available immediately.",
       still: `${input.brief.productName} settled frame — no travel, no delayed reveal.`,
     },
-    brandContract: DESIGNPROOF_BRAND_CONTRACT,
+    brandContract: input.tokens ?? DESIGNPROOF_BRAND_CONTRACT,
   });
 }
 

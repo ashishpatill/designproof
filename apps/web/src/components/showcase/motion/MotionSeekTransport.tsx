@@ -58,7 +58,7 @@ export function MotionSeekTransport({
         <label className="mg-transport__scrub-wrap">
           <span className="mg-sr-only">Seek Crease motion — 0 to 100 percent of the loop</span>
           <input
-            ref={scrubRef}
+            ref={scrubRef as RefObject<HTMLInputElement>}
             type="range"
             className="mg-transport__scrub"
             data-testid="motion-seek-scrub"
@@ -73,7 +73,7 @@ export function MotionSeekTransport({
             onChange={(e) => onScrub(Number(e.target.value) / 1000)}
           />
           <span className="mg-transport__readout mono" aria-hidden="true">
-            <span ref={readoutRef}>80%</span>
+            <span ref={readoutRef as RefObject<HTMLSpanElement>}>80%</span>
           </span>
         </label>
       </div>
