@@ -32,8 +32,17 @@ export async function POST(request: Request) {
   }
 
   const rawBody = await request.text();
-  const signature = request.headers.get("webhook-signature");
-  if (!verifyDodoSignature(rawBody, signature, secret)) {
+  // Standard Webhooks: signature verification needs all three headers.
+  const verified = verifyDodoSignature(
+    rawBody,
+    {
+      webhookId: request.headers.get("webhook-id"),
+      webhookTimestamp: request.headers.get("webhook-timestamp"),
+      webhookSignature: request.headers.get("webhook-signature"),
+    },
+    secret,
+  );
+  if (!verified) {
     return NextResponse.json({ ok: false, reason: "invalid webhook signature" }, { status: 401 });
   }
 

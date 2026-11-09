@@ -268,6 +268,14 @@ Free tier may spin down after idle — first request after sleep is slow (~30–
 | `DATABASE_URL` | — | Neon (or Postgres) connection string for durable `/api/reports/share` |
 | `BLOB_READ_WRITE_TOKEN` | — | Optional Vercel Blob fallback for share links |
 | `TELL_PREVIEW_URL` | — | GitHub repo variable for PR preview diagnosis CI |
+| `NEON_AUTH_BASE_URL` | — | Neon Auth base URL (Console → Auth) for hosted sign-in; with `NEON_AUTH_COOKIE_SECRET` (32+ chars) enables `/api/auth/*` and the `/studio` gate |
+| `NEON_AUTH_COOKIE_SECRET` | — | Cookie signing secret for Neon Auth sessions |
+| `DODO_ENVIRONMENT` | `test` | Billing mode. Production must set `live`; anything else is test mode (test keys, test products, test.dodopayments.com) |
+| `DODO_DESIGNPROOF_LIVE_API_KEY` | — | Dodo LIVE API key for `/api/billing/checkout` in production |
+| `DODO_DESIGNPROOF_TEST_API_KEY` | — | Dodo TEST API key for test-mode checkout runs |
+| `DODO_DESIGNPROOF_LIVE_WEBHOOK_SECRET` | — | Dodo LIVE webhook signing secret (`whsec_…`) for `/api/billing/dodo/webhook` |
+| `DODO_DESIGNPROOF_TEST_WEBHOOK_SECRET` | — | Dodo TEST webhook signing secret for test-mode webhook runs |
+| `NEXT_PUBLIC_DODO_ENVIRONMENT` | `live` | Storefront product-ID mode on the pricing page; set `test` only for test-mode storefront runs |
 
 ### Share links on Vercel (Neon preferred)
 

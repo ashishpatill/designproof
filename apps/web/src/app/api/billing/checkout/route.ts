@@ -11,6 +11,7 @@ import {
   planFromProductId,
   productMap,
   tipProductId,
+  dodoApiBaseUrl,
   DODO_PRODUCT_TIP_LIVE,
   DODO_PRODUCT_TIP_TEST,
   type BillingCycle,
@@ -18,8 +19,6 @@ import {
 import { planCaps } from "@/lib/hosted-access";
 
 export const runtime = "nodejs";
-
-const DODO_API_BASE_URL = process.env.DODO_API_BASE_URL?.trim() || "https://api.dodopayments.com";
 
 function knownProductIds(): Set<string> {
   const ids = new Set(productMap().map((e) => e.productId));
@@ -115,15 +114,25 @@ export async function POST(request: Request) {
   }
 
   try {
-    const res = await fetch(`${DODO_API_BASE_URL}/checkouts`, {
+    // Dodo Checkout Sessions contract: product_cart + customer + return_url,
+    // metadata rides along and returns verbatim on the webhook.
+    const res = await fetch(`${dodoApiBaseUrl()}/checkouts`, {
       method: "POST",
       headers: {
         authorization: `Bearer ${apiKey}`,
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        product_id: productId,
-        quantity: 1,
+        product_cart: [{ product_id: productId, quantity: 1 }],
+        ...(session.email
+          ? {
+              customer: {
+                email: session.email,
+                ...(session.name ? { name: session.name } : {}),
+              },
+            }
+          : {}),
+        return_url: `${new URL(request.url).origin}/studio?checkout=success`,
         metadata: { user_id: session.userId },
       }),
     });

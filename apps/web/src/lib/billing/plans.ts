@@ -65,8 +65,29 @@ export const PLAN_CTA_LABELS: Record<PlanId, string> = {
  * TEST brand (brnd_0NqZT56wT3RtB2an1WBPg) for sandbox checkout runs.
  */
 export const TIP_AMOUNT_USD = 5;
-export const TIP_PRODUCT_ID = "pdt_0NqZTUk7iWWdTlUtajVSP"; // LIVE DesignProof Tip $5
+export const TIP_PRODUCT_ID_LIVE = "pdt_0NqZTUk7iWWdTlUtajVSP"; // LIVE DesignProof Tip $5
 export const TIP_PRODUCT_ID_TEST = "pdt_0NqZTWiGZkR5T3hw1gBsk"; // TEST twin, brand brnd_0NqZT56wT3RtB2an1WBPg
+
+/**
+ * Storefront mode. The client can only see NEXT_PUBLIC_* env, so test-mode
+ * storefront runs set NEXT_PUBLIC_DODO_ENVIRONMENT=test (and the server's
+ * DODO_ENVIRONMENT=test to match). Default is live: this page sells.
+ */
+const CLIENT_TEST_MODE =
+  (process.env.NEXT_PUBLIC_DODO_ENVIRONMENT?.trim().toLowerCase() || "live") === "test";
+
+/** Tip product for the storefront's current mode. */
+export const TIP_PRODUCT_ID = CLIENT_TEST_MODE ? TIP_PRODUCT_ID_TEST : TIP_PRODUCT_ID_LIVE;
+
+const PRODUCT_IDS_LIVE = {
+  maker: { monthly: "pdt_0NqZOdQEPoUYY52egd9hw", yearly: "pdt_0NqZOdTt2kKHyB0skOhXw" },
+  studio: { monthly: "pdt_0NqZOdYgjIamyGVjhJH6t", yearly: "pdt_0NqZOdcjXJYfPL2o9V8Rs" },
+} as const;
+const PRODUCT_IDS_TEST = {
+  maker: { monthly: "pdt_0NqZTGWaRlbfCbvCVWDlU", yearly: "pdt_0NqZTGcX6azPETLjN69zj" },
+  studio: { monthly: "pdt_0NqZTGgoHwGbvwR1MfR4J", yearly: "pdt_0NqZTGkycZ8wq9qqlJG3X" },
+} as const;
+const PRODUCT_IDS = CLIENT_TEST_MODE ? PRODUCT_IDS_TEST : PRODUCT_IDS_LIVE;
 export const TIP_FOOTNOTE_LABEL = "Support the work — $5 tip";
 export const TIP_CTA_LABEL = "Send a $5 tip";
 
@@ -90,13 +111,13 @@ export function yearlySavingsUsd(plan: PlanConfig): number | null {
   return monthly * 12 - yearly;
 }
 
-/** Exact LIVE product id for a plan+cadence, or undefined when no checkout exists. */
+/** Exact product id for a plan+cadence in the storefront's mode, or undefined when no checkout exists. */
 export function productIdFor(plan: PlanId, cadence: Cadence): string | undefined {
   switch (plan) {
     case "maker":
-      return cadence === "yearly" ? "pdt_0NqZOdTt2kKHyB0skOhXw" : "pdt_0NqZOdQEPoUYY52egd9hw";
+      return PRODUCT_IDS.maker[cadence];
     case "studio":
-      return cadence === "yearly" ? "pdt_0NqZOdcjXJYfPL2o9V8Rs" : "pdt_0NqZOdYgjIamyGVjhJH6t";
+      return PRODUCT_IDS.studio[cadence];
     case "free":
       return undefined;
   }
