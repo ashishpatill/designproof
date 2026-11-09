@@ -81,12 +81,14 @@ Cloud Agent sessions may show other namespaces (GitHub, Figma, …). Those are *
 
 ## Plugins
 
-| Item | In this repo? |
-|---|---|
-| Cursor plugin package (`.cursor-plugin/`, grok-kit, etc.) | **No** |
-| Tell as MCP + CLI + skills | **Yes** — that is the product |
+Plugin packages ship in this repo (Ashish asked, 2026-11-09). Both hosts read one MCP declaration, `.mcp.json` at the repo root, which launches the same server as `.cursor/mcp.json` (`pnpm -F @tell/mcp start`, eleven `tell_*` tools). Skills come from `.cursor/skills/`; nothing is vendored twice.
 
-Do not scaffold a plugin unless Ashish asks.
+| Package | Files | How it installs |
+|---|---|---|
+| Cursor plugin | `.cursor-plugin/plugin.json` + `.mcp.json` | Add this repo as a Cursor marketplace (Dashboard → Plugins & MCPs → Add Marketplace → Import from Repo), or copy the checkout to `~/.cursor/plugins/local/designproof` and reload Cursor |
+| Codex plugin (the package format ChatGPT and Codex share) | `.codex-plugin/plugin.json` + `.mcp.json`, repo marketplace at `.agents/plugins/marketplace.json` | `codex plugin marketplace add ashishpatill/designproof`, then `codex plugin add designproof@designproof`. Verified with the Codex CLI: installs enabled, and the `tell` server shows in `codex mcp list` |
+| Grokbot (grok-kit harness in Cursor) | Wiring lives in **grok-kit**, not here: its `docs/mcp-snippets/tell-proof.json` carries the same server entry | `grok-kit apply --write-mcp` merges the snippet into a project's `.cursor/mcp.json` when Tell is recommended. The Cursor plugin above also works |
+| ChatGPT (chat surfaces) | Same package as Codex, different runtime rule | **Not yet.** ChatGPT cannot run a local stdio server; it needs the tell server hosted at a public HTTPS MCP endpoint. That hosted endpoint is a later step — today the package targets Codex (desktop + CLI) and Cursor |
 
 ---
 

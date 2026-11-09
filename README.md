@@ -281,6 +281,25 @@ Catalog must stay at **eleven** tools. `tell_apply` returns patch text only.
 
 ---
 
+## Plugins
+
+Design Proof also ships as an installable plugin for Cursor and for Codex. Both packages declare the same MCP server — `.mcp.json` at the repo root, the `pnpm -F @tell/mcp start` entry above — and bundle the skills from `.cursor/skills/`. Clone the repo and run `pnpm install` first; the server runs from your checkout.
+
+**Cursor** — `.cursor-plugin/plugin.json`. Add this repository as a marketplace (Dashboard → Plugins & MCPs → Add Marketplace → Import from Repo), or copy the checkout to `~/.cursor/plugins/local/designproof` and reload Cursor. Opening the repo on its own also works, through the built-in `.cursor/mcp.json`.
+
+**Grokbot (grok-kit in Cursor)** — Grokbot is the Grok harness running inside Cursor. grok-kit ships this server as a project snippet (`docs/mcp-snippets/tell-proof.json` in the grok-kit repo); `grok-kit apply --write-mcp` merges it into a project's `.cursor/mcp.json` when Tell is recommended. The Cursor plugin above works for Grokbot too.
+
+**Codex** — `.codex-plugin/plugin.json`, with a repo marketplace at `.agents/plugins/marketplace.json`:
+
+```bash
+codex plugin marketplace add ashishpatill/designproof
+codex plugin add designproof@designproof
+```
+
+**ChatGPT** — ChatGPT and Codex share one plugin directory and one package format, but ChatGPT cannot run a local stdio server. It needs the MCP server hosted at a public HTTPS endpoint, which is a later step. Today the package targets Codex (desktop and CLI) and Cursor.
+
+---
+
 ## Platform Compatibility
 
 Tell ships as **a CLI and an MCP server** that mainstream coding agents consume natively. Once the monorepo is installed, a single `tell mcp install <platform>` wires the MCP server into that agent's config - same tools from inside any host.
