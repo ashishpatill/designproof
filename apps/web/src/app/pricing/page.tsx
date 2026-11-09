@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ProductShell } from "@/components/shell";
 import { PricingBoard } from "./PricingBoard";
+import { Strategy } from "./Strategy";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function PricingPage() {
         <h1 className="pr-page__title">Plans for DesignProof</h1>
         <p className="pr-page__deck">{DECK}</p>
         <PricingBoard />
+        <Strategy />
       </main>
     </ProductShell>
   );

@@ -25,9 +25,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tell — Every AI-built UI has a tell",
+  title: "Design Proof — Every AI-built page has a tell",
   description:
-    "Capture your product, name what's generic, art-direct a direction, and apply the fix in Cursor.",
+    "Design Proof captures your page, names what makes it look generic, directs a better design, repairs your code, and proves the fix. Free to start.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
